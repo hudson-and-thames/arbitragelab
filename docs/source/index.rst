@@ -102,6 +102,14 @@ This project is licensed under an all rights reserved licence.
 
 .. toctree::
     :maxdepth: 2
+    :caption: Cointegration Approach
+    :hidden:
+
+    cointegration_approach/introduction
+    cointegration_approach/mean_reversion
+
+.. toctree::
+    :maxdepth: 2
     :caption: Additional Information
     :hidden:
 
