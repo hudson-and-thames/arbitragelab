@@ -9,5 +9,5 @@ docs/build/
 cover/
 *.pickle
 */.ipynb_checkpoints/*
-mlfinlab.egg-info/*
+arbitragelab.egg-info/*
 .eggs/

@@ -14,7 +14,7 @@ coverage combine
 res_combine=$?
 if [ $res_combine -ne 0 ]
 then
-  echo -e "Travis Build FAILURE: Coverage combine failed"
+  echo -e "Circle CI Build FAILURE: Coverage combine failed"
   exit 1
 fi
 
@@ -22,6 +22,6 @@ coverage report --fail-under=100
 coverage_report=$?
 if [ $coverage_report -ne 0 ]
 then
-  echo -e "Travis Build FAILURE: Coverage percentage failed"
+  echo -e "Circle CI Build FAILURE: Coverage percentage failed"
   exit 1
 fi

@@ -1,6 +1,6 @@
 # Copyright 2019, Hudson and Thames Quantitative Research
 # All rights reserved
-# Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
+# Read more: https://github.com/hudson-and-thames/arbitragtelab/blob/master/LICENSE.txt
 
 
 # Always prefer setuptools over distutils
