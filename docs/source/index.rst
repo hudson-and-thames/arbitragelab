@@ -102,6 +102,14 @@ This project is licensed under an all rights reserved licence.
 
 .. toctree::
     :maxdepth: 2
+    :caption: Distance Approach
+    :hidden:
+
+    distance_approach/introduction
+    distance_approach/distance_approach
+
+.. toctree::
+    :maxdepth: 2
     :caption: Additional Information
     :hidden:
 
