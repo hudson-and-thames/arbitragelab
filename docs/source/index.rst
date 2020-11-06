@@ -102,6 +102,14 @@ This project is licensed under an all rights reserved licence.
 
 .. toctree::
     :maxdepth: 2
+    :caption: Other Approaches
+    :hidden:
+
+    other_approaches/introduction
+    other_approaches/kalman_filter
+
+.. toctree::
+    :maxdepth: 2
     :caption: Additional Information
     :hidden:
 
