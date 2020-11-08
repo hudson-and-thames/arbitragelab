@@ -100,6 +100,15 @@ This project is licensed under an all rights reserved licence.
     getting_started/researcher
     getting_started/research_tools
 
+
+.. toctree::
+    :maxdepth: 2
+    :caption: ML Based Pairs Selection
+    :hidden:
+
+    ml_based_pairs_selection/framework
+
+
 .. toctree::
     :maxdepth: 2
     :caption: Additional Information
