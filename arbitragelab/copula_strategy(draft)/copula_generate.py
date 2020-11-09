@@ -657,7 +657,7 @@ class Switcher:
         my_copula = Student(nu=self.nu, cov=self.cov)
         return my_copula
     
-#%% test class for Gumbel
+# #%% test class for Gumbel
 # theta = 2
 # GC = Gumbel(theta=theta)
 # result = GC.generate_pairs(num=1000)
@@ -670,7 +670,7 @@ class Switcher:
 # plt.title(r'Gumbel Copula, $\theta$ = {}'.format(theta))
 # plt.show()
 
-#%% test class for Frank
+# #%% test class for Frank
 # FC = Frank(theta = 2)
 # result = FC.generate_pairs(num=1000)
 # theta_hat = FC._theta_hat(0.2)
@@ -764,7 +764,7 @@ class Switcher:
 # plt.title(r'N13 Copula, $\theta = {}$'.format(theta))
 # plt.show()
 
-#%% Test for multi_v_dist
+# #%% Test for multi_v_dist
 # print(mv_t_dist(x=(2,3),
 #                 mu=(0,0),
 #                 Sigma=np.array([[2, 1],
