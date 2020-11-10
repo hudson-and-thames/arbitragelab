@@ -37,14 +37,16 @@ class PairsSelector:
         """
 
         self.prices_df = universe
-        self.feature_vector = []
+        self.feature_vector = None
         self.cluster_pairs_combinations = []
-        self.coint_pass_pairs = []
         self.spreads_df = None
-        self.hurst_pass_pairs = []
-        self.hl_pass_pairs = []
+
+        self.coint_pass_pairs = pd.Series({}, dtype=object)
+        self.hurst_pass_pairs = pd.Series({}, dtype=object)
+        self.hl_pass_pairs = pd.Series({}, dtype=object)
+
         self.final_pairs = []
-        self.clust = None
+        self.clust_labels_ = []
 
     def dimensionality_reduction_by_components(self, num_features: int = 10):
         """
@@ -79,7 +81,7 @@ class PairsSelector:
         self.feature_vector.columns = returns_df.columns
         self.feature_vector = self.feature_vector.T
 
-    def plot_pca_matrix(self):
+    def plot_pca_matrix(self): # pragma: no cover
         """
         Plots the feature vector on a scatter matrix.
         """
@@ -110,7 +112,7 @@ class PairsSelector:
 
         clust = OPTICS(**args)
         clust.fit(self.feature_vector)
-        self.clust = clust
+        self.clust_labels_ = clust.labels_
 
     def cluster_using_dbscan(self, args: dict):
         """
@@ -127,10 +129,10 @@ class PairsSelector:
 
         clust = DBSCAN(**args)
         clust.fit(self.feature_vector)
-        self.clust = clust
+        self.clust_labels_ = clust.labels_
 
     def plot_clustering_info(self, n_dimensions: int = 2,
-                             method: str = "", figsize=(10, 10)):
+                             method: str = "", figsize=(10, 10)): # pragma: no cover
         """
         Plots the clusters found on a scatter plot.
 
@@ -143,11 +145,11 @@ class PairsSelector:
             raise Exception("The needed feature vector has not been computed yet",
                             "Please run dimensionality_reduction() before this method")
 
-        if self.clust is None:
-            raise Exception("The needed clusters have not been computed yet",
+        if self.clust_labels_ is None:
+            raise Exception("The needed cluster labels have not been computed yet",
                             "Please run cluster() before this method")
 
-        no_of_classes = len(np.unique(self.clust.labels_))
+        no_of_classes = len(np.unique(self.clust_labels_))
 
         fig = plt.figure(1, facecolor='white', figsize=figsize)
 
@@ -170,43 +172,31 @@ class PairsSelector:
             ax1.yaxis.set_ticks_position('left')
             ax1.tick_params(which='major', labelsize=18)
 
-#             cmap = plt.get_cmap('viridis')
-            #colors = cmap(np.linspace(0, 1, no_of_classes))
-
             paths_collection = []
 
-            # , color in zip(range(0, no_of_classes), colors):
             for klass in range(0, no_of_classes):
-                x_klass = tsne_fv[self.clust.labels_ == klass]
+                x_klass = tsne_fv[self.clust_labels_ == klass]
 
                 paths = ax1.plot(x_klass.loc[:, 0], x_klass.loc[:, 1], label=list(x_klass.index), markersize=30, alpha=0.75,
                                  marker='.', linestyle='None')
 
                 paths_collection.append(paths)
 
-        #             for i, ticker in enumerate( list(Xk.index) ):
-        #                 annot = ax1.annotate(ticker, (x[i], y[i]), alpha=0.9, size=10, color=color)
-        #                 annot.set_visible(False)
-
             IndexedHighlight(np.ravel(paths_collection),
                              formatter='{label}'.format)
 
-            ax1.plot(tsne_fv.iloc[self.clust.labels_ == -1, 0],
-                     tsne_fv.iloc[self.clust.labels_ == -1, 1], 'k+', alpha=0.1)
+            ax1.plot(tsne_fv.iloc[self.clust_labels_ == -1, 0],
+                     tsne_fv.iloc[self.clust_labels_ == -1, 1], 'k+', alpha=0.1)
 
             ax1.set_title('Automatic Clustering\n' + method)
 
         elif n_dimensions == 3:
 
             ax1 = plt.subplot(111, projection='3d')
-#             cmap = plt.get_cmap('viridis')
-            #colors = cmap(np.linspace(0, 1, no_of_classes))
-
             paths_collection = []
 
-            # , color in zip(range(0, no_of_classes), colors):
             for klass in range(0, no_of_classes):
-                x_klass = tsne_fv[self.clust.labels_ == klass]
+                x_klass = tsne_fv[self.clust_labels_ == klass]
 
                 paths = ax1.plot(x_klass.loc[:, 0], x_klass.loc[:, 1], x_klass.loc[:, 2], alpha=0.7,
                                  marker='.', linestyle='None', label=list(x_klass.index), markersize=30)
@@ -216,9 +206,9 @@ class PairsSelector:
             IndexedHighlight(np.ravel(paths_collection),
                              formatter='{label}'.format)
 
-            ax1.plot(tsne_fv.iloc[self.clust.labels_ == -1, 0],
-                     tsne_fv.iloc[self.clust.labels_ == -1, 1],
-                     tsne_fv.iloc[self.clust.labels_ == -1, 2], 'k+', alpha=0.1)
+            ax1.plot(tsne_fv.iloc[self.clust_labels_ == -1, 0],
+                     tsne_fv.iloc[self.clust_labels_ == -1, 1],
+                     tsne_fv.iloc[self.clust_labels_ == -1, 2], 'k+', alpha=0.1)
             ax1.set_title('Automatic Clustering\n' + method)
 
         else:
@@ -227,7 +217,7 @@ class PairsSelector:
         plt.tight_layout()
         plt.show()
 
-    def plot_knee_plot(self):
+    def plot_knee_plot(self): # pragma: no cover
         """
         This method will plot the k-distance graph, ordered from the largest to the smallest value.
         The values where this plot shows an "elbow" should be a reference to the user of the optimal
@@ -244,23 +234,22 @@ class PairsSelector:
         plt.xlabel('# of data rows')
         plt.plot(result[0])
 
-    def _generate_pairwise_combinations(self) -> list:
+    def _generate_pairwise_combinations(self, labels: list) -> list:
         """
         This method will loop through all generated clusters (except -1) and generate
         pairwise combinations of the assets in each cluster.
 
+        :param labels: (list) : List of unique labels
         :return pair_combinations: (list) : list of asset name pairs
         """
 
-        c_labels = np.unique(self.clust.labels_[self.clust.labels_ != -1])
-
-        if len(c_labels) == 0:
-            raise Exception("No clusters have been found")
+        if len(labels) == 0:
+            raise Exception("No Labels have been found")
 
         pair_combinations = []
 
-        for labl in c_labels:
-            cluster_x = self.feature_vector[self.clust.labels_ == labl].index
+        for labl in labels:
+            cluster_x = self.feature_vector[self.clust_labels_ == labl].index
             cluster_x = cluster_x.tolist()
 
             for combination in list(itertools.combinations(cluster_x, 2)):
@@ -370,7 +359,7 @@ class PairsSelector:
         return hl_pass_pairs, final_pairs
 
     def unsupervised_candidate_pair_selector(
-            self, pvalue_threshold: int = 0.01, hurst_exp_threshold: int = 0.5, min_crossover_threshold_per_year: int = 12) -> list:
+            self, pvalue_threshold: int = 0.01, hurst_exp_threshold: int = 0.5, min_crossover_threshold_per_year: int = 12) -> list: # pragma: no cover
         """
         Third step of the framework; The clusters found in step two are used to generate a list of possible pairwise
         combinations. The combinations generated are then checked to see if they comply with the criteria supplied in the
@@ -383,14 +372,15 @@ class PairsSelector:
         :return final_pairs: (list) : tuple list of final pairs
         """
 
-        if self.clust is None:
-            raise Exception("The needed clusters have not been computed yet",
+        if self.clust_labels_ is None:
+            raise Exception("The needed cluster labels have not been computed yet",
                             "Please run cluster() before this method")
 
         # Generate needed pairwise combinations and remove unneccessary
         # duplicates.
 
-        cluster_x_cointegration_combinations = self._generate_pairwise_combinations()
+        c_labels = np.unique(self.clust_labels_[self.clust_labels_ != -1])
+        cluster_x_cointegration_combinations = self._generate_pairwise_combinations(c_labels)
         self.cluster_pairs_combinations = cluster_x_cointegration_combinations
 
         return self._criterion_selection(cluster_x_cointegration_combinations, pvalue_threshold, hurst_exp_threshold, min_crossover_threshold_per_year)
@@ -444,23 +434,8 @@ class PairsSelector:
 
         return final_pairs.index.values
 
-    def manual_candidate_pair_selector(self, pair_combinations: list, pvalue_threshold: int = 0.01,
-                                       hurst_exp_threshold: int = 0.5, min_crossover_threshold_per_year: int = 12) -> list:
-        """
-        The combinations given are checked to see if they comply with the criteria supplied in the
-        paper: the pair being cointegrated, the hurst exponent being <0.5, the spread moves within convenient periods and
-        finally that the spread reverts to the mean with enough frequency.
 
-        :param pair_combinations: (list) : list of asset pairs
-        :param pvalue_threshold: (int) : max p-value threshold to be used in the cointegration tests
-        :param hurst_exp_threshold: (int) : max hurst threshold value
-        :param min_crossover_threshold_per_year: (int) : minimum amount of mean crossovers per year
-        :return final_pairs: (list) : tuple list of final pairs
-        """
-
-        return self._criterion_selection(pair_combinations, pvalue_threshold, hurst_exp_threshold, min_crossover_threshold_per_year)
-
-    def plot_selected_pairs(self):
+    def plot_selected_pairs(self): # pragma: no cover
         """
         Plots the final selection of pairs.
         """
@@ -494,7 +469,7 @@ class PairsSelector:
         :return: (pd.DataFrame) Dataframe of summary statistics.
         """
 
-        no_clusters = len(list(set(self.clust.labels_))) - 1
+        no_clusters = len(list(set(self.clust_labels_))) - 1
         no_paircomb = len(self.cluster_pairs_combinations)
         no_hurstpair = len(self.hurst_pass_pairs)
         no_hlpair = len(self.hl_pass_pairs)
@@ -528,11 +503,11 @@ class PairsSelector:
                 'level_0': 'leg_1',
                 'level_1': 'leg_2',
                 'hl': 'half_life'}) \
-            .drop(['constant'], axis=1) \
+            .drop(['constant'], axis=1, errors='ignore') \
 
 
     @staticmethod
-    def _convert_to_tuple(arr: np.array) -> tuple:
+    def _convert_to_tuple(arr: np.array) -> tuple: # pragma: no cover
         """
         Returns a list converted to a tuple.
 
@@ -542,14 +517,14 @@ class PairsSelector:
         return tuple(i for i in arr)
 
     def describe_pairs_sectoral_info(
-            self, leg_1: str, leg_2: str, sectoral_info_df: pd.DataFrame) -> pd.DataFrame:
+            self, leg_1: list, leg_2: list, sectoral_info_df: pd.DataFrame) -> pd.DataFrame:
         """
         Returns information on each pair selected.
         The following statistics are included - both legs of the pair, cointegration (t-value, p-value, hedge_ratio),
         hurst_exponent, half_life, no_mean_crossovers.
 
-        :param leg_1: (str) Symbol of the first asset.
-        :param leg_2: (str) Symbol of the second asset.
+        :param leg_1: (list) vector Symbol of the first asset.
+        :param leg_2: (list) vector Symbol of the second asset.
         :param sectoral_info_df: (pd.DataFrame) DataFrame with two columns (ticker, sector) to be used in the output.
         :return: (pd.DataFrame) Dataframe of pair sectoral statistics.
         """

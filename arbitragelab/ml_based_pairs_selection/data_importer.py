@@ -8,13 +8,10 @@ import yfinance as yf
 import yahoo_fin.stock_info as ys
 
 
-class ImportData:
+class DataImporter:
     """
     Wrapper class that imports data from yfinance and yahoo_fin.
     """
-
-    def __init__(self):
-        pass
 
     @staticmethod
     def get_sp500_tickers() -> list:
@@ -41,21 +38,11 @@ class ImportData:
     @staticmethod
     def remove_nuns(dataframe: pd.DataFrame, threshold: int = 100) -> pd.DataFrame:
         """
-        Remove tickers with nuns in value over a threshold.
+        Remove tickers with nulls in value over a threshold.
 
-        Parameters
-        ----------
-        df : pandas dataframe
-            Price time series dataframe
-
-        threshold: int, OPTIONAL
-            The number of null values allowed
-            Default is 100
-
-        Returns
-        -------
-        df : pandas dataframe
-            Updated price time series without any nuns
+        :param dataframe: (pd.DataFrame) : Asset price data
+        :param threshold: (int) : The number of null values allowed
+        :return dataframe: (pd.DataFrame) : Price Data without any null values.
         """
         null_sum_each_ticker = dataframe.isnull().sum()
         tickers_under_threshold = \
@@ -71,27 +58,13 @@ class ImportData:
                        interval: str = '5m') -> pd.DataFrame:
         """
         Get the price data with custom start and end date and interval.
-
-        No Pre and Post market data.
         For daily price, only keep the closing price.
 
-        Parameters
-        ----------
-        start_date : str
-            Download start date string (YYYY-MM-DD) or _datetime.
-        end_date : str
-            Download end date string (YYYY-MM-DD) or _datetime.
-        interval : str, OPTIONAL
-            Valid intervals: 1m,2m,5m,15m,30m,60m,90m,1h,1d,5d,1wk,1mo,3mo
-            Intraday data cannot extend last 60 days
-            Default is '5m'
-        tickers : str, list
-            List of tickers to download
-
-        Returns
-        -------
-        price_data : pandas dataframe
-            The requested price_data
+        :param tickers: (list) : List of tickers to download
+        :param start_date: (str) : Download start date string (YYYY-MM-DD)
+        :param end_date: (str) : Download end date string (YYYY-MM-DD)
+        :param interval: (str) : Valid intervals: 1m,2m,5m,15m,30m,60m,90m,1h,1d,5d,1wk,1mo,3mo
+        :return price_data: (pd.DataFrame) : The requested price_data.
         """
         price_data = yf.download(tickers,
                                  start=start_date, end=end_date,
@@ -115,10 +88,11 @@ class ImportData:
 
     def get_ticker_sector_info(self, tickers: list, yf_call_chunk: int = 20) -> pd.DataFrame:
         """
-        This method will loop through all the tickers tagged by sector and generate
-        pairwise combinations of the assets for each sector.
+        This method will loop through all the tickers, using the yfinance library
+        do a ticker info request and retrieve back 'sector' and 'industry' information.
 
-        :param tickers: (list) : List of asset name pairs
+        :param tickers: (list) : List of asset symbols
+        :param yf_call_chunk: (int) : Ticker values allowed per 'Tickers' object. This should always be less than 200.
         :return augmented_tickers: (pd.DataFrame) : DataFrame with input asset tickers and their respective sector and industry information
         """
 
@@ -139,9 +113,9 @@ class ImportData:
                 ticker_info = tckrs.tickers[i].info
                 tckr_info.append(
                     (tckr, ticker_info['industry'], ticker_info['sector']))
-            except ValueError:
+            except ValueError:  # pragma: no cover # can only happen if the server sends back corrupted data
                 pass
-            except RuntimeError:
+            except RuntimeError:  # pragma: no cover # can only happen if server is down
                 pass
 
         return pd.DataFrame(data=tckr_info, columns=['ticker', 'industry', 'sector'])

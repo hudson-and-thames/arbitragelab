@@ -29,9 +29,6 @@ def _outer_ou_loop(spreads_df: pd.DataFrame, test_period: str, cross_overs_per_d
 
         spread = spreads_df.loc[:, str(pair)]
 
-        if len(spread.shape) > 1:
-            spread = pd.Series(np.squeeze(spread.values))
-
         lagged_spread = spread.shift(1).dropna(0)
         lagged_spread_c = sm.add_constant(lagged_spread)
 
@@ -46,7 +43,7 @@ def _outer_ou_loop(spreads_df: pd.DataFrame, test_period: str, cross_overs_per_d
         # This result implies that the expected duration of mean reversion λ is
         # inversely proportional to the absolute value of λ
 
-        # h = np.log(2) / abs(res.params[0])
+        # Example; h = np.log(2) / abs(res.params[0])
 
         # split the spread in two; the train_df is going to be used to get the long term mean
         # and test_df is going to be used to get the number of mean cross overs
@@ -67,16 +64,13 @@ def _outer_ou_loop(spreads_df: pd.DataFrame, test_period: str, cross_overs_per_d
 
         cross_overs_counts.columns = ['counts']
 
-        if cross_overs_counts.empty:
-            cross_overs = False
-        else:
-            cross_overs = len(cross_overs_counts[cross_overs_counts['counts'] > cross_overs_per_delta]) > 0
+        cross_overs = len(cross_overs_counts[cross_overs_counts['counts'] > cross_overs_per_delta]) > 0
 
         ou_results.append([np.log(2) / abs(res.params[0]), cross_overs])
 
     return pd.DataFrame(ou_results, index=molecule, columns=['hl', 'crossovers'])
 
-def linear_f(beta, x_variable):
+def linear_f(beta, x_variable): # pragma: no cover
     """
     This is the helper linear model that is going to be used in the Orthogonal Regression.
 

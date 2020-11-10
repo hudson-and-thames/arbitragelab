@@ -5,7 +5,7 @@ This module houses the extension HighlightingDataCursor class to support cluster
 import matplotlib.pyplot as plt
 from mpldatacursor import DataCursor, HighlightingDataCursor
 
-class IndexedHighlight(HighlightingDataCursor):
+class IndexedHighlight(HighlightingDataCursor): # pragma: no cover
     """
     This class extends HighlightingDataCursor to add support for
     highlighting of cluster groups.

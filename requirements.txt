@@ -8,3 +8,9 @@ sphinx==2.2.1 # needed for docs
 sphinx-rtd-theme==0.4.3 # needed for docs
 statsmodels==0.11.1
 analytics-python==1.2.9
+
+mpldatacursor==0.7.1
+yfinance==0.1.54
+scipy==1.4.1
+scikit-learn==0.23.1
+yahoo-fin==0.86
