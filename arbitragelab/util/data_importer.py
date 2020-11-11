@@ -12,6 +12,11 @@ import yahoo_fin.stock_info as ys
 class DataImporter:
     """
     Wrapper class that imports data from yfinance and yahoo_fin.
+
+    This class allows for fast pulling/mangling of information needed
+    for the research process. These would include; ticker groups of
+    various indexes, pulling of relevant pricing data and processing
+    said data.
     """
 
     @staticmethod
@@ -93,30 +98,42 @@ class DataImporter:
         This method will loop through all the tickers, using the yfinance library
         do a ticker info request and retrieve back 'sector' and 'industry' information.
 
+        This method uses the yfinance 'Tickers' object which has a limit of the amount of
+        tickers supplied as a string argument. To go around this, this method uses the
+        chunking approach, where the supplied ticker list is broken down into small chunks
+        and supplied sequentially to the helper function.
+
         :param tickers: (list) List of asset symbols.
         :param yf_call_chunk: (int) Ticker values allowed per 'Tickers' object. This should always be less than 200.
         :return: (pd.DataFrame) DataFrame with input asset tickers and their respective sector and industry information.
         """
 
-        if len(tickers) > yf_call_chunk:
-            ticker_sector_queue = []
-            for i in range(0, len(tickers), yf_call_chunk):
-                end = i+yf_call_chunk if i <= len(tickers) else len(tickers)
-                ticker_sector_queue.append(self.get_ticker_sector_info(tickers[i: end]))
-            return pd.concat(ticker_sector_queue, axis=0).reset_index(drop=True)
+        ticker_sector_queue = []
+
+        for i in range(0, len(tickers), yf_call_chunk):
+
+            end = i+yf_call_chunk if i <= len(tickers) else len(tickers)
+
+            ticker_sector_queue.append(self._sector_info_helper(tickers[i: end]))
+
+        return pd.concat(ticker_sector_queue, axis=0).reset_index(drop=True)
+
+    @staticmethod
+    def _sector_info_helper(tickers: list) -> pd.DataFrame:
+        """
+        Helper method to supply chunked sector info to the main method.
+
+        :param tickers: (list) List of asset symbols.
+        :return: (pd.DataFrame) DataFrame with input asset tickers and their respective sector and industry information.
+        """
 
         tckrs = yf.Tickers(' '.join(tickers))
 
         tckr_info = []
 
         for i, tckr in enumerate(tickers):
-            try:
-                ticker_info = tckrs.tickers[i].info
-                tckr_info.append(
-                    (tckr, ticker_info['industry'], ticker_info['sector']))
-            except ValueError:  # pragma: no cover # can only happen if the server sends back corrupted data
-                pass
-            except RuntimeError:  # pragma: no cover # can only happen if server is down
-                pass
+            ticker_info = tckrs.tickers[i].info
+            tckr_tuple = (tckr, ticker_info['industry'], ticker_info['sector'])
+            tckr_info.append(tckr_tuple)
 
         return pd.DataFrame(data=tckr_info, columns=['ticker', 'industry', 'sector'])

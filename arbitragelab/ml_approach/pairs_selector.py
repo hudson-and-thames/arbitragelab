@@ -51,7 +51,7 @@ class PairsSelector:
 
     def dimensionality_reduction_by_components(self, num_features: int = 10):
         """
-        Processes and scales the prices universe supplied in the constructor, into returns. 
+        Processes and scales the prices universe supplied in the constructor, into returns.
 
         Then reduces the resulting data using pca down to the amount of dimensions needed
         to be used as a feature vector in the clustering step. Optimal ranges for the dimensions
@@ -418,7 +418,7 @@ class PairsSelector:
                                              min_crossover_threshold_per_year: int = 12) -> list:
         """
         Third step of the framework;
-        
+
         The clusters found in step two are used to generate a list of possible pairwise combinations.
         The combinations generated are then checked to see if they comply with the criteria supplied
         in the paper: the pair being cointegrated, the hurst exponent being <0.5, the spread moves
@@ -448,7 +448,7 @@ class PairsSelector:
                              hurst_exp_threshold: int = 0.5, min_crossover_threshold_per_year: int = 12) -> list:
         """
         Third step of the framework;
-        
+
         The clusters found in step two are used to generate a list of possible pairwise combinations.
         The combinations generated are then checked to see if they comply with the criteria supplied
         in the paper: the pair being cointegrated, the hurst exponent being <0.5, the spread moves
@@ -507,10 +507,9 @@ class PairsSelector:
             raise Exception("The needed pairs have not been computed yet.",
                             "Please run criterion_selector() before this method.")
 
-        _, axs = plt.subplots(len(self.final_pairs), squeeze=False,
-                              figsize=(15, 3 * len(self.final_pairs)))
+        _, axs = plt.subplots(len(self.final_pairs), figsize=(15, 3 * len(self.final_pairs)))
 
-        for ax_object, frame in zip(axs[0], self.final_pairs.index.values):
+        for ax_object, frame in zip(axs, self.final_pairs.index.values):
             rets_asset_one = np.log(self.prices_df.loc[:, frame[0]]).diff()
             rets_asset_two = np.log(self.prices_df.loc[:, frame[1]]).diff()
 

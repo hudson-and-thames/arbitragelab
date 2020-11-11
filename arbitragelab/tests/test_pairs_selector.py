@@ -184,6 +184,10 @@ class TestPairsSelector(unittest.TestCase):
             -1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
         ])
         self.pair_selector.unsupervised_candidate_pair_selector()
+
+        final_pairs = pd.DataFrame(index=[('ABMD', 'AZO'), ('AES', 'BBY'), ('BKR', 'CE')])
+
+        self.pair_selector.final_pairs = final_pairs
         self.pair_selector.plot_selected_pairs()
 
     def test_description_methods(self):
