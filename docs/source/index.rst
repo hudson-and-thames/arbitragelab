@@ -103,10 +103,10 @@ This project is licensed under an all rights reserved licence.
 
 .. toctree::
     :maxdepth: 2
-    :caption: ML Based Pairs Selection
+    :caption: ML Approach
     :hidden:
 
-    ml_based_pairs_selection/framework
+    ml_approach/ml_based_pairs_selection
 
 
 .. toctree::

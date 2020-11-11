@@ -1,4 +1,4 @@
-.. _ml_based_pairs_selection-framework:
+.. _ml_approach-ml_based_pairs_selection:
 
 .. note::
    The following documentation closely follows a book by Simão Moraes Sarmento and Nuno Horta:
@@ -16,14 +16,13 @@ Proposed Pairs Selection Framework
 ##################################
 
 .. figure:: images/prposed_framework_diagram.png
-    :scale: 80 %
     :align: center
 
     Framework diagram from `A Machine Learning based Pairs Trading Investment Strategy <http://premio-vidigal.inesc.pt/pdf/SimaoSarmentoMSc-resumo.pdf>`__.
     by Simão Moraes Sarmento and Nuno Horta.
 
 Dimensionality Reduction 
-************************
+########################
 The main objectives in this step are;
 
 - Extracting common underlying risk factors from securities returns
@@ -39,18 +38,16 @@ This term is introduced by `Bellman (1966) <https://doi.org/10.1126/science.153.
 According to `Berkhin (2006) <https://doi.org/10.1007/3-540-28349-8_2>`__, the effect starts to be severe for dimensions greater than 15. Taking this into consideration, the number of PCA dimensions is upper bounded at this value and is chosen empirically.
 
 Implementation
-==============
+**************
 
-.. py:currentmodule:: mlfinlab.statistical_arbitrage.pairs_selector.PairsSelector
+.. py:currentmodule:: arbitragelab.ml_approach.PairsSelector
 
 .. autofunction:: dimensionality_reduction_by_components
 .. autofunction:: plot_pca_matrix
 
 Unsupervised Learning
-*********************
-The main objective in this step is;
-
-- To identify the optimal cluster structure from the compact representation previously generated, prioritizing the following constraints;
+#####################
+The main objective in this step is to identify the optimal cluster structure from the compact representation previously generated, prioritizing the following constraints;
 
 	- No need to specify the number of clusters in advance
 	- No need to group all securities
@@ -61,20 +58,18 @@ The first method is to use the OPTICS clustering algorithm and letting the built
 The second method is to use the DBSCAN clustering algorithm. This is to be used when the user has domain specific knowledge that can enhance the results given the algorithm's parameter sensitivity. A possible approach to finding :math:`\epsilon` described in `Rahmah N, Sitanggang S (2016) <https://doi.org/10.1088/1755-1315/31/1/012012>`__ is to inspect the knee plot and fix a suitable :math:`\epsilon` by observing the global curve turning point.
 
 .. figure:: images/knee_plot.png
-    :scale: 80 %
     :align: center
 
     An example plot of the k-distance 'knee' graph
 
 
 .. figure:: images/3d_cluster_optics_plot.png
-    :scale: 80 %
     :align: center
 
     3D plot of the clustering result using the OPTICS method.
 
 Implementation
-==============
+**************
 
 .. autofunction:: cluster_using_optics
 .. autofunction:: cluster_using_dbscan
@@ -82,10 +77,9 @@ Implementation
 .. autofunction:: plot_knee_plot
 
 Select Pairs 
-************
+############
 
 .. figure:: images/pairs_selection_rules_diagram.png
-    :scale: 80 %
     :align: center
 
     The rules selection flow diagram from `A Machine Learning based Pairs Trading Investment Strategy <http://premio-vidigal.inesc.pt/pdf/SimaoSarmentoMSc-resumo.pdf>`__.
@@ -98,7 +92,9 @@ The rules that each pair needs to pass are;
 - The pair’s spread diverges and converges within convenient periods.
 - The pair’s spread reverts to the mean with enough frequency.
 
-To test for cointegration, the framework proposes the application of the Engle-Granger test, due to its simplicity. One critic `Armstrong (2001) <http://doi.org/10.1007/978-0-306-47630-3>`__ points at the Engle-Granger test sensitivity to the ordering of variables. It is a possibility that one of the relationships will be cointegrated, while the other will not. This is troublesome because we would expect that if the variables are truly cointegrated the two equations will yield the same conclusion. To mitigate this issue, the original paper proposes that the Engle-Granger test is run for the two possible selections of the dependent variable and that the combination that generated the lowest t-statistic is selected. Further work in `Hoel (2013) <https://core.ac.uk/download/pdf/52072275.pdf>`__ adds on, "the unsymmetrical coefficients imply that a hedge of long / short is not the opposite of long / short , i.e. the hedge ratios are inconsistent". A better solution is proposed and implemented, based on `Gregory et al. (2011) <http://dx.doi.org/10.2139/ssrn.1663703>`__ to use orthogonal regression – also referred to as Total Least Squares (TLS) – in which the residuals of both dependent and independent variables are taken into account. That way, we incorporate the volatility of both legs of the spread when estimating the relationship so that hedge ratios are consistent, and thus the cointegration estimates will be unaffected by the ordering of variables. 
+To test for cointegration, the framework proposes the application of the Engle-Granger test, due to its simplicity. One critic `Armstrong (2001) <http://doi.org/10.1007/978-0-306-47630-3>`__ points at the Engle-Granger test sensitivity to the ordering of variables. It is a possibility that one of the relationships will be cointegrated, while the other will not. This is troublesome because we would expect that if the variables are truly cointegrated the two equations will yield the same conclusion. 
+To mitigate this issue, the original paper proposes that the Engle-Granger test is run for the two possible selections of the dependent variable and that the combination that generated the lowest t-statistic is selected. Further work in `Hoel (2013) <https://core.ac.uk/download/pdf/52072275.pdf>`__ adds on, "the unsymmetrical coefficients imply that a hedge of long / short is not the opposite of long / short , i.e. the hedge ratios are inconsistent". 
+A better solution is proposed and implemented, based on `Gregory et al. (2011) <http://dx.doi.org/10.2139/ssrn.1663703>`__ to use orthogonal regression – also referred to as Total Least Squares (TLS) – in which the residuals of both dependent and independent variables are taken into account. That way, we incorporate the volatility of both legs of the spread when estimating the relationship so that hedge ratios are consistent, and thus the cointegration estimates will be unaffected by the ordering of variables. 
 
 Secondly, an additional validation step is also implemented to provide more confidence in the mean-reversion character of the pairs’ spread. The condition imposed is that the Hurst exponent associated with the spread of a given pair is enforced to be smaller than 0.5, assuring the process leans towards mean-reversion. 
 
@@ -107,11 +103,10 @@ In third place, the pair's spread movement is constrained using the half life of
 Lastly, we enforce that every spread crosses its mean at least once per month, to provide enough liquidity and thus providing enough opportunities to exit a position.
 
 Implementation
-==============
+**************
 
 .. autofunction:: get_pairs_by_sector
 .. autofunction:: unsupervised_candidate_pair_selector
-.. autofunction:: manual_candidate_pair_selector
 .. autofunction:: plot_selected_pairs
 
 Following methods describe the results of the selector in various ways.
@@ -122,14 +117,14 @@ Following methods describe the results of the selector in various ways.
 
 
 Examples
-********
+########
 
 .. code-block::
 
     # Importing packages
     import pandas as pd
     import numpy as np
-    from mlfinlab.statistical_arbitrage.pairs_selector import PairsSelector
+    from arbitragelab.ml_approach import PairsSelector
 
     # Getting the dataframe with time series of asset returns
     data = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])
