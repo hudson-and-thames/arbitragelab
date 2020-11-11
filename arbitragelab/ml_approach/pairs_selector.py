@@ -23,8 +23,9 @@ from arbitragelab.util.indexed_highlight import IndexedHighlight
 
 class PairsSelector:
     """
-    Implementation of the Proposed Pairs Selection Framework in the following paper. The
-    method consists of three parts; dimensionality reduction, clustering of features and
+    Implementation of the Proposed Pairs Selection Framework in the following paper.
+
+    The method consists of three parts; dimensionality reduction, clustering of features and
     finally the selection of pairs with the use of a set of heuristics.
     """
 
@@ -50,9 +51,11 @@ class PairsSelector:
 
     def dimensionality_reduction_by_components(self, num_features: int = 10):
         """
-        Processes and scales the prices universe supplied in the constructor, into returns. Then reduces the resulting
-        data using pca down to the amount of dimensions needed to be used as a feature vector in the clustering step.
-        Optimal ranges for the dimensions required in the feature vector should be <15.
+        Processes and scales the prices universe supplied in the constructor, into returns. 
+
+        Then reduces the resulting data using pca down to the amount of dimensions needed
+        to be used as a feature vector in the clustering step. Optimal ranges for the dimensions
+        required in the feature vector should be <15.
 
         :param num_features: (int) Used to select pca n_components to be used in the feature vector.
         """
@@ -104,7 +107,9 @@ class PairsSelector:
 
     def cluster_using_optics(self, args: dict):
         """
-        Second step of the framework; Doing Unsupervised Learning on the feature vector supplied from the first step.
+        Second step of the framework;
+
+        Doing Unsupervised Learning on the feature vector supplied from the first step.
         The clustering method used is OPTICS, chosen mainly for it being basically parameterless.
 
         :param args: (dict) Arguments to be passed to the clustering algorithm.
@@ -120,9 +125,11 @@ class PairsSelector:
 
     def cluster_using_dbscan(self, args: dict):
         """
-        Second step of the framework; Doing Unsupervised Learning on the feature vector supplied from the first step.
-        The second clustering method used is DBSCAN, for when the user needs a more hands on approach to doing the
-        clustering step, given the parameter sensitivity of this method.
+        Second step of the framework;
+
+        Doing Unsupervised Learning on the feature vector supplied from the first step. The
+        second clustering method used is DBSCAN, for when the user needs a more hands on approach
+        to doing the clustering step, given the parameter sensitivity of this method.
 
         :param args: (dict) Arguments to be passed to the clustering algorithm.
         """
@@ -263,6 +270,7 @@ class PairsSelector:
     def plot_knee_plot(self) -> Axes:
         """
         This method will plot the k-distance graph, ordered from the largest to the smallest value.
+
         The values where this plot shows an "elbow" should be a reference to the user of the optimal
         ε parameter to be used for the DBSCAN clustering method.
 
@@ -409,10 +417,12 @@ class PairsSelector:
     def unsupervised_candidate_pair_selector(self, pvalue_threshold: int = 0.01, hurst_exp_threshold: int = 0.5,
                                              min_crossover_threshold_per_year: int = 12) -> list:
         """
-        Third step of the framework; The clusters found in step two are used to generate a list of possible pairwise
-        combinations. The combinations generated are then checked to see if they comply with the criteria supplied in the
-        paper: the pair being cointegrated, the hurst exponent being <0.5, the spread moves within convenient periods and
-        finally that the spread reverts to the mean with enough frequency.
+        Third step of the framework;
+        
+        The clusters found in step two are used to generate a list of possible pairwise combinations.
+        The combinations generated are then checked to see if they comply with the criteria supplied
+        in the paper: the pair being cointegrated, the hurst exponent being <0.5, the spread moves
+        within convenient periods and finally that the spread reverts to the mean with enough frequency.
 
         :param pvalue_threshold: (int) Max p-value threshold to be used in the cointegration tests.
         :param hurst_exp_threshold: (int) Max hurst threshold value.
@@ -437,10 +447,12 @@ class PairsSelector:
     def _criterion_selection(self, cluster_x_cointegration_combinations: list, pvalue_threshold: int = 0.01,
                              hurst_exp_threshold: int = 0.5, min_crossover_threshold_per_year: int = 12) -> list:
         """
-        Third step of the framework; The clusters found in step two are used to generate a list of possible pairwise
-        combinations. The combinations generated are then checked to see if they comply with the criteria supplied in the
-        paper: the pair being cointegrated, the hurst exponent being <0.5, the spread moves within convenient periods and
-        finally that the spread reverts to the mean with enough frequency.
+        Third step of the framework;
+        
+        The clusters found in step two are used to generate a list of possible pairwise combinations.
+        The combinations generated are then checked to see if they comply with the criteria supplied
+        in the paper: the pair being cointegrated, the hurst exponent being <0.5, the spread moves
+        within convenient periods and finally that the spread reverts to the mean with enough frequency.
 
         :param cluster_x_cointegration_combinations: (list) List of asset pairs.
         :param pvalue_threshold: (int) Max p-value threshold to be used in the cointegration tests.
@@ -511,6 +523,7 @@ class PairsSelector:
     def describe(self) -> pd.DataFrame:
         """
         Returns the Pairs Selector Summary statistics.
+
         The following statistics are included - the number of clusters, total possible pair combinations,
         the number of pairs that passed the cointegration threshold, the number of pairs that passed the
         hurst exponent threshold, the number of pairs that passed the half life threshold and the number
@@ -537,6 +550,7 @@ class PairsSelector:
     def describe_extra(self) -> pd.DataFrame:
         """
         Returns information on each pair selected.
+
         The following statistics are included - both legs of the pair, cointegration (t-value, p-value, hedge_ratio),
         hurst_exponent, half_life, no_mean_crossovers.
 
@@ -564,6 +578,7 @@ class PairsSelector:
                                      sectoral_info_df: pd.DataFrame) -> pd.DataFrame:
         """
         Returns information on each pair selected.
+
         The following statistics are included - both legs of the pair, cointegration (t-value, p-value, hedge_ratio),
         hurst_exponent, half_life, no_mean_crossovers.
 
