@@ -2,8 +2,7 @@
 # All rights reserved
 # Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
 """
-Utility functions.
+This module houses the ML Based Approaches
 """
 
-from arbitragelab.util.data_importer import DataImporter
-from arbitragelab.util.indexed_highlight import IndexedHighlight
+from arbitragelab.ml_approach.pairs_selector import PairsSelector

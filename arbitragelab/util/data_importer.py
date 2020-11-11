@@ -1,12 +1,13 @@
+# Copyright 2019, Hudson and Thames Quantitative Research
+# All rights reserved
+# Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
 """
-This module is a user data helper wrapping various yahoo finance libraries
+This module is a user data helper wrapping various yahoo finance libraries.
 """
 
 import pandas as pd
-
 import yfinance as yf
 import yahoo_fin.stock_info as ys
-
 
 class DataImporter:
     """
@@ -18,8 +19,9 @@ class DataImporter:
         """
         Gets all S&P 500 stock tickers.
 
-        :return tickers: (list) : list of tickers
+        :return: (list) List of tickers.
         """
+
         tickers_sp500 = ys.tickers_sp500()
 
         return tickers_sp500
@@ -29,8 +31,9 @@ class DataImporter:
         """
         Gets all DOW stock tickers.
 
-        :return tickers: (list) : list of tickers
+        :return: (list) List of tickers.
         """
+
         tickers_dow = ys.tickers_dow()
 
         return tickers_dow
@@ -40,36 +43,34 @@ class DataImporter:
         """
         Remove tickers with nulls in value over a threshold.
 
-        :param dataframe: (pd.DataFrame) : Asset price data
-        :param threshold: (int) : The number of null values allowed
-        :return dataframe: (pd.DataFrame) : Price Data without any null values.
+        :param dataframe: (pd.DataFrame) Asset price data.
+        :param threshold: (int) The number of null values allowed.
+        :return dataframe: (pd.DataFrame) Price Data without any null values.
         """
+
         null_sum_each_ticker = dataframe.isnull().sum()
-        tickers_under_threshold = \
-            null_sum_each_ticker[null_sum_each_ticker <= threshold].index
+        tickers_passing = null_sum_each_ticker[null_sum_each_ticker <= threshold]
+        tickers_under_threshold = tickers_passing.index
         dataframe = dataframe[tickers_under_threshold]
 
         return dataframe
 
     @staticmethod
-    def get_price_data(tickers: list,
-                       start_date: str,
-                       end_date: str,
+    def get_price_data(tickers: list, start_date: str, end_date: str,
                        interval: str = '5m') -> pd.DataFrame:
         """
         Get the price data with custom start and end date and interval.
         For daily price, only keep the closing price.
 
-        :param tickers: (list) : List of tickers to download
-        :param start_date: (str) : Download start date string (YYYY-MM-DD)
-        :param end_date: (str) : Download end date string (YYYY-MM-DD)
-        :param interval: (str) : Valid intervals: 1m,2m,5m,15m,30m,60m,90m,1h,1d,5d,1wk,1mo,3mo
-        :return price_data: (pd.DataFrame) : The requested price_data.
+        :param tickers: (list) List of tickers to download.
+        :param start_date: (str) Download start date string (YYYY-MM-DD).
+        :param end_date: (str) Download end date string (YYYY-MM-DD).
+        :param interval: (str) Valid intervals: 1m,2m,5m,15m,30m,60m,90m,1h,1d,5d,1wk,1mo,3mo.
+        :return: (pd.DataFrame) The requested price_data.
         """
-        price_data = yf.download(tickers,
-                                 start=start_date, end=end_date,
-                                 interval=interval,
-                                 group_by='column')['Close']
+
+        price_data = yf.download(tickers, start=start_date, end=end_date,
+                                 interval=interval, group_by='column')['Close']
 
         return price_data
 
@@ -78,9 +79,10 @@ class DataImporter:
         """
         Calculate return data with custom start and end date and interval.
 
-        :param price_data: (pd.DataFrame) : Asset price data
-        :return returns_df: (pd.DataFrame) : Price Data converted to returns.
+        :param price_data: (pd.DataFrame) Asset price data.
+        :return: (pd.DataFrame) Price Data converted to returns.
         """
+
         returns_data = price_data.pct_change()
         returns_data = returns_data.iloc[1:]
 
@@ -91,17 +93,16 @@ class DataImporter:
         This method will loop through all the tickers, using the yfinance library
         do a ticker info request and retrieve back 'sector' and 'industry' information.
 
-        :param tickers: (list) : List of asset symbols
-        :param yf_call_chunk: (int) : Ticker values allowed per 'Tickers' object. This should always be less than 200.
-        :return augmented_tickers: (pd.DataFrame) : DataFrame with input asset tickers and their respective sector and industry information
+        :param tickers: (list) List of asset symbols.
+        :param yf_call_chunk: (int) Ticker values allowed per 'Tickers' object. This should always be less than 200.
+        :return: (pd.DataFrame) DataFrame with input asset tickers and their respective sector and industry information.
         """
 
         if len(tickers) > yf_call_chunk:
             ticker_sector_queue = []
             for i in range(0, len(tickers), yf_call_chunk):
                 end = i+yf_call_chunk if i <= len(tickers) else len(tickers)
-                ticker_sector_queue.append(
-                    self.get_ticker_sector_info(tickers[i: end]))
+                ticker_sector_queue.append(self.get_ticker_sector_info(tickers[i: end]))
             return pd.concat(ticker_sector_queue, axis=0).reset_index(drop=True)
 
         tckrs = yf.Tickers(' '.join(tickers))

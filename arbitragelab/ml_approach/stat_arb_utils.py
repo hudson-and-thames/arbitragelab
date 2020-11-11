@@ -1,26 +1,29 @@
+# Copyright 2019, Hudson and Thames Quantitative Research
+# All rights reserved
+# Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
 """
 This module houses utility functions used by the PairsSelector
 """
 
 import pandas as pd
 import numpy as np
-
 import statsmodels.api as sm
 from statsmodels.tsa.adfvalues import mackinnonp
 from statsmodels.tsa.stattools import adfuller
 from scipy.odr import ODR, Model, RealData
 
-def _outer_ou_loop(spreads_df: pd.DataFrame, test_period: str, cross_overs_per_delta: int, molecule: list) -> pd.DataFrame:
+def _outer_ou_loop(spreads_df: pd.DataFrame, test_period: str,
+                   cross_overs_per_delta: int, molecule: list) -> pd.DataFrame:
     """
     This function gets mean reversion calculations (half life and number of mean cross overs) for each pair in the molecule.
     Uses the linear regression method to get the half life, which is much lighter computationally wise compared to the version
     using the OrnsteinUhlenbeck class.
 
-    :param spreads_df: (pd.DataFrame) Spreads Universe
-    :param test_period: (str) Time delta format, to be used as the time period where the mean crossovers will be calculated
-    :param cross_overs_per_delta: (int) Crossovers per time delta selected
-    :param molecule: (list) Indices of pairs
-    :return: (pd.DataFrame) Mean Reversion statistics
+    :param spreads_df: (pd.DataFrame) Spreads Universe.
+    :param test_period: (str) Time delta format, to be used as the time period where the mean crossovers will be calculated.
+    :param cross_overs_per_delta: (int) Crossovers per time delta selected.
+    :param molecule: (list) Indices of pairs.
+    :return: (pd.DataFrame) Mean Reversion statistics.
     """
 
     ou_results = []
@@ -45,7 +48,7 @@ def _outer_ou_loop(spreads_df: pd.DataFrame, test_period: str, cross_overs_per_d
 
         # Example; h = np.log(2) / abs(res.params[0])
 
-        # split the spread in two; the train_df is going to be used to get the long term mean
+        # Split the spread in two; The train_df is going to be used to get the long term mean
         # and test_df is going to be used to get the number of mean cross overs
 
         test_df = spread.last(test_period)
@@ -74,10 +77,11 @@ def linear_f(beta, x_variable): # pragma: no cover
     """
     This is the helper linear model that is going to be used in the Orthogonal Regression.
 
-    :param beta: (np.array) Model beta coefficient
-    :param x_variable: (np.array) Model X vector
+    :param beta: (np.array) Model beta coefficient.
+    :param x_variable: (np.array) Model X vector.
     :return: (np.array)
     """
+
     return beta[0]*x_variable + beta[1]
 
 def _outer_cointegration_loop(prices_df: pd.DataFrame, molecule: list) -> pd.DataFrame:
@@ -85,9 +89,9 @@ def _outer_cointegration_loop(prices_df: pd.DataFrame, molecule: list) -> pd.Dat
     This function calculates the Engle-Granger test for each pair in the molecule. Uses the Total
     Least Squares approach to take into consideration the variance of both price series.
 
-    :param prices_df: (pd.DataFrame) Price Universe
-    :param molecule: (list) Indices of pairs
-    :return: (pd.DataFrame) Cointegration statistics
+    :param prices_df: (pd.DataFrame) Price Universe.
+    :param molecule: (list) Indices of pairs.
+    :return: (pd.DataFrame) Cointegration statistics.
     """
 
     cointegration_results = []

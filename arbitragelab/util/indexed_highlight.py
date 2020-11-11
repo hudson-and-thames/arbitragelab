@@ -1,11 +1,15 @@
+# Copyright 2019, Hudson and Thames Quantitative Research
+# All rights reserved
+# Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
 """
-This module houses the extension HighlightingDataCursor class to support cluster by cluster highlighting.
+This module houses the extension HighlightingDataCursor class to support cluster
+by cluster highlighting.
 """
 
 import matplotlib.pyplot as plt
 from mpldatacursor import DataCursor, HighlightingDataCursor
 
-class IndexedHighlight(HighlightingDataCursor): # pragma: no cover
+class IndexedHighlight(HighlightingDataCursor):
     """
     This class extends HighlightingDataCursor to add support for
     highlighting of cluster groups.
