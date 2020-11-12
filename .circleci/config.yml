@@ -1,21 +1,29 @@
 version: 2.1
 
-orbs:
-  python: circleci/python@0.2.1
-
 jobs:
-  build-and-test:
-    executor: python/default
+  run_tests:
+    docker:
+      - image: circleci/python:3.7.4
     steps:
       - checkout
-      - python/load-cache
-      - python/install-deps
-      - python/save-cache
       - run:
-          command: ./manage.py test
-          name: Test
+          name: Install Python Dependencies
+          command: |
+            pip install -r requirements.txt
+      - run:
+          name: Run Unit Tests
+          command: |
+            python -m unittest discover
+      - run:
+          name: Test Code Coverage
+          command: |
+            bash coverage
+      - store_test_reults:
+          path: test-reports
+      - store_artifacts:
+          path: test-reports
 
 workflows:
   main:
     jobs:
-      - build-and-test
+      - run_tests
