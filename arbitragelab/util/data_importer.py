@@ -110,8 +110,12 @@ class DataImporter:
 
         ticker_sector_queue = []
 
+        # For each chunk of size 'yf_call_chunk'.
         for i in range(0, len(tickers), yf_call_chunk):
 
+            # Set end as the limit value equals to the chunk size.
+            # If we hit the last chunk, set the end value as the
+            # full length of the ticker list.
             end = i+yf_call_chunk if i <= len(tickers) else len(tickers)
 
             ticker_sector_queue.append(self._sector_info_helper(tickers[i: end]))
