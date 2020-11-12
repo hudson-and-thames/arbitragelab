@@ -18,7 +18,7 @@ jobs:
           name: Test Code Coverage
           command: |
             bash coverage
-      - store_test_reults:
+      - store_test_results:
           path: test-reports
       - store_artifacts:
           path: test-reports
