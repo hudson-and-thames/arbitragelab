@@ -4,3 +4,4 @@ reproducible, interpretable, and easy to use tools.
 """
 
 import arbitragelab.other_approaches as other_approaches
+import arbitragelab.util as util
