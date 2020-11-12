@@ -4,3 +4,4 @@ reproducible, interpretable, and easy to use tools.
 """
 
 import arbitragelab.distance_approach as distance_approach
+import arbitragelab.util as util
