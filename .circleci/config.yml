@@ -9,7 +9,7 @@ jobs:
       - run:
           name: Install Python Dependencies
           command: |
-            pip install -r requirements.txt
+            pip install --user -r requirements.txt
       - run:
           name: Run Unit Tests
           command: |
