@@ -1,4 +1,6 @@
-# -*- coding: utf-8 -*-
+# Copyright 2020, Hudson and Thames Quantitative Research
+# All rights reserved
+# Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
 """
 Module that handles copula calculations
 Created on Sun Nov  8 22:06:40 2020
@@ -12,14 +14,20 @@ from scipy.stats import kendalltau
 from sklearn.covariance import EmpiricalCovariance
 from scipy.stats import norm
 from scipy.stats import t as student_t
-import matplotlib.pyplot as plt
+from statsmodels.distributions.empirical_distribution import ECDF
 
-# if __name__ != '__main__':
 theta_copula_names = ['Gumbel', 'Clayton', 'Frank', 'Joe', 'N13', 'N14']
 cov_copula_names = ['Gaussian', 'Student']
 
-def find_marginal_dist(x):
-    pass
+def find_marginal_cdf(x, empirical=True):
+    """
+    Find cumulative density from scaled data.
+    """
+    if empirical:
+        # Prevent probability 0 and 1 from occuring
+        augment = [-0.00001, 1.00001]
+        new_x = np.insert(x, 0, augment)
+        return ECDF(new_x)
 
 def ml_theta_hat(x, y, copula_name: str):
     # 1. Calculate Kendall's tau from data
@@ -65,7 +73,7 @@ def log_ml(x, y, copula_name: str, nu: int=None):
     likelihood_list = [my_copula._c(xi, yi) for (xi, yi) in zip(x,y)]
     log_likelihood_sum = np.sum(np.log(likelihood_list))
     
-    return log_likelihood_sum, likelihood_list
+    return log_likelihood_sum, my_copula
 
 def sic(log_likelihood: float, n: int, k=1):
     sic_value = np.log(n)*k - 2*log_likelihood
@@ -169,4 +177,4 @@ def hqic(log_likelihood: float, n: int, k=1):
 #                 cmap='viridis', edgecolor='none')
 # ax.set_zlim(0, 5);
 # ax.set_title('surface');
-    
+
