@@ -3,7 +3,7 @@ import warnings
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
-from mlfinlab.statistical_arbitrage import JohansenPortfolio, EngleGrangerPortfolio
+from arbitragelab.cointegration_approach import JohansenPortfolio, EngleGrangerPortfolio
 
 
 class MinimumProfit:

@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
-from mlfinlab.statistical_arbitrage import EngleGrangerPortfolio
+from arbitragelab.cointegration_approach.engle_granger import EngleGrangerPortfolio
 
 
 class MinimumProfitSimulation:
