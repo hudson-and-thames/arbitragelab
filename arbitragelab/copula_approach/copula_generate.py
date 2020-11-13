@@ -2,9 +2,9 @@
 # All rights reserved
 # Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
 """
-Created on Thu Nov  5 13:59:47 2020
-
-@author: Hansen
+Module that houses all copula classes and the parent copula class. Also
+include a Switcher class to create copula by its name and parameters, to
+emulate a switch functionality.
 """
 import numpy as np
 from scipy.optimize import brentq as brentq
@@ -16,7 +16,6 @@ from scipy.stats import multivariate_normal as mvn
 from scipy.integrate import quad
 
 
-# noinspection PyPep8Naming
 def _bv_t_dist(x, mu, cov, df):
     """
     Bivariate Student-t probability density.
@@ -34,32 +33,51 @@ def _bv_t_dist(x, mu, cov, df):
     c21 = cov[1][0]
     c22 = cov[1][1]
     det_cov = c11 * c22 - c12 * c21
+    # Pseudo code: (x.transpose)(cov.inverse)(x)/ Det(cov)
     xT_covinv_x = (-2 * c12 * x1 * x2 + c11 * (x1 ** 2 + x2 ** 2)) / det_cov
 
     numerator = gm((2 + df) / 2)
-
-    denominator = (
-            gm(df / 2) * df * np.pi * np.sqrt(det_cov)
-            * np.power(1 + xT_covinv_x / df, (2 + df) / 2)
-    )
+    denominator = (gm(df / 2) * df * np.pi * np.sqrt(det_cov)
+                   * np.power(1 + xT_covinv_x / df, (2 + df) / 2))
 
     result = numerator / denominator
     return result
 
+class Copula:
+    """Copula class houses common functions for each coplula subtype."""
+    def __init__(self):
+        pass
+        
+    def describe(self):
+        """
+        Describe the copula's name and parameter.
+        """
+        print('test describe method')
+    
+    def sample_plot(self):
+        """
+        Quick plotting from sampling points based on copula's P.D.F.
+        """
+        print('test sample plot')
 
-class Gumbel:
+class Gumbel(Copula):
     def __init__(self, threshold=1e-10, theta=None):
-        # Lower than this amount will be considered 0
+        super().__init__()
+        # Lower than this amount will be considered 0.
         self.threshold = threshold
-        self.theta = theta  # Default input
+        self.theta = theta  # Gumbel copula parameter.
 
     def generate_pairs(self, num=None, theta=None, unif_vec=None):
         """
-        Generate pairs stored in an 2D np array.
+        Generate pairs according to P.D.F., stored in an 2D np array.
         
-        Array dimension  = (num, 2)
+        User may choose to side load independent uniformly distributed data in [0, 1]
         
-        theta in [1, +inf)
+        :param num: (int) Number of points to generate.
+        :param theta: (float) Range in [1, +inf), measurement of correlation.
+        :param unif_vec: (np.array) Shape=(num, 2) array, two independent uniformly distributed sets of data. 
+            Default uses numpy pseudo-random generators.
+        :return sample_pairs: (np.array) Shape=(num, 2) array, sampled data for this copula.
         """
         if num is None and unif_vec is None:
             raise ValueError("Please either input num or unif_vec")
@@ -67,6 +85,7 @@ class Gumbel:
         if theta is None and self.theta is not None:
             theta = self.theta  # Use the default input
 
+        # Distribution of C(U1, U2). To be used for numerically solving the inverse.
         def _Kc(w):
             return w * (1 - np.log(w) / theta)
 
@@ -74,20 +93,24 @@ class Gumbel:
         if unif_vec is None:
             unif_vec = np.random.uniform(low=0, high=1, size=(num, 2))
 
-        # Compute Gumbel copulas from the independent uniform pairs
-        copula_pairs = np.zeros_like(unif_vec)
+        # Compute Gumbel copulas from the independent uniform pairs.
+        sample_pairs = np.zeros_like(unif_vec)
         for row, pair in enumerate(unif_vec):
-            copula_pairs[row] = self._generate_one_pair(pair[0],
+            sample_pairs[row] = self._generate_one_pair(pair[0],
                                                         pair[1],
                                                         theta=theta,
                                                         Kc=_Kc)
 
-        return copula_pairs
+        return sample_pairs
 
     def _generate_one_pair(self, v1, v2, theta, Kc):
         """
-        Helper func to generate one pair of vectors from Gumbel copula
+        Helper func to generate one pair of vectors from Gumbel copula.
+        
+        :param v1: (float) i.i.d. uniform random variable in [0,1].
+        :param v2: (float) i.i.d. uniform random variable in [0,1].
         """
+        # Numerically root finding for w1, where Kc(w1) = v2. 
         if v2 > self.threshold:
             w = brentq(lambda w1: Kc(w1) - v2, self.threshold, 1)
         else:
@@ -102,20 +125,20 @@ class Gumbel:
         P.D.F. of the biavriate copula
         """
         theta = self.theta
+        # Prep param and calc
         u_part = (-np.log(u)) ** theta
         v_part = (-np.log(v)) ** theta
         expo = (u_part + v_part) ** (1 / theta)
-        pdf = 1 / (u * v) * (
-                np.exp(-expo)
-                * u_part / (-np.log(u)) * v_part / (-np.log(v))
-                * (theta + expo - 1)
-                * (u_part + v_part) ** (1 / theta - 2)
-        )
+        pdf = 1 / (u * v) \
+            * ( np.exp(-expo)
+               * u_part / (-np.log(u)) * v_part / (-np.log(v))
+               * (theta + expo - 1)
+               * (u_part + v_part) ** (1 / theta - 2))
         return pdf
 
     def _C(self, u, v):
         """
-        C.D.F. of the copula
+        C.D.F. of the copula.
         """
         theta = self.theta
         expo = ((-np.log(u)) ** theta + (-np.log(v)) ** theta) ** (1 / theta)
@@ -124,7 +147,7 @@ class Gumbel:
 
     def condi_cdf(self, u, v):
         """
-        Calculate P(U<=u | V=v)
+        Calculate P(U<=u | V=v).
         """
         theta = self.theta
         expo = ((-np.log(u)) ** theta + (-np.log(v)) ** theta) ** ((1 - theta) / theta)
@@ -221,7 +244,6 @@ class Frank:
                   / ((ent - 1) + (enut - 1) * (envt - 1)))
         return result
 
-    @staticmethod
     def _theta_hat(self, tau):
         """
         Estimate theta hat from Kendall's tau from sample data

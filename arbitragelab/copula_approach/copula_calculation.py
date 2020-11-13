@@ -2,13 +2,17 @@
 # All rights reserved
 # Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
 """
-Module that handles copula calculations
-Created on Sun Nov  8 22:06:40 2020
+Back end module that handles maximum likelihood related copula calculations.
 
-@author: Hansen
+Functions include:
+    Finding (marginal) cumulative distribution function from data.
+    Maximum likelihood estimation of theta_hat (empirical theta) from data.
+    Calculate the sum log likelihood given a copula and data.
+    Calculate SIC (Schwarz information criterion).
+    Calculate AIC (Akaike information criterion).
+    Calculate HQIC (Hannan-Quinn information criterion).
 """
 import copula_generate as cg
-import pandas as pd
 import numpy as np
 from scipy.stats import kendalltau
 from sklearn.covariance import EmpiricalCovariance
@@ -21,69 +25,136 @@ cov_copula_names = ['Gaussian', 'Student']
 
 def find_marginal_cdf(x, empirical=True):
     """
-    Find cumulative density from scaled data.
+    Find the cumulative density function (CDF) from scaled data. i.e., P(X<=x)
+
+    User can choose between empirical CDF or a CDF selected by maximum likelihood. 
+    :param x: (np.array) Data, need to be scaled to interval [0, 1].
+    :param empirical: (bool) Whether to use empirical estimation for CDF.
+    :return fitted_cdf: (func) The cumulative density function from data.
     """
     if empirical:
-        # Prevent probability 0 and 1 from occuring
+        # To prevent probability 0 and 1 from occuring, we augment the data set a bit.
         augment = [-0.00001, 1.00001]
         new_x = np.insert(x, 0, augment)
-        return ECDF(new_x)
+        # Use empirical cumulative density function on data.
+        fitted_cdf = ECDF(new_x)
+        return fitted_cdf
+    else: # Choose a distribution by maximum likelihood estimation.
+        return fitted_cdf
 
-def ml_theta_hat(x, y, copula_name: str):
-    # 1. Calculate Kendall's tau from data
-    tau = kendalltau(x, y)[0]
+def ml_theta_hat(x, y, copula_name):
+    """
+    Calculate empirical theta (theta_hat) for a type of copula by maximum likelihood.
     
-    # 2. Calculate theta from the desired copula
-    dud_cov = [[1,0],[0,1]]
+    x, y need to be uniformly distributed respectively. Use Kendall's tau value to
+    calculate theta hat.
+
+    Note: Gaussian and Student-t copula do not use this function.
+    :param x: (np.array) 1D vector data.
+    :param y: (np.array) 1D vector data.
+    :param copula_name: (str) Name of the copula.
+    :return theta_hat: (float) Empirical theta for the copula.
+    """
+    # Calculate Kendall's tau from data.
+    tau = kendalltau(x, y)[0]
+    # Calculate theta from the desired copula.
+    dud_cov = [[1,0],[0,1]]  # To create copula by name. Not involved in calculations.
+    # Create copula by its name. Fulfil switch functionality.
     Switch = cg.Switcher()
     my_copula = Switch.choose_copula(copula_name=copula_name,
                                      cov=dud_cov)
+    # Translate Kendall's tau into theta.
     theta_hat = my_copula._theta_hat(tau)
     
     return theta_hat
 
-def log_ml(x, y, copula_name: str, nu: int=None):
+def log_ml(x, y, copula_name, nu=None):
     """
-    Log of max likelihood of a given copula type.
+    Fit a type of copula using maximum likelihood.
     
-    x, y need to be uniformly distributed.
+    User provide the name of the copula (and degree of freedom nu, if it is 'Student-t'), then this method
+    fits the copyla type by maximum likelihood. Moreover, it calculates log maximum likelihood.
+    
+    :param x: (np.array) 1D vector data. Need to be uniformly distributed.
+    :param y: (np.array) 1D vector data. Need to be uniformly distributed.
+    :param copula_name: (str) Name of the copula.
+    :param nu: (float) Degree of freedom for Student-t copula.
+    :return (tuple):
+        log_likelihood_sum (float): Logarithm of max likelihood value from data.
+        my_copula (Copula): Copula with its parameter fitted to data.
     """
-    # Find log max likelihood given all the data
+    # Find log max likelihood given all the data.
     Switch = cg.Switcher()
     if copula_name in theta_copula_names:
+        # Get the max likelihood theta_hat for theta from data.
         theta = ml_theta_hat(x, y, copula_name)
         my_copula = Switch.choose_copula(copula_name=copula_name,
                                          theta=theta)
     elif copula_name == 'Gaussian':
-        unif_data = np.array([x,y]).reshape(2,-1).T  # correct dim for fitting
-        value_data = norm.ppf(unif_data)
+        # 1. Calculate covariance matrix using sklearn.
+        # Correct matrix dimension for fitting in sklearn.
+        unif_data = np.array([x,y]).reshape(2,-1).T 
+        value_data = norm.ppf(unif_data)  # Change from quantile to value.
+        # Getting empirical covariance matrix.
         cov_hat = EmpiricalCovariance().fit(value_data).covariance_
+        
+        # 2. Construct copula with fitted parameter.
         my_copula = Switch.choose_copula(copula_name=copula_name,
                                          cov=cov_hat)
     elif copula_name == 'Student':
-        unif_data = np.array([x,y]).reshape(2,-1).T  # correct dim for fitting
+        # 1. Calculate covariance matrix using sklearn.
+        # Correct matrix dimension for fitting in sklearn.
+        unif_data = np.array([x,y]).reshape(2,-1).T
         t_dist = student_t(df=nu)
-        value_data = t_dist.ppf(unif_data)
+        value_data = t_dist.ppf(unif_data)  # Change from quantile to value.
+        # Getting empirical covariance matrix.
         cov_hat = EmpiricalCovariance().fit(value_data).covariance_
-        print('cov_hat', cov_hat)
+        
+        # 2. Construct copula with fitted parameter.
         my_copula = Switch.choose_copula(copula_name=copula_name,
                                          cov=cov_hat,
                                          nu=nu)
     
+    # Likelihood quantity for each pair of data, stored in a list.
     likelihood_list = [my_copula._c(xi, yi) for (xi, yi) in zip(x,y)]
+    # Sum of logarithm of likelihood data.
     log_likelihood_sum = np.sum(np.log(likelihood_list))
     
     return log_likelihood_sum, my_copula
 
 def sic(log_likelihood: float, n: int, k=1):
+    """
+    Schwarz information criterion (SIC), aka Bayesian information criterion (BIC).
+    
+    :param log_likelihood (float): Sum of log likelihood of some data.
+    :param n (int): Number of instances.
+    :param k (int): Number of parametrs estimated by max likelihood.
+    :return sic_value (float): Value of SIC.
+    """
     sic_value = np.log(n)*k - 2*log_likelihood
     return sic_value
 
 def aic(log_likelihood: float, n: int, k=1):
+    """
+    Akaike information criterion.
+    
+    :param log_likelihood (float): Sum of log likelihood of some data.
+    :param n (int): Number of instances.
+    :param k (int): Number of parametrs estimated by max likelihood.
+    :return sic_value (float): Value of AIC.
+    """
     aic_value = (2*n/(n-k-1))*k - 2*log_likelihood
     return aic_value
 
 def hqic(log_likelihood: float, n: int, k=1):
+    """
+    Hannan-Quinn information criterion.
+    
+    :param log_likelihood (float): Sum of log likelihood of some data.
+    :param n (int): Number of instances.
+    :param k (int): Number of parametrs estimated by max likelihood.
+    :return sic_value (float): Value of HQIC.
+    """
     hqic_value = 2*np.log(np.log(n))*k - 2*log_likelihood
     return hqic_value
 
