@@ -2,7 +2,7 @@
 # All rights reserved
 # Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
 """
-Tests function of Statistical Arbitrage Kalman Filter module.
+Tests the Kalman Filter Strategy from the Other Approaches module.
 """
 
 import unittest
@@ -15,7 +15,7 @@ from arbitragelab.other_approaches import KalmanFilterStrategy
 
 class TestKalmanFilter(unittest.TestCase):
     """
-    Test Statistical Arbitrage Kalman filter functions.
+    Test Kalman Filter Strategy functions.
     """
 
     def setUp(self):
