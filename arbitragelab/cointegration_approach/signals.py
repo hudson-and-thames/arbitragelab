@@ -3,7 +3,7 @@
 # Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
 
 """
-Module for Statistical Arbitrage package implementing signal generation logic from mean-reverting portfolio process.
+Module for signal generation for Cointegratin Approach.
 """
 
 import numpy as np

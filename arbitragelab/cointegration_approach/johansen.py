@@ -3,12 +3,12 @@
 # Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
 
 """
-This module implements the Johansen cointegration approach for statistical arbitrage.
+This module implements the Johansen cointegration approach.
 """
 
 import pandas as pd
 from statsmodels.tsa.vector_ar.vecm import coint_johansen
-from mlfinlab.statistical_arbitrage.base import CointegratedPortfolio
+from arbitragelab.cointegration_approach.base import CointegratedPortfolio
 
 
 class JohansenPortfolio(CointegratedPortfolio):

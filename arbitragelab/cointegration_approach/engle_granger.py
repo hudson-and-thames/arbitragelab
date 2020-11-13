@@ -3,14 +3,14 @@
 # Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
 
 """
-This module implements Engle-Granger cointegration approach for statistical arbitrage.
+This module implements Engle-Granger cointegration approach.
 """
 
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import LinearRegression
 from statsmodels.tsa.stattools import adfuller
-from mlfinlab.statistical_arbitrage.base import CointegratedPortfolio
+from arbitragelab.cointegration_approach.base import CointegratedPortfolio
 
 
 class EngleGrangerPortfolio(CointegratedPortfolio):
