@@ -2,7 +2,7 @@
 # All rights reserved
 # Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
 """
-Tests the PCA Strategy from the Statistical Arbitrage module.
+Tests the PCA Strategy from the Other Approaches module.
 """
 
 import unittest
