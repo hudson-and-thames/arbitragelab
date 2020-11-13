@@ -111,6 +111,14 @@ This project is licensed under an all rights reserved licence.
 
 .. toctree::
     :maxdepth: 2
+    :caption: Utils
+    :hidden:
+
+    utils/data_importer
+
+
+.. toctree::
+    :maxdepth: 2
     :caption: Additional Information
     :hidden:
 
