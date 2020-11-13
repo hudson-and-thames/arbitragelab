@@ -185,7 +185,7 @@ Code Examples
 
    # Importing packages
    import pandas as pd
-   from arbitragelab.distance_approach.distance_approach import DistanceStrategy
+   from arbitragelab.distance_approach.basic_distance_approach import DistanceStrategy
 
    # Getting the dataframe with price time series for a set of assets
    data = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])
@@ -221,6 +221,6 @@ Research Notebooks
 
 The following research notebook can be used to better understand the distance approach described above.
 
-* `Distance Approach`_
+* `Basic Distance Approach`_
 
-.. _`Distance Approach`: https://github.com/Hudson-and-Thames-Clients/research/blob/master/Statistical%20Arbitrage/distance_approach.ipynb
+.. _`Basic Distance Approach`: https://github.com/Hudson-and-Thames-Clients/research/blob/master/Statistical%20Arbitrage/distance_approach.ipynb

@@ -1,4 +1,4 @@
 """
-The module implements Distance-based Statistical Arbitrage strategies
+The module implements Distance-based Statistical Arbitrage strategies.
 """
-from arbitragelab.distance_approach.distance_approach import DistanceStrategy
+from arbitragelab.distance_approach.basic_distance_approach import DistanceStrategy

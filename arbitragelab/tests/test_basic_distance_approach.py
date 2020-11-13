@@ -2,7 +2,7 @@
 # All rights reserved
 # Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
 """
-Tests the distance approach from the StatArb module in statistical_arbitrage/distance_approach.py.
+Tests the basic distance approach from the Distance Approach module of ArbitrageLab.
 """
 import unittest
 import os
@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 import matplotlib
 
-from arbitragelab.distance_approach.distance_approach import DistanceStrategy
+from arbitragelab.distance_approach.basic_distance_approach import DistanceStrategy
 
 
 class TestDistanceStrategy(unittest.TestCase):
