@@ -18,8 +18,8 @@ sys.path.insert(0, os.path.abspath('./../..'))
 # -- Project information -----------------------------------------------------
 
 project = 'arbitragelab'
-copyright = '2019, Hudson & Thames Quantitative Research,'
-author = 'Hudson & Thames Quantitative Research'
+copyright = '2019, Hudson & Thames Quantitative Research.'
+author = 'Hudson & Thames Quantitative Research.'
 
 # The full version, including alpha/beta/rc tags
 release = '0.0.1'
@@ -34,7 +34,9 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.coverage',
     'sphinx.ext.intersphinx',
-    'sphinx.ext.viewcode'
+    'sphinx.ext.viewcode',
+    'releases'
+
 ]
 
 
@@ -73,3 +75,8 @@ html_favicon = '_static/favicon.png'
 html_static_path = ['_static']
 
 html_copy_source = True
+
+
+# 'releases' (changelog) settings
+releases_github_path = 'hudson-and-thames/arbitragelab'
+releases_unstable_prehistory = True

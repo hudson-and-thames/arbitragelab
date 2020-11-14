@@ -7,5 +7,6 @@ pandas==1.0.4
 codecov==2.0.15
 coverage==4.5.2
 pylint==2.5.3
-sphinx==2.2.1 # needed for docs
-sphinx-rtd-theme==0.4.3 # needed for docs
+sphinx==2.2.1 # Docs
+sphinx-rtd-theme==0.4.3 # Docs
+releases==1.6.3  # Docs
