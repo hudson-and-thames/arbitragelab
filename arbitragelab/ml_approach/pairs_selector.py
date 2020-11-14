@@ -23,7 +23,9 @@ from arbitragelab.util.indexed_highlight import IndexedHighlight
 
 class PairsSelector:
     """
-    Implementation of the Proposed Pairs Selection Framework in the following paper.
+    Implementation of the Proposed Pairs Selection Framework in the following paper:
+    `"A Machine Learning based Pairs Trading Investment Strategy."
+    <http://premio-vidigal.inesc.pt/pdf/SimaoSarmentoMSc-resumo.pdf>`__.
 
     The method consists of three parts; dimensionality reduction, clustering of features and
     finally the selection of pairs with the use of a set of heuristics.
@@ -128,7 +130,7 @@ class PairsSelector:
         Second step of the framework;
 
         Doing Unsupervised Learning on the feature vector supplied from the first step. The
-        second clustering method used is DBSCAN, for when the user needs a more hands on approach
+        second clustering method used is DBSCAN, for when the user needs a more hands-on approach
         to doing the clustering step, given the parameter sensitivity of this method.
 
         :param args: (dict) Arguments to be passed to the clustering algorithm.
@@ -143,7 +145,7 @@ class PairsSelector:
         self.clust_labels_ = clust.labels_
 
     def plot_clustering_info(self, n_dimensions: int = 2, method: str = "",
-                             figsize: tuple = (10, 10), show: bool = True) -> Axes:
+                             figsize: tuple = (10, 10)) -> Axes:
         """
         Plots the clusters found on a scatter plot.
 
@@ -161,7 +163,7 @@ class PairsSelector:
             raise Exception("The needed cluster labels have not been computed yet.",
                             "Please run cluster() before this method.")
 
-        if (n_dimensions > 3) and (n_dimensions > 1):
+        if (n_dimensions > 3) or (n_dimensions < 1):
             raise Exception("Select a valid dimension! (more than 1 and less than 3).")
 
         no_of_classes = len(np.unique(self.clust_labels_))
@@ -170,64 +172,73 @@ class PairsSelector:
 
         tsne = TSNE(n_components=n_dimensions)
 
-        tsne_fv = pd.DataFrame(
-            tsne.fit_transform(self.feature_vector),
-            index=self.feature_vector.index
-        )
+        tsne_fv = pd.DataFrame(tsne.fit_transform(self.feature_vector),
+                               index=self.feature_vector.index)
 
         if n_dimensions == 2:
-            return self.plot_2d_scatter_plot(fig, tsne_fv, no_of_classes, method, show)
+            return self.plot_2d_scatter_plot(fig, tsne_fv, no_of_classes, method)
 
-        return self.plot_3d_scatter_plot(tsne_fv, no_of_classes, method, show)
-
+        return self.plot_3d_scatter_plot(tsne_fv, no_of_classes, method)
 
     def plot_3d_scatter_plot(self, tsne_df: pd.DataFrame, no_of_classes: int,
-                             method: str = "", show: bool = False) -> Axes:
+                             method: str = "") -> Axes:
         """
-        Plots the clusters found on a 3d scatter plot.
+        Plots the clusters found on a 3d scatter plot. In this method it is
+        assumed that the data being plotted has been pre-processed using TSNE
+        constrained to three components to provide the best visualization of
+        dataset possible.
 
         :param tsne_df: (pd.DataFrame) Data reduced using T-SNE.
         :param no_of_classes: (int) Number of unique clusters/classes.
         :param method: (str) String to be used as title in the plot.
-        :param show: (bool) Switches between [True] plotting on a new axes object or
-            [False] plotting on the last axes object that's been created.
         :return: (Axes) Axes object.
         """
 
         ax_object = plt.subplot(111, projection='3d')
         paths_collection = []
 
-        for klass in range(0, no_of_classes):
-            x_klass = tsne_df[self.clust_labels_ == klass]
+        # For each cluster.
+        for cluster in range(0, no_of_classes):
 
-            paths = ax_object.plot(x_klass.loc[:, 0], x_klass.loc[:, 1], x_klass.loc[:, 2], alpha=0.7,
-                                   marker='.', linestyle='None', label=list(x_klass.index), markersize=30)
+            # Get specific cluster data from the tsne processed dataframe.
+            cluster_data = tsne_df[self.clust_labels_ == cluster]
 
+            # Plot the cluster data by column index [0, 1, 2] -> [x, y, z].
+            paths = ax_object.plot(cluster_data.loc[:, 0], cluster_data.loc[:, 1],
+                                   cluster_data.loc[:, 2], alpha=0.7, marker='.',
+                                   linestyle='None', label=list(cluster_data.index),
+                                   markersize=30)
+
+            # Stash the list of Line2D objects for future use.
             paths_collection.append(paths)
 
+        # Flatten the paths array and instantiate the IndexedHighlight class
+        # that will manage the selection and highlighting of the plotted
+        # clusters.
         IndexedHighlight(np.ravel(paths_collection),
                          formatter='{label}'.format)
 
+        # Plot the noisy samples which are not included in a leaf cluster labelled as -1,
+        # by column index [0, 1, 2] -> [x, y, z].
         ax_object.plot(tsne_df.iloc[self.clust_labels_ == -1, 0], tsne_df.iloc[self.clust_labels_ == -1, 1],
                        tsne_df.iloc[self.clust_labels_ == -1, 2], 'k+', alpha=0.1)
+
+        # Set the chart title.
         ax_object.set_title('Automatic Clustering\n' + method)
 
-        if show: # pragma: no cover
-            plt.show()
+        plt.show()
 
         return ax_object
 
     def plot_2d_scatter_plot(self, fig: Figure, tsne_df: pd.DataFrame, no_of_classes: int,
-                             method: str = "", show: bool = False) -> Axes:
+                             method: str = "") -> Axes:
         """
         Plots the clusters found on a 2d scatter plot.
 
-        :param fig: (Figure) Figure object, needed for styling of spline.
+        :param fig: (Figure) Figure object, needed for the styling of the spline.
         :param tsne_df: (pd.DataFrame) Data reduced using T-SNE.
         :param no_of_classes: (int) Number of unique clusters/classes.
         :param method: (str) String to be used as title in the plot.
-        :param show: (bool) Switches between [True] plotting on a new axes object or
-            [False] plotting on the last axes object that's been created.
         :return: (Axes) Axes object.
         """
 
@@ -246,11 +257,12 @@ class PairsSelector:
 
         paths_collection = []
 
-        for klass in range(0, no_of_classes):
-            x_klass = tsne_df[self.clust_labels_ == klass]
+        for cluster in range(0, no_of_classes):
+            cluster_data = tsne_df[self.clust_labels_ == cluster]
 
-            paths = ax_object.plot(x_klass.loc[:, 0], x_klass.loc[:, 1], label=list(x_klass.index),
-                                   markersize=30, alpha=0.75, marker='.', linestyle='None')
+            paths = ax_object.plot(cluster_data.loc[:, 0], cluster_data.loc[:, 1],
+                                   label=list(cluster_data.index), markersize=30,
+                                   alpha=0.75, marker='.', linestyle='None')
 
             paths_collection.append(paths)
 
@@ -262,8 +274,7 @@ class PairsSelector:
 
         ax_object.set_title('Automatic Clustering\n' + method)
 
-        if show:# pragma: no cover # this is here to stop matplotlib from popping an image on the build server
-            plt.show()
+        plt.show()
 
         return ax_object
 
@@ -341,38 +352,40 @@ class PairsSelector:
                          hurst_exp_threshold: int = 0.5) -> tuple:
         """
         This method will go through all the pairs given, calculate the needed spread and run
-        the hurst exponent test against each one.
+        the Hurst exponent test against each one.
 
         :param pairs: (pd.DataFrame) DataFrame of asset name pairs to be analyzed.
-        :param hurst_exp_threshold: (int) Max hurst threshold value.
+        :param hurst_exp_threshold: (int) Max Hurst threshold value.
         :return: (pd.DataFrame, pd.DataFrame) The first DataFrame consists of the Hedge ratio adjusted spreads
-            and the second DataFrame consists of pairs that passed the hurst check / their respective hurst value.
+            and the second DataFrame consists of pairs that passed the Hurst check / their respective Hurst value.
         """
 
         hurst_pass_pairs = []
         spreads_lst = []
         spreads_cols = []
 
-        if len(pairs) != 0:
-            for idx, frame in pairs.iterrows():
-                asset_one = self.prices_df.loc[:, idx[1]].values
-                asset_two = self.prices_df.loc[:, idx[0]].values
-
-                spread_ts = (asset_one - asset_two * frame['hedge_ratio'])
-                hurst_exp = self.hurst(spread_ts)
-
-                if hurst_exp < hurst_exp_threshold:
-                    hurst_pass_pairs.append((idx, hurst_exp))
-                    spreads_lst.append(spread_ts)
-                    spreads_cols.append(str(idx))
-        else:
+        if len(pairs) == 0:
             raise Exception("No pairs have been found!")
+
+        for idx, frame in pairs.iterrows():
+            asset_one = self.prices_df.loc[:, idx[1]].values
+            asset_two = self.prices_df.loc[:, idx[0]].values
+
+            spread_ts = (asset_one - asset_two * frame['hedge_ratio'])
+            hurst_exp = self.hurst(spread_ts)
+
+            if hurst_exp < hurst_exp_threshold:
+                hurst_pass_pairs.append((idx, hurst_exp))
+                spreads_lst.append(spread_ts)
+                spreads_cols.append(str(idx))
 
         spreads_df = pd.DataFrame(data=spreads_lst).T
         spreads_df.columns = spreads_cols
         spreads_df.index = pd.to_datetime(self.prices_df.index)
 
-        hurst_pass_pairs_df = pd.DataFrame(data=hurst_pass_pairs, columns=['pairs', 'hurst_exponent']).set_index('pairs')
+        hurst_pass_pairs_df = pd.DataFrame(data=hurst_pass_pairs)
+        hurst_pass_pairs_df.columns = ['pairs', 'hurst_exponent']
+        hurst_pass_pairs_df.set_index('pairs', inplace=True)
         hurst_pass_pairs_df.index.name = None
 
         return spreads_df, hurst_pass_pairs_df
@@ -382,35 +395,34 @@ class PairsSelector:
                           min_crossover_threshold_per_year: int = 12) -> tuple:
         """
         This method consists of the final two criterions checks in the third stage of the proposed
-        framework which involves; the calculation and check, of the half life of the given pair spread
+        framework which involves; the calculation and check, of the half-life of the given pair spread
         and the amount of mean crossovers throughout a set period, in this case in a year.
 
         :param spreads_df: (pd.DataFrame) Hedge ratio adjusted spreads DataFrame.
         :param pairs: (list) List of asset name pairs to be analyzed.
         :param min_crossover_threshold_per_year: (int) Minimum amount of mean crossovers per year.
-        :return: (pd.DataFrame, pd.DataFrame) The first is a DataFrame of pairs that passed the half life
+        :return: (pd.DataFrame, pd.DataFrame) The first is a DataFrame of pairs that passed the half-life
             test and the second is a DataFrame of final pairs and their mean crossover counts.
         """
 
         hl_pass_pairs = []
         final_pairs = []
 
-        if len(pairs) != 0:
-            ou_results = _outer_ou_loop(spreads_df, molecule=pairs, test_period='2Y',
-                                        cross_overs_per_delta=min_crossover_threshold_per_year)
-
-            final_selection = ou_results[ou_results['hl'] > 1]
-
-            final_selection = final_selection.loc[ou_results['hl'] < 365]
-
-            hl_pass_pairs = final_selection
-
-            final_selection = final_selection.loc[ou_results['crossovers']]
-
-            final_pairs = final_selection
-
-        else:
+        if len(pairs) == 0:
             raise Exception("No pairs have been found!")
+
+        ou_results = _outer_ou_loop(spreads_df, molecule=pairs, test_period='2Y',
+                                    cross_overs_per_delta=min_crossover_threshold_per_year)
+
+        final_selection = ou_results[ou_results['hl'] > 1]
+
+        final_selection = final_selection.loc[ou_results['hl'] < 365]
+
+        hl_pass_pairs = final_selection
+
+        final_selection = final_selection.loc[ou_results['crossovers']]
+
+        final_pairs = final_selection
 
         return hl_pass_pairs, final_pairs
 
@@ -421,11 +433,11 @@ class PairsSelector:
 
         The clusters found in step two are used to generate a list of possible pairwise combinations.
         The combinations generated are then checked to see if they comply with the criteria supplied
-        in the paper: the pair being cointegrated, the hurst exponent being <0.5, the spread moves
+        in the paper: the pair being cointegrated, the Hurst exponent being <0.5, the spread moves
         within convenient periods and finally that the spread reverts to the mean with enough frequency.
 
         :param pvalue_threshold: (int) Max p-value threshold to be used in the cointegration tests.
-        :param hurst_exp_threshold: (int) Max hurst threshold value.
+        :param hurst_exp_threshold: (int) Max Hurst threshold value.
         :param min_crossover_threshold_per_year: (int) Minimum amount of mean crossovers per year.
         :return: (list) Tuple list of final pairs.
         """
@@ -434,7 +446,7 @@ class PairsSelector:
             raise Exception("The needed cluster labels have not been computed yet.",
                             "Please run cluster() before this method.")
 
-        # Generate needed pairwise combinations and remove unneccessary
+        # Generate needed pairwise combinations and remove unnecessary
         # duplicates.
 
         c_labels = np.unique(self.clust_labels_[self.clust_labels_ != -1])
@@ -451,12 +463,12 @@ class PairsSelector:
 
         The clusters found in step two are used to generate a list of possible pairwise combinations.
         The combinations generated are then checked to see if they comply with the criteria supplied
-        in the paper: the pair being cointegrated, the hurst exponent being <0.5, the spread moves
+        in the paper: the pair being cointegrated, the Hurst exponent being <0.5, the spread moves
         within convenient periods and finally that the spread reverts to the mean with enough frequency.
 
         :param cluster_x_cointegration_combinations: (list) List of asset pairs.
         :param pvalue_threshold: (int) Max p-value threshold to be used in the cointegration tests.
-        :param hurst_exp_threshold: (int) Max hurst threshold value.
+        :param hurst_exp_threshold: (int) Max Hurst threshold value.
         :param min_crossover_threshold_per_year: (int) Minimum amount of mean crossovers per year.
         :return: (list) Tuple list of final pairs.
         """
@@ -495,7 +507,6 @@ class PairsSelector:
 
         return final_pairs.index.values
 
-
     def plot_selected_pairs(self) -> list:
         """
         Plots the final selection of pairs.
@@ -525,7 +536,7 @@ class PairsSelector:
 
         The following statistics are included - the number of clusters, total possible pair combinations,
         the number of pairs that passed the cointegration threshold, the number of pairs that passed the
-        hurst exponent threshold, the number of pairs that passed the half life threshold and the number
+        Hurst exponent threshold, the number of pairs that passed the half-life threshold and the number
         of final set of pairs.
 
         :return: (pd.DataFrame) Dataframe of summary statistics.
@@ -542,8 +553,9 @@ class PairsSelector:
         info.append(("Total Pair Combinations", no_paircomb))
         info.append(("Pairs passing Coint Test", len(self.coint_pass_pairs)))
         info.append(("Pairs passing Hurst threshold", no_hurstpair))
-        info.append(("Pairs passing Half Life threshold", no_hlpair))
+        info.append(("Pairs passing Half-Life threshold", no_hlpair))
         info.append(("Final Set of Pairs", len(self.final_pairs)))
+
         return pd.DataFrame(info)
 
     def describe_extra(self) -> pd.DataFrame:
@@ -561,6 +573,7 @@ class PairsSelector:
         description_df.reset_index(inplace=True)
         description_df.rename(columns={'level_0': 'leg_1', 'level_1': 'leg_2', 'hl': 'half_life'}, inplace=True)
         description_df.drop(['constant'], axis=1, errors='ignore', inplace=True)
+
         return description_df
 
     @staticmethod
@@ -571,6 +584,7 @@ class PairsSelector:
         :param arr: (np.array) Input array to be converted.
         :return: (tuple) List converted to tuple.
         """
+
         return tuple(i for i in arr)
 
     def describe_pairs_sectoral_info(self, leg_1: list, leg_2: list,
@@ -631,4 +645,5 @@ class PairsSelector:
         tau = [np.sqrt(np.std(np.subtract(data[lag:], data[:-lag])))
                for lag in lags]
         poly = np.polyfit(np.log(lags), np.log(tau), 1)
+
         return poly[0] * 2.0

@@ -70,7 +70,7 @@ class DataImporter:
         :param tickers: (list) List of tickers to download.
         :param start_date: (str) Download start date string (YYYY-MM-DD).
         :param end_date: (str) Download end date string (YYYY-MM-DD).
-        :param interval: (str) Valid intervals: 1m,2m,5m,15m,30m,60m,90m,1h,1d,5d,1wk,1mo,3mo.
+        :param interval: (str) Valid intervals: [1m,2m,5m,15m,30m,60m,90m,1h,1d,5d,1wk,1mo,3mo].
         :return: (pd.DataFrame) The requested price_data.
         """
 
@@ -104,8 +104,10 @@ class DataImporter:
         and supplied sequentially to the helper function.
 
         :param tickers: (list) List of asset symbols.
-        :param yf_call_chunk: (int) Ticker values allowed per 'Tickers' object. This should always be less than 200.
-        :return: (pd.DataFrame) DataFrame with input asset tickers and their respective sector and industry information.
+        :param yf_call_chunk: (int) Ticker values allowed per 'Tickers'
+            object. This should always be less than 200.
+        :return: (pd.DataFrame) DataFrame with input asset tickers and their
+            respective sector and industry information.
         """
 
         ticker_sector_queue = []
@@ -128,7 +130,8 @@ class DataImporter:
         Helper method to supply chunked sector info to the main method.
 
         :param tickers: (list) List of asset symbols.
-        :return: (pd.DataFrame) DataFrame with input asset tickers and their respective sector and industry information.
+        :return: (pd.DataFrame) DataFrame with input asset tickers and their respective sector
+            and industry information.
         """
 
         tckrs = yf.Tickers(' '.join(tickers))

@@ -3,7 +3,7 @@
 # Read more: https://github.com/hudson-and-thames/arbitragelab/blob/master/LICENSE.txt
 """
 Tests function of ML Pairs Selection module:
-ml_based_pairs_selection/pairs_selector.py
+ml_approach/pairs_selector.py
 """
 import os
 import unittest
@@ -52,7 +52,7 @@ class TestPairsSelector(unittest.TestCase):
 
         # Test clustering plot before generating any clusters.
         with self.assertRaises(Exception):
-            self.pair_selector.plot_clustering_info(show=False)
+            self.pair_selector.plot_clustering_info()
 
         # Test dimensionality reduction when inputting invalid data.
         with self.assertRaises(Exception):
@@ -275,7 +275,7 @@ class TestPairsSelector(unittest.TestCase):
 
         # Test the clustering plotting method with no information.
         with self.assertRaises(Exception):
-            self.pair_selector.plot_clustering_info(show=False)
+            self.pair_selector.plot_clustering_info()
 
         # Setup initial variables needed for the test.
         self.pair_selector.dimensionality_reduction_by_components(1)
@@ -286,13 +286,13 @@ class TestPairsSelector(unittest.TestCase):
         self.assertTrue(issubclass(type(knee_plot_pyplot_obj), matplotlib.axes.SubplotBase))
 
         # Test 2d cluster plot return object.
-        twod_pyplot_obj = self.pair_selector.plot_clustering_info(n_dimensions=2, show=False)
+        twod_pyplot_obj = self.pair_selector.plot_clustering_info(n_dimensions=2)
         self.assertTrue(issubclass(type(twod_pyplot_obj), matplotlib.axes.SubplotBase))
 
         # Test 3d cluster plot return object.
-        threed_pyplot_obj = self.pair_selector.plot_clustering_info(n_dimensions=3, show=False)
+        threed_pyplot_obj = self.pair_selector.plot_clustering_info(n_dimensions=3)
         self.assertTrue(issubclass(type(threed_pyplot_obj), matplotlib.axes.SubplotBase))
 
         # Test the clustering plotting method with an oversized dimension number.
         with self.assertRaises(Exception):
-            self.pair_selector.plot_clustering_info(n_dimensions=10, show=False)
+            self.pair_selector.plot_clustering_info(n_dimensions=10)

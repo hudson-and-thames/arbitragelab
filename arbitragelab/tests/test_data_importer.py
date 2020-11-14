@@ -3,7 +3,7 @@
 # Read more: https://github.com/hudson-and-thames/arbitragelab/blob/master/LICENSE.txt
 """
 Tests functionality of Data Importer:
-ml_based_pairs_selection/data_importer.py
+util/data_importer.py
 """
 import os
 import unittest

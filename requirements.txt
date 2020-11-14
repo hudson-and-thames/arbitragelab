@@ -15,3 +15,4 @@ yfinance==0.1.54
 yahoo-fin==0.8.6
 mpldatacursor==0.7.1
 lxml==4.5.2
+requests_html==0.10.0
