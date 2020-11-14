@@ -1,23 +1,26 @@
-[html]
-directory = build/coverage/html
-
 [run]
-branch = True
-omit =
-     *__init__*
-     /tests/*
+omit=*__init__*
+     arbitragelab/tests/*
      scripts/*
      /opt/conda/*
+     */home/travis/virtualenv/python3.7.1/lib/python3.7/site-packages/xmlrunner/*
+     */home/travis/virtualenv/python3.7.1/lib/python3.7/site-packages/*
      # Ensure we exclude any files in .local
      */.local/*
+branch=True
 disable_warnings = no-data-collected
 
 [report]
-partial_branches = True
-show_missing = True
+partial_branches=True
+show_missing=True
 exclude_lines =
     pragma: no cover
     raise NotImplementedError
     @abc.abstractmethod
     @abc.abstractproperty
     def _dependencies(self):
+
+[html]
+directory=cover
+
+[xml]
