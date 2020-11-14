@@ -15,9 +15,8 @@ import matplotlib.pyplot as plt
 
 class DistanceStrategy:
     """
-    Class for creation of trading signals following the strategy by
-    Gatev, E., Goetzmann, W. N., and Rouwenhorst, K. G. in
-    "Pairs trading:  Performance of a relative-value arbitrage rule." (2006)
+    Class for creation of trading signals following the strategy by Gatev, E., Goetzmann, W. N., and Rouwenhorst, K. G.
+    in "Pairs trading:  Performance of a relative-value arbitrage rule." (2006)
     https://papers.ssrn.com/sol3/papers.cfm?abstract_id=141615.
     """
     def __init__(self):

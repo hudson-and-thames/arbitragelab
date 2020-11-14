@@ -2,10 +2,10 @@
 
 .. note::
    The following documentation closely follows a paper by Gatev et al. (2006):
-   `Pairs trading: Performance of a relative-value arbitrage rule <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=141615>`__.
+   `Pairs trading: Performance of a relative-value arbitrage rule <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=141615>`_.
 
-   And a paper by Christopher Krauss (2015):
-   `Statistical arbitrage pairs trading strategies: Review and outlook <https://www.econstor.eu/bitstream/10419/116783/1/833997289.pdf>`__.
+   As well as a paper by Christopher Krauss (2015):
+   `Statistical arbitrage pairs trading strategies: Review and outlook <https://www.econstor.eu/bitstream/10419/116783/1/833997289.pdf>`_.
 
 =================
 Distance Approach
@@ -178,8 +178,11 @@ Implementation
 
 .. autofunction:: plot_portfolio
 
-Code Examples
-#############
+Examples
+########
+
+Code Example
+************
 
 .. code-block::
 
@@ -217,10 +220,18 @@ Code Examples
    figure = strategy.plot_pair(1)
 
 Research Notebooks
-##################
+******************
 
 The following research notebook can be used to better understand the distance approach described above.
 
 * `Basic Distance Approach`_
 
 .. _`Basic Distance Approach`: https://github.com/Hudson-and-Thames-Clients/research/blob/master/Statistical%20Arbitrage/distance_approach.ipynb
+
+
+References
+##########
+
+* `Do, B. and Faff, R., 2010. Does simple pairs trading still work?. Financial Analysts Journal, 66(4), pp.83-95. <https://www.jstor.org/stable/pdf/25741293.pdf?casa_token=nIfIcPq13NAAAAAA:Nfrg__C0Q1lcvoBi6Z8DwC_-6pA_cHDdLxxINYg7BPvuq-R5nNzbhVWra2PBL7t2hntj_WBxGH_vCezpp-ZN7NKYhKuZMoX97A7im7PREt7oh2mAew>`_
+* `Gatev, E., Goetzmann, W.N. and Rouwenhorst, K.G., 2006. Pairs trading: Performance of a relative-value arbitrage rule. The Review of Financial Studies, 19(3), pp.797-827. <https://www.nber.org/system/files/working_papers/w7032/w7032.pdf>`_
+* `Krauss, C., 2017. Statistical arbitrage pairs trading strategies: Review and outlook. Journal of Economic Surveys, 31(2), pp.513-545. <https://www.econstor.eu/bitstream/10419/116783/1/833997289.pdf>`_

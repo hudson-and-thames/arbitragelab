@@ -97,7 +97,6 @@ This project is licensed under an all rights reserved licence.
     :hidden:
 
     getting_started/installation
-    getting_started/researcher
     getting_started/research_tools
 
 .. toctree::
@@ -113,7 +112,6 @@ This project is licensed under an all rights reserved licence.
     :caption: Additional Information
     :hidden:
 
-    additional_information/contributing
     additional_information/license
 
 .. toctree::
