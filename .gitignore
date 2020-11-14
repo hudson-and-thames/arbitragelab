@@ -5,8 +5,8 @@ cover/
 build/
 dist/
 .tox/
-*.pyc
 __pycache__
+*.pyc
 test_reports
 .coverage
 .coverage.*

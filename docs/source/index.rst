@@ -41,7 +41,7 @@ We source all of our implementations from the most elite and peer-reviewed journ
 4. `Cambridge University Press <https://www.cambridge.org/>`_
 
 .. figure:: _static/logo_black.png
-   :scale: 100 %
+   :scale: 15 %
    :align: center
    :figclass: align-center
    :alt: Academic Journals
@@ -115,3 +115,10 @@ This project is licensed under an all rights reserved licence.
 
     additional_information/contributing
     additional_information/license
+
+.. toctree::
+    :maxdepth: 3
+    :caption: Developer Guide
+    :hidden:
+
+    changelog
