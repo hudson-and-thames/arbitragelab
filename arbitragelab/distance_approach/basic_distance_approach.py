@@ -34,15 +34,6 @@ class DistanceStrategy:
         self.portfolios = None  # Pair portfolios composed from test dataset
         self.trading_signals = None  # Final trading signals
 
-    @staticmethod
-    def untested():
-        """
-        asd
-        :return: a
-        """
-        answer = 1 + 1
-        return answer
-
     def form_pairs(self, train_data, num_top=5, skip_top=0, list_names=None):
         """
         Forms pairs based on input training data.
