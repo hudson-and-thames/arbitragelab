@@ -36,8 +36,12 @@ class DistanceStrategy:
 
     @staticmethod
     def untested():
-        a = 1 + 1
-        return a
+        """
+        asd
+        :return: a
+        """
+        answer = 1 + 1
+        return answer
 
     def form_pairs(self, train_data, num_top=5, skip_top=0, list_names=None):
         """
