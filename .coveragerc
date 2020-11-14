@@ -5,8 +5,7 @@ directory = build/coverage/html
 branch = True
 omit =
      *__init__*
-     /tests/*
-     scripts/*
+     tests/*
      /opt/conda/*
      # Ensure we exclude any files in .local
      */.local/*

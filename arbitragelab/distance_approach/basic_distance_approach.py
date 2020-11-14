@@ -8,13 +8,12 @@ Gatev, E., Goetzmann, W. N., and Rouwenhorst, K. G. in
 https://papers.ssrn.com/sol3/papers.cfm?abstract_id=141615.
 """
 
-from abc import ABC
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
 
-class DistanceStrategy(ABC):
+class DistanceStrategy:
     """
     Class for creation of trading signals following the strategy by
     Gatev, E., Goetzmann, W. N., and Rouwenhorst, K. G. in
