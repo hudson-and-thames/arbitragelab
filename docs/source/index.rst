@@ -1,4 +1,4 @@
-.. image:: logo/black_logo.png
+.. image:: _static/logo_black.png
    :scale: 15 %
    :align: center
    :target: https://hudsonthames.org/
@@ -40,7 +40,7 @@ We source all of our implementations from the most elite and peer-reviewed journ
 3. `The Journal of Algorithmic Finance <http://www.algorithmicfinance.org/>`_
 4. `Cambridge University Press <https://www.cambridge.org/>`_
 
-.. figure:: logo/journals.png
+.. figure:: _static/logo_black.png
    :scale: 100 %
    :align: center
    :figclass: align-center

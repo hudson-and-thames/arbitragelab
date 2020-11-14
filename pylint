@@ -1,2 +1,2 @@
 #!/bin/bash
-pylint mlfinlab --rcfile=.pylintrc -f text
+pylint arbitragelab --rcfile=.pylintrc -f text
