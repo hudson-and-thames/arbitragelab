@@ -1,8 +1,11 @@
-codecov==2.0.15
-coverage==4.5.2
+# Production
 numpy==1.18.5
 matplotlib==3.2.1
 pandas==1.0.4
+
+# Develop
+codecov==2.0.15
+coverage==4.5.2
 pylint==2.5.3
 sphinx==2.2.1 # Docs
 sphinx-rtd-theme==0.4.3 # Docs

@@ -1,6 +1,6 @@
 [run]
 omit=*__init__*
-     arbitragelab/tests/*
+     tests/*
      scripts/*
      /opt/conda/*
      */home/travis/virtualenv/python3.7.1/lib/python3.7/site-packages/xmlrunner/*
@@ -22,5 +22,3 @@ exclude_lines =
 
 [html]
 directory=cover
-
-[xml]
