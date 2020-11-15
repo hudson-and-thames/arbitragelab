@@ -1,4 +1,4 @@
-.. image:: logo/black_logo.png
+.. image:: _static/logo_black.png
    :scale: 15 %
    :align: center
    :target: https://hudsonthames.org/
@@ -40,8 +40,8 @@ We source all of our implementations from the most elite and peer-reviewed journ
 3. `The Journal of Algorithmic Finance <http://www.algorithmicfinance.org/>`_
 4. `Cambridge University Press <https://www.cambridge.org/>`_
 
-.. figure:: logo/journals.png
-   :scale: 100 %
+.. figure:: _static/logo_black.png
+   :scale: 15 %
    :align: center
    :figclass: align-center
    :alt: Academic Journals
@@ -97,8 +97,15 @@ This project is licensed under an all rights reserved licence.
     :hidden:
 
     getting_started/installation
-    getting_started/researcher
     getting_started/research_tools
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Distance Approach
+    :hidden:
+
+    distance_approach/introduction
+    distance_approach/distance_approach
 
 .. toctree::
     :maxdepth: 2
@@ -113,5 +120,11 @@ This project is licensed under an all rights reserved licence.
     :caption: Additional Information
     :hidden:
 
-    additional_information/contributing
     additional_information/license
+
+.. toctree::
+    :maxdepth: 3
+    :caption: Developer Guide
+    :hidden:
+
+    changelog

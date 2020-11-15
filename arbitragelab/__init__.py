@@ -4,4 +4,4 @@ reproducible, interpretable, and easy to use tools.
 """
 
 import arbitragelab.cointegration_approach as cointegration_approach
-import arbitragelab.util as util
+import arbitragelab.distance_approach as distance_approach
