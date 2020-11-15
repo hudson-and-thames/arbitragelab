@@ -3,4 +3,4 @@ ArbitrageLab helps portfolio managers and traders who want to leverage the power
 reproducible, interpretable, and easy to use tools.
 """
 
-import arbitragelab.util as util
+import arbitragelab.distance_approach as distance_approach
