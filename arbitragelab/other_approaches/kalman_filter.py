@@ -20,6 +20,7 @@ Additional information can be found in the following sources:
 import numpy as np
 import pandas as pd
 
+
 # pylint: disable=invalid-name
 class KalmanFilterStrategy:
     """
@@ -42,8 +43,8 @@ class KalmanFilterStrategy:
         """
         Init Kalman Filter strategy.
 
-        Kalman filter has two important parameters which need to be set in advance or
-        optimized: observation covariance and transition covariance.
+        Kalman filter has two important parameters which need to be set in advance or optimized: observation covariance
+        and transition covariance.
 
         :param observation_covariance: (float) Observation covariance value.
         :param transition_covariance: (float) Transition covariance value.
@@ -68,14 +69,15 @@ class KalmanFilterStrategy:
         """
         Update the hedge ratio based on the recent observation of two assets.
 
-        By default, y is the observed variable and x is the hidden one. That is the hedge
-        ratio for y is 1 and the hedge ratio for x is estimated by the Kalman filter.
+        By default, y is the observed variable and x is the hidden one. That is the hedge ratio for y is 1 and the
+        hedge ratio for x is estimated by the Kalman filter.
+
         Mean-reverting portfolio series is formed by:
 
         y - self.hedge_ratios * x
 
-        One can get spread series from self.spread_series and self.spread_std_series to trade
-        the Bollinger Bands strategy.
+        One can get spread series from self.spread_series and self.spread_std_series to trade the Bollinger Bands
+        strategy.
 
         :param x: (float) X variable value (hidden).
         :param y: (float) Y variable value.

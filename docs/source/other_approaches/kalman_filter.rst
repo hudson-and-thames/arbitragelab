@@ -1,7 +1,7 @@
 .. _other_approaches-kalman_filter:
 
 .. note::
-   The following documentation closely follows a book by Ernest P. Chan:
+   The following documentation closely follows the book by Ernest P. Chan:
    `Algorithmic Trading: Winning Strategies and Their Rationale <https://www.wiley.com/en-us/Algorithmic+Trading%3A+Winning+Strategies+and+Their+Rationale-p-9781118460146>`__.
 
 =============
@@ -13,7 +13,7 @@ of this module (Johansen test, etc.), for other price series we should use other
 hedge ratio. For real price series, the hedge ratio can be changing in time. Using a look-back period to
 estimate the parameters of a model has its disadvantages, as a short period can cut a part of the information.
 
-This module describes a scheme that allows using the Kalman filter for hedge ratio updating, as presented in the
+This module describes a scheme that allows using the Kalman Filter for hedge ratio updating, as presented in the
 book by Ernest P. Chan "Algorithmic Trading: Winning Strategies and Their Rationale". One of the advantages
 of this approach is that we don't have to pick a weighting scheme for observations in the look-back period.
 
@@ -175,3 +175,8 @@ The following research notebook can be used to better understand the Kalman Filt
 * `Kalman Filter`_
 
 .. _`Kalman Filter`: https://github.com/Hudson-and-Thames-Clients/research/blob/master/Statistical%20Arbitrage/kalman_filter.ipynb
+
+References
+##########
+
+* `Chan, E., 2013. Algorithmic trading: winning strategies and their rationale (Vol. 625). John Wiley & Sons. <https://www.amazon.co.uk/Algorithmic-Trading-Winning-Strategies-Rationale/dp/1118460146>`_
