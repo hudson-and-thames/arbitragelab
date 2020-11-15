@@ -2,7 +2,7 @@
 
 .. Note::
 
-    These descriptions closely follow a book by Ernest P. Chan:
+    These descriptions closely follow the book by Ernest P. Chan:
     `Algorithmic Trading: Winning Strategies and Their Rationale <https://www.wiley.com/en-us/Algorithmic+Trading%3A+Winning+Strategies+and+Their+Rationale-p-9781118460146>`__.
 
 ============
