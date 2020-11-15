@@ -4,7 +4,7 @@
    The following documentation closely follows a book by Ernest P. Chan:
    `Algorithmic Trading: Winning Strategies and Their Rationale <https://www.wiley.com/en-us/Algorithmic+Trading%3A+Winning+Strategies+and+Their+Rationale-p-9781118460146>`__.
 
-   And the paper by Faik Bilgili:
+   As well as the paper by Faik Bilgili:
    `Stationarity and cointegration tests: Comparison of Engle-Granger and Johansen methodologies <https://mpra.ub.uni-muenchen.de/75967/1/MPRA_paper_75967.pdf>`__.
 
 ==============
@@ -57,7 +57,7 @@ extended to three and more assets.
 
     Another set of tools for pairs trading strategies is available in our Optimal Mean Reversion Module.
 
-Johansen cointegration test
+Johansen Cointegration Test
 ###########################
 
 This is one of the most widely used cointegration tests, it's upside is that it can be applied to
@@ -88,7 +88,7 @@ hedge ratios to construct a mean-reverting portfolio.
 
 Note that the Johansen test is independent of the order of the price series, in contrast to the CADF test.
 
-The Johansen test from the MlFInLab package allows getting the cointegration vectors, trace statistics,
+The Johansen test from the MlFinLab package allows getting the cointegration vectors, trace statistics,
 and eigenvector statistics from a given dataframe with price series. Note that the two last statistics
 will be calculated only if the input dataframe contains 12 or less price series.
 
@@ -137,7 +137,7 @@ Examples
    # Constructing series of portfolio prices
    portfolio_price = portfolio.construct_mean_reverting_portfolio(data, cointegration_vectors.loc[0])
 
-Engle-Granger cointegration test
+Engle-Granger Cointegration Test
 ################################
 
 The cointegration testing approach proposed by Engle-Granger allows us to test whether two or more price
@@ -221,7 +221,7 @@ Examples
 
 
 
-Half-life of mean-reversion
+Half-life of Mean-Reversion
 ###########################
 
 This module contains a function that allows calculating a half-life of the mean-reversion process
@@ -254,7 +254,7 @@ Examples
    half_life = get_half_life_of_mean_reversion(portfolio_price)
 
 
-Linear trading strategy
+Linear Trading Strategy
 #######################
 
 Using a mean-reverting portfolio obtained from the Johansen test, a linear mean-reverting trading strategy
@@ -270,12 +270,12 @@ So the number of portfolio units to hold (:math:`N_t`) is calculated as:
 
     N_{t} = \frac{P_{t} - MA(P_{t}, T_{MA})}{std(P_{t}, T_{std})}
 
-where
+Where:
 
-- :math:`P_{t}` is the price of a portfolio,
+- :math:`P_{t}` is the price of a portfolio.
 
 - :math:`MA(P_{t}, T_{MA})` is the moving average of the portfolio price calculated
-  using a backward-looking :math:`T_{MA}` window,
+  using a backward-looking :math:`T_{MA}` window.
 
 - :math:`std(P_{t}, T_{std})` is the rolling standard deviation of the portfolio price
   calculated using a backward-looking :math:`T_{std}` window.
@@ -320,7 +320,7 @@ Examples
    target_quantity = trading_results.iloc[:,2]
 
 
-Bollinger Bands trading strategy
+Bollinger Bands Trading Strategy
 ################################
 
 This is a more practical strategy in comparison to the Linear Trading strategy mentioned in this module,
@@ -382,3 +382,9 @@ The following research notebook can be used to better understand the mean-revert
 * `Mean Reversion`_
 
 .. _`Mean Reversion`: https://github.com/Hudson-and-Thames-Clients/research/blob/master/Statistical%20Arbitrage/mean_reversion.ipynb
+
+References
+##########
+
+* `Chan, E., 2013. Algorithmic trading: winning strategies and their rationale (Vol. 625). John Wiley & Sons. <https://www.amazon.co.uk/Algorithmic-Trading-Winning-Strategies-Rationale/dp/1118460146>`_
+* `Bilgili, F., 1998. Stationarity and cointegration tests: Comparison of Engle-Granger and Johansen methodologies. <https://mpra.ub.uni-muenchen.de/75967/1/MPRA_paper_75967.pdf>`_
