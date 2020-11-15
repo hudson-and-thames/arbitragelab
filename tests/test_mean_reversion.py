@@ -5,12 +5,15 @@
 Tests function of Statistical Arbitrage Cointegration module:
 cointegration_approach/base.py, engle_granger.py, johansen.py, signals.py
 """
+import os
 import unittest
 import warnings
-import os
+
 import pandas as pd
-from arbitragelab.cointegration_approach import JohansenPortfolio, EngleGrangerPortfolio, get_half_life_of_mean_reversion, \
-    linear_trading_strategy, bollinger_bands_trading_strategy
+
+from arbitragelab.cointegration_approach import (JohansenPortfolio, EngleGrangerPortfolio,
+                                                 get_half_life_of_mean_reversion,
+                                                 linear_trading_strategy, bollinger_bands_trading_strategy)
 
 
 class TestCointegration(unittest.TestCase):

@@ -3,7 +3,7 @@
 # Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
 
 """
-Module for signal generation for Cointegratin Approach.
+Module for signal generation for Cointegration Approach.
 """
 
 import numpy as np

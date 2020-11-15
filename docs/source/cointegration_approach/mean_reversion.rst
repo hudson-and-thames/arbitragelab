@@ -38,7 +38,7 @@ used to calculate the *half-life*, which indicates how long it takes for a price
 
 .. math::
 
-    Half-life = -log(2) / \lambda
+    \text{Half-life} = -log(2) / \lambda
 
 Furthermore, we can see that if the :math:`\lambda` value is positive, the price series are not mean-reverting.
 If it's close to zero, the half-life is very long and the strategy won't be profitable due to slow mean

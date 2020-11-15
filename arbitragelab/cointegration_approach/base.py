@@ -12,7 +12,7 @@ import pandas as pd
 
 class CointegratedPortfolio(ABC):
     """
-    Abstract class for portfolios formed using the cointegration method (Johansen test, Engle-Granger test).
+    Class for portfolios formed using the cointegration method (Johansen test, Engle-Granger test).
     """
 
     def construct_mean_reverting_portfolio(self, price_data: pd.DataFrame,

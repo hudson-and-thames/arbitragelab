@@ -8,8 +8,9 @@ This module implements Engle-Granger cointegration approach.
 
 import numpy as np
 import pandas as pd
-from sklearn.linear_model import LinearRegression
 from statsmodels.tsa.stattools import adfuller
+from sklearn.linear_model import LinearRegression
+
 from arbitragelab.cointegration_approach.base import CointegratedPortfolio
 
 

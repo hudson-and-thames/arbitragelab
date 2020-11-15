@@ -8,6 +8,7 @@ This module implements the Johansen cointegration approach.
 
 import pandas as pd
 from statsmodels.tsa.vector_ar.vecm import coint_johansen
+
 from arbitragelab.cointegration_approach.base import CointegratedPortfolio
 
 

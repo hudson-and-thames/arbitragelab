@@ -1,7 +1,9 @@
 # Production
 numpy==1.18.5
-matplotlib==3.2.1
 pandas==1.0.4
+statsmodels==0.12.1
+scikit-learn==0.23.1
+matplotlib==3.2.1
 
 #Develop
 codecov==2.0.15
