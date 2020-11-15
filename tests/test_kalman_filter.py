@@ -7,9 +7,11 @@ Tests the Kalman Filter Strategy from the Other Approaches module.
 
 import unittest
 import os
-import pandas as pd
+
 import numpy as np
+import pandas as pd
 from sklearn.linear_model import LinearRegression
+
 from arbitragelab.other_approaches import KalmanFilterStrategy
 
 
