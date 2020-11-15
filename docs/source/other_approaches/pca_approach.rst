@@ -157,7 +157,7 @@ which is stationary and auto-regressive with lag 1.
 
 .. Note::
 
-   To find out more about the Orn stein-Uhlenbeck mode land optimal trading under this model
+   To find out more about the Ornstein-Uhlenbeck model and optimal trading under this model
    please check out our section on Trading Under the Ornstein-Uhlenbeck Model.
 
 The parameters :math:`\alpha_{i}, \kappa_{i}, m_{i}, \sigma_{i}` are specific for each stock.
@@ -320,3 +320,8 @@ The following research notebook can be used to better understand the PCA approac
 * `PCA Approach`_
 
 .. _`PCA Approach`: https://github.com/Hudson-and-Thames-Clients/research/blob/master/Statistical%20Arbitrage/pca_approach.ipynb
+
+References
+##########
+
+* `Avellaneda, M. and Lee, J.H., 2010. Statistical arbitrage in the US equities market. Quantitative Finance, 10(7), pp.761-782. <https://math.cims.nyu.edu/faculty/avellane/AvellanedaLeeStatArb071108.pdf>`__

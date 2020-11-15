@@ -3,9 +3,9 @@
 # Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
 
 """
-This module implements the PCA approach described by by Marco Avellaneda
-and Jeong-Hyun Lee in `"Statistical Arbitrage in the U.S. Equities Market"
-<https://math.nyu.edu/faculty/avellane/AvellanedaLeeStatArb20090616.pdf>`__.
+This module implements the PCA approach described by by Marco Avellaneda and Jeong-Hyun Lee in
+`"Statistical Arbitrage in the U.S. Equities Market"
+<https://math.nyu.edu/faculty/avellane/AvellanedaLeeStatArb20090616.pdf>`_.
 """
 
 
@@ -22,10 +22,10 @@ class PCAStrategy:
     is to estimate PCA factors affecting the dynamics of assets in a portfolio. Thereafter, for each asset in a
     portfolio, we define OLS residuals by regressing asset returns on PCA factors. These residuals are used to
     calculate S-scores to generate trading signals and the regression coefficients are used to construct
-    eigenportfolios for each asset. If the eigneportfolio shows good mean-reverting properties and the S-score
-    deviates enough from its mean value, that eigenportfolio is being traded. The output trading signals of
+    eigen portfolios for each asset. If the eigen portfolio shows good mean-reverting properties and the S-score
+    deviates enough from its mean value, that eigen portfolio is being traded. The output trading signals of
     this strategy are weights for each asset in a portfolio at each given time. These weights are are a composition
-    of all eigenportfolios that satisfy the required properties.
+    of all eigen portfolios that satisfy the required properties.
     """
 
     def __init__(self, n_components: int = 15):
@@ -51,8 +51,8 @@ class PCAStrategy:
 
         R_standardized = (R - mean(R)) / st.d.(R)
 
-        :param matrix: (pd.DataFrame) Dataframe with returns that need to be standardized.
-        :return: (pd.DataFrame. pd.Series) Dataframe with standardized returns and series of
+        :param matrix: (pd.DataFrame) DataFrame with returns that need to be standardized.
+        :return: (pd.DataFrame. pd.Series) a tuple with two elements: DataFrame with standardized returns and Series of
             standard deviations.
         """
 
@@ -63,13 +63,13 @@ class PCAStrategy:
 
     def get_factorweights(self, matrix: pd.DataFrame) -> pd.DataFrame:
         """
-        A function to calculate weights (scaled eigenvectors) to use for factor return calculation.
+        A function to calculate weights (scaled eigen vectors) to use for factor return calculation.
 
         Weights are calculated from PCA components as:
 
-        Weight = Eigenvector / st.d.(R)
+        Weight = Eigen vector / st.d.(R)
 
-        So the output is a dataframe containing the weight for each asset in a portfolio for each eigenvector.
+        So the output is a dataframe containing the weight for each asset in a portfolio for each eigen vector.
 
         :param matrix: (pd.DataFrame) Dataframe with index and columns containing asset returns.
         :return: (pd.DataFrame) Weights (scaled PCA components) for each index from the matrix.
@@ -81,10 +81,10 @@ class PCAStrategy:
         # Fitting PCA
         pca_factors = self.pca_model.fit(standardized)
 
-        # Output eigenvectors for weights calculation
+        # Output eigen vectors for weights calculation
         weights = pd.DataFrame(pca_factors.components_, columns=standardized.columns)
 
-        # Scaling eigenvectors to get weights for eigenportfolio creation
+        # Scaling eigen vectors to get weights for eigen portfolio creation
         weights = weights / std
 
         return weights
@@ -114,12 +114,12 @@ class PCAStrategy:
         # A class for regression
         regression = LinearRegression()
 
-        # Iterating through all tickers - to create residuals for every eigenportfolio
+        # Iterating through all tickers - to create residuals for every eigen portfolio
         for ticker in matrix.columns:
             # Fitting a regression
             regression.fit(pca_factorret, matrix[ticker])
 
-            # Calculating residual for eigenportfolio
+            # Calculating residual for eigen portfolio
             residual[ticker] = matrix[ticker] - regression.intercept_ - np.dot(pca_factorret, regression.coef_)
 
             # Writing down the regression coefficient
@@ -130,16 +130,16 @@ class PCAStrategy:
     @staticmethod
     def get_sscores(residuals: pd.DataFrame, k: float) -> pd.Series:
         """
-        A function to calculate S-scores for asset eigenportfolios given dataframes of residuals
+        A function to calculate S-scores for asset eigen portfolios given dataframes of residuals
         and a mean reversion speed threshold.
 
-        From residuals, a discrete version of the OU process is created for each asset eigenportfolio.
+        From residuals, a discrete version of the OU process is created for each asset eigen portfolio.
 
         If the OU process of the asset shows a mean reversion speed above the given
         threshold k, it can be traded and the S-score is being calculated for it.
 
         The output of this function is a dataframe with S-scores that are directly used
-        to determine if the eigenportfolio of a given asset should be traded at this period.
+        to determine if the eigen portfolio of a given asset should be traded at this period.
 
         In the original paper, it is advised to choose k being less than half of a
         window for residual estimation. If this window is 60 days, half of it is 30 days.
@@ -147,7 +147,7 @@ class PCAStrategy:
 
         :param residuals: (pd.DataFrame) Dataframe with residuals after fitting returns to
             PCA factor returns.
-        :param k: (float) Required speed of mean reversion to use the eigenportfolio in
+        :param k: (float) Required speed of mean reversion to use the eigen portfolio in
             trading.
         :return: (pd.Series) Series of S-scores for each asset for a given residual dataframe.
         """
@@ -164,7 +164,7 @@ class PCAStrategy:
         # Iterating over tickers
         for ticker in X_k.columns:
 
-            # Calculate parameter b using autocorrelations
+            # Calculate parameter b using auto-correlations
             b = X_k[ticker].autocorr()
 
             # If mean reversion times are good, enter trades
@@ -210,9 +210,9 @@ class PCAStrategy:
         Close a short position if s-score < +sbc
 
         :param position_stock: (pd.DataFrame) Dataframe with current positions for each asset in each
-            eigenportfolio.
+            eigen portfolio.
         :param s_scores: (pd.Series) Series with S-scores used to generate trading signals.
-        :param coeff: (pd.DataFrame) Dataframe with regression coefficients used to create eigenportfolios.
+        :param coeff: (pd.DataFrame) Dataframe with regression coefficients used to create eigen portfolios.
         :param sbo: (float) Parameter for signal generation for the S-score.
         :param sso: (float) Parameter for signal generation for the S-score.
         :param ssc: (float) Parameter for signal generation for the S-score.
@@ -220,7 +220,7 @@ class PCAStrategy:
         :param size: (float) Number of units invested in assets when opening trades. So when opening
             a long position, buying (size) units of stock and selling (size) * betas units of other
             stocks.
-        :return: (pd.DataFrame) Updated dataframe with positions for each asset in each eigenportfolio.
+        :return: (pd.DataFrame) Updated dataframe with positions for each asset in each eigen portfolio.
         """
 
         # Generating signals using obtained s-scores
@@ -281,16 +281,16 @@ class PCAStrategy:
         Where X_i(t) is the OU process generated from the residuals, m_i and sigma_i are the
         calculated properties of this process.
 
-        The S-score is being calculated only for eigenportfolios that show mean reversion speed
+        The S-score is being calculated only for eigen portfolios that show mean reversion speed
         above the given threshold k.
 
         In the original paper, it is advised to choose k being less than half of a
         window for residual estimation. If this window is 60 days, half of it is 30 days.
         So k > 252/30 = 8.4. (Assuming 252 trading days in a year)
 
-        So, we can have mean-reverting eigenportfolios for each asset in our portfolio. But this
+        So, we can have mean-reverting eigen portfolios for each asset in our portfolio. But this
         portfolio is worth investing in only if it shows good mean reversion speed and the S-score
-        has deviated enough from its mean value. Based on this logic we pick promising eigneportfolios
+        has deviated enough from its mean value. Based on this logic we pick promising eigen portfolios
         and invest in them. The trading signals we get are the target weights for each of the assets
         in our portfolio at any given time.
 
@@ -304,13 +304,13 @@ class PCAStrategy:
         The authors empirically chose the optimal values for the above parameters based on stock
         prices for years 2000-2004 as: sbo = sso = 1.25; sbc = 0.75; ssc = 0.5.
 
-        Opening a long position on an eigneportfolio means buying one dollar of the corresponding asset
+        Opening a long position on an eigne portfolio means buying one dollar of the corresponding asset
         and selling beta_i1 dollars of weights of other assets from component1, beta_i2 dollars of weights
         of other assets from component2 and so on. Opening a short position means selling the corresponding
         asset and buying betas of other assets.
 
         :param matrix: (pd.DataFrame) Dataframe with returns for assets.
-        :param k: (float) Required speed of mean reversion to use the eigenportfolio in trading.
+        :param k: (float) Required speed of mean reversion to use the eigen portfolio in trading.
         :param corr_window: (int) Look-back window used for correlation matrix estimation.
         :param residual_window: (int) Look-back window used for residuals calculation.
         :param sbo: (float) Parameter for signal generation for the S-score.
@@ -321,7 +321,7 @@ class PCAStrategy:
             a long position, buying (size) units of stock and selling (size) * betas units of other
             stocks.
         :return: (pd.DataFrame) DataFrame with target weights for each asset at every observation.
-            It is being calculated as a combination of all eigenportfolios that are satisfying the
+            It is being calculated as a combination of all eigen portfolios that are satisfying the
             mean reversion speed requirement and S-score values.
         """
         # pylint: disable=too-many-locals
@@ -351,7 +351,7 @@ class PCAStrategy:
             # Calculating residuals for this window
             resid, coeff = self.get_residuals(obs_residual, factorret_resid)
 
-            # Finding the S-scores for eigenportfolios in this period
+            # Finding the S-scores for eigen portfolios in this period
             s_scores = self.get_sscores(resid, k)
 
             # Generating signals using obtained S-scores
@@ -361,7 +361,7 @@ class PCAStrategy:
             # Temporary series to store all weights
             position_stock_temp = pd.Series(0, index=matrix.columns, dtype=np.float64)
 
-            # Sum over all components to combine betas (other assets) all eigenportfolios
+            # Sum over all components to combine betas (other assets) all eigen portfolios
             fac_sum = position_stock.sum(axis=1)[1:]
 
             # Iterating through tickers inside weights
@@ -369,7 +369,7 @@ class PCAStrategy:
                 # Multiplying our target quantities by weights
                 position_stock_temp = sum(weights[ticker] * fac_sum)
 
-            # Adding also first stocks from all eigenportfolios
+            # Adding also first stocks from all eigen portfolios
             position_stock_temp = position_stock_temp + position_stock.iloc[0]
 
             # Adding final Series of weights to a general DataFrame with weights
