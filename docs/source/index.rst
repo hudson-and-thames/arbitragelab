@@ -126,15 +126,15 @@ This project is licensed under an all rights reserved licence.
     other_approaches/pca_approach
 
 .. toctree::
-    :maxdepth: 2
-    :caption: Additional Information
-    :hidden:
-
-    additional_information/license
-
-.. toctree::
     :maxdepth: 3
     :caption: Developer Guide
     :hidden:
 
     changelog
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Additional Information
+    :hidden:
+
+    additional_information/license

@@ -6,13 +6,6 @@
 
 -----------------
 # Statistical Arbitrage Laboratory (ArbitrageLab)
-[![PyPi](https://img.shields.io/pypi/v/mlfinlab.svg)]((https://pypi.org/project/mlfinlab/))
-[![Python](https://img.shields.io/pypi/pyversions/mlfinlab.svg)]((https://pypi.org/project/mlfinlab/))
-[![Build Status](https://travis-ci.com/hudson-and-thames/mlfinlab.svg?branch=master)](https://travis-ci.com/hudson-and-thames/mlfinlab)
-[![codecov](https://codecov.io/gh/hudson-and-thames/mlfinlab/branch/master/graph/badge.svg)](https://codecov.io/gh/hudson-and-thames/mlfinlab)
-
-![pylint Score](https://mperlet.github.io/pybadge/badges/10.svg)
-[![Documentation Status](https://readthedocs.org/projects/mlfinlab/badge/?version=latest)](https://mlfinlab.readthedocs.io/en/latest/?badge=latest)
 
 ArbitrageLab is a python package which helps portfolio managers and traders who want to leverage the power of statistical arbitrage by providing reproducible, interpretable, and easy to use tools. 
 
