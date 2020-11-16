@@ -25,9 +25,9 @@ The ADF test uses the linear model that describes the price changes as follows:
 
 .. math::
 
-    \Delta y(t) = \lambda y(t-1) + \mu + \beta t + \alpha_1 \Delta y(t-1) + ... \alpha_k \Delta y(t-k) + \epsilon_t
+    \Delta y(t) = \lambda y(t-1) + \mu + \beta t + \alpha_1 \Delta y(t-1) + ... + \alpha_k \Delta y(t-k) + \epsilon_t
 
-where :math:`\Delta y(t) \equiv y(t) - y(t-1)`, :math:`\Delta y(t) \equiv y(t-1) - y(t-2)`, ...
+where :math:`\Delta y(t) \equiv y(t) - y(t-1)`, :math:`\Delta y(t-1) \equiv y(t-1) - y(t-2)`, ...
 
 The hypothesis that is being tested is: :math:`\lambda = 0`. For simplicity we assume the drift term
 to be zero (:math:`\beta = 0`). If we reject the hypothesis, this means that the next price move
@@ -89,7 +89,7 @@ hedge ratios to construct a mean-reverting portfolio.
 
 Note that the Johansen test is independent of the order of the price series, in contrast to the CADF test.
 
-The Johansen test from the MlFinLab package allows getting the cointegration vectors, trace statistics,
+The Johansen test from the ArbitrageLab package allows getting the cointegration vectors, trace statistics,
 and eigenvector statistics from a given dataframe with price series. Note that the two last statistics
 will be calculated only if the input dataframe contains 12 or less price series.
 
@@ -173,7 +173,7 @@ The hedge ratios for constructing a mean-reverting portfolio in the case of the 
 are set to :math:`1` for the :math:`x` variable and the coefficient :math:`-a_1` for the :math:`y`
 variable (or :math:`-a_1, -a_2, ..` in case of multiple :math:`y_i` price series).
 
-The Engle-Granger cointegration test implemented in the MlFinLab package assumes that the first step
+The Engle-Granger cointegration test implemented in the ArbitrageLab package assumes that the first step
 of the algorithm is passed and that the variables are integrated of order one. This test allows us to
 get cointegration vectors, ADF test statistics for the null hypotheses in the final step from a given
 dataframe with price series.
