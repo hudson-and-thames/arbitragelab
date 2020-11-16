@@ -33,7 +33,7 @@ Proposed Pairs Selection Framework
 
 Dimensionality Reduction 
 ########################
-The main objectives in this step are;
+The main objectives in this step are:
 
 - Extracting common underlying risk factors from securities returns
 - Producing a compact representation for each security (stored in the variable 'feature_vector')
@@ -119,9 +119,9 @@ Select Pairs
     The rules selection flow diagram from `A Machine Learning based Pairs Trading Investment Strategy <http://premio-vidigal.inesc.pt/pdf/SimaoSarmentoMSc-resumo.pdf>`__.
     by Simão Moraes Sarmento and Nuno Horta.
 
-The rules that each pair needs to pass are;
+The rules that each pair needs to pass are:
 
-- The pair’s constituents are cointegrated. Literature suggest cointegration performs better than minumum distance and correlation approaches
+- The pair’s constituents are cointegrated. Literature suggests cointegration performs better than minimum distance and correlation approaches
 - The pair’s spread Hurst exponent reveals a mean-reverting character. Extra layer of validation.
 - The pair’s spread diverges and converges within convenient periods.
 - The pair’s spread reverts to the mean with enough frequency.
@@ -206,7 +206,9 @@ Examples
     sectoral_info = pd.read_csv('X_FILE_PATH.csv')
 
     # Generate a sector/industry relationship Panel of each pair
-    ps.describe_pairs_sectoral_info(final_pairs_info['leg_1'], final_pairs_info['leg_2'], sectoral_info)
+    ps.describe_pairs_sectoral_info(final_pairs_info['leg_1'],
+                                    final_pairs_info['leg_2'],
+                                    sectoral_info)
 
 Research Notebooks
 ##################
