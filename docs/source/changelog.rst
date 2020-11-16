@@ -15,6 +15,7 @@ Changelog
 
 
 * :feature:`3` Landmark techniques: Engle Granger and Johansen tests for Co-integration.
+* :feature:`3` Method for Half-Life of mean reverting process.
 * :feature:`3` Linear & Bollinger Band strategy by EP Chan.
 * :support:`3` Co-integration approach documentation.
 * :feature:`14` Landmark paper: The Distance Approach (Gatev et al. 2006).
