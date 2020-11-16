@@ -127,6 +127,18 @@ This project is licensed under an all rights reserved licence.
 
 .. toctree::
     :maxdepth: 2
+    :caption: Codependence
+    :hidden:
+
+    codependence/introduction
+    codependence/correlation_based_metrics
+    codependence/information_theory_metrics
+    codependence/codependence_marti
+    codependence/codependence_matrix
+    codependence/optimal_transport
+
+.. toctree::
+    :maxdepth: 2
     :caption: Additional Information
     :hidden:
 
