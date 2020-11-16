@@ -38,9 +38,9 @@ The main objectives in this step are:
 - Extracting common underlying risk factors from securities returns
 - Producing a compact representation for each security (stored in the variable 'feature_vector')
 
-In this step the number of features, k, needs to be defined. A usual procedure consists in 
+In this step the number of features, k, needs to be defined. A usual procedure consists of 
 analyzing the proportion of the total variance explained by each principal component, and 
-then use the number of components that explain a fixed percentage, as in `Avellaneda M, Lee JH (2010) <https://doi.org/10.1080/14697680903124632>`__. 
+then using the number of components that explain a fixed percentage, as in `Avellaneda M, Lee JH (2010) <https://doi.org/10.1080/14697680903124632>`__. 
 However, given that in this framework an Unsupervised Learning Algorithm is applied, the 
 approach adopted took the data dimensionality problem as a major consideration. High data 
 dimensionality presents a dual problem. 
@@ -83,7 +83,7 @@ representation previously generated, prioritizing the following constraints;
 	- No need to group all securities
 	- No assumptions regarding the clusters’ shape.
 
-The first method is to use the OPTICS clustering algorithm and letting the built in automatic 
+The first method is to use the OPTICS clustering algorithm and letting the built-in automatic 
 procedure to select the most suitable :math:`\epsilon` for each cluster.  
 
 The second method is to use the DBSCAN clustering algorithm. This is to be used when the user 
@@ -137,6 +137,7 @@ possible selections of the dependent variable and that the combination that gene
 is selected. Further work in `Hoel (2013) <https://core.ac.uk/download/pdf/52072275.pdf>`__ adds on, "the 
 unsymmetrical coefficients imply that a hedge of long / short is not the opposite of long / short , i.e. 
 the hedge ratios are inconsistent". 
+
 A better solution is proposed and implemented, based on `Gregory et al. (2011) <http://dx.doi.org/10.2139/ssrn.1663703>`__ 
 to use orthogonal regression – also referred to as Total Least Squares (TLS) – in which the residuals 
 of both dependent and independent variables are taken into account. That way, we incorporate the volatility 
@@ -147,7 +148,7 @@ Secondly, an additional validation step is also implemented to provide more conf
 character of the pairs’ spread. The condition imposed is that the Hurst exponent associated with the spread
 of a given pair is enforced to be smaller than 0.5, assuring the process leans towards mean-reversion. 
 
-In third place, the pair's spread movement is constrained using the half life of the mean reverting process. 
+In third place, the pair's spread movement is constrained using the half-life of the mean-reverting process. 
 In the framework paper the strategy built on top of the selection framework is based on the medium term price
 movements, so for this reason the spreads that either have very short (< 1 day) or very long mean-reversion (> 365 days)
 periods were not suitable.  
