@@ -4,7 +4,7 @@ Research Tools
 ==============
 
 As researchers, we often neglect finding the right tools to streamline
-the progress. Financial Machine Learning is no different in that a lot of the papers are scattered
+the progress. Financial machine learning is no different in that a lot of the papers are scattered
 across different journals and different fields. Ranging from journals on econometrics to machine
 learning, researchers often struggle to find the best academic papers to begin their studies.
 

@@ -50,6 +50,7 @@ This project is licensed under an all rights reserved licence.
 
     getting_started/installation
     getting_started/research_tools
+    getting_started/roadmap
 
 .. toctree::
     :maxdepth: 2
