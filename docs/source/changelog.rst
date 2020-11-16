@@ -23,3 +23,5 @@ Changelog
 * :support:`3` Co-integration approach documentation.
 * :feature:`2` Kalman Filter + Kalman strategy added.
 * :support:`2` Kalman Filter documentation.
+* :feature:`16` OU-model to the Optimal Mean Reversion module added.
+* :support:`16` OU-model documentation.
