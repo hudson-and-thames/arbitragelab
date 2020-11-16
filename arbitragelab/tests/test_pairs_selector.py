@@ -220,6 +220,12 @@ class TestPairsSelector(unittest.TestCase):
         # Check if returned plot object is a list of Axes objects.
         self.assertTrue(type(selected_pairs_return), list)
 
+        with self.assertRaises(Exception):
+            pairs_list = list((('F', 'V'),)*45)
+            final_pairs = pd.DataFrame(index=pairs_list)
+            self.pair_selector.final_pairs = final_pairs
+            self.pair_selector.plot_selected_pairs()
+
     def test_description_methods(self):
         """
         Tests the various pair description methods.

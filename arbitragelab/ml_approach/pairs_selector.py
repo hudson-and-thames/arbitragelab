@@ -391,7 +391,8 @@ class PairsSelector:
         return spreads_df, hurst_pass_pairs_df
 
     @staticmethod
-    def _final_criterions(spreads_df: pd.DataFrame, pairs: list,
+    def _final_criterions(spreads_df: pd.DataFrame,
+                          pairs: list, test_period: str = '2Y',
                           min_crossover_threshold_per_year: int = 12) -> tuple:
         """
         This method consists of the final two criterions checks in the third stage of the proposed
@@ -400,6 +401,8 @@ class PairsSelector:
 
         :param spreads_df: (pd.DataFrame) Hedge ratio adjusted spreads DataFrame.
         :param pairs: (list) List of asset name pairs to be analyzed.
+        :param test_period: (str) Time delta format, to be used as the time
+            period where the mean crossovers will be calculated.
         :param min_crossover_threshold_per_year: (int) Minimum amount of mean crossovers per year.
         :return: (pd.DataFrame, pd.DataFrame) The first is a DataFrame of pairs that passed the half-life
             test and the second is a DataFrame of final pairs and their mean crossover counts.
@@ -411,7 +414,7 @@ class PairsSelector:
         if len(pairs) == 0:
             raise Exception("No pairs have been found!")
 
-        ou_results = _outer_ou_loop(spreads_df, molecule=pairs, test_period='2Y',
+        ou_results = _outer_ou_loop(spreads_df, molecule=pairs, test_period=test_period,
                                     cross_overs_per_delta=min_crossover_threshold_per_year)
 
         final_selection = ou_results[ou_results['hl'] > 1]
@@ -426,8 +429,10 @@ class PairsSelector:
 
         return hl_pass_pairs, final_pairs
 
-    def unsupervised_candidate_pair_selector(self, pvalue_threshold: int = 0.01, hurst_exp_threshold: int = 0.5,
-                                             min_crossover_threshold_per_year: int = 12) -> list:
+    def unsupervised_candidate_pair_selector(self, pvalue_threshold: int = 0.01,
+                                             hurst_exp_threshold: int = 0.5,
+                                             min_crossover_threshold_per_year: int = 12,
+                                             test_period: str = '2Y') -> list:
         """
         Third step of the framework;
 
@@ -439,6 +444,8 @@ class PairsSelector:
         :param pvalue_threshold: (int) Max p-value threshold to be used in the cointegration tests.
         :param hurst_exp_threshold: (int) Max Hurst threshold value.
         :param min_crossover_threshold_per_year: (int) Minimum amount of mean crossovers per year.
+        :param test_period: (str) Time delta format, to be used as the time
+            period where the mean crossovers will be calculated.
         :return: (list) Tuple list of final pairs.
         """
 
@@ -454,10 +461,13 @@ class PairsSelector:
         self.cluster_pairs_combinations = cluster_x_cointegration_combinations
 
         return self._criterion_selection(cluster_x_cointegration_combinations,
-                                         pvalue_threshold, hurst_exp_threshold, min_crossover_threshold_per_year)
+                                         pvalue_threshold, hurst_exp_threshold,
+                                         min_crossover_threshold_per_year, test_period)
 
-    def _criterion_selection(self, cluster_x_cointegration_combinations: list, pvalue_threshold: int = 0.01,
-                             hurst_exp_threshold: int = 0.5, min_crossover_threshold_per_year: int = 12) -> list:
+    def _criterion_selection(self, cluster_x_cointegration_combinations: list,
+                             pvalue_threshold: int = 0.01, hurst_exp_threshold: int = 0.5,
+                             min_crossover_threshold_per_year: int = 12,
+                             test_period: str = '2Y') -> list:
         """
         Third step of the framework;
 
@@ -470,6 +480,8 @@ class PairsSelector:
         :param pvalue_threshold: (int) Max p-value threshold to be used in the cointegration tests.
         :param hurst_exp_threshold: (int) Max Hurst threshold value.
         :param min_crossover_threshold_per_year: (int) Minimum amount of mean crossovers per year.
+        :param test_period: (str) Time delta format, to be used as the time
+            period where the mean crossovers will be calculated.
         :return: (list) Tuple list of final pairs.
         """
 
@@ -499,6 +511,7 @@ class PairsSelector:
         # 12 times per year.
 
         hl_pass_pairs, final_pairs = self._final_criterions(spreads_df, hurst_pass_pairs.index.values,
+                                                            test_period,
                                                             min_crossover_threshold_per_year)
 
         self.hl_pass_pairs = hl_pass_pairs
@@ -517,6 +530,10 @@ class PairsSelector:
         if (self.final_pairs is None) or (len(self.final_pairs) == 0):
             raise Exception("The needed pairs have not been computed yet.",
                             "Please run criterion_selector() before this method.")
+
+        if len(self.final_pairs) > 40:
+            raise Exception("The amount of pairs to be plotted cannot exceed 40",
+                            "without causing system instability.")
 
         _, axs = plt.subplots(len(self.final_pairs), figsize=(15, 3 * len(self.final_pairs)))
 
