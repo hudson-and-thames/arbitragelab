@@ -6,79 +6,34 @@
 |
 
 ===============================================
-Statistical Arbitrage Laboratory (arbitragelab)
+Statistical Arbitrage Laboratory (ArbitrageLab)
 ===============================================
 
-    |PyPi| |Python| |Build Status| |codecov| |pylint Score|
-
-    .. |Build Status| image:: https://travis-ci.com/hudson-and-thames/mlfinlab.svg?branch=master
-        :target: https://travis-ci.com/hudson-and-thames/mlfinlab
-
-    .. |codecov| image:: https://codecov.io/gh/hudson-and-thames/mlfinlab/branch/master/graph/badge.svg
-        :target: https://codecov.io/gh/hudson-and-thames/mlfinlab
-
-    .. |pylint Score| image:: https://mperlet.github.io/pybadge/badges/10.svg
-
-    |Downloads|
-
-    .. |PyPi| image:: https://img.shields.io/pypi/v/mlfinlab.svg
-        :target: https://pypi.org/project/mlfinlab/
-
-    .. |Downloads| image:: https://img.shields.io/pypi/dm/mlfinlab.svg
-        :target: https://pypi.org/project/mlfinlab/
-
-    .. |Python| image:: https://img.shields.io/pypi/pyversions/mlfinlab.svg
-        :target: https://pypi.org/project/mlfinlab/
-
-ArbitrageLab is a python package which helps portfolio managers and traders who want to leverage the power of statistical arbitrage
-by providing reproducible, interpretable, and easy to use tools.
-
-We source all of our implementations from the most elite and peer-reviewed journals. Including publications from:
-
-1. `The Journal of Financial Data Science <https://jfds.pm-research.com/>`_
-2. `The Journal of Portfolio Management <https://jpm.pm-research.com/>`_
-3. `The Journal of Algorithmic Finance <http://www.algorithmicfinance.org/>`_
-4. `Cambridge University Press <https://www.cambridge.org/>`_
-
-.. figure:: _static/logo_black.png
-   :scale: 15 %
-   :align: center
-   :figclass: align-center
-   :alt: Academic Journals
-   :target: https://www.pm-research.com/
+ArbitrageLab is a python library that enables traders who want to exploit mean-reverting portfolios by providing a complete set of algorithms from the best academic journals.
 
 ----
 
 Documentation & Tutorials
 #########################
 
-We lower barriers to entry for all users by providing extensive `documentation <https://arbitragelab.readthedocs.io/en/latest/>`__
-and `tutorial notebooks <https://github.com/hudson-and-thames/research>`_, with code examples.
+We lower barriers to entry for all users by providing extensive documentation and tutorial notebooks, with code examples.
 
 Who is Hudson & Thames?
 #######################
 
-We are a private research group focused on implementing research based financial machine learning. We all work in
-virtual teams, spread across the world, primarily: New York, London, and Kyiv.
+Hudson and Thames Quantitative Research is a company with a focus on implementing the most cutting edge algorithms in
+quantitative finance. We productionalize all our tools in the form of libraries and provide capability to our clients.
 
-* `Website <https://hudsonthames.org/>`_
-* `Github Group <https://github.com/hudson-and-thames>`_
-* `Project Boards <https://github.com/orgs/hudson-and-thames/projects>`_
-* `Documentation <https://mlfinlab.readthedocs.io/en/latest/>`_
+Adding our libraries to your company’s pipeline is like adding a department of PhD researchers.
+
+* `Website <https://hudsonthames.org/>`__
+* `Github Group <https://github.com/hudson-and-thames>`__
+* `MlFinLab <https://mlfinlab.readthedocs.io/en/latest/>`__
+
 
 Contact us
 ##########
-
-We host a booming community of like minded data scientists and quants, join the
-`Slack Channel <https://www.patreon.com/HudsonThames>`_ now! Open to sponsors of our package.
-
-The channel has the following benefits:
-
-* Community of like minded individuals.
-* Ask questions about the package implementations and get community feedback.
-* Occasional presentations on topics within financial machine learning.
-* A papers channel where we share the papers which are freely available.
-* Access to members of our research group.
+The best place to contact the team is via the ArbitrageLab Slack channel. Alternatively you can email us at: research@hudsonthames.org.
 
 Looking forward to hearing from you!
 
@@ -86,9 +41,6 @@ License
 #######
 
 This project is licensed under an all rights reserved licence.
-
-`LICENSE.txt <https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt>`_ file for details.
-
 
 
 .. toctree::
@@ -98,6 +50,7 @@ This project is licensed under an all rights reserved licence.
 
     getting_started/installation
     getting_started/research_tools
+    getting_started/roadmap
 
 .. toctree::
     :maxdepth: 2
@@ -109,10 +62,33 @@ This project is licensed under an all rights reserved licence.
 
 .. toctree::
     :maxdepth: 2
-    :caption: Additional Information
+    :caption: Codependence Measures
     :hidden:
 
-    additional_information/license
+    codependence/introduction
+    codependence/correlation_based_metrics
+    codependence/information_theory_metrics
+    codependence/codependence_marti
+    codependence/codependence_matrix
+    codependence/optimal_transport
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Cointegration Approach
+    :hidden:
+
+    cointegration_approach/introduction
+    cointegration_approach/cointegration_tests
+    cointegration_approach/half_life
+    cointegration_approach/trading_strategies
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Other Approaches
+    :hidden:
+
+    other_approaches/kalman_filter
+    other_approaches/pca_approach
 
 .. toctree::
     :maxdepth: 3
@@ -120,3 +96,10 @@ This project is licensed under an all rights reserved licence.
     :hidden:
 
     changelog
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Additional Information
+    :hidden:
+
+    additional_information/license

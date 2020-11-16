@@ -7,7 +7,7 @@ Recommended Versions
 ####################
 
 * Anaconda 3
-* Python 3.6 or 3.7
+* Python 3.7 and up.
 
 Installation
 ############
@@ -31,11 +31,11 @@ Accept all the requests to install.
 
    source activate <env name>
 
-5. From Terminal: install the MlFinLab package:
+5. From Terminal: install the arbitragelab package:
 
 .. code-block::
 
-   pip install mlfinlab
+   pip install arbitragelab
 
 Windows
 *******
@@ -62,13 +62,13 @@ Windows
 
 .. code-block::
 
-   pip install mlfinlab
+   pip install arbitragelab
 
 **Option B (with command prompt)**
 
 1. Download and install the latest version of `Anaconda 3 <https://www.anaconda.com/distribution/#download-section>`__
 2. Launch Anacoda Prompt
-3. Create new environment (replace <env name> with a name, for example ``mlfinlab``):
+3. Create new environment (replace <env name> with a name, for example ``arbitragelab``):
 
 .. code-block::
 

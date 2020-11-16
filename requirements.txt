@@ -1,7 +1,12 @@
 # Production
 numpy==1.18.5
-matplotlib==3.2.1
 pandas==1.0.4
+scipy==1.5.4
+statsmodels==0.12.1
+scikit-learn==0.23.1
+matplotlib==3.2.1
+cython==0.29.21
+POT==0.7.0
 
 #Develop
 codecov==2.0.15
@@ -14,5 +19,4 @@ scipy==1.5.4
 scikit-learn~=0.23.2
 sphinx==2.2.1 # Docs
 sphinx-rtd-theme==0.4.3 # Docs
-releases==1.6.3
-
+releases==1.6.3 # Docs
