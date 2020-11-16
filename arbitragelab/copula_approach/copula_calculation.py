@@ -1,4 +1,4 @@
-# Copyright 2020, Hudson and Thames Quantitative Research
+# Copyright 2019, Hudson and Thames Quantitative Research
 # All rights reserved
 # Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
 """
@@ -23,24 +23,32 @@ from statsmodels.distributions.empirical_distribution import ECDF
 theta_copula_names = ['Gumbel', 'Clayton', 'Frank', 'Joe', 'N13', 'N14']
 cov_copula_names = ['Gaussian', 'Student']
 
-def find_marginal_cdf(x, empirical=True):
+def find_marginal_cdf(x, empirical=True, **kwargs):
     """
-    Find the cumulative density function (CDF) from scaled data. i.e., P(X<=x)
+    Find the cumulative density function (CDF). i.e., P(X<=x)
 
     User can choose between empirical CDF or a CDF selected by maximum likelihood. 
-    :param x: (np.array) Data, need to be scaled to interval [0, 1].
+    :param x: (np.array) Data. Will be scaled to [0, 1]
     :param empirical: (bool) Whether to use empirical estimation for CDF.
+    :param kwargs: (dict) Setting the floor and cap of probability.
+        prob_floor: (float) Probability floor.
+        prob_cap: (float) Probability cap.
     :return fitted_cdf: (func) The cumulative density function from data.
     """
+    # Make sure it is an np.array.
+    x = np.array(x)
+    
+    prob_floor = kwargs.get('prob_floor', 0.00001)
+    prob_cap = kwargs.get('prob_cap', 0.99999)
     if empirical:
-        # To prevent probability 0 and 1 from occuring, we augment the data set a bit.
-        augment = [-0.00001, 1.00001]
-        new_x = np.insert(x, 0, augment)
         # Use empirical cumulative density function on data.
-        fitted_cdf = ECDF(new_x)
-        return fitted_cdf
+        fitted_cdf = lambda data: max(min(ECDF(x)(data), prob_cap), prob_floor)
+        # Vectorize so it works on an np.array.
+        v_fitted_cdf = np.vectorize(fitted_cdf)
+        return v_fitted_cdf
     else: # Choose a distribution by maximum likelihood estimation.
         return fitted_cdf
+    
 
 def ml_theta_hat(x, y, copula_name):
     """
@@ -158,94 +166,37 @@ def hqic(log_likelihood: float, n: int, k=1):
     hqic_value = 2*np.log(np.log(n))*k - 2*log_likelihood
     return hqic_value
 
-# #%% Test
-# # 1. generate x, y from Gumbel copula
-# GC = cg.Gumbel(theta=3)
-# data = GC.generate_pairs(num=1000)
-# # 2. max likelihood estimate of theta hat
-# theta_hat = ml_theta_hat(data[:,0], data[:,1], copula_name='Gumbel')
-# # 3. sic estimation
-# ll = log_ml(data[:,0], data[:,1], copula_name='Gumbel')
-# sic_value = sic(log_likelihood=ll, n=len(data[:,0]))
-# aic_value = aic(log_likelihood=ll, n=len(data[:,0]))
-# hqic_value = hqic(log_likelihood=ll, n=len(data[:,0]))
-
-# print('SIC = {}'.format(sic_value))
-# print('AIC = {}'.format(aic_value))
-# print('HQIC = {}'.format(hqic_value))
-
-# #%% Test for Gaussian
-# # 1. generate x, y from Gaussian copula
-# cov = [[2, 0.5],
-#        [0.5, 2]]
-# GaussianC = cg.Gaussian(cov=cov)
-# data = GaussianC.generate_pairs(num=3000)
-# x = norm.ppf(data[:, 0])
-# y = norm.ppf(data[:, 1])
-# # 2. max likelihood estimate of theta hat
-# theta_hat = ml_theta_hat(x, y, copula_name='Gaussian')
-# # 3. max likelihood estimate of covariance matrix
-# cov_hat = EmpiricalCovariance().fit(norm.ppf(data)).covariance_
-
-# #%% Test for Student t
-# # 1. generate x, y from Student copula
-# cov = [[2, 1],
-#        [1, 2]]
-# nu = 5
-# StudentC = cg.Student(cov=cov, nu=nu)
-# data = StudentC.generate_pairs(num=3000)
-# t_dist = student_t(df=nu)
-# x = t_dist.ppf(data[:, 0])
-# y = t_dist.ppf(data[:, 1])
-# # 2. max likelihood estimate of theta hat
-# theta_hat = ml_theta_hat(x, y, copula_name='Student')
-# # 3. max likelihood estimate of covariance matrix
-# cov_hat = EmpiricalCovariance().fit(t_dist.ppf(data)).covariance_
-
-# #%% ML Test Student T
-# # 1. generate x, y from Student copula
-# cov = [[2, 1],
-#        [1, 2]]
-# nu = 5
-# StudentC = cg.Student(cov=cov, nu=nu)
-# data = StudentC.generate_pairs(num=3000)
-# # 2. IC estimation
-# ll, like_list = log_ml(data[:,0], data[:,1], copula_name='Student', nu=nu)
-# sic_value = sic(log_likelihood=ll, n=len(data[:,0]))
-# aic_value = aic(log_likelihood=ll, n=len(data[:,0]))
-# hqic_value = hqic(log_likelihood=ll, n=len(data[:,0]))
-
-# print('SIC = {}'.format(sic_value))
-# print('AIC = {}'.format(aic_value))
-# print('HQIC = {}'.format(hqic_value))
-
-# #%% plot student_t density
-# cov = [[2, 1],
-#        [1, 2]]
-# nu = 5
-# StudentC = cg.Student(cov=cov, nu=nu)
-# data = StudentC.generate_pairs(num=3000)
-
-# from mpl_toolkits import mplot3d
-# x_coord = np.linspace(0.001,1-0.001,100)
-# y_coord = np.linspace(0.001,1-0.001,100)
-
-# X, Y = np.meshgrid(x_coord, y_coord)
-# Z_coord = [[0]*100 for i in range(100)]
-# for i in range(100):
-#     for j in range(100):
-#         Z_coord[i][j] = [x_coord[i], y_coord[j]]
+# class EmpiricalCopula:
+#     """
+#     Fit data and return the empirical copula function.
+#     """
+#     def __init__(self):
+#         self.copula = None
+    
+#     def fit(self, s1_train, s2_train):
+#         """
+#         """
+#         prob_floor = 1e-10
+#         prob_cap = 1 - prob_floor
+#         # 1. Change r.v.'s into their own quantiles.
+#         # u1_cdf = find_marginal_cdf(s1_train, empirical=True,
+#         #                            prob_floor=0, prob_cap=1)
+#         # u2_cdf = find_marginal_cdf(s2_train, empirical=True,
+#         #                            prob_floor=0, prob_cap=1)
+#         # U1_quantile = u1_cdf(s1_train)
+#         # U2 = u2_cdf(s2_train)
         
-# Z = [[None]*100 for i in range(100)]
-# for i in range(100):
-#     for j in range(100):
-#         Z[i][j] = StudentC._c(Z_coord[i][j][0], Z_coord[i][j][1])
-# #%%
-# Z =np.array(Z)
-# plt.figure(dpi=300)
-# ax = plt.axes(projection='3d')
-# ax.plot_surface(X, Y, Z, rstride=1, cstride=1,
-#                 cmap='viridis', edgecolor='none')
-# ax.set_zlim(0, 5);
-# ax.set_title('surface');
+#         # 2. Build the joint C.D.F. from rank of observation.
+#         n_train = len(s1_train)  # Number of instances for empirical data.
+#         def joint_cdf(s1_test, s2_test):
+#             n_test = len(s1_test)
+#             cdfs = np.zeros(n_test)
+#             for i in range(n_test):
+#                 for j in range(n_train):
+#                     count = 0
+#                     if s1_train[j] <= s1_test[i] and s2_train[j]<=s2_test[i]:
+#                         count += 1
+                    
+#                     instance_cdf = min(count/n_train, prob_cap)
+
 

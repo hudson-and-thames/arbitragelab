@@ -1,12 +1,15 @@
-# Copyright 2020, Hudson and Thames Quantitative Research
+# Copyright 2019, Hudson and Thames Quantitative Research
 # All rights reserved
 # Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
-"""Master module that uses copula for trading strategy"""
-import copula_generate
-import copula_calculation as ccalc
+"""Master module that uses copula for trading strategy."""
+import arbitragelab.copula_approach.copula_generate as copula_generate
+import arbitragelab.copula_approach.copula_calculation as ccalc
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
+
+# import arbitragelab.copula_approach.copula_generate as cg.
+# Or import all classes in brackets as you wish.
 
 
 class CopulaStrategy:
@@ -40,11 +43,12 @@ class CopulaStrategy:
         self.lower_threshold = 0.05
         self.upper_threshold = 0.95
 
-    def fit_copula(self, data, copula_name, if_empirical_cdf=True, **kwargs):
+    def fit_copula(self, s1_series, s2_series, copula_name, if_empirical_cdf=True, **kwargs):
         """
         Conduct a max likelihood estimation and information criterion.
 
-        :param data: (numpy.ndarray) Scaled stock pair price time series data, shape = (n x 2).
+        :param s1_series: (numpy.ndarray) 1D stock pair price time series data.
+        :param s2_series: (numpy.ndarray) 1D stock pair price time series data.
         :param copula_name: (str) Type of copula to fit.
         :param if_empirical_cdf: (bool) Whether use empirical cumulative density function to fit data.
         :param kwargs: Input degree of freedom if using Student-t copula. e.g. nu=10.
@@ -55,26 +59,28 @@ class CopulaStrategy:
             s2_cdf: (func) The cumulative density function for stock 2, using training data.
         """
         nu = kwargs.get('nu', None)  # Degree of freedom for Student-t copula.
-        # Stocks scaled price time series.
-        s1_series = data[:, 0]
-        s2_series = data[:, 1]
+        num_of_instances = len(s1_series)  # Number of instances.
+
+        # Convert stock prices to cumulative log return.
+        s1_clr = self.cum_log_return(s1_series)
+        s2_clr = self.cum_log_return(s2_series)
         
         # Finding a inverse cumulative density distribution (quantile) for each stock price series.
-        s1_cdf = ccalc.find_marginal_cdf(s1_series, empirical=if_empirical_cdf)
-        s2_cdf = ccalc.find_marginal_cdf(s2_series, empirical=if_empirical_cdf)
+        s1_cdf = ccalc.find_marginal_cdf(s1_clr, empirical=if_empirical_cdf)
+        s2_cdf = ccalc.find_marginal_cdf(s2_clr, empirical=if_empirical_cdf)
         
-        # Quantile data for each stock.
-        u1_series = s1_cdf(s1_series)
-        u2_series = s2_cdf(s2_series)
+        # Quantile data for each stock w.r.t. their cumulative log return.
+        u1_series = s1_cdf(s1_clr)
+        u2_series = s2_cdf(s2_clr)
         
         # Get log-likelihood value and the copula with parameters fitted to training data.
         log_likelihood, copula = ccalc.log_ml(u1_series, u2_series,
                                               copula_name, nu)
         
         # Information criterion for evaluating model fitting performance.
-        sic_value = ccalc.sic(log_likelihood, n=len(data[:, 0]))
-        aic_value = ccalc.aic(log_likelihood, n=len(data[:, 0]))
-        hqic_value = ccalc.hqic(log_likelihood, n=len(data[:, 0]))
+        sic_value = ccalc.sic(log_likelihood, n=num_of_instances)
+        aic_value = ccalc.aic(log_likelihood, n=num_of_instances)
+        hqic_value = ccalc.hqic(log_likelihood, n=num_of_instances)
 
         result_dict = {'Copula Name': copula_name,
                        'SIC': sic_value,
@@ -87,7 +93,55 @@ class CopulaStrategy:
             self.copula = copula
 
         return result_dict, copula, s1_cdf, s2_cdf
+    
+    def ic_test(self, s1_test, s2_test, cdf1, cdf2):
+        """
+        Run SIC, AIC and HQIC of the fitted copula given data.
+        
+        This method only works if CopulaStrategy has fitted a copula given training data.
+        
+        :param s1_test: (np.array) 1D price time series.
+        :param s2_test: (np.array) 1D price time series.
+        :param cdf1: (func) Cumulative density function trained, for the security in s1_test.
+        :param cdf2: (func) Cumulative density function trained, for the security in s2_test.
+        :return: (dict) Result of SIC, AIC and HQIC.
+        """
+        num_of_instances = len(s1_test)
+        copula = self.copula
+        # Get the internal copula's name.
+        copula_name = copula.__class__.__name__
+        if copula_name not in self.all_copula_names:
+            raise ValueError('CopulaStrategy does not have a currently defined copula.')
+        # Get nu (degree of freedom) if it is a Student-t copula.
+        if copula_name == 'Student':
+            nu = copula.nu
+        else:
+            nu = None
 
+        # Convert stock prices to cumulative log return.
+        s1_clr = self.cum_log_return(s1_test)
+        s2_clr = self.cum_log_return(s2_test)
+        
+        # Quantile data for each stock w.r.t. their cumulative log return.
+        u1_series = cdf1(s1_clr)
+        u2_series = cdf2(s2_clr)
+        
+        # Get log-likelihood value and the copula with parameters fitted to training data.
+        log_likelihood, _ = ccalc.log_ml(u1_series, u2_series,
+                                         copula_name, nu)
+        
+        # Information criterion for evaluating model fitting performance.
+        sic_value = ccalc.sic(log_likelihood, n=num_of_instances)
+        aic_value = ccalc.aic(log_likelihood, n=num_of_instances)
+        hqic_value = ccalc.hqic(log_likelihood, n=num_of_instances)
+        
+        result_dict = {'Copula Name': copula_name,
+                       'SIC': sic_value,
+                       'AIC': aic_value,
+                       'HQIC': hqic_value}
+        
+        return result_dict
+        
     def graph_copula(self, copula_name, ax=None, **kwargs):
         """
         Graph the sample from a given copula. Returns axis.
@@ -154,8 +208,8 @@ class CopulaStrategy:
         """
         Generate positions given price series of two stocks.
 
-        :param s1_series: (np.array) Scaled 1D price series from stock 1.
-        :param s2_series: (np.array) Scaled 1D price series from stock 2.
+        :param s1_series: (np.array) 1D price series from stock 1.
+        :param s2_series: (np.array) 1D price series from stock 2.
         :param cdf1: (func) Marginal C.D.F. for stock 1.
         :param cdf2: (func) Marginal C.D.F. for stock 2.
         :param kwargs: Parameter for adjusting upper and lower thresholds for opening a position.
@@ -220,7 +274,7 @@ class CopulaStrategy:
                                                         prev_prob_u2,
                                                         current_pos)
 
-        # If currently have no position.
+        # If currently position is not open.
         if current_pos == self.position_kind[2]:
             # If the signal is long, then go long.
             # If the signal is short, then go short.
@@ -233,22 +287,45 @@ class CopulaStrategy:
         # By default, hold the current position.
         return current_pos
     
+    @staticmethod
+    def cum_log_return(price_series):
+        """
+        Convert a price time series to cumulative log return.
+
+        clr[i] = log(S[i]/S[0]) = log(S[i]) - log(s[0]).
+
+        :param price_series: (np.array) 1D price time series.
+        :return clr: (np.array) 1D cumulative log return series.
+        """
+        # Natural log of price series.
+        log_prices = np.log(price_series)
+        # Calculate cumulative log return.
+        log_price_0 = log_prices[0]
+        clr = np.array([log_price_now - log_price_0 for log_price_now in log_prices])
+        
+        return clr
+    
     def series_condi_prob(self, s1_series, s2_series, cdf1, cdf2):
         """
         Calculate the cumulative conditional probabilities for two price series.
-        
-        :param s1_series: (np.array) Scaled 1D price series from stock 1.
-        :param s2_series: (np.array) Scaled 1D price series from stock 2.
+
+        :param s1_series: (np.array) 1D price series from stock 1.
+        :param s2_series: (np.array) 1D price series from stock 2.
         :param cdf1: (func) Marginal C.D.F. for stock 1.
         :param cdf2: (func) Marginal C.D.F. for stock 2.
         :return prob_series: (np.array) (N, 2) shaped array storing the conditional C.D.F. pair for the stock pair.
         """
-        prob_series = np.zeros((len(s1_series), 2))
+        num_of_instances = len(s1_series)
+        # Convert to cumulative log return.
+        s1_clr = self.cum_log_return(s1_series)
+        s2_clr = self.cum_log_return(s2_series)
+
+        prob_series = np.zeros((num_of_instances, 2))
         # For pair, calculate and store its conditional C.D.F. pair.
         for row_idx, each_row in enumerate(prob_series):
             each_row[0], each_row[1] = \
-                self._condi_prob(s1_series[row_idx],
-                                 s2_series[row_idx],
+                self._condi_prob(s1_clr[row_idx],
+                                 s2_clr[row_idx],
                                  cdf1, cdf2)
 
         return prob_series
@@ -358,7 +435,8 @@ class CopulaStrategy:
 
         return pairs_action
 
-    def _check_if_cross(self, prob_u1, prob_u2, prev_prob_u1, prev_prob_u2,
+    @staticmethod
+    def _check_if_cross(prob_u1, prob_u2, prev_prob_u1, prev_prob_u2,
                         upper_exit_threshold=0.5,
                         lower_exit_threshold=0.5):
         """
@@ -367,14 +445,14 @@ class CopulaStrategy:
         When any one of the conditional probability crosses the boundary, we
         attemp to close the position.
         """
-        prob_u1_x_up = (prev_prob_u1 < lower_exit_threshold
-                        and prob_u1 > upper_exit_threshold)  # Prob u1 crosses upward
-        prob_u1_x_down = (prev_prob_u1 > upper_exit_threshold
-                          and prob_u1 < lower_exit_threshold)  # Prob u1 crosses downward
-        prob_u2_x_up = (prev_prob_u2 < lower_exit_threshold
-                        and prob_u2 > upper_exit_threshold)  # Prob u2 crosses upward
-        prob_u2_x_down = (prev_prob_u2 > upper_exit_threshold
-                          and prob_u2 < lower_exit_threshold)  # Prob u2 crosses downward
+        prob_u1_x_up = (prev_prob_u1 <= lower_exit_threshold
+                        and prob_u1 >= upper_exit_threshold)  # Prob u1 crosses upward
+        prob_u1_x_down = (prev_prob_u1 >= upper_exit_threshold
+                          and prob_u1 <= lower_exit_threshold)  # Prob u1 crosses downward
+        prob_u2_x_up = (prev_prob_u2 <= lower_exit_threshold
+                        and prob_u2 >= upper_exit_threshold)  # Prob u2 crosses upward
+        prob_u2_x_down = (prev_prob_u2 >= upper_exit_threshold
+                          and prob_u2 <= lower_exit_threshold)  # Prob u2 crosses downward
         cross_events = [prob_u1_x_up, prob_u1_x_down,
                         prob_u2_x_up, prob_u2_x_down]
         if_cross = any(cross_events)
