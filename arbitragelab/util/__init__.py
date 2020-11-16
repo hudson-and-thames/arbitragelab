@@ -1,5 +1,5 @@
 """
-Utility functions of ArbitrageLab.
+Utility functions.
 """
 
-from arbitragelab.util.risk_metrics import RiskMetrics
+from arbitragelab.util.generate_dataset import get_classification_data
