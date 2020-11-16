@@ -1,9 +1,9 @@
-# Copyright 2019, Hudson and Thames Quantitative Research
-# All rights reserved
-# Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
 """
-init file for copula_approach
+This module implements Copula-based Statistical Arbitrage strategies.
 """
-import arbitragelab.copula_approach.copula_strategy
-import arbitragelab.copula_approach.copula_generate
-import arbitragelab.copula_approach.copula_calculation
+
+from arbitragelab.copula_approach.copula_calculation import (find_marginal_cdf, ml_theta_hat, log_ml,
+                                                             sic, aic, hqic)
+from arbitragelab.copula_approach.copula_generate import (Copula, Gumbel, Frank, Clayton, Joe, N13,
+                                                          N14, Gaussian, Student, Switcher)
+from arbitragelab.copula_approach.copula_strategy import CopulaStrategy
