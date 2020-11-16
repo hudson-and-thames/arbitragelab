@@ -12,7 +12,6 @@ from sklearn.metrics import mutual_info_score
 
 
 # pylint: disable=invalid-name
-
 def get_optimal_number_of_bins(num_obs: int, corr_coef: float = None) -> int:
     """
     Calculates optimal number of bins for discretization based on number of observations
