@@ -8,6 +8,9 @@
 PCA Approach
 ============
 
+Introduction
+############
+
 This module shows how the Principal Component Analysis can be used to create mean-reverting portfolios
 and generate trading signals. It's done by considering residuals or idiosyncratic components
 of returns and modeling them as mean-reverting processes.
@@ -110,14 +113,14 @@ And the corresponding eigenvectors:
 
    v^{(j)} = ( v^{(j)}_{1}, ..., v^{(j)}_{N} ); j = 1, ..., N.
 
-Now, for each index :math:`j` we consider a corresponding "eigenportfolio", in which we
+Now, for each index :math:`j` we consider a corresponding "eigen portfolio", in which we
 invest the respective amounts invested in each of the stocks as:
 
 .. math::
 
     Q^{(j)}_{i} = \frac{v^{(j)}_{i}}{\bar{\sigma_{i}}}
 
-And the eigenportfolio returns are:
+And the eigen portfolio returns are:
 
 .. math::
 
@@ -199,10 +202,9 @@ Implementation
 PCA Trading Strategy
 ####################
 
-The strategy implemented in the MlFinLab module sets a default estimation window for the correlation
-matrix as 252 days, a window for residuals estimation of 60 days (:math:`T_{1} = 60/252`) and the
-threshold for the mean reversion speed of an eigenportfolio for it to be traded so that the reversion time
-is less than :math:`1/2` period (:math:`\kappa > 252/30 = 8.4`).
+The strategy implemented sets a default estimation window for the correlation matrix as 252 days, a window for residuals
+estimation of 60 days (:math:`T_{1} = 60/252`) and the threshold for the mean reversion speed of an eigen portfolio for
+it to be traded so that the reversion time is less than :math:`1/2` period (:math:`\kappa > 252/30 = 8.4`).
 
 For the process :math:`X_{i}(t)` the equilibrium variance is defined as:
 
@@ -217,7 +219,7 @@ And the following variable is defined:
    s_{i} = \frac{X_{i}(t)-m_{i}}{\sigma_{eq,i}}
 
 This variable is called the S-score. The S-score measures the distance to the equilibrium of the
-cointegrated residual in units standard deviations, i.e. how far away a given asset eigenportfolio
+cointegrated residual in units standard deviations, i.e. how far away a given asset eigen portfolio
 is from the theoretical equilibrium value associated with the model.
 
 .. figure:: images/pca_approach_s_score.png
@@ -228,7 +230,7 @@ is from the theoretical equilibrium value associated with the model.
     An example from `Statistical Arbitrage in the U.S. Equities Market <https://math.nyu.edu/faculty/avellane/AvellanedaLeeStatArb20090616.pdf>`__.
     by Marco Avellaneda and Jeong-Hyun Lee.
 
-If the eigenportfolio shows a mean reversion speed above the set threshold (:math:`\kappa`), the
+If the eigen portfolio shows a mean reversion speed above the set threshold (:math:`\kappa`), the
 S-score based on the values from the residual estimation window is being calculated.
 
 The trading signals are generated from the S-scores using the following rules:
@@ -241,7 +243,7 @@ The trading signals are generated from the S-scores using the following rules:
 
 - Close a short position if :math:`s_{i} > - \bar{s_{sc}}`
 
-Opening a long position means buying $1 of the corresponding stock (of the asset eigenportfolio)
+Opening a long position means buying $1 of the corresponding stock (of the asset eigen portfolio)
 and selling :math:`\beta_{i1}` dollars of assets from the first scaled eigenvector (:math:`Q^{(1)}_{i}`),
 :math:`\beta_{i2}` from the second scaled eigenvector (:math:`Q^{(2)}_{i}`) and so on.
 
@@ -255,14 +257,14 @@ based on simulating strategies from 2000 to 2004 in the case of ETF factors:
 
 - :math:`\bar{s_{bc}} = 0.75`, :math:`\bar{s_{sc}} = 0.50`
 
-The rationale behind this strategy is that we open trades when the eigenportfolio shows good mean
+The rationale behind this strategy is that we open trades when the eigen portfolio shows good mean
 reversion speed and its S-score is far from the equilibrium, as we think that we detected an anomalous
 excursion of the co-integration residual. We expect most of the assets in our portfolio to be near
 equilibrium most of the time, so we are closing trades at values close to zero.
 
 The signal generating function implemented in the MlFinLab package outputs target weights for each
 asset in our portfolio for each observation time - target weights here are the sum of weights of all
-eigenportfolios that show high mean reversion speed and have needed S-score value at a given time.
+eigen portfolios that show high mean reversion speed and have needed S-score value at a given time.
 
 Implementation
 **************
@@ -309,7 +311,7 @@ Examples
    # Calculating residuals for a set 60-day window
    residual, coefficient = pca_strategy.get_residuals(data_60days, factorret)
 
-   # Calculating S-scores for each eigenportfolio for a set 60-day window
+   # Calculating S-scores for each eigen portfolio for a set 60-day window
    s_scores = pca_strategy.get_sscores(residual, k=8)
 
 Research Notebooks
@@ -325,3 +327,4 @@ References
 ##########
 
 * `Avellaneda, M. and Lee, J.H., 2010. Statistical arbitrage in the US equities market. Quantitative Finance, 10(7), pp.761-782. <https://math.cims.nyu.edu/faculty/avellane/AvellanedaLeeStatArb071108.pdf>`__
+* `Jolliffe, I. T., Principal Components Analysis, Springer Series in Statistics, Springer-Verlag, Heidelberg, 2002. <https://www.springer.com/gp/book/9780387954424>`__

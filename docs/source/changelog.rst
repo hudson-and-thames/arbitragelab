@@ -21,5 +21,5 @@ Changelog
 * :feature:`3` Method for Half-Life of mean reverting process.
 * :feature:`3` Linear & Bollinger Band strategy by EP Chan.
 * :support:`3` Co-integration approach documentation.
- :feature:`2` Kalman Filter + Kalman strategy added.
+* :feature:`2` Kalman Filter + Kalman strategy added.
 * :support:`2` Kalman Filter documentation.
