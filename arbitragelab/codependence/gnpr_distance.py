@@ -12,8 +12,8 @@ import pandas as pd
 from scipy.stats import spearmanr
 import ot
 
-# pylint: disable=invalid-name
 
+# pylint: disable=invalid-name
 def spearmans_rho(x: np.array, y: np.array) -> float:
     """
     Calculates a statistical estimate of Spearman's rho - a copula-based dependence measure.
@@ -38,6 +38,7 @@ def spearmans_rho(x: np.array, y: np.array) -> float:
     rho, _ = spearmanr(x, y)
 
     return rho
+
 
 def gpr_distance(x: np.array, y: np.array, theta: float) -> float:
     """
@@ -66,6 +67,7 @@ def gpr_distance(x: np.array, y: np.array, theta: float) -> float:
                               np.exp(- (1 / 4) * (x.mean() - y.mean())**2 / (x.std()**2 + y.std()**2)))
 
     return distance**(1/2)
+
 
 def gnpr_distance(x: np.array, y: np.array, theta: float, n_bins: int = 50) -> float:
     """

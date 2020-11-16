@@ -4,7 +4,7 @@
 
 """
 This implementation lets user generate dependence and distance matrix based on the various methods of Information
-Codependence  described in Cornell lecture notes on Codependence:
+Codependence described in Cornell lecture notes on Codependence:
 https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994&download=yes
 """
 
@@ -18,7 +18,6 @@ from arbitragelab.codependence.optimal_transport import optimal_transport_depend
 
 
 # pylint: disable=invalid-name
-
 def get_dependence_matrix(df: pd.DataFrame, dependence_method: str, theta: float = 0.5,
                           n_bins: int = None, normalize: bool = True,
                           estimator: str = 'standard', target_dependence: str = 'comonotonicity',
@@ -96,6 +95,7 @@ def get_dependence_matrix(df: pd.DataFrame, dependence_method: str, theta: float
         return 1 - dependence_df  # IV is reverse, 1 - independent, 0 - similar
 
     return dependence_df
+
 
 def get_distance_matrix(X: pd.DataFrame, distance_metric: str = 'angular') -> pd.DataFrame:
     """

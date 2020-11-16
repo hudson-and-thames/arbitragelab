@@ -11,10 +11,11 @@ import numpy as np
 import pandas as pd
 from sklearn.datasets import make_classification
 
+
 # pylint: disable=invalid-name
 def get_classification_data(n_features=100, n_informative=25, n_redundant=25, n_samples=10000, random_state=0, sigma=.0):
     """
-    A function to generate synthetic classification datasets
+    A function to generate synthetic classification data sets.
 
     :param n_features: (int) Total number of features to be generated (i.e. informative + redundant + noisy).
     :param n_informative: (int) Number of informative features.

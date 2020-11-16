@@ -12,7 +12,7 @@
 Optimal Transport
 =================
 
-As described by Gautier Marti `here <https://gmarti.gitlab.io/qfin/2020/06/25/copula-optimal-transport-dependence.html>`__.:
+As described by Gautier Marti `here <https://gmarti.gitlab.io/qfin/2020/06/25/copula-optimal-transport-dependence.html>`__:
 
 "The basic idea of the optimal copula transport dependence measure is rather simple. It relies on leveraging:
 

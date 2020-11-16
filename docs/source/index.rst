@@ -109,6 +109,18 @@ This project is licensed under an all rights reserved licence.
 
 .. toctree::
     :maxdepth: 2
+    :caption: Codependence Measures
+    :hidden:
+
+    codependence/introduction
+    codependence/correlation_based_metrics
+    codependence/information_theory_metrics
+    codependence/codependence_marti
+    codependence/codependence_matrix
+    codependence/optimal_transport
+
+.. toctree::
+    :maxdepth: 2
     :caption: Cointegration Approach
     :hidden:
 
@@ -124,18 +136,6 @@ This project is licensed under an all rights reserved licence.
 
     other_approaches/kalman_filter
     other_approaches/pca_approach
-
-.. toctree::
-    :maxdepth: 2
-    :caption: Codependence
-    :hidden:
-
-    codependence/introduction
-    codependence/correlation_based_metrics
-    codependence/information_theory_metrics
-    codependence/codependence_marti
-    codependence/codependence_matrix
-    codependence/optimal_transport
 
 .. toctree::
     :maxdepth: 2

@@ -13,8 +13,6 @@ from scipy.spatial.distance import squareform, pdist
 
 
 # pylint: disable=invalid-name
-
-
 def angular_distance(x: np.array, y: np.array) -> float:
     """
     Returns angular distance between two vectors. Angular distance is a slight modification of Pearson correlation which

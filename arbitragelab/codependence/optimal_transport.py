@@ -12,7 +12,6 @@ import ot
 
 
 # pylint: disable=invalid-name
-
 def _get_empirical_copula(x: np.array, y: np.array) -> np.array:
     """
     Calculate empirical copula using ranked observations.
@@ -30,6 +29,7 @@ def _get_empirical_copula(x: np.array, y: np.array) -> np.array:
     empirical = np.array([[x, y] for x, y in zip(x_unif, y_unif)])
 
     return empirical
+
 
 def optimal_transport_dependence(x: np.array, y: np.array, target_dependence: str = 'comonotonicity',
                                  gaussian_corr: float = 0.7, var_threshold: float = 0.2) -> float:
@@ -85,6 +85,7 @@ def optimal_transport_dependence(x: np.array, y: np.array, target_dependence: st
 
     return ot_dependence
 
+
 def _compute_copula_ot_dependence(empirical: np.array, target: np.array, forget: np.array,
                                   n_obs: int) -> float:
     """
@@ -119,6 +120,7 @@ def _compute_copula_ot_dependence(empirical: np.array, target: np.array, forget:
     ot_measure = 1 - e2t_dist / (e2f_dist + e2t_dist)
 
     return ot_measure
+
 
 def _create_target_copula(target_dependence: str, n_obs: int, gauss_corr: float,
                           var_threshold: float) -> np.array:
