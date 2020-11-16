@@ -122,7 +122,6 @@ This project is licensed under an all rights reserved licence.
     :caption: Other Approaches
     :hidden:
 
-    other_approaches/introduction
     other_approaches/kalman_filter
 
 .. toctree::
