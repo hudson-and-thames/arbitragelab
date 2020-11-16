@@ -109,9 +109,20 @@ This project is licensed under an all rights reserved licence.
 
 .. toctree::
     :maxdepth: 2
+    :caption: Cointegration Approach
+    :hidden:
+
+    cointegration_approach/introduction
+    cointegration_approach/cointegration_tests
+    cointegration_approach/half_life
+    cointegration_approach/trading_strategies
+
+.. toctree::
+    :maxdepth: 2
     :caption: Other Approaches
     :hidden:
 
+    other_approaches/kalman_filter
     other_approaches/introduction
     other_approaches/pca_approach
 
