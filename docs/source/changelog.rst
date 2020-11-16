@@ -23,3 +23,5 @@ Changelog
 * :support:`3` Co-integration approach documentation.
 * :feature:`2` Kalman Filter + Kalman strategy added.
 * :support:`2` Kalman Filter documentation.
+* :feature:`15` Codependence Module added.
+* :support:`15` Codependence Module documentation.
