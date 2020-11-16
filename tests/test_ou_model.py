@@ -21,6 +21,9 @@ class TestOrnsteinUhlenbeck(unittest.TestCase):
         """
         Set the file path for the data and testing variables.
         """
+
+        np.random.seed(0)
+
         project_path = os.path.dirname(__file__)
         self.path = project_path + '/test_data/gld_gdx_data.csv'
         data = pd.read_csv(self.path)
@@ -41,7 +44,7 @@ class TestOrnsteinUhlenbeck(unittest.TestCase):
         # Constructing portfolio price identical to self.assetprices
         # optimal portfolio
         self.portfolioprices = ((1 /asset_helper[0][0]) * asset_helper[0][:]
-                                - (0.20281 / asset_helper[1][0]) * asset_helper[1][:])
+                                - (0.212909090909 / asset_helper[1][0]) * asset_helper[1][:])
 
         # List with testing values for data frequency
         self.test_data_frequency = ["D", "M", "Y", True]
@@ -184,7 +187,7 @@ class TestOrnsteinUhlenbeck(unittest.TestCase):
         dataframe_parameters = [dataframe.theta, dataframe.mu, dataframe.sigma_square, dataframe.half_life(),
                                 dataframe.B_value]
 
-        expected_output = [0.72650, 6.0929, 0.00696, 0.114, 0.20281]
+        expected_output = [0.71758, 6.306, 0.00698, 0.10992, 0.21291]
 
         # Testing optimal parameters fit to the portfolio constructed from asset prices from pd.DataFrame
         np.testing.assert_almost_equal(dataframe_parameters, expected_output, decimal=3)
@@ -227,9 +230,9 @@ class TestOrnsteinUhlenbeck(unittest.TestCase):
                                  assets.optimal_liquidation_level_stop_loss()]
 
         # Expected values
-        expected_optimal_levels_portfolio = [0.75315, 0.65905, 0.75315, 0.20669, 0.65905]
+        expected_optimal_levels_portfolio = [0.7443, 0.651, 0.7443, 0.2066, 0.651]
 
-        expected_optimal_levels_assets = [0.75315, 0.65905, 0.20669, 0.65905, 0.75315]
+        expected_optimal_levels_assets = [0.7443, 0.651, 0.2066, 0.651, 0.7443]
 
         # Testing
         np.testing.assert_almost_equal(optimal_levels_portfolio, expected_optimal_levels_portfolio, decimal=4)
