@@ -187,13 +187,13 @@ class TestOrnsteinUhlenbeck(unittest.TestCase):
         expected_output = [0.72650, 6.0929, 0.00696, 0.114, 0.20281]
 
         # Testing optimal parameters fit to the portfolio constructed from asset prices from pd.DataFrame
-        np.testing.assert_almost_equal(dataframe_parameters, expected_output, decimal=2)
+        np.testing.assert_almost_equal(dataframe_parameters, expected_output, decimal=3)
 
         # Testing optimal parameters fit to the portfolio constructed from asset prices from np.array
-        np.testing.assert_almost_equal(assets_parameters, expected_output, decimal=2)
+        np.testing.assert_almost_equal(assets_parameters, expected_output, decimal=3)
 
         # Testing optimal parameters fit to the given portfolio from np.array
-        np.testing.assert_almost_equal(portfolio_parameters, expected_output[:-1], decimal=2)
+        np.testing.assert_almost_equal(portfolio_parameters, expected_output[:-1], decimal=3)
 
     def test_optimal_levels(self):
         """
@@ -232,8 +232,8 @@ class TestOrnsteinUhlenbeck(unittest.TestCase):
         expected_optimal_levels_assets = [0.75315, 0.65905, 0.20669, 0.65905, 0.75315]
 
         # Testing
-        np.testing.assert_almost_equal(optimal_levels_portfolio, expected_optimal_levels_portfolio, decimal=3)
-        np.testing.assert_almost_equal(optimal_levels_assets, expected_optimal_levels_assets, decimal=3)
+        np.testing.assert_almost_equal(optimal_levels_portfolio, expected_optimal_levels_portfolio, decimal=4)
+        np.testing.assert_almost_equal(optimal_levels_assets, expected_optimal_levels_assets, decimal=4)
 
         # Testing the fitness check function
         assets.check_fit()
