@@ -91,7 +91,6 @@ class KalmanFilterStrategy:
             P = self.covs_trace[-1]
             self.R = P + self.transition_covariance
         else:
-            P = np.zeros((2, 2))
             self.R = np.zeros((2, 2))
 
         # Adding last beta to the list of betas
