@@ -26,3 +26,4 @@ Changelog
 * :support:`14` Added a number of new tools to improve our deployment and align us with best practices. They include: CircleCI, VersionBump, Update Issue Templates, ChangeLog, Logo, Favicon.
 * :feature:`15` Codependence module added.
 * :support:`15` Codependence module documentation.
+* :support:`17` Added Licence, ReadMe, and RoadMap
