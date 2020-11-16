@@ -1,37 +1,20 @@
-# Description
+## Purpose
+_Describe the problem or feature in addition to a link to the issues._
 
-Please include a summary of the change and which issue is fixed. Please also include relevant motivation and context. List any dependencies that are required for this change.
+## Approach
+_How does this change address the problem?_
 
-Fixes # (issue)
+## Tests for New Behavior
+_What new tests were added to cover new features or behaviors?_
 
-## Type of change
+## Checklist
+_Make sure you did the following (if applicable):_
+- [ ] Added tests for any new features or behaviors.
+- [ ] Ran ``./pylint`` to make sure code style is consistent.
+- [ ] Built and reviewed the docs.
+- [ ] Added a note to the [changelog](https://github.com/twosigma/marbles/blob/master/docs/changelog.rst).
 
-Please delete options that are not relevant.
+## Learning
+_Describe the research stage_
 
-- [ ] Bug fix (non-breaking change which fixes an issue)
-- [ ] New feature (non-breaking change which adds functionality)
-- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
-- [ ] This change requires a documentation update
-
-# How Has This Been Tested?
-
-Please describe the tests that you ran to verify your changes. Provide instructions so we can reproduce. Please also list any relevant details for your test configuration
-
-- [ ] Test A
-- [ ] Test B
-
-**Test Configuration**:
-* Operating system
-* IDE used
-
-
-# Checklist:
-
-- [ ] My code follows the style guidelines of this project
-- [ ] I have performed a self-review of my own code
-- [ ] I have commented my code, particularly in hard-to-understand areas
-- [ ] I have made corresponding changes to the documentation
-- [ ] My changes generate no new warnings
-- [ ] I have added tests that prove my fix is effective or that my feature works
-- [ ] New and existing unit tests pass locally with my changes
-- [ ] Any dependent changes have been merged and published in downstream modules
+_Links to blog posts, patterns, libraries or addons used to solve this problem_
