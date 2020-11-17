@@ -214,12 +214,12 @@ class TestMinimumProfitSimulation(unittest.TestCase):
                                               use_statsmodel=True)
 
         sim_ar_coeff_mean, sim_ar_coeff_std = simulation.verify_ar(manual_series)
-        self.assertEqual(sim_ar_coeff_mean, 0.3820601669620297)
-        self.assertEqual(sim_ar_coeff_std, 0.05399845019275104)
+        self.assertAlmostEqual(sim_ar_coeff_mean, 0.3820601669620297)
+        self.assertAlmostEqual(sim_ar_coeff_std, 0.05399845019275104)
 
         sim_ar_coeff_mean, sim_ar_coeff_std = simulation.verify_ar(stats_series)
-        self.assertEqual(sim_ar_coeff_mean, 0.3869582560668456)
-        self.assertEqual(sim_ar_coeff_std, 0.051880085690937654)
+        self.assertAlmostEqual(sim_ar_coeff_mean, 0.3869582560668456)
+        self.assertAlmostEqual(sim_ar_coeff_std, 0.051880085690937654)
 
         # 1 time series, length of 250
         sim_spec = MinimumProfitSimulation(1, 250)
@@ -229,11 +229,11 @@ class TestMinimumProfitSimulation(unittest.TestCase):
                                             use_statsmodel=False)
 
         sim_ar_coeff_mean, sim_ar_coeff_std = sim_spec.verify_ar(manual_series)
-        self.assertEqual(sim_ar_coeff_mean, 0.3499509806636654)
+        self.assertAlmostEqual(sim_ar_coeff_mean, 0.3499509806636654)
         self.assertEqual(sim_ar_coeff_std, None)
 
         sim_ar_coeff_mean, sim_ar_coeff_std = sim_spec.verify_ar(stats_series)
-        self.assertEqual(sim_ar_coeff_mean, 0.43948269685199864)
+        self.assertAlmostEqual(sim_ar_coeff_mean, 0.43948269685199864)
         self.assertEqual(sim_ar_coeff_std, None)
 
     def test_verify_coint(self):
@@ -254,11 +254,11 @@ class TestMinimumProfitSimulation(unittest.TestCase):
 
         sim_beta_coeff_mean, sim_beta_coeff_std = simulation.verify_coint(manual_s1, manual_s2)
         self.assertAlmostEqual(sim_beta_coeff_mean, self.normal_coint_params['beta'], places=4)
-        self.assertEqual(sim_beta_coeff_std, 0.00036726312274826706)
+        self.assertAlmostEqual(sim_beta_coeff_std, 0.00036726312274826706)
 
         sim_beta_coeff_mean, sim_beta_coeff_std = simulation.verify_coint(stats_s1, stats_s2)
         self.assertAlmostEqual(sim_beta_coeff_mean, self.normal_coint_params['beta'], places=4)
-        self.assertEqual(sim_beta_coeff_std, 0.0005293777736886055)
+        self.assertAlmostEqual(sim_beta_coeff_std, 0.0005293777736886055)
 
         # 1 time series, length of 250
         sim_spec = MinimumProfitSimulation(1, 250)

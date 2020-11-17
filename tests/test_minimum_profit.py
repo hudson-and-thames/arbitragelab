@@ -7,6 +7,7 @@ Tests function of Minimum Profit Condition Optimization module:
 minimum_profit/MinimumProfit.py
 """
 
+import os
 import unittest
 from copy import deepcopy
 
@@ -30,7 +31,9 @@ class TestMinimumProfit(unittest.TestCase):
         :return:
         """
         np.random.seed(42)
-        self.data = pd.read_csv("test_data/ANZ-ADB.csv", parse_dates=['Date'])
+        project_path = os.path.dirname(__file__)
+        data_path = project_path + '/test_data/ANZ-ADB.csv'
+        self.data = pd.read_csv(data_path, parse_dates=['Date'])
         self.data.set_index("Date", inplace=True)
 
         self.faulty_data = deepcopy(self.data)
@@ -59,10 +62,10 @@ class TestMinimumProfit(unittest.TestCase):
         beta_jo, epsilon_t_jo, ar_coeff_jo, ar_resid_jo = optimizer.fit(train_df, use_johansen=True)
 
         # Check the AR(1) coefficient and cointegration coefficient
-        self.assertEqual(beta_eg, -1.8378837809650117)
-        self.assertEqual(beta_jo, -1.8647763422880634)
-        self.assertEqual(ar_coeff_eg, 0.8933542389605265)
-        self.assertEqual(ar_coeff_jo, 0.892487910270181)
+        self.assertAlmostEqual(beta_eg, -1.8378837809650117)
+        self.assertAlmostEqual(beta_jo, -1.8647763422880634)
+        self.assertAlmostEqual(ar_coeff_eg, 0.8933542389605265)
+        self.assertAlmostEqual(ar_coeff_jo, 0.892487910270181)
 
         # Check if the cointegration error and residual error follows the following relationship:
         # sigma_epsilon = \sqrt{1 - phi^2} sigma_a
@@ -105,7 +108,7 @@ class TestMinimumProfit(unittest.TestCase):
             optimal_ub, _, _, optimal_mtp, _ = optimizer.optimize(ar_coeff, epsilon_t, ar_resid, horizon)
             self.assertAlmostEqual(optimal_ub, upper_bounds[idx])
             print("Optimal upper bound Uo is: {}".format(optimal_ub))
-            self.assertEqual(optimal_mtp, mtps[idx])
+            self.assertAlmostEqual(optimal_mtp, mtps[idx])
             print("Optimal minimum trade profit is: {}".format(optimal_mtp))
 
     def test_trade_signal(self):
