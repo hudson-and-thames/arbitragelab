@@ -30,7 +30,7 @@ class TestMinimumProfit(unittest.TestCase):
         Data: ANZ-ADB daily data (1/1/2001 - 8/30/2002)
         :return:
         """
-        np.random.seed(42)
+        np.random.seed(50)
         project_path = os.path.dirname(__file__)
         data_path = project_path + '/test_data/ANZ-ADB.csv'
         self.data = pd.read_csv(data_path, parse_dates=['Date'])
@@ -97,22 +97,21 @@ class TestMinimumProfit(unittest.TestCase):
         optimizer = MinimumProfit(empty_df)
 
         # Parameters
-        ar_coeffs = [-0.8, -0.2]
+        ar_coeff = -0.2
         sigma_a = 0.5
         horizon = 1000
 
         # Results on paper
-        upper_bounds = [0.59, 0.47]
-        mtps = [92.59328169728951, 66.73757636673506]
+        upper_bounds = 0.47
+        mtps = 66.92441657550803
 
         # Only do two tests as this process is quite time consuming.
-        for idx, ar_coeff in enumerate(ar_coeffs):
-            ar_resid = np.random.normal(0, sigma_a, 1000)
-            sigma_epsilon = sigma_a / np.sqrt(1 - ar_coeff ** 2)
-            epsilon_t = pd.Series(np.random.normal(0, sigma_epsilon, 1000))
-            optimal_ub, _, _, optimal_mtp, _ = optimizer.optimize(ar_coeff, epsilon_t, ar_resid, horizon)
-            self.assertAlmostEqual(optimal_ub, upper_bounds[idx])
-            self.assertAlmostEqual(optimal_mtp, mtps[idx])
+        ar_resid = np.random.normal(0, sigma_a, 1000)
+        sigma_epsilon = sigma_a / np.sqrt(1 - ar_coeff ** 2)
+        epsilon_t = pd.Series(np.random.normal(0, sigma_epsilon, 1000))
+        optimal_ub, _, _, optimal_mtp, _ = optimizer.optimize(ar_coeff, epsilon_t, ar_resid, horizon)
+        self.assertAlmostEqual(optimal_ub, upper_bounds)
+        self.assertAlmostEqual(optimal_mtp, mtps)
 
     def test_trade_signal(self):
         """
