@@ -6,7 +6,7 @@ Installation
 Recommended Versions
 ####################
 
-* Anaconda 3
+* Anaconda
 * Python 3.7 and up.
 
 Installation
@@ -15,7 +15,7 @@ Installation
 Mac OS X and Ubuntu Linux
 *************************
 
-1. Make sure you install the latest version of the Anaconda 3 distribution. To do this you can follow the install and update instructions found on this `link <https://www.anaconda.com/download/#mac>`_
+1. Make sure you install the latest version of the Anaconda distribution. To do this you can follow the install and update instructions found on this `link <https://www.anaconda.com/download/#mac>`_
 2. Launch a terminal
 3. Create a New Conda Environment. From terminal.
 
@@ -31,11 +31,47 @@ Accept all the requests to install.
 
    source activate <env name>
 
-5. From Terminal: install the arbitragelab package:
+5. Purchase ArbitrageLab from the `Hudson & Thames website <https://app.hudsonthames.org/auth/signin>`__. This will provide you with an API key.
+
+.. code-block::
+
+    Example: "26303adb02cb759b2d484233162a0"
+
+6. Add API key as an environment variable:
+
+   6.1 The Best Way:
+
+      By adding the API key as an environment variable, you won't need to constantly add the key every time you import the library.
+
+      * Open the terminal and run: ``sudo gedit /etc/environment``
+      * This will open a text editor.
+      * Add the following environment variable: ``ARBLAB_API_KEY="26303adb02cb759b2d484233162a0"``
+      * Note that you must add your own API key and not the one given in this example.
+      * Save the file and Logout or restart your computer. (If you skip this step, it won't register the change)
+
+   6.2 The Easy Way:
+
+      If you don't want the key to persist on your local machine, you can always declare each time, before you import the
+      ArbitrageLab library.
+
+      * In your python script or notebook, add the following line before you import ArbitrageLab:
+
+      .. code::
+
+         import os
+         os.environ['ARBLAB_API_KEY'] = "426303b02cb7475984b2d484319062a0"
+
+7. Install the arbitragelab library into your python environment.
+
+   7.1 From Terminal: install the arbitragelab package:
 
 .. code-block::
 
    pip install arbitragelab
+
+6. Register your API Key to Unlock the library.
+
+
 
 Windows
 *******

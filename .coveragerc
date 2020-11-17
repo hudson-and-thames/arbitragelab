@@ -5,6 +5,7 @@ directory = build/coverage/html
 branch = True
 omit =
      *__init__*
+     arbitragelab/network/validation.py
      tests/*
      /opt/conda/*
      # Ensure we exclude any files in .local
