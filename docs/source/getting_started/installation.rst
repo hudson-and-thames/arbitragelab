@@ -157,12 +157,45 @@ Windows
 
    conda activate <env name>
 
-6. Install MlFinLab:
+5. Purchase ArbitrageLab from the `Hudson & Thames website <https://app.hudsonthames.org/auth/signin>`__. This will provide you with an API key.
 
 .. code-block::
 
-   pip install mlfinlab
+    Example: "26303adb02cb759b2d484233162a0"
 
-.. Note::
+6. Add API key as an environment variable:
 
-    If you have problems with installation related to Numba and llvmlight, `this solution <https://github.com/hudson-and-thames/mlfinlab/issues/448>`_ might help.
+   6.1 The Best Way:
+
+      By adding the API key as an environment variable, you won't need to constantly add the key every time you import the library.
+
+      * Open command prompt.
+      * Create the variable: ``setx ARBLAB_API_KEY  "26303adb02cb759b2d484233162a0"``
+      * Note that you must add your own API key and not the one given in this example.
+      * Close and open a new command prompt
+      * Validate that your variable has been added: ``echo %ARBLAB_API_KEY%``
+
+   6.2 The Easy Way:
+
+      If you don't want the key to persist on your local machine, you can always declare it each time, before you import ArbitrageLab.
+
+      * In your python script or notebook, add the following line before you import ArbitrageLab:
+
+      .. code::
+
+         import os
+         os.environ['ARBLAB_API_KEY'] = "426303b02cb7475984b2d484319062a0"
+         import arbitragelab as al
+
+7. Install arbitragelab into your python environment via the terminal.
+
+   Please make sure to use this exact statement:
+
+   .. code-block::
+
+      pip install git+https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@github.com/hudson-and-thames/arbitragelab.git@master
+
+.. tip::
+
+   * We have added error handling which will raise an error if your environment variables are incorrect.
+   * If you are having problems with the installation, please ping us on Slack and we will be able to assist.
