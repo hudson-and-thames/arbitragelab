@@ -12,7 +12,7 @@ Functions include:
     Calculate AIC (Akaike information criterion).
     Calculate HQIC (Hannan-Quinn information criterion).
 """
-import copula_generate as cg
+import arbitragelab.copula_approach.copula_generate as cg
 import numpy as np
 from scipy.stats import kendalltau
 from sklearn.covariance import EmpiricalCovariance
@@ -47,7 +47,7 @@ def find_marginal_cdf(x, empirical=True, **kwargs):
         v_fitted_cdf = np.vectorize(fitted_cdf)
         return v_fitted_cdf
     else: # Choose a distribution by maximum likelihood estimation.
-        return fitted_cdf
+        return # fitted_cdf
     
 
 def ml_theta_hat(x, y, copula_name):
@@ -124,43 +124,47 @@ def log_ml(x, y, copula_name, nu=None):
                                          nu=nu)
     
     # Likelihood quantity for each pair of data, stored in a list.
-    likelihood_list = [my_copula._c(xi, yi) for (xi, yi) in zip(x,y)]
+    likelihood_list = [my_copula._c(xi, yi) for (xi, yi) in zip(x, y)]
     # Sum of logarithm of likelihood data.
     log_likelihood_sum = np.sum(np.log(likelihood_list))
+    log_likelihood_sum = log_likelihood_sum[abs(log_likelihood_sum) < np.inf] # Only keeping the valid values
     
     return log_likelihood_sum, my_copula
+
 
 def sic(log_likelihood: float, n: int, k=1):
     """
     Schwarz information criterion (SIC), aka Bayesian information criterion (BIC).
     
-    :param log_likelihood (float): Sum of log likelihood of some data.
-    :param n (int): Number of instances.
-    :param k (int): Number of parametrs estimated by max likelihood.
-    :return sic_value (float): Value of SIC.
+    :param log_likelihood: (float) Sum of log likelihood of some data.
+    :param n: (int) Number of instances.
+    :param k: (int) Number of parametrs estimated by max likelihood.
+    :return sic_value: (float) Value of SIC.
     """
     sic_value = np.log(n)*k - 2*log_likelihood
     return sic_value
+
 
 def aic(log_likelihood: float, n: int, k=1):
     """
     Akaike information criterion.
     
-    :param log_likelihood (float): Sum of log likelihood of some data.
-    :param n (int): Number of instances.
-    :param k (int): Number of parametrs estimated by max likelihood.
+    :param log_likelihood: (float) Sum of log likelihood of some data.
+    :param n: (int) Number of instances.
+    :param k: (int) Number of parametrs estimated by max likelihood.
     :return sic_value (float): Value of AIC.
     """
     aic_value = (2*n/(n-k-1))*k - 2*log_likelihood
     return aic_value
 
+
 def hqic(log_likelihood: float, n: int, k=1):
     """
     Hannan-Quinn information criterion.
     
-    :param log_likelihood (float): Sum of log likelihood of some data.
-    :param n (int): Number of instances.
-    :param k (int): Number of parametrs estimated by max likelihood.
+    :param log_likelihood: (float) Sum of log likelihood of some data.
+    :param n: (int) Number of instances.
+    :param k: (int) Number of parametrs estimated by max likelihood.
     :return sic_value (float): Value of HQIC.
     """
     hqic_value = 2*np.log(np.log(n))*k - 2*log_likelihood

@@ -8,12 +8,12 @@ emulate a switch functionality.
 """
 import numpy as np
 from scipy.optimize import brentq as brentq
-from scipy.special import erfinv as erfinv
 from scipy.special import gamma as gm
 from scipy.stats import t as student_t
 from scipy.stats import norm
 from scipy.stats import multivariate_normal as mvn
 from scipy.integrate import quad
+
 
 class Copula:
     """Copula class houses common functions for each coplula subtype."""
@@ -24,13 +24,13 @@ class Copula:
         """
         Describe the copula's name and parameter.
         """
-        print('test describe method')
+        pass
     
     def sample_plot(self):
         """
         Quick plotting from sampling points based on copula's P.D.F.
         """
-        print('test sample plot')
+        pass
 
 class Gumbel(Copula):
     """Gumbel Copula"""
@@ -154,10 +154,6 @@ class Frank(Copula):
         # Lower than this amount will be considered 0
         self.threshold = threshold
         self.theta = theta  # Default input
-        if np.abs(self.theta) > 30:
-            print('Warning: abs(theta) too large.'
-                  + 'The calculations will behave poorly.')
-
 
     def generate_pairs(self, num=None, theta=None, unif_vec=None):
         """
@@ -247,7 +243,6 @@ class Frank(Copula):
 
     def _theta_hat(self, tau):
         """Calculate theta hat from Kendall's tau from sample data"""
-
         def debye1(theta):
             """Debye function D_1(theta)"""
             result = quad(lambda x: x / theta / (np.exp(x) - 1), 0, theta)
@@ -264,8 +259,6 @@ class Clayton(Copula):
     """Clayton copula"""
     def __init__(self, threshold=1e-10, theta=None):
         super().__init__()
-        if theta == 0 or theta < -1:
-            raise ValueError('theta should be in [-1, +inf) \ {0}.')
         # Lower than this amount will be considered 0
         self.threshold = threshold
         self.theta = theta  # Default input
@@ -536,10 +529,65 @@ class N13(Copula):
             1 - ((1 - v1) * ((1 - np.log(w))**theta - 1) + 1)**(1 / theta))
 
         return u1, u2
+    
+    def _c(self, u, v):
+        """
+        Calculate probability density of the biavriate copula: P(U=u, V=v).
+        
+        Result is analytical.
+        """
+        theta = self.theta
+        u_part = (1 - np.log(u))**theta
+        v_part = (1 - np.log(v))**theta
+        Cuv = self._C(u, v)
+        
+        numerator = (Cuv * u_part * v_part
+                     * (-1 + theta + (-1 + u_part + v_part)**(1/theta))
+                     * (-1 + u_part + v_part)**(1/theta) )
+        
+        denominator = u * v * (1 - np.log(u)) * (1 - np.log(v)) * (-1 + u_part + v_part)**2
+        
+        pdf = numerator / denominator
+        return pdf
+
+    def _C(self, u, v):
+        """
+        Calculate cumulative density of the bivariate copula: P(U<=u, V<=v).
+        
+        Result is analytical.
+        """
+        theta = self.theta
+        u_part = (1 - np.log(u))**theta
+        v_part = (1 - np.log(v))**theta
+        cdf = np.exp(
+            1 - (-1 + u_part + v_part)**(1/theta))
+
+        return cdf
+    
+    def condi_cdf(self, u, v):
+        """
+        Calculate conditional cumulative density function: P(U<=u | V=v).
+        
+        Result is analytical.
+        
+        Note: This probability is symmmetric about (u, v).
+        """
+        theta = self.theta
+        u_part = (1 - np.log(u))**theta
+        v_part = (1 - np.log(v))**theta
+        Cuv = self._C(u, v)
+
+        numerator = Cuv * (-1 + u_part + v_part)**(1/theta) * v_part
+        denominator = v * (-1 + u_part + v_part) * (1 - np.log(v))
+
+        result = numerator / denominator
+        
+        return result
 
 
 class N14:
-    """N14 Copula (Nelsen 14)"""
+    """N14 Copula (Nelsen 14)."""
+    
     def __init__(self, threshold=1e-10, theta=None):
         # Lower than this amount will be considered 0.
         self.threshold = threshold
@@ -565,7 +613,7 @@ class N14:
             theta = self.theta  # Use the default input.
 
         def _Kc(w):
-            return w ** ((theta - 1) / theta)
+            return -w * (-2 + w**(1/theta))
 
         # Generate pairs of indep uniform dist vectors. Use numpy to generate.
         if unif_vec is None:
@@ -595,10 +643,67 @@ class N14:
                        self.threshold, 1 - self.threshold)
         else:
             w = 0  # Below the threshold, gives 0 as the root.
-        u1 = (1 + (v1 * (w**(1 / theta) - 1)**theta) ** (1 / theta))**theta
-        u2 = (1 + ((1 - v1) * (w**(1 / theta) - 1)**theta)**(1 / theta))**theta
+        u1 = (1 + (v1 * (w**(-1 / theta) - 1)**theta) ** (1 / theta))**(-theta)
+        u2 = (1 + ((1 - v1) * (w**(-1 / theta) - 1)**theta)**(1 / theta))**(-theta)
 
         return u1, u2
+    
+    def _c(self, u, v):
+        """
+        Calculate probability density of the biavriate copula: P(U=u, V=v).
+        
+        Result is analytical.
+        """
+        theta = self.theta
+        u_ker = -1 + np.power(u, 1/theta)
+        v_ker = -1 + np.power(v, 1/theta)
+        u_part = (-1 + np.power(u, -1/theta))**theta
+        v_part = (-1 + np.power(v, -1/theta))**theta
+        cdf_ker =  1 + (u_part + v_part)**(1/theta)
+        
+        numerator = (u_part * v_part * (cdf_ker -1)
+                     * (-1 + theta + 2 * theta * (cdf_ker -1)))
+        
+        denominator = ((u_part + v_part)**2 * cdf_ker**(2 + theta)
+                       * u * v * u_ker * v_ker * theta)
+        
+        pdf = numerator / denominator
+        return pdf
+
+    def _C(self, u, v):
+        """
+        Calculate cumulative density of the bivariate copula: P(U<=u, V<=v).
+        
+        Result is analytical.
+        """
+        theta = self.theta
+        u_part = (-1 + np.power(u, -1/theta))**theta
+        v_part = (-1 + np.power(v, -1/theta))**theta
+        cdf = (1 + (u_part + v_part)**(1/theta))**(-theta)
+
+        return cdf
+    
+    def condi_cdf(self, u, v):
+        """
+        Calculate conditional cumulative density function: P(U<=u | V=v).
+        
+        Result is analytical.
+        
+        Note: This probability is symmmetric about (u, v).
+        """
+        theta = self.theta
+        u_ker = -1 + np.power(u, -1/theta)
+        v_ker = -1 + np.power(v, -1/theta)
+        u_part = (-1 + np.power(u, -1/theta))**theta
+        v_part = (-1 + np.power(v, -1/theta))**theta
+        cdf_ker =  1 + (u_part + v_part)**(1/theta)
+
+        numerator = v_part * (cdf_ker - 1)
+        denominator = v**(1 + 1/theta) * v_ker * (u_part + v_part) * cdf_ker**(1 + theta)
+
+        result = numerator / denominator
+        
+        return result
 
 
 class Gaussian(Copula):
@@ -653,7 +758,7 @@ class Gaussian(Copula):
         inv_cdf_u = norm.ppf(u)
         inv_cdf_v = norm.ppf(v)
         
-        pdf = - inv_cdf_u * inv_cdf_v * rho / np.sqrt(1 - rho**2)
+        pdf = np.exp(- inv_cdf_u * inv_cdf_v * rho) / np.sqrt(1 - rho**2)
         return pdf
 
     def _C(self, u, v):
@@ -811,11 +916,11 @@ class Student:
         """
         Bivariate Student-t probability density.
     
-        :param x: (list_like) values, shape=(2, ).
+        :param x: (list_like) a pair of values, shape=(2, ).
         :param mu: (list_like) mean for the distribution, shape=(2, ).
         :param cov: (list_like) covariance matrix, shape=(2, 2).
         :param df: (float) degree of freedom.
-        :return: (float) the probability density
+        :return: (float) the probability density.
         """
         x1 = x[0] - mu[0]
         x2 = x[1] - mu[1]
@@ -900,4 +1005,3 @@ class Switcher:
     def _create_student(self):
         my_copula = Student(nu=self.nu, cov=self.cov)
         return my_copula
-

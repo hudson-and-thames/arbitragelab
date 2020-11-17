@@ -63,7 +63,7 @@ class TestCopulas(unittest.TestCase):
         
         # Check copula conditional cdf Prob(U<=u|V=v)
         self.assertAlmostEqual(cop.condi_cdf(0.5, 0.7), 0.257605, delta=1e-4)
-        
+    
     def test_joe(self):
         """Test Joe copula class."""
         cop = copula_generate.Joe(theta=6)
@@ -82,6 +82,40 @@ class TestCopulas(unittest.TestCase):
         # Check copula conditional cdf Prob(U<=u|V=v)
         self.assertAlmostEqual(cop.condi_cdf(0.5, 0.7), 0.0737336, delta=1e-4)
         
+    def test_n13(self):
+        """Test N14 Copula class."""
+        cop = copula_generate.N13(theta=3)
+        
+        # Check copula joint cumulative density C(U=u,V=v)
+        self.assertAlmostEqual(cop._C(0.7, 1e-4), cop._C(1e-4, 0.7), delta=1e-4)
+        self.assertAlmostEqual(cop._C(0.7, 1), cop._C(1, 0.7), delta=1e-4)
+        self.assertAlmostEqual(cop._C(0.7, 1e-8), 0, delta=1e-4)
+        self.assertAlmostEqual(cop._C(0.3, 0.7), 0.271918, delta=1e-4)
+        
+        # # Check copula joint probability density c(U=u,V=v)
+        self.assertAlmostEqual(cop._c(0.5, 0.7), cop._c(0.7,0.5), delta=1e-8)
+        self.assertAlmostEqual(cop._c(0.3, 0.7), 0.770034, delta=1e-4)
+        
+        # Check copula conditional cdf Prob(U<=u|V=v)
+        self.assertAlmostEqual(cop.condi_cdf(0.3, 0.7), 0.134891, delta=1e-4)
+        
+    def test_n14(self):
+        """Test N14 Copula class."""
+        cop = copula_generate.N14(theta=3)
+        
+        # Check copula joint cumulative density C(U=u,V=v)
+        self.assertAlmostEqual(cop._C(0.7, 1e-4), cop._C(1e-4, 0.7), delta=1e-4)
+        self.assertAlmostEqual(cop._C(0.7, 1), cop._C(1, 0.7), delta=1e-4)
+        self.assertAlmostEqual(cop._C(0.7, 1e-8), 0, delta=1e-4)
+        self.assertAlmostEqual(cop._C(0.3, 0.7), 0.298358, delta=1e-4)
+        
+        # Check copula joint probability density c(U=u,V=v)
+        self.assertAlmostEqual(cop._c(0.5, 0.7), cop._c(0.7,0.5), delta=1e-8)
+        self.assertAlmostEqual(cop._c(0.3, 0.7), 0.228089, delta=1e-4)
+        
+        # Check copula conditional cdf Prob(U<=u|V=v)
+        self.assertAlmostEqual(cop.condi_cdf(0.3, 0.7), 0.0207363, delta=1e-4)
+        
     def test_gaussian(self):
         """Test Gaussian copula class."""
         cov = [[2, 0.5], [0.5, 2]]
@@ -96,8 +130,8 @@ class TestCopulas(unittest.TestCase):
         
         # Check copula joint probability density c(U=u,V=v)
         self.assertAlmostEqual(cop._c(0.5, 0.7), cop._c(0.7,0.5), delta=1e-8)
-        self.assertAlmostEqual(cop._c(0.5, 0.7), 0, delta=1e-4)
-        self.assertAlmostEqual(cop._c(0.6, 0.7), -0.0343031, delta=1e-4)
+        self.assertAlmostEqual(cop._c(0.5, 0.7), 1.0327955, delta=1e-4)
+        self.assertAlmostEqual(cop._c(0.6, 0.7), 0.999055, delta=1e-4)
         
         # Check copula conditional cdf Prob(U<=u|V=v)
         self.assertAlmostEqual(cop.condi_cdf(0.5, 0.7), 0.446148, delta=1e-4)
@@ -113,7 +147,7 @@ class TestCopulas(unittest.TestCase):
         # Check copula joint probability density c(U=u,V=v)
         self.assertAlmostEqual(cop._c(0.5, 0.7), cop._c(0.7,0.5), delta=1e-8)
         self.assertAlmostEqual(cop._c(0.5, 0.7), 1.09150554, delta=1e-4)
-        #self.assertAlmostEqual(cop._c(0.6, 0.7), -0.0343031, delta=1e-4)
+        self.assertAlmostEqual(cop._c(0.6, 0.7), 1.1416005, delta=1e-4)
         
         # Check copula conditional cdf Prob(U<=u|V=v)
         self.assertAlmostEqual(cop.condi_cdf(0.5, 0.7), 0.4415184293094455, delta=1e-4)
@@ -155,6 +189,4 @@ class TestCopulas(unittest.TestCase):
                                        prev_prob_u1=0.3, prev_prob_u2=0.1,
                                        current_pos=1)
         self.assertEqual(new_pos, 0)
-        
-if __name__ == '__main__':
-    unittest.main()
+

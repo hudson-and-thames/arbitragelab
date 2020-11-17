@@ -7,9 +7,7 @@ import arbitragelab.copula_approach.copula_calculation as ccalc
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
-
-# import arbitragelab.copula_approach.copula_generate as cg.
-# Or import all classes in brackets as you wish.
+from typing import Callable
 
 
 class CopulaStrategy:
@@ -24,7 +22,7 @@ class CopulaStrategy:
         3. Scatter plot of a given copula about its probability density.
     """
 
-    def __init__(self, copula=None):
+    def __init__(self, copula: copula_generate.Copula = None):
         # Copulas that uses theta as parameter
         self.theta_copula_names = ['Gumbel', 'Clayton', 'Frank',
                                    'Joe', 'N13', 'N14']
@@ -43,12 +41,17 @@ class CopulaStrategy:
         self.lower_threshold = 0.05
         self.upper_threshold = 0.95
 
-    def fit_copula(self, s1_series, s2_series, copula_name, if_empirical_cdf=True, **kwargs):
+    def fit_copula(self, s1_series: np.ndarray, s2_series: np.ndarray, copula_name: str,
+                   if_empirical_cdf: bool = True, **kwargs):
         """
         Conduct a max likelihood estimation and information criterion.
+        
+        Note: s1_series and s2_series need to be pre-processed. In general, raw price data is depreciated.
+            One may use log return or cumulative log return. CopulaStrategy class provides a method to
+            calculate cumulative log return.
 
-        :param s1_series: (numpy.ndarray) 1D stock pair price time series data.
-        :param s2_series: (numpy.ndarray) 1D stock pair price time series data.
+        :param s1_series: (numpy.ndarray) 1D stock time series data in desired form.
+        :param s2_series: (numpy.ndarray) 1D stock time series data in desired form.
         :param copula_name: (str) Type of copula to fit.
         :param if_empirical_cdf: (bool) Whether use empirical cumulative density function to fit data.
         :param kwargs: Input degree of freedom if using Student-t copula. e.g. nu=10.
@@ -62,16 +65,16 @@ class CopulaStrategy:
         num_of_instances = len(s1_series)  # Number of instances.
 
         # Convert stock prices to cumulative log return.
-        s1_clr = self.cum_log_return(s1_series)
-        s2_clr = self.cum_log_return(s2_series)
+        # s1_clr = self.cum_log_return(s1_series)
+        # s2_clr = self.cum_log_return(s2_series)
         
-        # Finding a inverse cumulative density distribution (quantile) for each stock price series.
-        s1_cdf = ccalc.find_marginal_cdf(s1_clr, empirical=if_empirical_cdf)
-        s2_cdf = ccalc.find_marginal_cdf(s2_clr, empirical=if_empirical_cdf)
+        # Finding an inverse cumulative density distribution (quantile) for each stock price series.
+        s1_cdf = ccalc.find_marginal_cdf(s1_series, empirical=if_empirical_cdf)
+        s2_cdf = ccalc.find_marginal_cdf(s2_series, empirical=if_empirical_cdf)
         
         # Quantile data for each stock w.r.t. their cumulative log return.
-        u1_series = s1_cdf(s1_clr)
-        u2_series = s2_cdf(s2_clr)
+        u1_series = s1_cdf(s1_series)
+        u2_series = s2_cdf(s2_series)
         
         # Get log-likelihood value and the copula with parameters fitted to training data.
         log_likelihood, copula = ccalc.log_ml(u1_series, u2_series,
@@ -94,14 +97,17 @@ class CopulaStrategy:
 
         return result_dict, copula, s1_cdf, s2_cdf
     
-    def ic_test(self, s1_test, s2_test, cdf1, cdf2):
+    def ic_test(self, s1_test: np.array, s2_test: np.array, cdf1: Callable, cdf2: Callable):
         """
         Run SIC, AIC and HQIC of the fitted copula given data.
         
         This method only works if CopulaStrategy has fitted a copula given training data.
         
-        :param s1_test: (np.array) 1D price time series.
-        :param s2_test: (np.array) 1D price time series.
+        Note: s1_series and s2_series need to be pre-processed. In general, raw price data is depreciated.
+            One may use log return or cumulative log return. CopulaStrategy class provides a method to
+            calculate cumulative log return.
+        :param s1_test: (np.array) 1D stock time series data in desired form.
+        :param s2_test: (np.array) 1D stock time series data in desired form.
         :param cdf1: (func) Cumulative density function trained, for the security in s1_test.
         :param cdf2: (func) Cumulative density function trained, for the security in s2_test.
         :return: (dict) Result of SIC, AIC and HQIC.
@@ -119,12 +125,12 @@ class CopulaStrategy:
             nu = None
 
         # Convert stock prices to cumulative log return.
-        s1_clr = self.cum_log_return(s1_test)
-        s2_clr = self.cum_log_return(s2_test)
+        # s1_clr = self.cum_log_return(s1_test)
+        # s2_clr = self.cum_log_return(s2_test)
         
         # Quantile data for each stock w.r.t. their cumulative log return.
-        u1_series = cdf1(s1_clr)
-        u2_series = cdf2(s2_clr)
+        u1_series = cdf1(s1_test)
+        u2_series = cdf2(s2_test)
         
         # Get log-likelihood value and the copula with parameters fitted to training data.
         log_likelihood, _ = ccalc.log_ml(u1_series, u2_series,
@@ -148,6 +154,7 @@ class CopulaStrategy:
 
         Randomly sample using copula density. User may further specify axis parameters for plotting in kwargs.
         :param copula_name: (str) Name of the copula to graph.
+        :param ax: (plt.ax) Plotting axes.
         :param kwargs: Parameters for the copula and the plot axes.
             num: (int) Number of sample points to plot.
             theta: (float) The copula parameter indicating correlation.
@@ -161,7 +168,7 @@ class CopulaStrategy:
         cov = kwargs.get('cov', None)
         nu = kwargs.get('nu', None)
         # Seperate plotting kwargs from copula parameters.
-        copula_params = ['theta', 'cov', 'nu']
+        copula_params = ['theta', 'cov', 'nu', 'num']
         plot_kwargs = {k: v for k, v in kwargs.items() if k not in copula_params}
         
         # Those copulas use theta as parameter.
@@ -288,20 +295,22 @@ class CopulaStrategy:
         return current_pos
     
     @staticmethod
-    def cum_log_return(price_series):
+    def cum_log_return(price_series: np.array, start: float = None):
         """
         Convert a price time series to cumulative log return.
 
         clr[i] = log(S[i]/S[0]) = log(S[i]) - log(s[0]).
 
         :param price_series: (np.array) 1D price time series.
+        :param start: (float) Initial price. Default to the starting element of price_series.
         :return clr: (np.array) 1D cumulative log return series.
         """
+        if start is None:
+            start = np.log(price_series[0])
         # Natural log of price series.
         log_prices = np.log(price_series)
         # Calculate cumulative log return.
-        log_price_0 = log_prices[0]
-        clr = np.array([log_price_now - log_price_0 for log_price_now in log_prices])
+        clr = np.array([log_price_now - start for log_price_now in log_prices])
         
         return clr
     
@@ -393,8 +402,6 @@ class CopulaStrategy:
                                            prev_prob_u1, prev_prob_u2)
             return open_type, to_exit
 
-        return open_type, to_exit
-
     def _condi_prob(self, s1, s2, cdf1, cdf2):
         """
         Conditional accumulative probability for pair's price data and copula.
@@ -409,7 +416,6 @@ class CopulaStrategy:
         prob_u2_given_u1 = self.copula.condi_cdf(u2, u1)
 
         return prob_u1_given_u2, prob_u2_given_u1
-
 
     def _check_open_position(self, prob_u1, prob_u2,
                              upper_threshold=0.95,
