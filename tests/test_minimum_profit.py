@@ -55,6 +55,9 @@ class TestMinimumProfit(unittest.TestCase):
         """
         Unit tests for cointegration coefficient calculation.
         """
+
+        print("Test fit():")
+
         optimizer = MinimumProfit(self.data, "ANZ", "ADB")
 
         train_df, _ = train_test_split(optimizer.price_df, date_cutoff=pd.Timestamp(2002, 1, 1))
@@ -87,36 +90,38 @@ class TestMinimumProfit(unittest.TestCase):
 
         Use specified parameters here instead of fit from data.
         """
-        pass
+
+        print("Test optimize():")
         # Use an empty Dataframe to initialize an instance of optimizer
-        # empty_df = pd.DataFrame(columns=['Share S1', 'Share S2'])
-        # optimizer = MinimumProfit(empty_df)
-        #
-        # # Parameters
-        # ar_coeffs = [-0.8, -0.5]
-        # sigma_a = 0.7
-        # horizon = 1000
-        #
-        # # Results on paper
-        # upper_bounds = [0.83, 0.7]
-        # mtps = [127.33541743524337, 108.31128758311243]
-        #
-        # # Only do two tests as this process is quite time consuming.
-        # for idx, ar_coeff in enumerate(ar_coeffs):
-        #     ar_resid = np.random.normal(0, sigma_a, 1000)
-        #     sigma_epsilon = sigma_a / np.sqrt(1 - ar_coeff ** 2)
-        #     epsilon_t = pd.Series(np.random.normal(0, sigma_epsilon, 1000))
-        #     optimal_ub, _, _, optimal_mtp, _ = optimizer.optimize(ar_coeff, epsilon_t, ar_resid, horizon)
-        #     self.assertAlmostEqual(optimal_ub, upper_bounds[idx])
-        #     print("Optimal upper bound Uo is: {}".format(optimal_ub))
-        #     self.assertAlmostEqual(optimal_mtp, mtps[idx])
-        #     print("Optimal minimum trade profit is: {}".format(optimal_mtp))
+        empty_df = pd.DataFrame(columns=['Share S1', 'Share S2'])
+        optimizer = MinimumProfit(empty_df)
+
+        # Parameters
+        ar_coeffs = [-0.8, -0.5]
+        sigma_a = 0.7
+        horizon = 1000
+
+        # Results on paper
+        upper_bounds = [0.83, 0.7]
+        mtps = [127.33541743524337, 108.31128758311243]
+
+        # Only do two tests as this process is quite time consuming.
+        for idx, ar_coeff in enumerate(ar_coeffs):
+            ar_resid = np.random.normal(0, sigma_a, 1000)
+            sigma_epsilon = sigma_a / np.sqrt(1 - ar_coeff ** 2)
+            epsilon_t = pd.Series(np.random.normal(0, sigma_epsilon, 1000))
+            optimal_ub, _, _, optimal_mtp, _ = optimizer.optimize(ar_coeff, epsilon_t, ar_resid, horizon)
+            self.assertAlmostEqual(optimal_ub, upper_bounds[idx])
+            print("Optimal upper bound Uo is: {}".format(optimal_ub))
+            self.assertAlmostEqual(optimal_mtp, mtps[idx])
+            print("Optimal minimum trade profit is: {}".format(optimal_mtp))
 
     def test_trade_signal(self):
         """
         Unit tests for trade signal generation.
         """
 
+        print("Test trade_signal():")
         optimizer = MinimumProfit(self.data, "ANZ", "ADB")
 
         # Split data into training and test set
