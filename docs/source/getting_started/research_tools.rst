@@ -4,13 +4,13 @@ Research Tools
 ==============
 
 As researchers, we often neglect finding the right tools to streamline
-the progress. Financial Machine Learning is no different in that a lot of the papers are scattered
+the progress. Financial machine learning is no different in that a lot of the papers are scattered
 across different journals and different fields. Ranging from journals on econometrics to machine
 learning, researchers often struggle to find the best academic papers to begin their studies.
 
 At Hudson & Thames, we primarily use two resources: `Connected Papers`_ and `EThOS`_. These two
 free sites have been invaluable and offer an advantage to search through the most cutting edge
-resources available for our MlFinLab library.
+resources available for our ArbitrageLab package.
 
 .. _Connected Papers: https://www.connectedpapers.com/
 .. _EThOS: https://ethos.bl.uk/Home.do
