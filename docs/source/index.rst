@@ -84,19 +84,19 @@ This project is licensed under an all rights reserved licence.
 
 .. toctree::
     :maxdepth: 2
-    :caption: Other Approaches
-    :hidden:
-
-    other_approaches/kalman_filter
-    other_approaches/pca_approach
-
-.. toctree::
-    :maxdepth: 2
     :caption: Optimal Mean Reversion
     :hidden:
 
     optimal_mean_reversion/introduction
     optimal_mean_reversion/ou_model
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Other Approaches
+    :hidden:
+
+    other_approaches/kalman_filter
+    other_approaches/pca_approach
 
 .. toctree::
     :maxdepth: 3

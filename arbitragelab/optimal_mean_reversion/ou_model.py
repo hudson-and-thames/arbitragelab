@@ -4,12 +4,12 @@
 
 # pylint: disable=missing-module-docstring, invalid-name, too-many-instance-attributes
 import warnings
-import numpy as np
 from scipy.integrate import quad
 from scipy.optimize import root_scalar
-import matplotlib.pyplot as plt
 import scipy.optimize as so
+import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
 
 class OrnsteinUhlenbeck:
@@ -110,9 +110,7 @@ class OrnsteinUhlenbeck:
         if isinstance(self.data, np.ndarray):
             self.data = self.data.transpose()
             data = self.data
-
         else:
-
             # Checking if the starting and ending timestamps were specified
             if all(timestamp is not None for timestamp in [start, end]):
 
@@ -120,9 +118,7 @@ class OrnsteinUhlenbeck:
                 data = self.data.loc[start:end]
                 # Setting the training interval
                 self.training_period = [start, end]
-
             else:
-
                 data = self.data
                 self.training_period = [self.data.first_valid_index(),
                                         self.data.last_valid_index()]
@@ -465,7 +461,6 @@ class OrnsteinUhlenbeck:
         """
 
         # Constructing proper input
-
         if len(data.shape) == 1:  # If using portfolio prices
             portfolio = data
         elif data.shape[1] == 2:  # If using two assets prices
@@ -655,7 +650,6 @@ class OrnsteinUhlenbeck:
 
         # If was pre-calculated, using it
         else:
-
             output = self.liquidation_level[0]
 
         return output
