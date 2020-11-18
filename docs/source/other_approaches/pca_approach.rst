@@ -321,7 +321,7 @@ The following research notebook can be used to better understand the PCA approac
 
 * `PCA Approach`_
 
-.. _`PCA Approach`: https://github.com/Hudson-and-Thames-Clients/research/blob/master/Statistical%20Arbitrage/pca_approach.ipynb
+.. _`PCA Approach`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Other%20Approaches/pca_approach.ipynb
 
 References
 ##########
