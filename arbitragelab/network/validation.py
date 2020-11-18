@@ -12,7 +12,6 @@ import json
 from urllib.request import urlopen
 
 API_KEY_ENV_VAR = "ARBLAB_API_KEY"
-# os.environ['ARBLAB_API_KEY'] = "426303b02cb7475984b2d484319062a0"
 
 
 class Security:

@@ -12,7 +12,7 @@ _Make sure you did the following (if applicable):_
 - [ ] Added tests for any new features or behaviors.
 - [ ] Ran ``./pylint`` to make sure code style is consistent.
 - [ ] Built and reviewed the docs.
-- [ ] Added a note to the [changelog](https://github.com/twosigma/marbles/blob/master/docs/changelog.rst).
+- [ ] Added a note to the [changelog](https://github.com/hudson-and-thames/arbitragelab/blob/develop/docs/source/changelog.rst).
 
 ## Learning
 _Describe the research stage_
