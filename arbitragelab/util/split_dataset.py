@@ -1,5 +1,8 @@
-import warnings
+# Copyright 2019, Hudson and Thames Quantitative Research
+# All rights reserved
+# Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 
+import warnings
 
 def train_test_split(price_df, date_cutoff=None, num_cutoff=None):
     """
