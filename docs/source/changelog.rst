@@ -27,3 +27,5 @@ Changelog
 * :feature:`15` Codependence module added.
 * :support:`15` Codependence module documentation.
 * :support:`17` Added Licence, ReadMe, and RoadMap
+* :support:`20` Added API Key Validation.
+* :support:`20` Add install documentation and test on OS/Ubuntu/Windows.
