@@ -2,6 +2,10 @@
 # All rights reserved
 # Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 
+"""
+This module is used to split datasets inot train and test parts.
+"""
+
 import warnings
 
 def train_test_split(price_df, date_cutoff=None, num_cutoff=None):

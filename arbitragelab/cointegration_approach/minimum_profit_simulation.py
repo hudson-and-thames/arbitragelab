@@ -12,7 +12,7 @@ from typing import Tuple, Optional
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
-from arbitragelab.cointegration_approach import EngleGrangerPortfolio
+from arbitragelab.cointegration_approach.engle_granger import EngleGrangerPortfolio
 
 
 class MinimumProfitSimulation:

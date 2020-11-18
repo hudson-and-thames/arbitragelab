@@ -4,7 +4,7 @@
 
 """
 Tests function of Minimum Profit Condition Optimization module:
-minimum_profit/MinimumProfit.py
+cointegration_approach/minimum_profit.py
 """
 
 import os
@@ -14,8 +14,8 @@ from copy import deepcopy
 import numpy as np
 import pandas as pd
 
-from minimum_profit.MinimumProfit import MinimumProfit
-from minimum_profit.util import train_test_split
+from arbitragelab.cointegration_approach.minimum_profit import MinimumProfit
+from arbitragelab.util.split_dataset import train_test_split
 
 
 class TestMinimumProfit(unittest.TestCase):

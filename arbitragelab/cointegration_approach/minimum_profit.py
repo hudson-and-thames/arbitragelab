@@ -13,7 +13,8 @@ from typing import Tuple
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
-from arbitragelab.cointegration_approach import JohansenPortfolio, EngleGrangerPortfolio
+from arbitragelab.cointegration_approach.johansen import JohansenPortfolio
+from arbitragelab.cointegration_approach.engle_granger import EngleGrangerPortfolio
 
 
 class MinimumProfit:
