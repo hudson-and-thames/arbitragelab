@@ -262,7 +262,7 @@ reversion speed and its S-score is far from the equilibrium, as we think that we
 excursion of the co-integration residual. We expect most of the assets in our portfolio to be near
 equilibrium most of the time, so we are closing trades at values close to zero.
 
-The signal generating function implemented in the MlFinLab package outputs target weights for each
+The signal generating function implemented in the ArbitrageLab package outputs target weights for each
 asset in our portfolio for each observation time - target weights here are the sum of weights of all
 eigen portfolios that show high mean reversion speed and have needed S-score value at a given time.
 
