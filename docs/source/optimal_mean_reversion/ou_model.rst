@@ -608,4 +608,4 @@ The following research notebook can be used to better understand the concepts of
 
 * `Trading Under the Ornstein-Uhlenbeck Model`_
 
-.. _`Trading Under the Ornstein-Uhlenbeck Model`: https://github.com/Hudson-and-Thames-Clients/research/tree/master/Optimal%20Mean%20Reversion/ou_model.ipynb
+.. _`Trading Under the Ornstein-Uhlenbeck Model`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Optimal%20Mean%20Reversion/ou_model.ipynb
