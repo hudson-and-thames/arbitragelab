@@ -234,14 +234,7 @@ class MinimumProfitSimulation:
                 and cointegration error.
         """
         # Read the parameters from the param dictionary
-        try:
-            beta = coint_params['beta']
-
-        except KeyError:
-            print("Missing crucial parameters.\n"
-                  "Call initialize_params() to reset the configuration of "
-                  "the parameters to default.")
-            raise
+        beta = coint_params['beta']
 
         share_s2_diff = self.simulate_ar(price_params, use_statsmodel=True)
 
@@ -272,14 +265,7 @@ class MinimumProfitSimulation:
                 and cointegration error.
         """
         # Read the parameters from the param dictionary
-        try:
-            beta = coint_params['beta']
-
-        except KeyError:
-            print("Missing crucial parameters.\n"
-                  "Call initialize_params() to reset the configuration of "
-                  "the parameters to default.")
-            raise
+        beta = coint_params['beta']
 
         # Generate share S2 price difference with an AR(1) process
         share_s2_diff = self.simulate_ar(price_params, use_statsmodel=False)
