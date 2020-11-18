@@ -10,7 +10,9 @@ import unittest
 import os
 import numpy as np
 import pandas as pd
+
 from arbitragelab.optimal_mean_reversion.ou_model import OrnsteinUhlenbeck
+
 
 class TestOrnsteinUhlenbeck(unittest.TestCase):
     """

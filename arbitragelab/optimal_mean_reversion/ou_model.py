@@ -295,9 +295,8 @@ class OrnsteinUhlenbeck:
         x = np.zeros(n)
 
         # Checking whether to use given parameters or parameters of the fitted model
-
-        if all(param is not None for param in
-               [theta_given, mu_given, sigma_given, delta_t_given]):  # Use given data parameters
+        # Use given data parameters
+        if all(param is not None for param in [theta_given, mu_given, sigma_given, delta_t_given]):
             x[0] = theta_given
             theta = theta_given
             mu = mu_given
@@ -313,8 +312,7 @@ class OrnsteinUhlenbeck:
 
         # Simulating the OU process values
         for i in range(n - 1):
-            x[i + 1] = (x[i] + mu * (theta - x[i]) * delta_t
-                        + sigma * np.sqrt(delta_t) * np.random.randn())
+            x[i + 1] = (x[i] + mu * (theta - x[i]) * delta_t + sigma * np.sqrt(delta_t) * np.random.randn())
 
         return x
 
