@@ -15,6 +15,7 @@ Installation
 Ubuntu Linux
 ************
 
+0. Set up Git (if you haven't already, the following `link <https://docs.github.com/en/free-pro-team@latest/github/getting-started-with-github/set-up-git>`__ provides a nice guide.)
 1. Make sure you install the latest version of the Anaconda distribution. To do this you can follow the install and update instructions found on this `link <https://www.anaconda.com/products/individual>`_
 2. Launch a terminal
 3. Create a New Conda Environment. From terminal.
@@ -78,6 +79,8 @@ Accept all the requests to install.
 
 Mac OS X
 ********
+
+0. Set up Git (if you haven't already, the following `link <https://docs.github.com/en/free-pro-team@latest/github/getting-started-with-github/set-up-git>`__ provides a nice guide.)
 1. Make sure you install the latest version of the Anaconda distribution. To do this you can follow the install and update instructions found on this `link <https://www.anaconda.com/products/individual>`_
 2. Launch a terminal
 3. Create a New Conda Environment. From terminal.
@@ -143,6 +146,7 @@ Accept all the requests to install.
 Windows
 *******
 
+0. Set up Git (if you haven't already, the following `link <https://docs.github.com/en/free-pro-team@latest/github/getting-started-with-github/set-up-git>`__ provides a nice guide.)
 1. Download and install the latest version of `Anaconda 3 <https://www.anaconda.com/products/individual>`__
 2. Launch Anacoda Prompt
 3. Create new environment (replace <env name> with a name, for example ``arbitragelab``):
@@ -169,7 +173,7 @@ Windows
 
       By adding the API key as an environment variable, you won't need to constantly add the key every time you import the library.
 
-      * Open command prompt.
+      * Open command prompt as an administrator.
       * Create the variable: ``setx ARBLAB_API_KEY  "26303adb02cb759b2d484233162a0"``
       * Note that you must add your own API key and not the one given in this example.
       * Close and open a new command prompt
@@ -199,3 +203,10 @@ Windows
 
    * We have added error handling which will raise an error if your environment variables are incorrect.
    * If you are having problems with the installation, please ping us on Slack and we will be able to assist.
+
+Important Notes
+###############
+
+* ArbitrageLab requires an internet connection when you import the library. This checks that your API key is valid.
+* We have added analytics to the library which will let us know in which city the function call was made and which functions were called, but it shares no personal data and goes via Google Analytics.
+  This to help aid our team to improve the functionality that is used the most (standard practice with SaaS products).
