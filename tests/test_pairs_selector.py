@@ -202,14 +202,8 @@ class TestPairsSelector(unittest.TestCase):
 
         # The following will mark a few tickers as valid to be used
         # in the pairs generation process.
-        self.pair_selector.clust_labels_ = np.array([
-            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1, 1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
-        ])
+        self.pair_selector.clust_labels_ = np.array([-1] * 100)
+        np.put(self.pair_selector.clust_labels_, [55, 56, 86], 1)
 
         self.assertTrue(type(self.pair_selector.unsupervised_candidate_pair_selector()), list)
 

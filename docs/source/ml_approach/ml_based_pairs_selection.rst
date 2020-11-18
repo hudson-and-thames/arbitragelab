@@ -191,7 +191,7 @@ Examples
 
     ps = PairsSelector(data)
 
-    # Price data is reduced to it's component features using PCA
+    # Price data is reduced to its component features using PCA
     ps.dimensionality_reduction_by_components(5)
 
     # Clustering is performed over feature vector
