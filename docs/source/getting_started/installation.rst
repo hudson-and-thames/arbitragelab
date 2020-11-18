@@ -51,6 +51,13 @@ Accept all the requests to install.
       * Save the file and Logout or restart your computer. (If you skip this step, it won't register the change)
       * To confirm your new env variable is active: ``echo $ARBLAB_API_KEY``
 
+      .. tip::
+
+         * If you are using Ubuntu on WSL (Windows Subsystem for Linux), then you should add this environment variable
+           to ~/.profile. Since you always load WSL from bash, this would make sure that the environment variable could
+           be loaded each time you start the virtual machine, which in turn ensured that Python can pick it up.
+
+
    6.2 The Easy Way:
 
       If you don't want the key to persist on your local machine, you can always declare it each time, before you import ArbitrageLab.
