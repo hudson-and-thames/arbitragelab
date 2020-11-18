@@ -29,3 +29,5 @@ Changelog
 * :support:`17` Added Licence, ReadMe, and RoadMap
 * :feature:`16` OU-model to the Optimal Mean Reversion module added.
 * :support:`16` OU-model documentation.
+* :support:`20` Added API Key Validation.
+* :support:`20` Add install documentation and test on OS/Ubuntu/Windows.
