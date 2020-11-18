@@ -232,3 +232,9 @@ The following research notebook can be used to better understand the codependenc
 * `Codependence by Marti`_
 
 .. _`Codependence by Marti`: https://github.com/Hudson-and-Thames-Clients/research/blob/master/Codependence/Codependence%20by%20Marti/codependence_by_marti.ipynb
+
+References
+##########
+
+* `Marti, G., 2017. Some contributions to the clustering of financial time series and applications to credit default swaps (Doctoral dissertation, Université Paris-Saclay (ComUE)). <https://www.researchgate.net/publication/322714557_Some_contributions_to_the_clustering_of_financial_time_series_and_applications_to_credit_default_swaps>`__
+* `Marti Gautier, 2020. Measuring non-linear dependence with Optimal Transport. Available at personal blog. <https://gmarti.gitlab.io/qfin/2020/06/25/copula-optimal-transport-dependence.html>`__
