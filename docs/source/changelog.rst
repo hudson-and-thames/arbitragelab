@@ -26,8 +26,8 @@ Changelog
 * :support:`14` Added a number of new tools to improve our deployment and align us with best practices. They include: CircleCI, VersionBump, Update Issue Templates, ChangeLog, Logo, Favicon.
 * :feature:`15` Codependence module added.
 * :support:`15` Codependence module documentation.
-* :support:`17` Added Licence, ReadMe, and RoadMap
 * :feature:`16` OU-model to the Optimal Mean Reversion module added.
 * :support:`16` OU-model documentation.
+* :support:`17` Added Licence, ReadMe, and RoadMap
 * :support:`20` Added API Key Validation.
 * :support:`20` Add install documentation and test on OS/Ubuntu/Windows.
