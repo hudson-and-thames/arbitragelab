@@ -63,6 +63,10 @@ Accept all the requests to install.
          os.environ['ARBLAB_API_KEY'] = "426303b02cb7475984b2d484319062a0"
          import arbitragelab as al
 
+      .. tip::
+
+         If you are running Ubuntu on a virtual machine, you may find it easiest to use the ``os.environ`` method.
+
 7. Install arbitragelab into your python environment via the terminal.
 
    Please make sure to use this exact statement:
