@@ -89,6 +89,7 @@ This project is licensed under an all rights reserved licence.
 
     optimal_mean_reversion/introduction
     optimal_mean_reversion/ou_model
+    optimal_mean_reversion/xou_model
 
 .. toctree::
     :maxdepth: 2
