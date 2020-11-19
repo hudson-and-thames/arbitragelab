@@ -122,3 +122,43 @@ class Heat_potentials():
 
         return eps_lower, eps_upper, phi_lower, phi_upper
 
+    def numerical_calculation_equations(self, v, K_11, K_12, K_21, K_22, f1, f2):
+        """
+        """
+
+        nu_1, nu_2 = np.array([])
+
+        nu_1[0] = f1(v[0])
+
+        nu_2[0] = -f2(v[0])
+
+        nu_1[1] = f1(v1) / (1 + K_11(v[1], v[1]) * np.sqrt(v[1]))
+
+        nu_2[1] = -f2(v1) / (1 + K_22(v[1], v[1]) * np.sqrt(v[1]))
+
+        for i in range(2, len(v)):
+            sum_1 = sum([(K_11(v[i], v[j]) * nu_1[j] + K_11(v[i], v[j - 1]) * nu_1[j - 1]) / (
+                        np.sqrt(i - j) + np.sqrt(i - j + 1))
+                         + 0.5(K_12(v[i], v[j]) * nu_2[j] + K_12(v[i], v[j]) * nu_2[j - 1]) for j in range(1, i - 1)])
+
+            nu_1[i] = ((1 + K_11(v[i], v[i]) * np.sqrt(self.delta_grid)) ** -1
+                       * (f1(v[i]) - K_11(v[i], v[i - 1]) * nu_1[i - 1] * np.sqrt(self.delta_grid)
+                          - 0.5 * K_12(v[i], v[i - 1]) * nu_2[i - 1] * self.delta_grid
+                          - sum_1 * self.delta_grid))
+
+            sum_2 = sum([0.5(K_21(v[i], v[j]) * nu_1[j] + K_21(v[i], v[j]) * nu_1[j - 1])
+                         + (K_22(v[i], v[j]) * nu_2(j) + K_11(v[i], v[j - 1]) * nu_1[j - 1]) / (
+                                     np.sqrt(i - j) + np.sqrt(i - j + 1))
+                         for j in range(1, i - 1)])
+
+            nu_2[i] = ((-1 + K_22(v[i], v[i]) * np.sqrt(self.delta_grid)) ** -1
+                       * (f2v[i] - 0.5 * K_21(v[i], v[i - 1]) * nu_1[i - 1] * self.delta_grid
+                          - K_22(v[i], v[i - 1]) * nu_2[i - 1] * np.sqrt(self.delta_grid)
+                          - sum_2 * self.delta_grid))
+
+
+
+
+
+
+
