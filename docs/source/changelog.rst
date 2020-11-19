@@ -31,3 +31,5 @@ Changelog
 * :support:`17` Added Licence, ReadMe, and RoadMap
 * :support:`20` Added API Key Validation.
 * :support:`20` Add install documentation and test on OS/Ubuntu/Windows.
+* :feature:`22` XOU-model to the Optimal Mean Reversion module added.
+* :support:`22` XOU-model documentation.
