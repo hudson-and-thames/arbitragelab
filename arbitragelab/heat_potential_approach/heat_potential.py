@@ -92,3 +92,33 @@ class Heat_potentials():
                    - 4 * (v + (Pi_upper + self.theta) ** 2) / np.log(1 - 2 * gamma) ** 2)
 
         return e_upper, e_lower, f_upper, f_lower
+
+    def numerical_calculation_helper(self, T=float, optimal_profit=float, optimal_stop_loss=float):
+        """
+        """
+        Pi_upper = lambda v: self.Pi_upper(v, optimal_profit)
+
+        Pi_lower = lambda v: self.Pi_lower(v, optimal_stop_loss)
+
+        K_1_1 = lambda v, s: ((1 / np.sqrt(2 * np.pi)) * (Pi_lower(v) - Pi_lower(s)) / (v - s)
+                              * np.exp(-(Pi_lower(v) - Pi_lower(s)) ** 2 / 2 * (v - s)))
+
+        K_1_2 = lambda v, s: ((1 / np.sqrt(2 * np.pi)) * (Pi_lower(v) - Pi_upper(s)) / (v - s)
+                              * np.exp(-(Pi_lower(v) - Pi_upper(s)) ** 2 / 2 * (v - s)))
+
+        K_2_1 = lambda v, s: ((1 / np.sqrt(2 * np.pi)) * (Pi_upper(v) - Pi_lower(s)) / (v - s)
+                              * np.exp(-(Pi_upper(v) - Pi_lower(s)) ** 2 / 2 * (v - s)))
+
+        K_2_2 = lambda v, s: ((1 / np.sqrt(2 * np.pi)) * (Pi_upper(v) - Pi_upper(s)) / (v - s)
+                              * np.exp(-(Pi_upper(v) - Pi_upper(s)) ** 2 / 2 * (v - s)))
+
+        e_l, e_u, f_l, f_u = self.heat_potential_helper(T, optimal_profit, optimal_stop_loss)
+
+        v = self.v(T)
+
+        eps_lower, eps_upper = self.numerical_calculation_equations(self, v, K_1_1, K_1_2, K_2_1, K_2_2, e_l, e_u)
+
+        phi_lower, phi_upper = self.numerical_calculation_equations(self, v, K_1_1, K_1_2, K_2_1, K_2_2, f_l, f_u)
+
+        return eps_lower, eps_upper, phi_lower, phi_upper
+
