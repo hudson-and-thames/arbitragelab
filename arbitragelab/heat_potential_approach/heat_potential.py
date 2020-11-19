@@ -67,3 +67,28 @@ class Heat_potentials():
 
         output = np.sqrt(1 - 2 * v) * (optimal_stop_loss - self.theta)
 
+    def heat_potential_helper(self, T=float, optimal_profit=float, optimal_stop_loss=float):
+        """
+        """
+
+        v = self.v(T)
+
+        gamma = self.gamma(T)
+
+        Pi_upper = self.Pi_upper(v, optimal_profit)
+
+        Pi_lower = self.Pi_lower(v, optimal_stop_loss)
+
+        e_lower = (2 * optimal_stop_loss / np.log((1 - 2 * v) / (1 - 2 * gamma))
+                   + 2 * (Pi_lower + self.theta) / np.log(1 - 2 * gamma))
+
+        e_upper = (2 * optimal_profit / np.log((1 - 2 * v) / (1 - 2 * gamma))
+                   + 2 * (Pi_upper + self.theta) / np.log(1 - 2 * gamma))
+
+        f_lower = (4 * optimal_stop_loss ** 2 / np.log((1 - 2 * v) / (1 - 2 * gamma)) ** 2
+                   - 4 * (v + (Pi_lower + self.theta) ** 2) / np.log(1 - 2 * gamma) ** 2)
+
+        f_upper = (4 * optimal_profit ** 2 / np.log((1 - 2 * v) / (1 - 2 * gamma)) ** 2
+                   - 4 * (v + (Pi_upper + self.theta) ** 2) / np.log(1 - 2 * gamma) ** 2)
+
+        return e_upper, e_lower, f_upper, f_lower
