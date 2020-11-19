@@ -156,6 +156,7 @@ class Heat_potentials():
                           - K_22(v[i], v[i - 1]) * nu_2[i - 1] * np.sqrt(self.delta_grid)
                           - sum_2 * self.delta_grid))
 
+        return nu_1, nu_2
 
 
 
