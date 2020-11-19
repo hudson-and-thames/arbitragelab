@@ -279,5 +279,3 @@ class TestMinimumProfitSimulation(unittest.TestCase):
         sim_beta_coeff_mean, sim_beta_coeff_std = sim_spec.verify_coint(stats_s1, stats_s2)
         self.assertAlmostEqual(sim_beta_coeff_mean, self.normal_coint_params['beta'], places=4)
         self.assertEqual(sim_beta_coeff_std, None)
-
-

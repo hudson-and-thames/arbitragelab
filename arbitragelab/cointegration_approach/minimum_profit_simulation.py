@@ -35,9 +35,7 @@ class MinimumProfitSimulation:
             beta. The output is the mean and standard deviation of beta.
     """
 
-    def __init__(self,
-                 ts_num: int,
-                 ts_length: int):
+    def __init__(self, ts_num: int, ts_length: int):
         """
         Initialize the simulation class.
 
@@ -92,7 +90,8 @@ class MinimumProfitSimulation:
         """
         Setter for price simulation parameters.
 
-        Change one specific parameter to designated value.
+        Change one specific parameter to designated value. Possible parameters are
+            ["ar_coeff", "white_noise_var", "constant_trend"].
 
         :param param: (str) Parameter dictionary key
         :param value: (float) Parameter value
@@ -105,7 +104,8 @@ class MinimumProfitSimulation:
         """
         Setter for cointegration error simulation parameters.
 
-        Change one specific paramter to designated value.
+        Change one specific parameter to designated value. Possible parameters are
+            ["ar_coeff", "white_noise_var", "constant_trend", "beta"]
 
         :param param: (str) Parameter dictionary key
         :param value: (float) Parameter value
@@ -218,20 +218,16 @@ class MinimumProfitSimulation:
             return series_list[0]
         return np.hstack(tuple(series_list))
 
-    def _simulate_cointegration(self,
-                                price_params: dict,
-                                coint_params: dict,
+    def _simulate_cointegration(self, price_params: dict, coint_params: dict,
                                 initial_price: float = 100.) -> Tuple[np.array, np.array, np.array]:
         """
-        Use the statsmodel to generate two price series that are cointegrated.
-        The hedge ratio is defined by beta.
+        Use the statsmodel to generate two price series that are cointegrated. The hedge ratio is defined by beta.
 
         :param price_params: (dict) Parameter dictionary for share S2 price simulation.
         :param coint_params: (dict) Parameter dictionary for cointegration error simulation.
         :param initial_price: (float) Initial price of share S2.
-        :return:
-            (np.array, np.array, np.array) Price series of share S1, price series of share S2,
-                and cointegration error.
+        :return: (np.array, np.array, np.array) Price series of share S1, price series of share S2,
+            and cointegration error.
         """
         # Read the parameters from the param dictionary
         beta = coint_params['beta']
@@ -249,20 +245,16 @@ class MinimumProfitSimulation:
 
         return share_s1, share_s2, coint_error
 
-    def _simulate_cointegration_raw(self,
-                                    price_params: dict,
-                                    coint_params: dict,
+    def _simulate_cointegration_raw(self, price_params: dict, coint_params: dict,
                                     initial_price: float = 100.) -> Tuple[np.array, np.array, np.array]:
         """
-        Use the raw simulation method to generate two price series that are cointegrated.
-        The hedge ratio is defined by beta.
+        Use the raw simulation method to generate two price series that are cointegrated. The hedge ratio is defined by beta.
 
         :param price_params: (dict) Parameter dictionary for share S2 price simulation.
         :param coint_params: (dict) Parameter dictionary for cointegration error simulation.
         :param initial_price: (float) Initial price of share S2.
-        :return:
-            (np.array, np.array, np.array) Price series of share S1, price series of share S2,
-                and cointegration error.
+        :return: (np.array, np.array, np.array) Price series of share S1, price series of share S2,
+            and cointegration error.
         """
         # Read the parameters from the param dictionary
         beta = coint_params['beta']
@@ -281,8 +273,7 @@ class MinimumProfitSimulation:
 
         return share_s1, share_s2, coint_error
 
-    def simulate_coint(self,
-                       initial_price: float,
+    def simulate_coint(self, initial_price: float,
                        use_statsmodel: bool = False) -> Tuple[np.array, np.array, np.array]:
         """
         Generate cointegrated price series and cointegration error series.
@@ -290,9 +281,8 @@ class MinimumProfitSimulation:
         :param initial_price: (float) Starting price of share S2.
         :param use_statsmodel: (bool) Use statsmodel API or use raw method.
             If True, then statsmodel API will be used.
-        :return:
-            (np.array, np.array, np.array) Price series of share S1, price series of share S2,
-                and cointegration error.
+        :return: (np.array, np.array, np.array) Price series of share S1, price series of share S2,
+            and cointegration error.
         """
         if use_statsmodel:
             return self._simulate_cointegration(self.__price_params,
@@ -332,13 +322,11 @@ class MinimumProfitSimulation:
         ar_coeff = np.array(ar_coeff_list)
         return ar_coeff.mean(), ar_coeff.std()
 
-    def verify_coint(self,
-                     price_series_x: np.array,
-                     price_series_y: np.array,
-                     x_name: str = "Share S1",
-                     y_name: str = "Share S2") -> Tuple[float, Optional[float]]:
+    def verify_coint(self, price_series_x: np.array, price_series_y: np.array,
+                     x_name: str = "Share S1", y_name: str = "Share S2") -> Tuple[float, Optional[float]]:
         """
         Use Engle-Granger test to verify if the simulated series are cointegrated.
+
         :param price_series_x: (np.array) A matrix where each column is a simulated
             price series of share S1.
         :param price_series_y: (np.array) A matrix where each column is a simulated

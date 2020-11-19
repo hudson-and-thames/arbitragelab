@@ -9,6 +9,7 @@ and generates the corresponding trading signal.
 """
 
 from typing import Tuple
+import warnings
 
 import numpy as np
 import pandas as pd
@@ -35,30 +36,23 @@ class MinimumProfit:
             Generate the signal of U-trades and L-trades, as well as the number of shares to trade.
     """
 
-    def __init__(self, price_df: pd.DataFrame,
-                 s1_name: str = "Share S1",
-                 s2_name: str = "Share S2"):
+    def __init__(self, price_df: pd.DataFrame):
         """
         Constructor of the cointegration pair trading optimization class.
 
         :param price_df: (pd.DataFrame) Price series dataframe which contains both series.
-        :param s1_name: (str) Share S1 name.
-        :param s2_name: (str) Share S2 name.
         """
 
         # Store the ticker name and rename the columns
         if price_df.shape[1] != 2:
             raise Exception("Data Format Error. Should only contain two price series.")
         self.price_df = price_df
-        self.price_df.columns = [s1_name, s2_name]
-        self._s1_name = s1_name
-        self._s2_name = s2_name
 
-    def fit(self,
-            train_df: pd.DataFrame,
-            use_johansen: bool = False) -> Tuple[float, pd.Series, float, np.array]:
+    @staticmethod
+    def fit(train_df: pd.DataFrame, use_johansen: bool = False) -> Tuple[float, pd.Series, float, np.array]:
         """
-        Find the cointegration coefficient, beta, and the AR(1) coefficient for cointegration error
+        Find the cointegration coefficient, beta, and the AR(1) coefficient for cointegration error.
+
         :param train_df: (pd.DataFrame) Training set price series.
         :param use_johansen: (bool) If True, use Johansen to calculate beta;
             if False, use Engle-Granger.
@@ -72,6 +66,16 @@ class MinimumProfit:
             jo_portfolio = JohansenPortfolio()
             jo_portfolio.fit(train_df, det_order=0)
 
+            # Check eigenvalue and trace statistics to see if the pairs are cointegrated at 90% level.
+            eigen_stats = jo_portfolio.johansen_eigen_statistic
+            trace_stats = jo_portfolio.johansen_trace_statistic
+
+            if (eigen_stats.loc['eigen_value'] < eigen_stats.loc['90%']).all():
+                warnings.warn("The asset pair is not cointegrated based on eigenvalue statistics.")
+
+            if (trace_stats.loc['trace_statistic'] < trace_stats.loc['90%']).all():
+                warnings.warn("The asset pair is not cointegrated based on trace statistics.")
+
             # Retrieve beta
             coint_vec = jo_portfolio.cointegration_vectors.loc[0]
 
@@ -84,12 +88,19 @@ class MinimumProfit:
             eg_portfolio = EngleGrangerPortfolio()
             eg_portfolio.fit(train_df, add_constant=True)
 
+            # Check ADF statistics to see if the pairs are cointegrated at 90% level.
+            adf_stats = eg_portfolio.adf_statistics
+
+            # ADF stats are negative. The largest one is the least significant.
+            if (adf_stats.loc['statistic_value'] > adf_stats.loc['90%']).all():
+                warnings.warn("The asset pair is not cointegrated based on ADF statistics.")
+
             # Retrieve beta
             coint_vec = eg_portfolio.cointegration_vectors
-            beta = coint_vec[self._s2_name].values[0]
+            beta = coint_vec.iloc[:, 1].values[0]
 
         # Calculate the cointegration error, epsilon_t
-        epsilon_t = train_df[self._s1_name] + beta * train_df[self._s2_name]
+        epsilon_t = train_df.iloc[:, 0] + beta * train_df.iloc[:, 1]
 
         # Fit an AR(1) model to find the AR(1) coefficient
         ar_fit = sm.tsa.ARMA(epsilon_t, (1, 0)).fit(trend='c', disp=0)
@@ -101,6 +112,7 @@ class MinimumProfit:
     def _gaussian_kernel(ar_coeff: float, integrate_grid: np.array, ar_resid: np.array) -> np.array:
         """
         Calculate the Gaussian kernel (K(u_i, u_j)) matrix for mean passage time calculation.
+
         :param ar_coeff: (float) The fitted AR(1) coefficient.
         :param integrate_grid: (np.array) The integration grid with equal separation.
         :param ar_resid: (np.array) The residual obtained from AR(1) fit on cointegration error.
@@ -119,7 +131,6 @@ class MinimumProfit:
 
         # Now derive the standard deviation of AR(1) residual, sigma_ksi
         sigma_ksi = ar_resid.std()
-        # sigma_ksi = np.sqrt(1 - ar_coeff ** 2) * sigma_epsilon
 
         # Vectorize the term (u_j - phi * u_i) in the exponential
         exp_term1 = np.tile(integrate_grid, (len_grid, 1))
@@ -133,14 +144,11 @@ class MinimumProfit:
 
         return kernel
 
-    def _mean_passage_time(self,
-                           lower: int,
-                           upper: int,
-                           ar_coeff: float,
-                           ar_resid: np.array,
+    def _mean_passage_time(self, lower: int, upper: int, ar_coeff: float, ar_resid: np.array,
                            granularity: float) -> pd.Series:
         """
         Compute E(\\Tau_{a, b}(y0)), where lower = a, upper = b.
+
         :param lower: (int) Interval lower bound.
         :param upper: (int) Interval upper bound.
         :param ar_coeff: (float) AR(1) coefficient.
@@ -163,12 +171,8 @@ class MinimumProfit:
         passage_time_df = pd.Series(passage_time, index=grid)
         return passage_time_df
 
-    def optimize(self,
-                 ar_coeff: float,
-                 epsilon_t: pd.Series,
-                 ar_resid: np.array,
-                 horizon: int,
-                 granularity: float = 0.01) -> Tuple[float, ...]:
+    def optimize(self, ar_coeff: float, epsilon_t: pd.Series, ar_resid: np.array,
+                 horizon: int, granularity: float = 0.01) -> Tuple[float, ...]:
         """
         Optimize the upper bound following the optimization procedure in paper.
 
@@ -222,12 +226,9 @@ class MinimumProfit:
         # Retrieve optimal parameter set
         return (upper_bounds[max_idx], *minimum_trade_profit[max_idx, :])
 
-    def trade_signal(self,
-                     trade_df: pd.DataFrame,
-                     upper_bound: float,
-                     minimum_profit: float,
-                     beta: float,
-                     epsilon_t: np.array) -> Tuple[pd.DataFrame, np.array]:
+    @staticmethod
+    def trade_signal(trade_df: pd.DataFrame, upper_bound: float, minimum_profit: float,
+                     beta: float, epsilon_t: np.array) -> Tuple[pd.DataFrame, np.array]:
         """
         Generate the trade signal and calculate the number of shares to trade.
 
@@ -255,7 +256,7 @@ class MinimumProfit:
         share_s1_count = np.ceil(share_s2_count / abs(beta))
 
         # Now calculate the cointegration error for the trade_df
-        trade_epsilon_t = trade_df[self._s1_name] + beta * trade_df[self._s2_name]
+        trade_epsilon_t = trade_df.iloc[:, 0] + beta * trade_df[:, 1]
         trade_df_with_cond = trade_df.assign(coint_error=trade_epsilon_t)
 
         # U-trade triggers

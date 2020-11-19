@@ -40,7 +40,8 @@ class TestSplitDataset(unittest.TestCase):
         train_date, test_date = train_test_split(self.data, date_cutoff=pd.Timestamp(2002, 1, 1))
 
         # Cutoff by number
-        with self.assertWarns(Warning): # Expected warning here that date cutoff input is not used
+        with self.assertWarns(Warning):
+            # Expected warning here that date cutoff input is not used
             train_number, test_number = train_test_split(self.data, date_cutoff=None, num_cutoff=253)
 
         # No cutoff, should result in same dataset being returned twice
