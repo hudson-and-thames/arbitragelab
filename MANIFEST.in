@@ -1,7 +1,5 @@
 include *.md
 include *.txt
-include .coveragerc
-include coverage
-include pylint
+include Licence.txt
 recursive-include arbitragelab *.csv
 recursive-include scripts *.py
