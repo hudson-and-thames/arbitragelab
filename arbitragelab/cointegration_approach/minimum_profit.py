@@ -257,7 +257,7 @@ class MinimumProfit:
         share_s1_count = np.ceil(share_s2_count / abs(beta))
 
         # Now calculate the cointegration error for the trade_df
-        trade_epsilon_t = trade_df.iloc[:, 0] + beta * trade_df[:, 1]
+        trade_epsilon_t = trade_df.iloc[:, 0] + beta * trade_df.iloc[:, 1]
         trade_df_with_cond = trade_df.assign(coint_error=trade_epsilon_t)
 
         # U-trade triggers
