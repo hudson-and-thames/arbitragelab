@@ -8,14 +8,15 @@ This module optimizes the upper and lower bounds for mean-reversion cointegratio
 and generates the corresponding trading signal.
 """
 
-from typing import Tuple
 import warnings
+from typing import Tuple
 
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
-from arbitragelab.cointegration_approach.johansen import JohansenPortfolio
+
 from arbitragelab.cointegration_approach.engle_granger import EngleGrangerPortfolio
+from arbitragelab.cointegration_approach.johansen import JohansenPortfolio
 
 
 class MinimumProfit:

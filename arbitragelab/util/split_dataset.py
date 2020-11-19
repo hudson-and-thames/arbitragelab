@@ -6,9 +6,10 @@
 This module is used to split datasets inot train and test parts.
 """
 
-from typing import Tuple, Optional
-import pandas as pd
 import warnings
+from typing import Tuple, Optional
+
+import pandas as pd
 
 
 def train_test_split(price_df: pd.DataFrame, date_cutoff: Optional[pd.Timestamp] = None,
