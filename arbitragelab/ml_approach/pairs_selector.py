@@ -300,6 +300,7 @@ class PairsSelector:
         ax_object.set_ylabel('k-distance')
         ax_object.set_xlabel('# of data rows')
         ax_object.plot(result)
+        ax_object.set_title('Knee Plot')
 
         return ax_object
 
