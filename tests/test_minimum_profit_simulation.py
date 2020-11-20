@@ -120,7 +120,6 @@ class TestMinimumProfitSimulation(unittest.TestCase):
         AR(1) coefficients will get compared to designated value.
         """
 
-        print("Test simulate_ar():")
         # 50 time series, each of 250 length
         simulation = MinimumProfitSimulation(20, 250)
 
@@ -163,7 +162,6 @@ class TestMinimumProfitSimulation(unittest.TestCase):
         Cointegration coefficient will be compared to designated value.
         """
 
-        print("Test simulate_coint():")
         # 50 time series, each of 250 length
         simulation = MinimumProfitSimulation(20, 250)
         simulation.load_params(self.normal_price_params, target='price')
@@ -208,7 +206,6 @@ class TestMinimumProfitSimulation(unittest.TestCase):
         Unit test for AR(1) process verification.
         """
 
-        print("Test verify_ar():")
         # 50 time series, each of 250 length
         simulation = MinimumProfitSimulation(20, 250)
         manual_series = simulation.simulate_ar(self.normal_price_params,
@@ -244,7 +241,6 @@ class TestMinimumProfitSimulation(unittest.TestCase):
         Unit tests for cointegration coefficient verification.
         """
 
-        print("Test verify_coint():")
         # 50 time series, each of 250 length
         simulation = MinimumProfitSimulation(20, 250)
         simulation.load_params(self.normal_price_params, target='price')
@@ -279,5 +275,3 @@ class TestMinimumProfitSimulation(unittest.TestCase):
         sim_beta_coeff_mean, sim_beta_coeff_std = sim_spec.verify_coint(stats_s1, stats_s2)
         self.assertAlmostEqual(sim_beta_coeff_mean, self.normal_coint_params['beta'], places=4)
         self.assertEqual(sim_beta_coeff_std, None)
-
-

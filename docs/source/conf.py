@@ -35,6 +35,7 @@ extensions = [
     'sphinx.ext.coverage',
     'sphinx.ext.intersphinx',
     'sphinx.ext.viewcode',
+    'sphinx.ext.autodoc.typehints',
     'releases'
 ]
 
@@ -76,3 +77,5 @@ html_copy_source = True
 # 'releases' (changelog) settings
 releases_github_path = 'hudson-and-thames/arbitragelab'
 releases_unstable_prehistory = True
+
+autodoc_typehints = 'description'
