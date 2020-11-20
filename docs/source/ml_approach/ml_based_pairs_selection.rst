@@ -162,6 +162,10 @@ thus providing enough opportunities to exit a position.
     
     :math:`S = leg1 - (hedgeratio) * leg2`
 
+.. warning::
+    The pairs selection function is very computationally heavy, so execution is going to be long and might slow down your system.
+
+
 Implementation
 **************
 
