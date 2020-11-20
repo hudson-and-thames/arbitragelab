@@ -33,8 +33,8 @@ class TestDataImporter(unittest.TestCase):
         Tests ticker collection collectors.
         """
 
-        self.assertEqual(len(DataImporter.get_sp500_tickers()), 505)
-        self.assertEqual(len(DataImporter.get_dow_tickers()), 30)
+        self.assertTrue(len(DataImporter.get_sp500_tickers()) > 400)
+        self.assertTrue(len(DataImporter.get_dow_tickers()) > 20)
 
     def test_preprocessing_methods(self):
         """
