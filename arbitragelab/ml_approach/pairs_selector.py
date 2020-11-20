@@ -548,6 +548,24 @@ class PairsSelector:
 
         return axs
 
+    def plot_single_pair(self, pair: tuple) -> Axes:
+        """
+        Plots the given pair.
+
+        :param pair: (tuple) Tuple of asset names.
+        :return: (Axes) Axes object.
+        """
+        _, ax_object = plt.subplots(1, figsize=(15, 3))
+
+        rets_asset_one = np.log(self.prices_df.loc[:, pair[0]]).diff()
+        rets_asset_two = np.log(self.prices_df.loc[:, pair[1]]).diff()
+
+        ax_object.plot(rets_asset_one.cumsum())
+        ax_object.plot(rets_asset_two.cumsum())
+        ax_object.legend([pair[0], pair[1]])
+
+        return ax_object
+
     def describe(self) -> pd.DataFrame:
         """
         Returns the Pairs Selector Summary statistics.

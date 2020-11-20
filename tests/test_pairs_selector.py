@@ -285,6 +285,10 @@ class TestPairsSelector(unittest.TestCase):
         knee_plot_pyplot_obj = self.pair_selector.plot_knee_plot()
         self.assertTrue(issubclass(type(knee_plot_pyplot_obj), matplotlib.axes.SubplotBase))
 
+        # Test single pair plot return object.
+        singlepair_pyplot_obj = self.pair_selector.plot_single_pair(('AJG', 'ABMD'))
+        self.assertTrue(issubclass(type(singlepair_pyplot_obj), matplotlib.axes.SubplotBase))
+
         # Test 2d cluster plot return object.
         twod_pyplot_obj = self.pair_selector.plot_clustering_info(n_dimensions=2)
         self.assertTrue(issubclass(type(twod_pyplot_obj), matplotlib.axes.SubplotBase))
