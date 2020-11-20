@@ -2,53 +2,53 @@
 # All rights reserved
 # Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
 """
-Module that houses all copula classes and the parent copula class. Also
-include a Switcher class to create copula by its name and parameters, to
-emulate a switch functionality.
+Module that houses all copula classes and the parent copula class.
+
+Also include a Switcher class to create copula by its name and parameters,
+to emulate a switch functionality.
 """
-import numpy as np
-from scipy.optimize import brentq as brentq
+# pylint: disable = invalid-name, invalid-unary-operand-type, too-many-lines
+from typing import Callable
+from scipy.optimize import brentq
 from scipy.special import gamma as gm
 from scipy.stats import t as student_t
-from scipy.stats import norm
 from scipy.stats import multivariate_normal as mvn
+from scipy.stats import norm
 from scipy.integrate import quad
-
+import numpy as np
 
 class Copula:
     """Copula class houses common functions for each coplula subtype."""
+
     def __init__(self):
         pass
-        
+
     def describe(self):
-        """
-        Describe the copula's name and parameter.
-        """
-        pass
-    
+        """Describe the copula's name and parameter."""
+
+
     def sample_plot(self):
-        """
-        Quick plotting from sampling points based on copula's P.D.F.
-        """
-        pass
+        """Quick plotting from sampling points based on copula's P.D.F."""
+
 
 class Gumbel(Copula):
-    """Gumbel Copula"""
-    def __init__(self, threshold=1e-10, theta=None):
+    """Gumbel Copula."""
+
+    def __init__(self, threshold: float = 1e-10, theta: float = None):
         super().__init__()
         # Lower than this amount will be considered 0.
         self.threshold = threshold
         self.theta = theta  # Gumbel copula parameter.
 
-    def generate_pairs(self, num=None, theta=None, unif_vec=None):
+    def generate_pairs(self, num: int = None, theta: float = None, unif_vec: np.array = None):
         """
         Generate pairs according to P.D.F., stored in a 2D np.array.
-        
+
         User may choose to side load independent uniformly distributed data in [0, 1].
-        
+
         :param num: (int) Number of points to generate.
         :param theta: (float) Range in [1, +inf), measurement of correlation.
-        :param unif_vec: (np.array) Shape=(num, 2) array, two independent uniformly distributed sets of data. 
+        :param unif_vec: (np.array) Shape=(num, 2) array, two independent uniformly distributed sets of data.
             Default uses numpy pseudo-random generators.
         :return sample_pairs: (np.array) Shape=(num, 2) array, sampled data for this copula.
         """
@@ -59,7 +59,7 @@ class Gumbel(Copula):
             theta = self.theta  # Use the default input
 
         # Distribution of C(U1, U2). To be used for numerically solving the inverse.
-        def _Kc(w):
+        def _Kc(w: float):
             return w * (1 - np.log(w) / theta)
 
         # Generate pairs of indep uniform dist vectors.
@@ -76,16 +76,18 @@ class Gumbel(Copula):
 
         return sample_pairs
 
-    def _generate_one_pair(self, v1, v2, theta, Kc):
+    def _generate_one_pair(self, v1: float, v2: float, theta: float, Kc: Callable[[float], float]):
         """
-        Helper func to generate one pair of vectors from Gumbel copula.
+        Generate one pair of vectors from Gumbel copula.
 
-        :param v1: (float) i.i.d. uniform random variable in [0,1].
-        :param v2: (float) i.i.d. uniform random variable in [0,1].
+        v1, v2 are i.i.d. random numbers uniformly distributed in [0, 1].
+        :param v1: (float) i.i.d. uniform random variable in [0, 1].
+        :param v2: (float) i.i.d. uniform random variable in [0, 1].
         :param theta: (float) Range in [1, +inf), measurement of correlation.
-        :param Kc: (func) conditional probability function, for numerical inverse.
+        :param Kc: (func) Conditional probability function, for numerical inverse.
+        :return: (tuple) The sampled pair in [0, 1]x[0, 1].
         """
-        # Numerically root finding for w1, where Kc(w1) = v2. 
+        # Numerically root finding for w1, where Kc(w1) = v2.
         if v2 > self.threshold:
             w = brentq(lambda w1: Kc(w1) - v2, self.threshold, 1)
         else:
@@ -95,75 +97,91 @@ class Gumbel(Copula):
 
         return u1, u2
 
-    def _c(self, u, v):
+    def c(self, u: float, v: float):
         """
         Calculate probability density of the biavriate copula: P(U=u, V=v).
-        
+
         Result is analytical.
+        :param u: (float) A real number in [0, 1].
+        :param v: (float) A real number in [0, 1].
+        :return: (float) The probability density (aka copula density).
         """
         theta = self.theta
         # Preparameters parameters.
         u_part = (-np.log(u)) ** theta
         v_part = (-np.log(v)) ** theta
         expo = (u_part + v_part) ** (1 / theta)
-        
+
         # Assembling for P.D.F.
         pdf = 1 / (u * v) \
-            * ( np.exp(-expo)
+            * (np.exp(-expo)
                * u_part / (-np.log(u)) * v_part / (-np.log(v))
                * (theta + expo - 1)
                * (u_part + v_part) ** (1 / theta - 2))
         return pdf
 
-    def _C(self, u, v):
+    def C(self, u: float, v: float):
         """
         Calculate cumulative density of the bivariate copula: P(U<=u, V<=v).
-        
+
         Result is analytical.
+        :param u: (float) A real number in [0, 1].
+        :param v: (float) A real number in [0, 1].
+        :return: (float) The culumative density.
         """
         theta = self.theta
         # Preparameters parameters.
         expo = ((-np.log(u)) ** theta + (-np.log(v)) ** theta) ** (1 / theta)
-        
+
         # Assembling for P.D.F.
         cdf = np.exp(-expo)
         return cdf
 
-    def condi_cdf(self, u, v):
+    def condi_cdf(self, u: float, v: float):
         """
         Calculate conditional cumulative density function: P(U<=u | V=v).
-        
+
         Result is analytical.
-        
+
         Note: This probability is symmmetric about (u, v).
+        :param u: (float) A real number in [0, 1].
+        :param v: (float) A real number in [0, 1].
+        :return: (float) The conditional probability.
         """
         theta = self.theta
         expo = ((-np.log(u)) ** theta + (-np.log(v)) ** theta) ** ((1 - theta) / theta)
-        result = self._C(u, v) * expo * (-np.log(v)) ** (theta - 1) / v
+        result = self.C(u, v) * expo * (-np.log(v)) ** (theta - 1) / v
         return result
 
-    def _theta_hat(self, tau):
-        """Calculate theta hat from Kendall's tau from sample data"""
+    @staticmethod
+    def theta_hat(tau: float):
+        r"""
+        Calculate theta hat from Kendall's tau from sample data.
+
+        :param tau: (float) Kendall's tau from sample data.
+        :return: (float) The associated theta hat for this very copula.
+        """
         return 1 / (1 - tau)
 
 
 class Frank(Copula):
-    """Frank Copula"""
-    def __init__(self, threshold=1e-10, theta=None):
+    """Frank Copula."""
+
+    def __init__(self, threshold: float = 1e-10, theta: float = None):
         super().__init__()
         # Lower than this amount will be considered 0
         self.threshold = threshold
         self.theta = theta  # Default input
 
-    def generate_pairs(self, num=None, theta=None, unif_vec=None):
+    def generate_pairs(self, num: int = None, theta: float = None, unif_vec: np.array = None):
         """
         Generate pairs according to P.D.F., stored in a 2D np.array.
-        
+
         User may choose to side load independent uniformly distributed data in [0, 1]
-        
+
         :param num: (int) Number of points to generate.
         :param theta: (float) All reals except for 0, measurement of correlation.
-        :param unif_vec: (np.array) Shape=(num, 2) array, two independent uniformly distributed sets of data. 
+        :param unif_vec: (np.array) Shape=(num, 2) array, two independent uniformly distributed sets of data.
             Default uses numpy pseudo-random generators.
         :return sample_pairs: (np.array) Shape=(num, 2) array, sampled data for this copula.
         """
@@ -171,13 +189,13 @@ class Frank(Copula):
             raise ValueError("Please either input num or unif_vec")
 
         if theta is None and self.theta is not None:
-            theta = self.theta  # Use the default input
+            theta = self.theta  # Use the default input.
 
         # Generate pairs of indep uniform dist vectors. Use numpy to generate.
         if unif_vec is None:
             unif_vec = np.random.uniform(low=0, high=1, size=(num, 2))
 
-        # Compute Frank copulas from the unif pairs
+        # Compute Frank copulas from the unif pairs.
         sample_pairs = np.zeros_like(unif_vec)
         for row, pair in enumerate(unif_vec):
             sample_pairs[row] = self._generate_one_pair(pair[0],
@@ -186,12 +204,15 @@ class Frank(Copula):
 
         return sample_pairs
 
-    def _generate_one_pair(self, u1, v2, theta):
+    @staticmethod
+    def _generate_one_pair(u1: float, v2: float, theta: float):
         """
-        Helper func to generate one pair of vectors from Frank copula.
+        Generate one pair of vectors from Frank copula.
 
         :param v1: (float) i.i.d. uniform random variable in [0,1].
         :param v2: (float) i.i.d. uniform random variable in [0,1].
+        :param theta: (float) Range in [1, +inf), measurement of correlation.
+        :return: (tuple) The sampled pair in [0, 1]x[0, 1].
         """
         u2 = -1 / theta * np.log(1 + (v2 * (1 - np.exp(-theta))) /
                                  (v2 * (np.exp(-theta * u1) - 1)
@@ -199,25 +220,31 @@ class Frank(Copula):
 
         return u1, u2
 
-    def _c(self, u, v):
+    def c(self, u: float, v: float):
         """
         Calculate probability density of the biavriate copula: P(U=u, V=v).
-        
+
         Result is analytical.
+        :param u: (float) A real number in [0, 1].
+        :param v: (float) A real number in [0, 1].
+        :return: (float) The probability density (aka copula density).
         """
         theta = self.theta
         et = np.exp(theta)
         eut = np.exp(u * theta)
         evt = np.exp(v * theta)
         pdf = (et * eut * evt * (et - 1) * theta /
-                (et + eut * evt - et * eut - et * evt)**2)
+               (et + eut * evt - et * eut - et * evt)**2)
         return pdf
 
-    def _C(self, u, v):
+    def C(self, u: float, v: float):
         """
         Calculate cumulative density of the bivariate copula: P(U<=u, V<=v).
-        
+
         Result is analytical.
+        :param u: (float) A real number in [0, 1].
+        :param v: (float) A real number in [0, 1].
+        :return: (float) The culumative density.
         """
         theta = self.theta
         cdf = -1 / theta * np.log(
@@ -225,13 +252,16 @@ class Frank(Copula):
             / (np.exp(-theta) - 1))
         return cdf
 
-    def condi_cdf(self, u, v):
+    def condi_cdf(self, u: float, v: float):
         """
-        Calculate conditional cumulative density function: P(U<=u | V=v). 
-        
+        Calculate conditional cumulative density function: P(U<=u | V=v).
+
         Result is analytical.
-        
+
         Note: This probability is symmmetric about (u, v).
+        :param u: (float) A real number in [0, 1].
+        :param v: (float) A real number in [0, 1].
+        :return: (float) The conditional probability.
         """
         theta = self.theta
         enut = np.exp(-u * theta)
@@ -241,39 +271,46 @@ class Frank(Copula):
                   / ((ent - 1) + (enut - 1) * (envt - 1)))
         return result
 
-    def _theta_hat(self, tau):
-        """Calculate theta hat from Kendall's tau from sample data"""
+    @staticmethod
+    def theta_hat(tau: float):
+        r"""
+        Calculate theta hat from Kendall's tau from sample data.
+
+        :param tau: (float) Kendall's tau from sample data.
+        :return: (float) The associated theta hat for this very copula.
+        """
         def debye1(theta):
-            """Debye function D_1(theta)"""
+            """Debye function D_1(theta)."""
             result = quad(lambda x: x / theta / (np.exp(x) - 1), 0, theta)
             return result[0]
 
         def kendall_tau(theta):
             return 1 - 4 / theta + 4 * debye1(theta) / theta
-        
+
         # Numerically find the root.
         result = brentq(lambda theta: kendall_tau(theta) - tau, -100, 100)
         return result
 
 class Clayton(Copula):
-    """Clayton copula"""
-    def __init__(self, threshold=1e-10, theta=None):
+    """Clayton copula."""
+
+    def __init__(self, threshold: float = 1e-10, theta: float = None):
         super().__init__()
         # Lower than this amount will be considered 0
         self.threshold = threshold
         self.theta = theta  # Default input
 
-    def generate_pairs(self, num=None, theta=None, unif_vec=None):
-        """
+    def generate_pairs(self, num: int = None, theta: float = None, unif_vec: np.array = None):
+        r"""
         Generate pairs according to P.D.F., stored in a 2D np.array.
-        
+
         User may choose to side load independent uniformly distributed data in [0, 1].
-        
+
         Note: Large theta might suffer from accuracy issues.
 
         :param num: (int) Number of points to generate.
         :param theta: (float) Range in [-1, +inf) \ {0}., measurement of correlation.
-        :param unif_vec: (np.array) Shape=(num, 2) array, two independent uniformly distributed sets of data. 
+        :param unif_vec: (np.array) Shape=(num, 2) array, two independent uniformly distributed sets of data.
             Default uses numpy pseudo-random generators.
         :return sample_pairs: (np.array) Shape=(num, 2) array, sampled data for this copula.
         """
@@ -296,23 +333,29 @@ class Clayton(Copula):
 
         return sample_pairs
 
-    def _generate_one_pair(self, u1, v2, theta):
-        """
-        Helper func to generate one pair of vectors from Clayton copula.
+    @staticmethod
+    def _generate_one_pair(u1: float, v2: float, theta: float):
+        r"""
+        Generate one pair of vectors from Clayton copula.
 
         :param v1: (float) i.i.d. uniform random variable in [0,1].
         :param v2: (float) i.i.d. uniform random variable in [0,1].
+        :param theta: (float) Range in [1, +inf), measurement of correlation.
+        :return: (tuple) The sampled pair in [0, 1]x[0, 1].
         """
         u2 = np.power(u1 ** (-theta) * (v2 ** (-theta / (1 + theta)) - 1) + 1,
                       -1 / theta)
 
         return u1, u2
 
-    def _c(self, u, v):
+    def c(self, u: float, v: float):
         """
         Calculate probability density of the biavriate copula: P(U=u, V=v).
-        
+
         Result is analytical.
+        :param u: (float) A real number in [0, 1].
+        :param v: (float) A real number in [0, 1].
+        :return: (float) The probability density (aka copula density).
         """
         theta = self.theta
         u_part = u ** (-1 - theta)
@@ -321,24 +364,30 @@ class Clayton(Copula):
                * (-1 + u_part * u + v_part * v) ** (-2 - 1 / theta))
         return pdf
 
-    def _C(self, u, v):
+    def C(self, u: float, v: float):
         """
         Calculate cumulative density of the bivariate copula: P(U<=u, V<=v).
-        
+
         Result is analytical.
+        :param u: (float) A real number in [0, 1].
+        :param v: (float) A real number in [0, 1].
+        :return: (float) The culumative density.
         """
         theta = self.theta
         cdf = np.max(u ** (-theta) + v ** (-theta) - 1,
                      0) ** (-1 / theta)
         return cdf
 
-    def condi_cdf(self, u, v):
+    def condi_cdf(self, u: float, v: float):
         """
         Calculate conditional cumulative density function: P(U<=u | V=v).
-        
+
         Result is analytical.
-        
+
         Note: This probability is symmmetric about (u, v).
+        :param u: (float) A real number in [0, 1].
+        :param v: (float) A real number in [0, 1].
+        :return: (float) The conditional probability.
         """
         theta = self.theta
         unt = u ** (-theta)
@@ -348,30 +397,35 @@ class Clayton(Copula):
 
         return result
 
-    def _theta_hat(self, tau):
-        """Calculate theta hat from Kendall's tau from sample data"""
+    @staticmethod
+    def theta_hat(tau: float):
+        r"""
+        Calculate theta hat from Kendall's tau from sample data.
+
+        :param tau: (float) Kendall's tau from sample data.
+        :return: (float) The associated theta hat for this very copula.
+        """
         return 2 * tau / (1 - tau)
 
 
 class Joe(Copula):
-    """Joe Copula"""
-    def __init__(self, theta=None, threshold=1e-10, ):
-        if theta < 1:
-            raise ValueError("theta should be in [1, +inf).")
+    """Joe Copula."""
+
+    def __init__(self, theta: float = None, threshold: float = 1e-10):
         self.theta = theta  # Default input
         # Lower than this amount will be considered 0
         self.threshold = threshold
         super().__init__()
-        
-    def generate_pairs(self, num=None, theta=None, unif_vec=None):
+
+    def generate_pairs(self, num: int = None, theta: float = None, unif_vec: np.array = None):
         """
         Generate pairs according to P.D.F., stored in a 2D np.array.
-        
+
         User may choose to side load independent uniformly distributed data in [0, 1].
-        
+
         :param num: (int) Number of points to generate.
         :param theta: (float) Range in [1, +inf), measurement of correlation.
-        :param unif_vec: (np.array) Shape=(num, 2) array, two independent uniformly distributed sets of data. 
+        :param unif_vec: (np.array) Shape=(num, 2) array, two independent uniformly distributed sets of data.
             Default uses numpy pseudo-random generators.
         :return sample_pairs: (np.array) Shape=(num, 2) array, sampled data for this copula.
         """
@@ -381,10 +435,10 @@ class Joe(Copula):
         if theta is None and self.theta is not None:
             theta = self.theta  # Use the default input
 
-        def _Kc(w):
+        def _Kc(w: float):
             return w - 1 / theta * (
-                    (np.log(1 - (1 - w)**theta)) * (1 - (1 - w)**theta)
-                    / ((1 - w)**(theta - 1)))
+                (np.log(1 - (1 - w)**theta)) * (1 - (1 - w)**theta)
+                / ((1 - w)**(theta - 1)))
 
         # Generate pairs of indep uniform dist vectors. Use numpy to generate.
         if unif_vec is None:
@@ -400,14 +454,15 @@ class Joe(Copula):
 
         return sample_pairs
 
-    def _generate_one_pair(self, v1, v2, theta, Kc):
+    def _generate_one_pair(self, v1: float, v2: float, theta: float, Kc: Callable[[float], float]):
         """
-        Helper func to generate one pair of vectors from Joe copula.
+        Generate one pair of vectors from Joe copula.
 
         :param v1: (float) i.i.d. uniform random variable in [0,1].
         :param v2: (float) i.i.d. uniform random variable in [0,1].
         :param theta: (float) Range in [1, +inf), measurement of correlation.
         :param Kc: (func) conditional probability function, for numerical inverse.
+        :return: (tuple) The sampled pair in [0, 1]x[0, 1].
         """
         if v2 > self.threshold:
             w = brentq(lambda w1: Kc(w1) - v2,
@@ -420,25 +475,31 @@ class Joe(Copula):
 
         return u1, u2
 
-    def _c(self, u, v):
+    def c(self, u: float, v: float):
         """
         Calculate probability density of the biavriate copula: P(U=u, V=v).
-        
+
         Result is analytical.
+        :param u: (float) A real number in [0, 1].
+        :param v: (float) A real number in [0, 1].
+        :return: (float) The probability density (aka copula density).
         """
         theta = self.theta
         u_part = (1 - u)**theta
         v_part = (1 - v)**theta
         pdf = (u_part / (1 - u) * v_part / (1 - v)
-                * (u_part + v_part - u_part * v_part)**(1 / theta - 2)
-                * (theta - (u_part - 1) * (v_part - 1)))
+               * (u_part + v_part - u_part * v_part)**(1 / theta - 2)
+               * (theta - (u_part - 1) * (v_part - 1)))
         return pdf
 
-    def _C(self, u, v):
+    def C(self, u: float, v: float):
         """
         Calculate cumulative density of the bivariate copula: P(U<=u, V<=v).
-        
+
         Result is analytical.
+        :param u: (float) A real number in [0, 1].
+        :param v: (float) A real number in [0, 1].
+        :return: (float) The culumative density.
         """
         theta = self.theta
         u_part = (1 - u) ** theta
@@ -446,41 +507,45 @@ class Joe(Copula):
         cdf = 1 - ((u_part + v_part - u_part * v_part)
                    ** (1 / theta))
         return cdf
-    
-    def condi_cdf(self, u, v):
+
+    def condi_cdf(self, u: float, v: float):
         """
         Calculate conditional cumulative density function: P(U<=u | V=v).
-        
+
         Result is analytical.
-        
+
         Note: This probability is symmmetric about (u, v).
+        :param u: (float) A real number in [0, 1].
+        :param v: (float) A real number in [0, 1].
+        :return: (float) The conditional probability.
         """
         theta = self.theta
         u_part = (1 - u) ** theta
         v_part = (1 - v) ** theta
         result = -(-1 + u_part) * (u_part + v_part - u_part * v_part)**(-1 + 1/theta) \
             * v_part / (1 - v)
-        
+
         return result
 
 
 class N13(Copula):
-    """N13 Copula (Nelsen 13)"""
-    def __init__(self, threshold=1e-10, theta=None):
+    """N13 Copula (Nelsen 13)."""
+
+    def __init__(self, threshold: float = 1e-10, theta: float = None):
         # Lower than this amount will be considered 0
         self.threshold = threshold
         self.theta = theta  # Default input
         super().__init__()
 
-    def generate_pairs(self, num=None, theta=None, unif_vec=None):
+    def generate_pairs(self, num: int = None, theta: float = None, unif_vec: np.array = None):
         """
         Generate pairs according to P.D.F., stored in a 2D np.array.
-        
+
         User may choose to side load independent uniformly distributed data in [0, 1].
-        
+
         :param num: (int) Number of points to generate.
         :param theta: (float) Range in [1, +inf), measurement of correlation.
-        :param unif_vec: (np.array) Shape=(num, 2) array, two independent uniformly distributed sets of data. 
+        :param unif_vec: (np.array) Shape=(num, 2) array, two independent uniformly distributed sets of data.
             Default uses numpy pseudo-random generators.
         :return sample_pairs: (np.array) Shape=(num, 2) array, sampled data for this copula.
         """
@@ -492,7 +557,7 @@ class N13(Copula):
 
         def _Kc(w):
             return w + 1 / theta * (
-                    w - w * np.power((1 - np.log(w)), 1 - theta) - w * np.log(w))
+                w - w * np.power((1 - np.log(w)), 1 - theta) - w * np.log(w))
 
         # Generate pairs of indep uniform dist vectors. Use numpy to generate.
         if unif_vec is None:
@@ -508,14 +573,15 @@ class N13(Copula):
 
         return sample_pairs
 
-    def _generate_one_pair(self, v1, v2, theta, Kc):
+    def _generate_one_pair(self, v1: float, v2: float, theta: float, Kc: Callable[[float], float]):
         """
-        Helper func to generate one pair of vectors from N13 copula.
+        Generate one pair of vectors from N13 copula.
 
         :param v1: (float) i.i.d. uniform random variable in [0,1].
         :param v2: (float) i.i.d. uniform random variable in [0,1].
         :param theta: (float) Range in [1, +inf), measurement of correlation.
         :param Kc: (func) conditional probability function, for numerical inverse.
+        :return: (tuple) The sampled pair in [0, 1]x[0, 1].
         """
         if v2 > self.threshold:
             w = brentq(lambda w1: Kc(w1) - v2,
@@ -529,32 +595,38 @@ class N13(Copula):
             1 - ((1 - v1) * ((1 - np.log(w))**theta - 1) + 1)**(1 / theta))
 
         return u1, u2
-    
-    def _c(self, u, v):
+
+    def c(self, u: float, v: float):
         """
         Calculate probability density of the biavriate copula: P(U=u, V=v).
-        
+
         Result is analytical.
+        :param u: (float) A real number in [0, 1].
+        :param v: (float) A real number in [0, 1].
+        :return: (float) The probability density (aka copula density).
         """
         theta = self.theta
         u_part = (1 - np.log(u))**theta
         v_part = (1 - np.log(v))**theta
-        Cuv = self._C(u, v)
-        
+        Cuv = self.C(u, v)
+
         numerator = (Cuv * u_part * v_part
                      * (-1 + theta + (-1 + u_part + v_part)**(1/theta))
-                     * (-1 + u_part + v_part)**(1/theta) )
-        
+                     * (-1 + u_part + v_part)**(1/theta))
+
         denominator = u * v * (1 - np.log(u)) * (1 - np.log(v)) * (-1 + u_part + v_part)**2
-        
+
         pdf = numerator / denominator
         return pdf
 
-    def _C(self, u, v):
+    def C(self, u: float, v: float):
         """
         Calculate cumulative density of the bivariate copula: P(U<=u, V<=v).
-        
+
         Result is analytical.
+        :param u: (float) A real number in [0, 1].
+        :param v: (float) A real number in [0, 1].
+        :return: (float) The culumative density.
         """
         theta = self.theta
         u_part = (1 - np.log(u))**theta
@@ -563,46 +635,49 @@ class N13(Copula):
             1 - (-1 + u_part + v_part)**(1/theta))
 
         return cdf
-    
+
     def condi_cdf(self, u, v):
         """
         Calculate conditional cumulative density function: P(U<=u | V=v).
-        
+
         Result is analytical.
-        
+
         Note: This probability is symmmetric about (u, v).
+        :param u: (float) A real number in [0, 1].
+        :param v: (float) A real number in [0, 1].
+        :return: (float) The conditional probability.
         """
         theta = self.theta
         u_part = (1 - np.log(u))**theta
         v_part = (1 - np.log(v))**theta
-        Cuv = self._C(u, v)
+        Cuv = self.C(u, v)
 
         numerator = Cuv * (-1 + u_part + v_part)**(1/theta) * v_part
         denominator = v * (-1 + u_part + v_part) * (1 - np.log(v))
 
         result = numerator / denominator
-        
+
         return result
 
 
 class N14:
     """N14 Copula (Nelsen 14)."""
-    
-    def __init__(self, threshold=1e-10, theta=None):
+
+    def __init__(self, threshold: float = 1e-10, theta: float = None):
         # Lower than this amount will be considered 0.
         self.threshold = threshold
         self.theta = theta  # Default input.
         super().__init__()
 
-    def generate_pairs(self, num=None, theta=None, unif_vec=None):
+    def generate_pairs(self, num: int = None, theta: float = None, unif_vec: np.array = None):
         """
         Generate pairs according to P.D.F., stored in a 2D np.array.
-        
+
         User may choose to side load independent uniformly distributed data in [0, 1].
-        
+
         :param num: (int) Number of points to generate.
         :param theta: (float) Range in [1, +inf), measurement of correlation.
-        :param unif_vec: (np.array) Shape=(num, 2) array, two independent uniformly distributed sets of data. 
+        :param unif_vec: (np.array) Shape=(num, 2) array, two independent uniformly distributed sets of data.
             Default uses numpy pseudo-random generators.
         :return sample_pairs: (np.array) Shape=(num, 2) array, sampled data for this copula.
         """
@@ -629,14 +704,15 @@ class N14:
 
         return sample_pairs
 
-    def _generate_one_pair(self, v1, v2, theta, Kc):
+    def _generate_one_pair(self, v1: float, v2: float, theta: float, Kc: Callable[[float], float]):
         """
-        Helper func to generate one pair of vectors from N14 copula.
+        Generate one pair of vectors from N14 copula.
 
         :param v1: (float) i.i.d. uniform random variable in [0,1].
         :param v2: (float) i.i.d. uniform random variable in [0,1].
         :param theta: (float) Range in [1, +inf), measurement of correlation.
         :param Kc: (func) conditional probability function, for numerical inverse.
+        :return: (tuple) The sampled pair in [0, 1]x[0, 1].
         """
         if v2 > self.threshold:
             w = brentq(lambda w1: Kc(w1) - v2,
@@ -647,34 +723,40 @@ class N14:
         u2 = (1 + ((1 - v1) * (w**(-1 / theta) - 1)**theta)**(1 / theta))**(-theta)
 
         return u1, u2
-    
-    def _c(self, u, v):
+
+    def c(self, u: float, v: float):
         """
         Calculate probability density of the biavriate copula: P(U=u, V=v).
-        
+
         Result is analytical.
+        :param u: (float) A real number in [0, 1].
+        :param v: (float) A real number in [0, 1].
+        :return: (float) The probability density (aka copula density).
         """
         theta = self.theta
         u_ker = -1 + np.power(u, 1/theta)
         v_ker = -1 + np.power(v, 1/theta)
         u_part = (-1 + np.power(u, -1/theta))**theta
         v_part = (-1 + np.power(v, -1/theta))**theta
-        cdf_ker =  1 + (u_part + v_part)**(1/theta)
-        
+        cdf_ker = 1 + (u_part + v_part)**(1/theta)
+
         numerator = (u_part * v_part * (cdf_ker -1)
                      * (-1 + theta + 2 * theta * (cdf_ker -1)))
-        
+
         denominator = ((u_part + v_part)**2 * cdf_ker**(2 + theta)
                        * u * v * u_ker * v_ker * theta)
-        
+
         pdf = numerator / denominator
         return pdf
 
-    def _C(self, u, v):
+    def C(self, u: float, v: float):
         """
         Calculate cumulative density of the bivariate copula: P(U<=u, V<=v).
-        
+
         Result is analytical.
+        :param u: (float) A real number in [0, 1].
+        :param v: (float) A real number in [0, 1].
+        :return: (float) The culumative density.
         """
         theta = self.theta
         u_part = (-1 + np.power(u, -1/theta))**theta
@@ -682,47 +764,49 @@ class N14:
         cdf = (1 + (u_part + v_part)**(1/theta))**(-theta)
 
         return cdf
-    
-    def condi_cdf(self, u, v):
+
+    def condi_cdf(self, u: float, v: float):
         """
         Calculate conditional cumulative density function: P(U<=u | V=v).
-        
+
         Result is analytical.
-        
+
         Note: This probability is symmmetric about (u, v).
+        :param u: (float) A real number in [0, 1].
+        :param v: (float) A real number in [0, 1].
+        :return: (float) The conditional probability.
         """
         theta = self.theta
-        u_ker = -1 + np.power(u, -1/theta)
         v_ker = -1 + np.power(v, -1/theta)
         u_part = (-1 + np.power(u, -1/theta))**theta
         v_part = (-1 + np.power(v, -1/theta))**theta
-        cdf_ker =  1 + (u_part + v_part)**(1/theta)
+        cdf_ker = 1 + (u_part + v_part)**(1/theta)
 
         numerator = v_part * (cdf_ker - 1)
         denominator = v**(1 + 1/theta) * v_ker * (u_part + v_part) * cdf_ker**(1 + theta)
 
         result = numerator / denominator
-        
+
         return result
 
 
 class Gaussian(Copula):
-    """Bivariate Gaussian Copula"""
-    def __init__(self, cov=None):
+    """Bivariate Gaussian Copula."""
+
+    def __init__(self, cov: np.array = None):
         self.cov = cov  # Covariance matrix
         # Correlation
         self.rho = cov[0][1] / (np.sqrt(cov[0][0]) * np.sqrt(cov[1][1]))
         super().__init__()
 
-    def generate_pairs(self, num=None, cov=None):
+    def generate_pairs(self, num: int = None, cov: np.array = None):
         """
         Generate pairs according to P.D.F., stored in a 2D np.array.
-        
+
         User may choose to side load independent uniformly distributed data in [0, 1].
-        
+
         :param num: (int) Number of points to generate.
         :param cov: (np.array) 2 by 2 covariance matrix.
-
         :return sample_pairs: (np.array) Shape=(num, 2) array, sampled data for this copula.
         """
         if cov is None:
@@ -733,12 +817,14 @@ class Gaussian(Copula):
 
         return sample_pairs
 
-    def _generate_corr_gaussian(self, num, cov):
+    @staticmethod
+    def _generate_corr_gaussian(num: int, cov: np.array):
         """
-        Helper func to sample from a bivariate Gaussian dist.
+        Sample from a bivariate Gaussian dist.
 
         :param num: (int) Number of samples.
         :param cov: (np.array) Covariance matrix.
+        :return: (np.array) The bivariate gaussian sample, shape = (num, 2).
         """
         # Generate bivariate normal with mean 0 and intended covariance.
         rand_generator = np.random.default_rng()
@@ -748,24 +834,30 @@ class Gaussian(Copula):
 
         return result
 
-    def _c(self, u, v):
+    def c(self, u: int, v: int):
         """
         Calculate probability density of the biavriate copula: P(U=u, V=v).
-        
+
         Result is analytical.
+        :param u: (float) A real number in [0, 1].
+        :param v: (float) A real number in [0, 1].
+        :return: (float) The probability density (aka copula density).
         """
         rho = self.rho
         inv_cdf_u = norm.ppf(u)
         inv_cdf_v = norm.ppf(v)
-        
+
         pdf = np.exp(- inv_cdf_u * inv_cdf_v * rho) / np.sqrt(1 - rho**2)
         return pdf
 
-    def _C(self, u, v):
+    def C(self, u: int, v: int):
         """
         Calculate cumulative density of the bivariate copula: P(U<=u, V<=v).
-        
+
         Result is analytical.
+        :param u: (float) A real number in [0, 1].
+        :param v: (float) A real number in [0, 1].
+        :return: (float) The culumative density.
         """
         corr = [[1, self.rho], [self.rho, 1]]  # Correlation matrix.
         inv_cdf_u = norm.ppf(u)  # Inverse cdf of standard normal.
@@ -777,10 +869,13 @@ class Gaussian(Copula):
     def condi_cdf(self, u, v):
         """
         Calculate conditional cumulative density function: P(U<=u | V=v).
-        
+
         Result is analytical.
-        
+
         Note: This probability is symmmetric about (u, v).
+        :param u: (float) A real number in [0, 1].
+        :param v: (float) A real number in [0, 1].
+        :return: (float) The conditional probability.
         """
         rho = self.rho
         inv_cdf_u = norm.ppf(u)
@@ -791,29 +886,35 @@ class Gaussian(Copula):
 
         return result
 
-    def _theta_hat(self, tau):
-        """Calculate theta hat from Kendall's tau from sample data"""
+    @staticmethod
+    def theta_hat(tau: float):
+        r"""
+        Calculate theta hat from Kendall's tau from sample data.
+
+        :param tau: (float) Kendall's tau from sample data.
+        :return: (float) The associated theta hat for this very copula.
+        """
         return np.sin(tau * np.pi / 2)
 
 
 class Student:
     """Bivariate Student-t Copula, need degree of freedom nu."""
-    def __init__(self, nu=None, cov=None):
+
+    def __init__(self, nu: float = None, cov: np.array = None):
         self.cov = cov  # Covariance matrix.
         self.nu = nu  # Degree of freedom.
         # Correlation from covariance matrix.
         self.rho = cov[0][1] / (np.sqrt(cov[0][0]) * np.sqrt(cov[1][1]))
 
-    def generate_pairs(self, num=None, nu=None, cov=None):
+    def generate_pairs(self, num: int = None, nu: float = None, cov: np.array = None):
         """
         Generate pairs according to P.D.F., stored in a 2D np.array.
-        
+
         User may choose to side load independent uniformly distributed data in [0, 1].
-        
+
         :param num: (int) Number of points to generate.
         :param nu: (float) Degree of freedom.
         :param cov: (np.array) 2 by 2 covariance matrix.
-
         :return sample_pairs: (np.array) Shape=(num, 2) array, sampled data for this copula.
         """
         if cov is None:
@@ -827,13 +928,15 @@ class Student:
 
         return copula_pairs
 
-    def _generate_corr_student(self, num, cov, nu):
+    @staticmethod
+    def _generate_corr_student(num: int, cov: np.ndarray, nu: float):
         """
-        Helper func to sample from a bivariate Student-t dist.
+        Sample from a bivariate Student-t dist.
 
         :param num: (int) Number of samples.
-        :param cov: (np.array) Covariance matrix.
+        :param cov: (np.array) 2 by 2 covariance matrix.
         :param nu: (float) Degree of freedom.
+        :return: (tuple) The sampled pair in [0, 1]x[0, 1].
         """
         # Sample from bivariate Normal with cov=cov.
         rand_generator = np.random.default_rng()
@@ -847,11 +950,14 @@ class Student:
 
         return result
 
-    def _c(self, u, v):
+    def c(self, u: float, v: float):
         """
         Calculate probability density of the biavriate copula: P(U=u, V=v).
-        
+
         Result is analytical.
+        :param u: (float) A real number in [0, 1].
+        :param v: (float) A real number in [0, 1].
+        :return: (float) The probability density (aka copula density).
         """
         # rho = self.rho
         nu = self.nu
@@ -863,22 +969,42 @@ class Student:
         y2 = t_dist.ppf(v)
 
         numerator = self._bv_t_dist(x=(y1, y2),
-                               mu=(0, 0),
-                               cov=corr,
-                               df=nu)
+                                    mu=(0, 0),
+                                    cov=corr,
+                                    df=nu)
         denominator = t_dist.pdf(y1) * t_dist.pdf(y2)
 
         pdf = numerator / denominator
 
         return pdf
 
-    def condi_cdf(self, u, v):
+    def C(self, u: float, v: float):
+        """
+        Calculate cumulative density of the bivariate copula: P(U<=u, V<=v).
+
+        Result is analytical.
+        :param u: (float) A real number in [0, 1].
+        :param v: (float) A real number in [0, 1].
+        :return: (float) The culumative density.
+        """
+        corr = [[1, self.rho], [self.rho, 1]]  # correlation mtx
+        t_dist = student_t(df=self.nu)
+        var1 = t_dist.ppf(u)  # Inverse cdf of standard normal
+        var2 = t_dist.ppf(v)
+        mvt_dist = mvn(mean=[0, 0], cov=corr)  # Joint cdf of multivar normal
+        cdf = mvt_dist.cdf((var1, var2))
+        return cdf
+
+    def condi_cdf(self, u: float, v: float):
         """
         Calculate conditional cumulative density function: P(U<=u | V=v).
-        
+
         Result is analytical.
-        
+
         Note: This probability is symmmetric about (u, v).
+        :param u: (float) A real number in [0, 1].
+        :param v: (float) A real number in [0, 1].
+        :return: (float) The conditional probability.
         """
         rho = self.rho
         nu = self.nu
@@ -893,32 +1019,24 @@ class Student:
 
         return result
 
-    def _C(self, u, v):
-        """
-        Calculate cumulative density of the bivariate copula: P(U<=u, V<=v).
-        
-        Result is analytical.
-        """
-        corr = [[1, self.rho], [self.rho, 1]]  # correlation mtx
-        t_dist = student_t(df=self.nu)
-        var1 = t_dist.ppf(u)  # Inverse cdf of standard normal
-        var2 = t_dist.ppf(v)
-        mvt_dist = mvn(mean=[0, 0], cov=corr)  # Joint cdf of multivar normal
-        cdf = mvt_dist.cdf((var1, var2))
-        return cdf
-
-    def _theta_hat(self, tau):
-        """Calculate theta hat from Kendall's tau from sample data"""
-        return np.sin(tau * np.pi / 2)
-    
     @staticmethod
-    def _bv_t_dist(x, mu, cov, df):
+    def theta_hat(tau: float):
+        r"""
+        Calculate theta hat from Kendall's tau from sample data.
+
+        :param tau: (float) Kendall's tau from sample data.
+        :return: (float) The associated theta hat for this very copula.
+        """
+        return np.sin(tau * np.pi / 2)
+
+    @staticmethod
+    def _bv_t_dist(x: np.array, mu: np.array, cov: np.array, df: float):
         """
         Bivariate Student-t probability density.
-    
-        :param x: (list_like) a pair of values, shape=(2, ).
-        :param mu: (list_like) mean for the distribution, shape=(2, ).
-        :param cov: (list_like) covariance matrix, shape=(2, 2).
+
+        :param x: (np.array) a pair of values, shape=(2, ).
+        :param mu: (np.array) mean for the distribution, shape=(2, ).
+        :param cov: (np.array) covariance matrix, shape=(2, 2).
         :param df: (float) degree of freedom.
         :return: (float) the probability density.
         """
@@ -931,11 +1049,11 @@ class Student:
         det_cov = c11 * c22 - c12 * c21
         # Pseudo code: (x.transpose)(cov.inverse)(x)/ Det(cov)
         xT_covinv_x = (-2 * c12 * x1 * x2 + c11 * (x1 ** 2 + x2 ** 2)) / det_cov
-    
+
         numerator = gm((2 + df) / 2)
         denominator = (gm(df / 2) * df * np.pi * np.sqrt(det_cov)
                        * np.power(1 + xT_covinv_x / df, (2 + df) / 2))
-    
+
         result = numerator / denominator
         return result
 
@@ -943,9 +1061,10 @@ class Student:
 class Switcher:
     """
     Switch class to emulate switch functionality.
-    
+
     Create copula by its string name.
     """
+
     def __init__(self):
         self.theta = None
         self.cov = None
@@ -954,7 +1073,7 @@ class Switcher:
     def choose_copula(self, **kwargs):
         """
         Choose a method to instanticate a copula.
-        
+
         User need to input copula's name and necessary parameters as kwargs.
 
         :param kwargs: (dict) Key word arguments to generate a copula by its name.
@@ -974,34 +1093,34 @@ class Switcher:
                          lambda: print("Invalid copula name"))
         return method()
 
-    def _create_gumbel(self):
+    def _create_gumbel(self):  # pylint: disable=missing-function-docstring
         my_copula = Gumbel(theta=self.theta)
         return my_copula
 
-    def _create_frank(self):
+    def _create_frank(self):  # pylint: disable=missing-function-docstring
         my_copula = Frank(theta=self.theta)
         return my_copula
 
-    def _create_clayton(self):
+    def _create_clayton(self):  # pylint: disable=missing-function-docstring
         my_copula = Clayton(theta=self.theta)
         return my_copula
 
-    def _create_joe(self):
+    def _create_joe(self):  # pylint: disable=missing-function-docstring
         my_copula = Joe(theta=self.theta)
         return my_copula
 
-    def _create_n13(self):
+    def _create_n13(self):  # pylint: disable=missing-function-docstring
         my_copula = N13(theta=self.theta)
         return my_copula
 
-    def _create_n14(self):
+    def _create_n14(self):  # pylint: disable=missing-function-docstring
         my_copula = N14(theta=self.theta)
         return my_copula
 
-    def _create_gaussian(self):
+    def _create_gaussian(self):  # pylint: disable=missing-function-docstring
         my_copula = Gaussian(cov=self.cov)
         return my_copula
 
-    def _create_student(self):
+    def _create_student(self):  # pylint: disable=missing-function-docstring
         my_copula = Student(nu=self.nu, cov=self.cov)
         return my_copula
