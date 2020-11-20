@@ -10,7 +10,7 @@ learning, researchers often struggle to find the best academic papers to begin t
 
 At Hudson & Thames, we primarily use two resources: `Connected Papers`_ and `EThOS`_. These two
 free sites have been invaluable and offer an advantage to search through the most cutting edge
-resources available for our MlFinLab library.
+resources available for our ArbitrageLab package.
 
 .. _Connected Papers: https://www.connectedpapers.com/
 .. _EThOS: https://ethos.bl.uk/Home.do
