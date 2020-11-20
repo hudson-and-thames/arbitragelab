@@ -222,4 +222,4 @@ The following research notebook can be used to better understand the Pairs Selec
 
 * `ML based Pairs Selection`_
 
-.. _`ML based Pairs Selection`: https://github.com/hudson-and-thames/research/blob/ml_based_pairs_selection/Statistical%20Arbitrage/ml_based_pairs_selection.ipynb
+.. _`ML based Pairs Selection`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/ml_approach/ml_based_pairs_selection.ipynb
