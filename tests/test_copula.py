@@ -6,10 +6,17 @@ from arbitragelab.copula_approach import copula_generate, copula_strategy, copul
 import unittest
 import numpy as np
 import pandas as pd
+import os
 
 class TestCopulas(unittest.TestCase):
     """Test each copula class, calculations and strategy."""
-    
+    def setUp(self):
+        """
+        Get the correct directory.
+        """
+        project_path = os.path.dirname(__file__)
+        self.data_path = project_path + r'/test_data'
+
     def test_gumbel(self):
         """Test gumbel copula class."""
         cop = copula_generate.Gumbel(theta=2)
@@ -263,7 +270,7 @@ class TestCopulas(unittest.TestCase):
     def test_ml_theta_hat(self):
         """Test max likelihood fit of theta hat for each copula."""
         # Import data.
-        pair_prices = pd.read_csv(r'test_data\BKD_ESC_2009_2011.csv')
+        pair_prices = pd.read_csv(self.data_path + r'/BKD_ESC_2009_2011.csv')
         BKD_series = pair_prices['BKD'].to_numpy()
         ESC_series = pair_prices['ESC'].to_numpy()
         # Change price to cumulative log return. Here we fit the whole set.
@@ -284,7 +291,7 @@ class TestCopulas(unittest.TestCase):
     def test_fit_copula(self):
         """Test fit_copula in CopulaStrategy for each copula."""
         # Import data.
-        pair_prices = pd.read_csv(r'test_data\BKD_ESC_2009_2011.csv')
+        pair_prices = pd.read_csv(self.data_path + r'/BKD_ESC_2009_2011.csv')
         BKD_series = pair_prices['BKD'].to_numpy()
         ESC_series = pair_prices['ESC'].to_numpy()
         # Change price to cumulative log return. Here we fit the whole set.
@@ -312,7 +319,7 @@ class TestCopulas(unittest.TestCase):
             
     def test_analyze_time_series(self):
         """Test analyze_time_series in CopulaStrategy for each copula."""
-        pair_prices = pd.read_csv(r'test_data\BKD_ESC_2009_2011.csv')
+        pair_prices = pd.read_csv(self.data_path + r'/BKD_ESC_2009_2011.csv')
         BKD_series = pair_prices['BKD'].to_numpy()
         ESC_series = pair_prices['ESC'].to_numpy()
 
@@ -348,7 +355,7 @@ class TestCopulas(unittest.TestCase):
                 positions_data[name] = positions
 
         # Load and compare with theoretical data
-        expected_positions_df = pd.read_csv('test_data\BKD_ESC_unittest_positions.csv')
+        expected_positions_df = pd.read_csv(self.data_path + r'/BKD_ESC_unittest_positions.csv')
         for name in copulas:
             np.testing.assert_array_almost_equal(positions_data[name],
                                                   expected_positions_df[name].to_numpy(),
@@ -357,7 +364,7 @@ class TestCopulas(unittest.TestCase):
     def test_ic_test(self):
         """Test ic_test from CopulaStrategy for each copula."""
         # 1. Get and process price pairs data
-        pair_prices = pd.read_csv(r'test_data\BKD_ESC_2009_2011.csv')
+        pair_prices = pd.read_csv(self.data_path + r'/BKD_ESC_2009_2011.csv')
         BKD_series = pair_prices['BKD'].to_numpy()
         ESC_series = pair_prices['ESC'].to_numpy()
         # Change price to cumulative log return. Here we fit the whole set.
