@@ -404,5 +404,5 @@ class TestCopulas(unittest.TestCase):
             for ic in ic_type:
                 self.assertAlmostEqual(ic_dict[name][ic], ic_dict_expect[name][ic], delta=1e-5)
 
-if __name__ == "__main__":
-    unittest.main()
+# if __name__ == "__main__":
+#     unittest.main()
