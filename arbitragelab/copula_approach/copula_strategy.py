@@ -14,14 +14,15 @@ class CopulaStrategy:
     Analyze a pair of stock prices using copulas.
 
     We use the convention that the spread is defined as stock 1 in relation to stock 2.
-    This class provides the following functionality:
+    This class provides the following functionalities:
         1. Maximum likelihood fitting to training data. User provides the name and necessary parameters.
         2. Use a given copula to generate trading positions based on test data. By default it uses
         the fitted copula generated in functionality 1.
         3. Scatter plot of a given copula about its probability density.
     """
 
-    def __init__(self, copula: cg.Copula = None):
+    def __init__(self, copula: cg.Copula = None, position_kind: list = None,
+                 default_lower_threshold: float = 0.05, default_upper_threshold: float = 0.95):
         # Copulas that uses theta as parameter
         self.theta_copula_names = ['Gumbel', 'Clayton', 'Frank',
                                    'Joe', 'N13', 'N14']
@@ -29,20 +30,23 @@ class CopulaStrategy:
         self.cov_copula_names = ['Gaussian', 'Student']
         self.all_copula_names = self.theta_copula_names \
                                 + self.cov_copula_names
-        # Trading positions.
+        # Default trading positions.
         # 1: Long the spread.
         # -1: Short the spread.
         # 0: No position.
-        self.position_kind = [1, -1, 0]
+        if position_kind is None:
+            self.position_kind = [1, -1, 0]
+        else:
+            self.position_kind = position_kind
         # To be used for the test data set.
         self.copula = copula
-        # Thresholds for opening trading positions.
-        self.lower_threshold = 0.05
-        self.upper_threshold = 0.95
+        # Default thresholds for opening trading positions.
+        self.lower_threshold = default_lower_threshold
+        self.upper_threshold = default_upper_threshold
 
     def fit_copula(self, s1_series: np.array, s2_series: np.ndarray, copula_name: str,
-                   if_empirical_cdf: bool = True, **kwargs):
-        """
+                   if_empirical_cdf: bool = True, if_renew: bool = True, **kwargs):
+        r"""
         Conduct a max likelihood estimation and information criterion.
 
         Note: s1_series and s2_series need to be pre-processed. In general, raw price data is depreciated.
@@ -53,6 +57,7 @@ class CopulaStrategy:
         :param s2_series: (np.array) 1D stock time series data in desired form.
         :param copula_name: (str) Type of copula to fit.
         :param if_empirical_cdf: (bool) Whether use empirical cumulative density function to fit data.
+        :param if_renew: (bool) Whether use the fitted copula to replace the copula in CopulaStrategy.
         :param kwargs: Input degree of freedom if using Student-t copula. e.g. nu=10.
         :return: (tuple)
             result_dict: (dict) The name of the copula and its SIC, AIC, HQIC values.
@@ -62,10 +67,6 @@ class CopulaStrategy:
         """
         nu = kwargs.get('nu', None)  # Degree of freedom for Student-t copula.
         num_of_instances = len(s1_series)  # Number of instances.
-
-        # Convert stock prices to cumulative log return.
-        # s1_clr = self.cum_log_return(s1_series)
-        # s2_clr = self.cum_log_return(s2_series)
 
         # Finding an inverse cumulative density distribution (quantile) for each stock price series.
         s1_cdf = ccalc.find_marginal_cdf(s1_series, empirical=if_empirical_cdf)
@@ -89,9 +90,9 @@ class CopulaStrategy:
                        'AIC': aic_value,
                        'HQIC': hqic_value}
 
-        # If when the strategy is initialized it does not come with a copula, then the strategy will use this fitted
-        # copula for further analysis.
-        if self.copula is None:
+        # If when the strategy is initialized it does not come with a copula, or the user intends to renew the
+        # system's copula, then the strategy will use this fitted copula for further analysis.
+        if if_renew or self.copula is None:
             self.copula = copula
 
         return result_dict, copula, s1_cdf, s2_cdf
@@ -106,6 +107,7 @@ class CopulaStrategy:
         Note: s1_series and s2_series need to be pre-processed. In general, raw price data is depreciated.
             One may use log return or cumulative log return. CopulaStrategy class provides a method to
             calculate cumulative log return.
+
         :param s1_test: (np.array) 1D stock time series data in desired form.
         :param s2_test: (np.array) 1D stock time series data in desired form.
         :param cdf1: (func) Cumulative density function trained, for the security in s1_test.
@@ -123,10 +125,6 @@ class CopulaStrategy:
             nu = copula.nu
         else:
             nu = None
-
-        # Convert stock prices to cumulative log return.
-        # s1_clr = self.cum_log_return(s1_test)
-        # s2_clr = self.cum_log_return(s2_test)
 
         # Quantile data for each stock w.r.t. their cumulative log return.
         u1_series = cdf1(s1_test)
@@ -153,6 +151,7 @@ class CopulaStrategy:
         Graph the sample from a given copula. Returns axis.
 
         Randomly sample using copula density. User may further specify axis parameters for plotting in kwargs.
+
         :param copula_name: (str) Name of the copula to graph.
         :param ax: (plt.axes) Plotting axes.
         :param kwargs: Parameters for the copula and the plot axes.
@@ -211,26 +210,35 @@ class CopulaStrategy:
 
         return ax
 
-    def analyze_price_series(self, s1_series: np.array, s2_series: np.array,
-                             cdf1: Callable[[float], float], cdf2: Callable[[float], float], **kwargs):
+    def analyze_time_series(self, s1_series: np.array, s2_series: np.array,
+                            cdf1: Callable[[float], float], cdf2: Callable[[float], float],
+                            upper_threshold: float = None, lower_threshold: float = None,
+                            start_position: int = None):
         """
-        Generate positions given price series of two stocks.
+        Generate positions given time series of two stocks.
 
-        :param s1_series: (np.array) 1D price series from stock 1.
-        :param s2_series: (np.array) 1D price series from stock 2.
+        Note: s1_series and s2_series need to be pre-processed. In general, raw price data is depreciated.
+            One may use log return or cumulative log return. CopulaStrategy class provides a method to
+            calculate cumulative log return.
+
+        :param s1_series: (np.array) 1D time series from stock 1.
+        :param s2_series: (np.array) 1D time series from stock 2.
         :param cdf1: (func) Marginal C.D.F. for stock 1.
         :param cdf2: (func) Marginal C.D.F. for stock 2.
-        :param kwargs: Parameter for adjusting upper and lower thresholds for opening a position.
-            upper_threshold: (float) Upper threshold. Class defalts to 0.95.
-            lower_threshold: (float) Lower threshold. Class defalts to 0.05.
-            start_position: (int) Starting position. Default is 0, i.e., no position.
+        :param upper_threshold: (float) Upper threshold. Class defaults to 0.95.
+        :param lower_threshold: (float) Lower threshold. Class defaults to 0.05.
+        :param start_position: (int) Starting position. Default is no position.
+
         :return positions: (np.array) The suggested positions for the given price data.
         """
-        # Update the trading thresholds.
-        self.upper_threshold = kwargs.get('upper_threshold')
-        self.lower_threshold = kwargs.get('lower_threshold')
+        # Update the trading thresholds if there are inputs. Otherwise use the default.
+        if upper_threshold is None:
+            self.upper_threshold = upper_threshold
+        if lower_threshold is None:
+            self.lower_threshold = lower_threshold
         # Default starting position is no position.
-        start_position = kwargs.get('start_position', self.position_kind[2])
+        if start_position is None:
+            start_position = self.position_kind[2]
 
         # Cumulative conditional probability series for 2 stocks.
         prob_series = self.series_condi_prob(s1_series, s2_series,
@@ -300,43 +308,48 @@ class CopulaStrategy:
         """
         Convert a price time series to cumulative log return.
 
-        clr[i] = log(S[i]/S[0]) = log(S[i]) - log(s[0]).
+        clr[i] = log(S[i]/S[0]) = log(S[i]) - log(S[0]).
 
         :param price_series: (np.array) 1D price time series.
         :param start: (float) Initial price. Default to the starting element of price_series.
         :return clr: (np.array) 1D cumulative log return series.
         """
         if start is None:
-            start = np.log(price_series[0])
+            start = price_series[0]
+        log_start = np.log(start)
+
         # Natural log of price series.
         log_prices = np.log(price_series)
         # Calculate cumulative log return.
-        clr = np.array([log_price_now - start for log_price_now in log_prices])
+        clr = np.array([log_price_now - log_start for log_price_now in log_prices])
 
         return clr
 
     def series_condi_prob(self, s1_series: np.array, s2_series: np.array,
                           cdf1: Callable[[float], float], cdf2: Callable[[float], float]):
         """
-        Calculate the cumulative conditional probabilities for two price series.
+        Calculate the cumulative conditional probabilities for two time series.
 
-        :param s1_series: (np.array) 1D price series from stock 1.
-        :param s2_series: (np.array) 1D price series from stock 2.
+        i.e., P(U1 <= u1 | U2 = u2) and P(U2 <= u2 | U1 = u1)
+
+        Note: s1_series and s2_series need to be pre-processed. In general, raw price data is depreciated.
+            One may use log return or cumulative log return. CopulaStrategy class provides a method to
+            calculate cumulative log return.
+
+        :param s1_series: (np.array) 1D time series from stock 1.
+        :param s2_series: (np.array) 1D time series from stock 2.
         :param cdf1: (func) Marginal C.D.F. for stock 1.
         :param cdf2: (func) Marginal C.D.F. for stock 2.
         :return prob_series: (np.array) (N, 2) shaped array storing the conditional C.D.F. pair for the stock pair.
         """
         num_of_instances = len(s1_series)
-        # Convert to cumulative log return.
-        s1_clr = self.cum_log_return(s1_series)
-        s2_clr = self.cum_log_return(s2_series)
 
         prob_series = np.zeros((num_of_instances, 2))
         # For pair, calculate and store its conditional C.D.F. pair.
         for row_idx, each_row in enumerate(prob_series):
             each_row[0], each_row[1] = \
-                self._condi_prob(s1_clr[row_idx],
-                                 s2_clr[row_idx],
+                self._condi_prob(s1_series[row_idx],
+                                 s2_series[row_idx],
                                  cdf1, cdf2)
 
         return prob_series
@@ -387,6 +400,13 @@ class CopulaStrategy:
         There are two signals:
             open_type: -1, 1, or None, indicating the type of position one should open. None means do not open.
             to_exit: bool, inidicating if one should exit the current position.
+
+        :param prob_u1: (float) Current marginal C.D.F. for stock 1, given stock 2.
+        :param prob_u2: (float) Current marginal C.D.F. for stock 2, given stock 1.
+        :param prev_prob_u1: (float) Previous marginal C.D.F. for stock 1, given stock 2.
+        :param prev_prob_u2: (float) Previous marginal C.D.F. for stock 2, given stock 1.
+        :param current_pos: (int) Most recent trading position.
+        :return: (tuple) Suggested trading signal after assessment.
         """
         # Default values.
         open_type = None
@@ -395,9 +415,7 @@ class CopulaStrategy:
         # If currently hold no position, then check if can open position
         if current_pos == self.position_kind[2]:  #pylint: disable = no-else-return
             open_type = self._check_open_position(prob_u1,
-                                                  prob_u2,
-                                                  self.upper_threshold,
-                                                  self.lower_threshold)
+                                                  prob_u2)
             return open_type, to_exit
         # If have a position already, check if any probabilities cross.
         # If any probabilities cross, exit position.
@@ -411,7 +429,18 @@ class CopulaStrategy:
         """
         Conditional accumulative probability for pair's price data and copula.
 
+        i.e. tuple(P(U1<=u1 | U2=u2), P(U2<=u2 | U1=u1)) for probability u1, u2 in association with s1, s2.
+
         Note: The calculation assumes copula being Archimedean, and thus the conditional C.D.F. is symmetric.
+            s1 and s2 need to be pre-processed. In general, raw price data is depreciated.
+            One may use log return or cumulative log return. CopulaStrategy class provides a method to
+            calculate cumulative log return.
+
+        :param s1: (np.array) Single data from stock 1.
+        :param s2: (np.array) Single data from stock 2.
+        :param cdf1: (func) Marginal C.D.F. for stock 1.
+        :param cdf2: (func) Marginal C.D.F. for stock 2.
+        :return: (tuple) P(U1<=u1 | U2=u2), P(U2<=u2 | U1=u1).
         """
         u1 = cdf1(s1)
         u2 = cdf2(s2)
@@ -422,9 +451,7 @@ class CopulaStrategy:
 
         return prob_u1_given_u2, prob_u2_given_u1
 
-    def _check_open_position(self, prob_u1: float, prob_u2: float,
-                             upper_threshold: float = 0.95,
-                             lower_threshold: float = 0.05):
+    def _check_open_position(self, prob_u1: float, prob_u2: float):
         """
         Check if open position from price quantile data given threshold.
 
@@ -433,7 +460,14 @@ class CopulaStrategy:
         Note: This function has no information about the current trading position. Hence its decision is solely
         based on the current probabilities. Higher level classmethods will assemble this information later for
         suggesting a full trading position.
+
+        :param prob_u1: (float) Current marginal C.D.F. for stock 1, given stock 2.
+        :param prob_u2: (float) Current marginal C.D.F. for stock 2, given stock 1.
+        :return pairs_action: Suggested opening position after assessment.
         """
+        # Use the class attribute for thresholds.
+        lower_threshold = self.lower_threshold
+        upper_threshold = self.upper_threshold
         position = self.position_kind  # i.e., [long, short, no position]
         pairs_action = None  # Default to None
 
@@ -453,8 +487,16 @@ class CopulaStrategy:
         """
         Check if to exit position from conditional probability.
 
-        When any one of the conditional probability crosses the boundary, we
+        When any one of the conditional probability crosses the threshold band, we
         attemp to close the position.
+
+        :param prob_u1: (float) Current marginal C.D.F. for stock 1, given stock 2.
+        :param prob_u2: (float) Current marginal C.D.F. for stock 2, given stock 1.
+        :param prev_prob_u1: (float) Previous marginal C.D.F. for stock 1, given stock 2.
+        :param prev_prob_u2: (float) Previous marginal C.D.F. for stock 2, given stock 1.
+        :param upper_exit_threshold: (float) Upper bound of the threshold band. Defaults to 0.5.
+        :param lower_exit_threshold: (float) Lower bound of the threshold band. Defaults to 0.5.
+        :return: (int) Suggested trading position after assessment.
         """
         prob_u1_x_up = (prev_prob_u1 <= lower_exit_threshold
                         and prob_u1 >= upper_exit_threshold)  # Prob u1 crosses upward

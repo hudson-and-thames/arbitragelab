@@ -7,10 +7,10 @@ Back end module that handles maximum likelihood related copula calculations.
 Functions include:
     Finding (marginal) cumulative distribution function from data.
     Maximum likelihood estimation of theta_hat (empirical theta) from data.
-    Calculate the sum log likelihood given a copula and data.
-    Calculate SIC (Schwarz information criterion).
-    Calculate AIC (Akaike information criterion).
-    Calculate HQIC (Hannan-Quinn information criterion).
+    Calculating the sum log likelihood given a copula and data.
+    Calculating SIC (Schwarz information criterion).
+    Calculating AIC (Akaike information criterion).
+    Calculating HQIC (Hannan-Quinn information criterion).
 """
 # pylint: disable = invalid-name
 from scipy.stats import kendalltau
@@ -20,9 +20,6 @@ from sklearn.covariance import EmpiricalCovariance
 from statsmodels.distributions.empirical_distribution import ECDF
 import numpy as np
 import arbitragelab.copula_approach.copula_generate as cg
-
-theta_copula_names = ['Gumbel', 'Clayton', 'Frank', 'Joe', 'N13', 'N14']
-cov_copula_names = ['Gaussian', 'Student']
 
 def find_marginal_cdf(x: np.array, empirical: bool = True, **kwargs):
     """
@@ -81,7 +78,7 @@ def log_ml(x: np.array, y: np.array, copula_name: str, nu: float = None):
     """
     Fit a type of copula using maximum likelihood.
 
-    User provide the name of the copula (and degree of freedom nu, if it is 'Student-t'), then this method
+    User provides the name of the copula (and degree of freedom nu, if it is 'Student-t'), then this method
     fits the copyla type by maximum likelihood. Moreover, it calculates log maximum likelihood.
 
     :param x: (np.array) 1D vector data. Need to be uniformly distributed.
@@ -92,6 +89,7 @@ def log_ml(x: np.array, y: np.array, copula_name: str, nu: float = None):
         log_likelihood_sum: (float) Logarithm of max likelihood value from data.
         my_copula: (Copula) Copula with its parameter fitted to data.
     """
+    theta_copula_names = ['Gumbel', 'Clayton', 'Frank', 'Joe', 'N13', 'N14']
     # Find log max likelihood given all the data.
     switch = cg.Switcher()
     if copula_name in theta_copula_names:
@@ -128,7 +126,6 @@ def log_ml(x: np.array, y: np.array, copula_name: str, nu: float = None):
     likelihood_list = [my_copula.c(xi, yi) for (xi, yi) in zip(x, y)]
     # Sum of logarithm of likelihood data.
     log_likelihood_sum = np.sum(np.log(likelihood_list))
-    log_likelihood_sum = log_likelihood_sum[abs(log_likelihood_sum) < np.inf] # Only keeping the valid values
 
     return log_likelihood_sum, my_copula
 

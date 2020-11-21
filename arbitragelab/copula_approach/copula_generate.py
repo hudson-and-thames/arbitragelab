@@ -23,13 +23,21 @@ class Copula:
     def __init__(self):
         pass
 
-    def describe(self):
-        """Describe the copula's name and parameter."""
+    def describe(self, if_print: bool = True):
+        r"""
+        Print the description of the copula's name and parameter as a dict.
 
+        Note: the descriptive name is different from the copula's class name, but its full actual name.
+        E.g. The Student copula class has its descriptive name as 'Bivariate Student-t Copula'.
 
-    def sample_plot(self):
-        """Quick plotting from sampling points based on copula's P.D.F."""
-
+        :param if_print: (bool) Whether prints the description.
+        :return description: (dict) The description of the copula, including its descriptive name, class name,
+            and its parameter(s) when applicable.
+        """
+        description = self._get_param()
+        if if_print:
+            print(description)
+        return description
 
 class Gumbel(Copula):
     """Gumbel Copula."""
@@ -97,11 +105,26 @@ class Gumbel(Copula):
 
         return u1, u2
 
+    def _get_param(self):
+        """
+        Get the name and parameter(s) for this copula instance.
+
+        :return: (dict) Name and parameters for this copula.
+        """
+        descriptive_name = 'Bivariate Gumbel Copula'
+        class_name = 'Gumbel'
+        theta = self.theta
+        info_dict = {'Descriptive Name': descriptive_name,
+                     'Class Name': class_name,
+                     'theta': theta}
+        return info_dict
+
     def c(self, u: float, v: float):
         """
         Calculate probability density of the biavriate copula: P(U=u, V=v).
 
         Result is analytical.
+
         :param u: (float) A real number in [0, 1].
         :param v: (float) A real number in [0, 1].
         :return: (float) The probability density (aka copula density).
@@ -125,6 +148,7 @@ class Gumbel(Copula):
         Calculate cumulative density of the bivariate copula: P(U<=u, V<=v).
 
         Result is analytical.
+
         :param u: (float) A real number in [0, 1].
         :param v: (float) A real number in [0, 1].
         :return: (float) The culumative density.
@@ -220,11 +244,26 @@ class Frank(Copula):
 
         return u1, u2
 
+    def _get_param(self):
+        """
+        Get the name and parameter(s) for this copula instance.
+
+        :return: (dict) Name and parameters for this copula.
+        """
+        descriptive_name = 'Bivariate Frank Copula'
+        class_name = 'Frank'
+        theta = self.theta
+        info_dict = {'Descriptive Name': descriptive_name,
+                     'Class Name': class_name,
+                     'theta': theta}
+        return info_dict
+
     def c(self, u: float, v: float):
         """
         Calculate probability density of the biavriate copula: P(U=u, V=v).
 
         Result is analytical.
+
         :param u: (float) A real number in [0, 1].
         :param v: (float) A real number in [0, 1].
         :return: (float) The probability density (aka copula density).
@@ -242,6 +281,7 @@ class Frank(Copula):
         Calculate cumulative density of the bivariate copula: P(U<=u, V<=v).
 
         Result is analytical.
+
         :param u: (float) A real number in [0, 1].
         :param v: (float) A real number in [0, 1].
         :return: (float) The culumative density.
@@ -348,11 +388,26 @@ class Clayton(Copula):
 
         return u1, u2
 
+    def _get_param(self):
+        """
+        Get the name and parameter(s) for this copula instance.
+
+        :return: (dict) Name and parameters for this copula.
+        """
+        descriptive_name = 'Bivariate Clayton Copula'
+        class_name = 'Clayton'
+        theta = self.theta
+        info_dict = {'Descriptive Name': descriptive_name,
+                     'Class Name': class_name,
+                     'theta': theta}
+        return info_dict
+
     def c(self, u: float, v: float):
         """
         Calculate probability density of the biavriate copula: P(U=u, V=v).
 
         Result is analytical.
+
         :param u: (float) A real number in [0, 1].
         :param v: (float) A real number in [0, 1].
         :return: (float) The probability density (aka copula density).
@@ -369,6 +424,7 @@ class Clayton(Copula):
         Calculate cumulative density of the bivariate copula: P(U<=u, V<=v).
 
         Result is analytical.
+
         :param u: (float) A real number in [0, 1].
         :param v: (float) A real number in [0, 1].
         :return: (float) The culumative density.
@@ -475,11 +531,26 @@ class Joe(Copula):
 
         return u1, u2
 
+    def _get_param(self):
+        """
+        Get the name and parameter(s) for this copula instance.
+
+        :return: (dict) Name and parameters for this copula.
+        """
+        descriptive_name = 'Bivariate Joe Copula'
+        class_name = 'Joe'
+        theta = self.theta
+        info_dict = {'Descriptive Name': descriptive_name,
+                     'Class Name': class_name,
+                     'theta': theta}
+        return info_dict
+
     def c(self, u: float, v: float):
         """
         Calculate probability density of the biavriate copula: P(U=u, V=v).
 
         Result is analytical.
+
         :param u: (float) A real number in [0, 1].
         :param v: (float) A real number in [0, 1].
         :return: (float) The probability density (aka copula density).
@@ -497,6 +568,7 @@ class Joe(Copula):
         Calculate cumulative density of the bivariate copula: P(U<=u, V<=v).
 
         Result is analytical.
+
         :param u: (float) A real number in [0, 1].
         :param v: (float) A real number in [0, 1].
         :return: (float) The culumative density.
@@ -525,6 +597,25 @@ class Joe(Copula):
         result = -(-1 + u_part) * (u_part + v_part - u_part * v_part)**(-1 + 1/theta) \
             * v_part / (1 - v)
 
+        return result
+
+    @staticmethod
+    def theta_hat(tau: float):
+        r"""
+        Calculate theta hat from Kendall's tau from sample data.
+
+        :param tau: (float) Kendall's tau from sample data.
+        :return: (float) The associated theta hat for this very copula.
+        """
+        # Calculate tau(theta) = 1 + 4*intg_0^1[phi(t)/d(phi(t)) dt]
+        def kendall_tau(theta):
+            # phi(t)/d(phi(t)), phi is the generator function for this copula.
+            pddp = lambda x: (1 - (1 - x)**theta) * (1 - x)**(1 - theta) * np.log(1 - (1 - x)**theta) / theta
+            result = quad(pddp, 0, 1, full_output=1)[0]
+            return 1 + 4*result
+
+        # Numerically find the root.
+        result = brentq(lambda theta: kendall_tau(theta) - tau, 1, 100)
         return result
 
 
@@ -596,11 +687,26 @@ class N13(Copula):
 
         return u1, u2
 
+    def _get_param(self):
+        """
+        Get the name and parameter(s) for this copula instance.
+
+        :return: (dict) Name and parameters for this copula.
+        """
+        descriptive_name = 'Bivariate Nelsen 13 Copula'
+        class_name = 'N13'
+        theta = self.theta
+        info_dict = {'Descriptive Name': descriptive_name,
+                     'Class Name': class_name,
+                     'theta': theta}
+        return info_dict
+
     def c(self, u: float, v: float):
         """
         Calculate probability density of the biavriate copula: P(U=u, V=v).
 
         Result is analytical.
+
         :param u: (float) A real number in [0, 1].
         :param v: (float) A real number in [0, 1].
         :return: (float) The probability density (aka copula density).
@@ -624,6 +730,7 @@ class N13(Copula):
         Calculate cumulative density of the bivariate copula: P(U<=u, V<=v).
 
         Result is analytical.
+
         :param u: (float) A real number in [0, 1].
         :param v: (float) A real number in [0, 1].
         :return: (float) The culumative density.
@@ -659,6 +766,24 @@ class N13(Copula):
 
         return result
 
+    @staticmethod
+    def theta_hat(tau: float):
+        r"""
+        Calculate theta hat from Kendall's tau from sample data.
+
+        :param tau: (float) Kendall's tau from sample data.
+        :return: (float) The associated theta hat for this very copula.
+        """
+        # Calculate tau(theta) = 1 + 4*intg_0^1[phi(t)/d(phi(t)) dt]
+        def kendall_tau(theta):
+            # phi(t)/d(phi(t)), phi is the generator function for this copula.
+            pddp = lambda x: -((x - x * (1 - np.log(x))**(1 - theta) - x * np.log(x)) / theta)
+            result = quad(pddp, 0, 1, full_output=1)[0]
+            return 1 + 4*result
+
+        # Numerically find the root.
+        result = brentq(lambda theta: kendall_tau(theta) - tau, 1e-7, 100)
+        return result
 
 class N14:
     """N14 Copula (Nelsen 14)."""
@@ -724,11 +849,26 @@ class N14:
 
         return u1, u2
 
+    def _get_param(self):
+        """
+        Get the name and parameter(s) for this copula instance.
+
+        :return: (dict) Name and parameters for this copula.
+        """
+        descriptive_name = 'Bivariate Nelsen 14 Copula'
+        class_name = 'N14'
+        theta = self.theta
+        info_dict = {'Descriptive Name': descriptive_name,
+                     'Class Name': class_name,
+                     'theta': theta}
+        return info_dict
+
     def c(self, u: float, v: float):
         """
         Calculate probability density of the biavriate copula: P(U=u, V=v).
 
         Result is analytical.
+
         :param u: (float) A real number in [0, 1].
         :param v: (float) A real number in [0, 1].
         :return: (float) The probability density (aka copula density).
@@ -754,6 +894,7 @@ class N14:
         Calculate cumulative density of the bivariate copula: P(U<=u, V<=v).
 
         Result is analytical.
+
         :param u: (float) A real number in [0, 1].
         :param v: (float) A real number in [0, 1].
         :return: (float) The culumative density.
@@ -789,6 +930,17 @@ class N14:
 
         return result
 
+    @staticmethod
+    def theta_hat(tau: float):
+        r"""
+        Calculate theta hat from Kendall's tau from sample data.
+
+        :param tau: (float) Kendall's tau from sample data.
+        :return: (float) The associated theta hat for this very copula.
+        """
+        # N14 has a closed form solution
+        result = (1 + tau) / (2 - 2 * tau)
+        return result
 
 class Gaussian(Copula):
     """Bivariate Gaussian Copula."""
@@ -834,11 +986,28 @@ class Gaussian(Copula):
 
         return result
 
+    def _get_param(self):
+        """
+        Get the name and parameter(s) for this copula instance.
+
+        :return: (dict) Name and parameters for this copula.
+        """
+        descriptive_name = 'Bivariate Gaussian Copula'
+        class_name = 'Gaussian'
+        cov = self.cov
+        rho = self.rho
+        info_dict = {'Descriptive Name': descriptive_name,
+                     'Class Name': class_name,
+                     'cov': cov,
+                     'rho': rho}
+        return info_dict
+
     def c(self, u: int, v: int):
         """
         Calculate probability density of the biavriate copula: P(U=u, V=v).
 
         Result is analytical.
+
         :param u: (float) A real number in [0, 1].
         :param v: (float) A real number in [0, 1].
         :return: (float) The probability density (aka copula density).
@@ -855,6 +1024,7 @@ class Gaussian(Copula):
         Calculate cumulative density of the bivariate copula: P(U<=u, V<=v).
 
         Result is analytical.
+
         :param u: (float) A real number in [0, 1].
         :param v: (float) A real number in [0, 1].
         :return: (float) The culumative density.
@@ -897,7 +1067,7 @@ class Gaussian(Copula):
         return np.sin(tau * np.pi / 2)
 
 
-class Student:
+class Student(Copula):
     """Bivariate Student-t Copula, need degree of freedom nu."""
 
     def __init__(self, nu: float = None, cov: np.array = None):
@@ -905,6 +1075,7 @@ class Student:
         self.nu = nu  # Degree of freedom.
         # Correlation from covariance matrix.
         self.rho = cov[0][1] / (np.sqrt(cov[0][0]) * np.sqrt(cov[1][1]))
+        super().__init__()
 
     def generate_pairs(self, num: int = None, nu: float = None, cov: np.array = None):
         """
@@ -950,11 +1121,30 @@ class Student:
 
         return result
 
+    def _get_param(self):
+        """
+        Get the name and parameter(s) for this copula instance.
+
+        :return: (dict) Name and parameters for this copula.
+        """
+        descriptive_name = r'Bivariate Student-t Copula'
+        class_name = r'Student'
+        cov = self.cov
+        rho = self.rho
+        nu = self.nu
+        info_dict = {'Descriptive Name': descriptive_name,
+                     'Class Name': class_name,
+                     'cov': cov,
+                     'rho': rho,
+                     'nu (degrees of freedom)': nu}
+        return info_dict
+
     def c(self, u: float, v: float):
         """
         Calculate probability density of the biavriate copula: P(U=u, V=v).
 
         Result is analytical.
+
         :param u: (float) A real number in [0, 1].
         :param v: (float) A real number in [0, 1].
         :return: (float) The probability density (aka copula density).
@@ -983,6 +1173,7 @@ class Student:
         Calculate cumulative density of the bivariate copula: P(U<=u, V<=v).
 
         Result is analytical.
+
         :param u: (float) A real number in [0, 1].
         :param v: (float) A real number in [0, 1].
         :return: (float) The culumative density.
