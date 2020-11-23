@@ -7,7 +7,6 @@ Sarmento and Nuno Horta in `"A Machine Learning based Pairs Trading Investment S
 """
 
 import pandas as pd
-import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 
@@ -52,7 +51,7 @@ class QuantileTimeSeriesTradingStrategy:
         """
         Plot kde-plots of positive and negative differences vs long/short thresholds.
         """
-        figure, axes = plt.subplots(1, 2, figsize=(10, 8), sharey=True)
+        _, axes = plt.subplots(1, 2, figsize=(10, 8), sharey=True)
         # Positive differences plot
         sns.kdeplot(self.positive_differences, shade=True, color="green", ax=axes[0],
                     label='threshold: {}'.format(self.long_diff_threshold.round(4)))
@@ -67,29 +66,29 @@ class QuantileTimeSeriesTradingStrategy:
 
     def get_allocation(self, current_value: float, prediction: float, exit_threshold: float = 0) -> int:
         """
-        Get target allocation (-1, 0, 1) based on current spread value, predicted value and exit treshold. -1/1 means
+        Get target allocation (-1, 0, 1) based on current spread value, predicted value and exit threshold. -1/1 means
         either to open a new short/long position or stay in long/short trade (if the position has been already opened).
-        0 means exit the positon.
+        0 means exit the position.
         :param current_value: (float) Current spread value.
         :param prediction: (float) Predicted spread value.
         :param exit_threshold: (float) Difference between predicted and current value threshold to close the trade.
-        :return: (int) -1 (short), 0 (exit the position/stay in cash), 1(long) trade signal.
+        :return: (int) -1 (short), 0 (exit current position/stay in cash), 1(long) trade signal.
         """
         # New position entry
+        return_flag = 0
         predicted_difference = prediction - current_value
         if predicted_difference >= self.long_diff_threshold:
-            self.positions.append(1)
-            return 1
+            return_flag = 1
         elif predicted_difference <= self.short_diff_threshold:
-            self.positions.append(-1)
-            return -1
+            return_flag = -1
 
         if self.positions[-1] == 1 and predicted_difference > exit_threshold:
-            self.positions.append(1)
-            return 1
+            return_flag = 1
         elif self.positions[-1] == -1 and predicted_difference <= exit_threshold:
-            self.positions.append(-1)
-            return -1
+            return_flag = -1
         else:
             self.positions.append(0)
-            return 0
+            return_flag = 0
+
+        self.positions.append(return_flag)
+        return return_flag
