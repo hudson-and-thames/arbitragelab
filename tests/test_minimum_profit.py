@@ -101,8 +101,6 @@ class TestMinimumProfit(unittest.TestCase):
 
         optimizer = MinimumProfit(self.no_coint_data)
 
-        good_opti
-
         train_df, _ = train_test_split(optimizer.price_df, date_cutoff=pd.Timestamp(2020, 1, 1))
         with self.assertWarnsRegex(Warning, 'ADF'):
             beta_eg, _, _, _ = optimizer.fit(train_df, sig_level="95%", use_johansen=False)
