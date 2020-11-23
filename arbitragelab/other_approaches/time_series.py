@@ -75,7 +75,6 @@ class QuantileTimeSeriesTradingStrategy:
         :return: (int) -1 (short), 0 (exit current position/stay in cash), 1(long) trade signal.
         """
         # New position entry
-        return_flag = 0
         predicted_difference = prediction - current_value
         if predicted_difference >= self.long_diff_threshold:
             return_flag = 1
@@ -87,7 +86,6 @@ class QuantileTimeSeriesTradingStrategy:
         elif self.positions[-1] == -1 and predicted_difference <= exit_threshold:
             return_flag = -1
         else:
-            self.positions.append(0)
             return_flag = 0
 
         self.positions.append(return_flag)
