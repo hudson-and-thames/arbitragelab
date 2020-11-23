@@ -80,10 +80,9 @@ class QuantileTimeSeriesTradingStrategy:
             return_flag = 1
         elif predicted_difference <= self.short_diff_threshold:
             return_flag = -1
-
-        if self.positions[-1] == 1 and predicted_difference > exit_threshold:
+        elif len(self.positions) > 0 and self.positions[-1] == 1 and predicted_difference > exit_threshold:
             return_flag = 1
-        elif self.positions[-1] == -1 and predicted_difference <= exit_threshold:
+        elif len(self.positions) > 0 and self.positions[-1] == -1 and predicted_difference <= exit_threshold:
             return_flag = -1
         else:
             return_flag = 0
