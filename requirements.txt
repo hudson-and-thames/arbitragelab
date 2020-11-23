@@ -16,6 +16,4 @@ sphinx==2.2.1 # Docs
 sphinx-rtd-theme==0.4.3 # Docs
 releases==1.6.3 # Docs
 
-arbitragelab~=0.0.1
-setuptools~=49.2.0
 tqdm~=4.47.0
