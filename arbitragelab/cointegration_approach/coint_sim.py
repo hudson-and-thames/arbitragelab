@@ -9,13 +9,15 @@ This module allows simulation of cointegrated time series pairs.
 
 from typing import Tuple, Optional
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
+
 from arbitragelab.cointegration_approach.engle_granger import EngleGrangerPortfolio
 
 
-class MinimumProfitSimulation:
+class CointegrationSimulation:
     """
     This is a class that can be used to simulate cointegrated price series pairs.
 
@@ -358,3 +360,29 @@ class MinimumProfitSimulation:
         # Calculate the standard and mean of the hedge ratio of all simulated series
         betas = np.array(betas_list)
         return betas.mean(), betas.std()
+
+    @staticmethod
+    def plot_coint_series(series_x: np.array, series_y: np.array, coint_error: np.array,
+                          figw: float = 15., figh: float = 10.):
+        """
+        Plot the simulated cointegrated series.
+
+        :param series_x: (np.array) Price series of share S1
+        :param series_y: (np.array) price series of share S2
+        :param coint_error: (np.array) Cointegration error.
+        :param figw: (float) Figure width.
+        :param figh: (float) Figure height.
+        """
+        fig, [ax1, ax2] = plt.subplots(2, 1, sharex=True, figsize=(figw, figh), gridspec_kw={'height_ratios': [2.5, 1]})
+
+        # Plot prices
+        ax1.plot(series_x, label="Share S1")
+        ax1.plot(series_y, label="Share S2")
+        ax1.legend(loc='best', fontsize=12)
+        ax1.tick_params(axis='y', labelsize=14)
+
+        # Plot cointegration error
+        ax2.plot(coint_error, label='spread')
+        ax2.legend(loc='best', fontsize=12)
+
+        return fig

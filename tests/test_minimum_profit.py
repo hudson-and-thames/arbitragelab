@@ -28,27 +28,39 @@ class TestMinimumProfit(unittest.TestCase):
         Set up the data and parameters.
 
         Data: ANZ-ADB daily data (1/1/2001 - 8/30/2002)
+        Data: XLF-XLK daily data (1/1/2018 - 11/17/2020)
         :return:
         """
         np.random.seed(50)
         project_path = os.path.dirname(__file__)
         data_path = project_path + '/test_data/ANZ-ADB.csv'
+        no_coint_path = project_path + '/test_data/XLF-XLK.csv'
+
+        # Normal data
         self.data = pd.read_csv(data_path, parse_dates=['Date'])
         self.data.set_index("Date", inplace=True)
 
+        # Data with missing columns or extra columns
         self.faulty_data = deepcopy(self.data)
         self.faulty_data = self.faulty_data.assign(AAPL=np.random.standard_normal(len(self.faulty_data)))
         self.faulty_data2 = self.data[['ANZ']]
+
+        # Data that are not cointegrated
+        self.no_coint_data = pd.read_csv(no_coint_path, parse_dates=['Date'])
+        self.no_coint_data.set_index("Date", inplace=True)
 
     def test_init(self):
         """
         Unit tests for constructor.
         """
 
-        optimizer = MinimumProfit(self.data, "ANZ", "ADB")
+        optimizer = MinimumProfit(self.data)
         self.assertEqual(optimizer.price_df.shape[1], 2)
 
+        # Test a dataframe with 3 columns
         self.assertRaises(Exception, MinimumProfit, self.faulty_data)
+
+        # Test a dataframe with 1 column
         self.assertRaises(Exception, MinimumProfit, self.faulty_data2)
 
     def test_fit(self):
@@ -56,9 +68,7 @@ class TestMinimumProfit(unittest.TestCase):
         Unit tests for cointegration coefficient calculation.
         """
 
-        print("Test fit():")
-
-        optimizer = MinimumProfit(self.data, "ANZ", "ADB")
+        optimizer = MinimumProfit(self.data)
 
         train_df, _ = train_test_split(optimizer.price_df, date_cutoff=pd.Timestamp(2002, 1, 1))
         beta_eg, epsilon_t_eg, ar_coeff_eg, ar_resid_eg = optimizer.fit(train_df, use_johansen=False)
@@ -84,6 +94,23 @@ class TestMinimumProfit(unittest.TestCase):
         self.assertTrue(error_eg < 0.02)
         self.assertTrue(error_jo < 0.02)
 
+    def test_fit_warning(self):
+        """
+        Unit tests for warnings triggered when the series pair is not cointegrated.
+        """
+
+        optimizer = MinimumProfit(self.no_coint_data)
+
+        train_df, _ = train_test_split(optimizer.price_df, date_cutoff=pd.Timestamp(2020, 1, 1))
+        with self.assertWarnsRegex(Warning, 'ADF'):
+            beta_eg, _, _, _ = optimizer.fit(train_df, sig_level="95%", use_johansen=False)
+        with self.assertWarnsRegex(Warning, 'eigen'):
+            beta_jo, _, _, _ = optimizer.fit(train_df, sig_level="90%", use_johansen=True)
+        with self.assertWarnsRegex(Warning, 'trace'):
+            beta_jo, _, _, _ = optimizer.fit(train_df, sig_level="99%", use_johansen=True)
+        with self.assertRaises(ValueError):
+            _, _, _, _ = optimizer.fit(train_df, sig_level="91%", use_johansen=True)
+
     def test_optimize(self):
         """
         Unit test for optimization procedure.
@@ -91,7 +118,6 @@ class TestMinimumProfit(unittest.TestCase):
         Use specified parameters here instead of fit from data.
         """
 
-        print("Test optimize():")
         # Use an empty Dataframe to initialize an instance of optimizer
         empty_df = pd.DataFrame(columns=['Share S1', 'Share S2'])
         optimizer = MinimumProfit(empty_df)
@@ -118,8 +144,7 @@ class TestMinimumProfit(unittest.TestCase):
         Unit tests for trade signal generation.
         """
 
-        print("Test trade_signal():")
-        optimizer = MinimumProfit(self.data, "ANZ", "ADB")
+        optimizer = MinimumProfit(self.data)
 
         # Split data into training and test set
         train_df, trade_df = train_test_split(optimizer.price_df,
@@ -136,9 +161,14 @@ class TestMinimumProfit(unittest.TestCase):
                                                                                   ar_resid_eg,
                                                                                   trade_days)
 
+        # Exception check
+        with self.assertRaises(Exception):
+            _, _, _ = optimizer.trade_signal(trade_df, optimal_ub, optimal_ub - 0.05,
+                                             beta_eg, epsilon_t_eg)
+
         # Generate trade_signal
-        trade_signals, num_of_shares = optimizer.trade_signal(trade_df, optimal_ub, optimal_mtp,
-                                                              beta_eg, epsilon_t_eg)
+        trade_signals, num_of_shares, cond_values = optimizer.trade_signal(trade_df, optimal_ub, optimal_mtp,
+                                                                           beta_eg, epsilon_t_eg)
 
         # Check if trade signals are correctly stored in the dataframe
         self.assertTrue("otc_U" in trade_signals.columns)
@@ -150,7 +180,10 @@ class TestMinimumProfit(unittest.TestCase):
         self.assertEqual(num_of_shares[0], 8)
         self.assertEqual(num_of_shares[1], 13)
 
-
+        # Check if the condition values are calculated correctly
+        self.assertAlmostEqual(cond_values[0], 4.05987711757588)
+        self.assertAlmostEqual(cond_values[1], 4.34987711757588)
+        self.assertAlmostEqual(cond_values[2], 4.63987711757588)
 
 
 

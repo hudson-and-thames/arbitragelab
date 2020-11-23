@@ -2,7 +2,7 @@
 numpy==1.18.5
 pandas==1.0.4
 scipy==1.5.4
-statsmodels==0.12.1
+statsmodels~=0.11.1
 scikit-learn==0.23.1
 matplotlib==3.2.1
 cython==0.29.21
@@ -15,3 +15,7 @@ pylint==2.5.3
 sphinx==2.2.1 # Docs
 sphinx-rtd-theme==0.4.3 # Docs
 releases==1.6.3 # Docs
+
+arbitragelab~=0.0.1
+setuptools~=49.2.0
+tqdm~=4.47.0
