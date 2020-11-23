@@ -71,8 +71,8 @@ class TestMinimumProfit(unittest.TestCase):
         optimizer = MinimumProfit(self.data)
 
         train_df, _ = train_test_split(optimizer.price_df, date_cutoff=pd.Timestamp(2002, 1, 1))
-        beta_eg, epsilon_t_eg, ar_coeff_eg, ar_resid_eg = optimizer.fit(train_df, use_johansen=False)
-        beta_jo, epsilon_t_jo, ar_coeff_jo, ar_resid_jo = optimizer.fit(train_df, use_johansen=True)
+        beta_eg, epsilon_t_eg, ar_coeff_eg, ar_resid_eg = optimizer.fit(train_df, sig_level="90%", use_johansen=False)
+        beta_jo, epsilon_t_jo, ar_coeff_jo, ar_resid_jo = optimizer.fit(train_df, sig_level="90%", use_johansen=True)
 
         # Check the AR(1) coefficient and cointegration coefficient
         self.assertAlmostEqual(beta_eg, -1.8378837809650117)
@@ -100,6 +100,8 @@ class TestMinimumProfit(unittest.TestCase):
         """
 
         optimizer = MinimumProfit(self.no_coint_data)
+
+        good_opti
 
         train_df, _ = train_test_split(optimizer.price_df, date_cutoff=pd.Timestamp(2020, 1, 1))
         with self.assertWarnsRegex(Warning, 'ADF'):
