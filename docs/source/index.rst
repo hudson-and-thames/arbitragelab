@@ -54,6 +54,13 @@ This project is licensed under an all rights reserved licence.
 
 .. toctree::
     :maxdepth: 2
+    :caption: Data
+    :hidden:
+
+    data/data_importer
+
+.. toctree::
+    :maxdepth: 2
     :caption: Distance Approach
     :hidden:
 
@@ -105,14 +112,6 @@ This project is licensed under an all rights reserved licence.
 
     ml_approach/introduction
     ml_approach/ml_based_pairs_selection
-
-
-.. toctree::
-    :maxdepth: 2
-    :caption: Utils
-    :hidden:
-
-    utils/data_importer
 
 .. toctree::
     :maxdepth: 3

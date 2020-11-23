@@ -223,3 +223,23 @@ The following research notebook can be used to better understand the Pairs Selec
 * `ML based Pairs Selection`_
 
 .. _`ML based Pairs Selection`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/ml_approach/ml_based_pairs_selection.ipynb
+
+
+References
+##########
+
+* `Sarmento, S.M. and Horta, N., A Machine Learning based Pairs Trading Investment Strategy. <https://www.springer.com/gp/book/9783030472504>`__
+
+* `Avellaneda, M. and Lee, J.H., 2010. Statistical arbitrage in the US equities market. Quantitative Finance, 10(7), pp.761-782. <https://doi.org/10.1080/14697680903124632>`_
+
+* `Bellman, R., 1966. Dynamic programming. Science, 153(3731), pp.34-37. <https://doi.org/10.1126/science.153.3731.34>`__
+
+* `Berkhin, P., 2006. A survey of clustering data mining techniques. In Grouping multidimensional data (pp. 25-71). Springer, Berlin, Heidelberg. <https://doi.org/10.1007/3-540-28349-8_2>`__
+
+* `Rahmah, N. and Sitanggang, I.S., 2016, January. Determination of optimal epsilon (eps) value on dbscan algorithm to clustering data on peatland hotspots in sumatra. In IOP Conference Series: Earth and Environmental Science (Vol. 31, No. 1, p. 012012). IOP Publishing. <https://doi.org/10.1088/1755-1315/31/1/012012>`__
+
+* `Armstrong, J.S. ed., 2001. Principles of forecasting: a handbook for researchers and practitioners (Vol. 30). Springer Science & Business Media. <http://doi.org/10.1007/978-0-306-47630-3>`__
+
+* `Hoel, C.H., 2013. Statistical arbitrage pairs: can cointegration capture market neutral profits? (Master's thesis). <https://core.ac.uk/download/pdf/52072275.pdf>`__
+
+* `Gregory, I., Ewald, C.O. and Knox, P., 2010, November. Analytical pairs trading under different assumptions on the spread and ratio dynamics. In 23rd Australasian Finance and Banking Conference. <http://dx.doi.org/10.2139/ssrn.1663703>`__

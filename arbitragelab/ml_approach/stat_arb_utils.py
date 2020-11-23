@@ -1,6 +1,6 @@
 # Copyright 2019, Hudson and Thames Quantitative Research
 # All rights reserved
-# Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
+# Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 """
 This module houses utility functions used by the PairsSelector.
 """
@@ -75,7 +75,7 @@ def _outer_ou_loop(spreads_df: pd.DataFrame, test_period: str,
 
     return pd.DataFrame(ou_results, index=molecule, columns=['hl', 'crossovers'])
 
-def linear_f(beta: np.array, x_variable: np.array) -> np.array:
+def _linear_f(beta: np.array, x_variable: np.array) -> np.array:
     """
     This is the helper linear model that is going to be used in the Orthogonal Regression.
 
@@ -103,7 +103,7 @@ def _outer_cointegration_loop(prices_df: pd.DataFrame, molecule: list) -> pd.Dat
         autolag = "aic"
         trend = "c"
 
-        linear = Model(linear_f)
+        linear = Model(_linear_f)
         mydata = RealData(prices_df.loc[:, pair[0]], prices_df.loc[:, pair[1]])
         myodr = ODR(mydata, linear, beta0=[1., 2.])
         res_co = myodr.run()

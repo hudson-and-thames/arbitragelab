@@ -1,11 +1,12 @@
 # Copyright 2019, Hudson and Thames Quantitative Research
 # All rights reserved
-# Read more: https://github.com/hudson-and-thames/arbitragelab/blob/master/LICENSE.txt
+# Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 """
 Tests functionality of Indexed Highlighter:
 utils/indexed_highlight.py
 """
 
+import warnings
 import unittest
 from unittest.mock import Mock
 
@@ -20,6 +21,10 @@ class TestIndexedHighlight(unittest.TestCase):
         """
         Tests Initial instantiation of the IndexedHighlighter class.
         """
+
+        # This is here to hide 'deprecated in Matplotlib 3.1' warnings. The
+        # functions mentioned here are needed for backward compatibility.
+        warnings.simplefilter("ignore")
 
         placeholder_annotation = Mock()
         placeholder_annotation.xyann = [0, 0]

@@ -1,6 +1,6 @@
 # Copyright 2019, Hudson and Thames Quantitative Research
 # All rights reserved
-# Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
+# Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 """
 This module implements the ML based Pairs Selection Framework described by Simão Moraes
 Sarmento and Nuno Horta in `"A Machine Learning based Pairs Trading Investment Strategy." <http://premio-vidigal.inesc.pt/pdf/SimaoSarmentoMSc-resumo.pdf>`__.
@@ -27,7 +27,7 @@ class PairsSelector:
     `"A Machine Learning based Pairs Trading Investment Strategy."
     <http://premio-vidigal.inesc.pt/pdf/SimaoSarmentoMSc-resumo.pdf>`__.
 
-    The method consists of three parts; dimensionality reduction, clustering of features and
+    The method consists of three parts: dimensionality reduction, clustering of features and
     finally the selection of pairs with the use of a set of heuristics.
     """
 
@@ -86,10 +86,12 @@ class PairsSelector:
         self.feature_vector.columns = returns_df.columns
         self.feature_vector = self.feature_vector.T
 
-    def plot_pca_matrix(self) -> list:
+    def plot_pca_matrix(self, alpha: float = 0.2, figsize: tuple = (15, 15)) -> list:
         """
         Plots the feature vector on a scatter matrix.
 
+        :param alpha: (float) Opacity level to be used in the plot.
+        :param figsize: (tuple) Tuple describing the size of the plot.
         :return: (list) List of Axes objects.
         """
 
@@ -99,7 +101,7 @@ class PairsSelector:
         feature_vector.columns = cols
 
         axes = pd.plotting.scatter_matrix(
-            feature_vector, alpha=0.2, figsize=(15, 15))
+            feature_vector, alpha=alpha, figsize=figsize)
 
         new_labels = [round(float(i.get_text()), 2)
                       for i in axes[0, 0].get_yticklabels()]
@@ -107,25 +109,25 @@ class PairsSelector:
 
         return axes
 
-    def cluster_using_optics(self, args: dict):
+    def cluster_using_optics(self, **kwargs: dict):
         """
         Second step of the framework;
 
         Doing Unsupervised Learning on the feature vector supplied from the first step.
         The clustering method used is OPTICS, chosen mainly for it being basically parameterless.
 
-        :param args: (dict) Arguments to be passed to the clustering algorithm.
+        :param kwargs: (dict) Arguments to be passed to the clustering algorithm.
         """
 
         if self.feature_vector is None:
             raise Exception("The needed feature vector has not been computed yet.",
                             "Please run dimensionality_reduction() before this method.")
 
-        clust = OPTICS(**args)
+        clust = OPTICS(**kwargs)
         clust.fit(self.feature_vector)
         self.clust_labels_ = clust.labels_
 
-    def cluster_using_dbscan(self, args: dict):
+    def cluster_using_dbscan(self, **kwargs: dict):
         """
         Second step of the framework;
 
@@ -133,21 +135,23 @@ class PairsSelector:
         second clustering method used is DBSCAN, for when the user needs a more hands-on approach
         to doing the clustering step, given the parameter sensitivity of this method.
 
-        :param args: (dict) Arguments to be passed to the clustering algorithm.
+        :param kwargs: (dict) Arguments to be passed to the clustering algorithm.
         """
 
         if self.feature_vector is None:
             raise Exception("The needed feature vector has not been computed yet.",
                             "Please run dimensionality_reduction() before this method.")
 
-        clust = DBSCAN(**args)
+        clust = DBSCAN(**kwargs)
         clust.fit(self.feature_vector)
         self.clust_labels_ = clust.labels_
 
     def plot_clustering_info(self, n_dimensions: int = 2, method: str = "",
                              figsize: tuple = (10, 10)) -> Axes:
         """
-        Plots the clusters found on a scatter plot.
+        Reduces the feature vector found in the dimensionality reduction step, further
+        down to the specified 'n_dimensions' argument using TSNE and then plots the
+        clusters found, on a scatter plot.
 
         :param n_dimensions: (int) Selected dimension to be used in the T-SNE plot.
         :param method: (str) String to be used as title in the plot.
@@ -155,14 +159,19 @@ class PairsSelector:
         :return: (Axes) Axes object.
         """
 
+        # First we check if the feature vector is empty or else we don't have anything
+        # to plot.
         if self.feature_vector is None:
             raise Exception("The needed feature vector has not been computed yet.",
                             "Please run dimensionality_reduction() before this method.")
 
+        # Check if there are enough clusters.
         if len(self.clust_labels_) == 0:
             raise Exception("The needed cluster labels have not been computed yet.",
                             "Please run cluster() before this method.")
 
+        # The plotting methods support both 2d and 3d representations, so here we limit
+        # the users choice to either 2 or 3 dimensions.
         if (n_dimensions > 3) or (n_dimensions < 1):
             raise Exception("Select a valid dimension! (more than 1 and less than 3).")
 
@@ -244,6 +253,7 @@ class PairsSelector:
 
         ax_object = fig.add_subplot(111)
 
+        # Set spine styling.
         ax_object.spines['left'].set_position('center')
         ax_object.spines['left'].set_alpha(0.3)
         ax_object.spines['bottom'].set_position('center')
@@ -257,21 +267,32 @@ class PairsSelector:
 
         paths_collection = []
 
+        # For each cluster.
         for cluster in range(0, no_of_classes):
+
+            # Get specific cluster data from the tsne process dataframe.
             cluster_data = tsne_df[self.clust_labels_ == cluster]
 
+            # Plot the cluster data by column index [0, 1] -> [x, y].
             paths = ax_object.plot(cluster_data.loc[:, 0], cluster_data.loc[:, 1],
                                    label=list(cluster_data.index), markersize=30,
                                    alpha=0.75, marker='.', linestyle='None')
 
+            # Stash the list of Line2D objects for future use.
             paths_collection.append(paths)
 
+        # Flatten the paths array and instantiate the IndexedHighlight class
+        # that will manage the selection and highlighting of the plotted
+        # clusters.
         IndexedHighlight(np.ravel(paths_collection),
                          formatter='{label}'.format)
 
+        # Plot the noisy samples which are not included in a leaf cluster labelled as -1,
+        # by column index [0, 1] -> [x, y].
         ax_object.plot(tsne_df.iloc[self.clust_labels_ == -1, 0],
                        tsne_df.iloc[self.clust_labels_ == -1, 1], 'k+', alpha=0.1)
 
+        # Set the chart title.
         ax_object.set_title('Automatic Clustering\n' + method)
 
         plt.show()

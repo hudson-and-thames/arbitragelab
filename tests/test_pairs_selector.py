@@ -1,6 +1,6 @@
 # Copyright 2019, Hudson and Thames Quantitative Research
 # All rights reserved
-# Read more: https://github.com/hudson-and-thames/arbitragelab/blob/master/LICENSE.txt
+# Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 """
 Tests function of ML Pairs Selection module:
 ml_approach/pairs_selector.py
@@ -28,7 +28,7 @@ class TestPairsSelector(unittest.TestCase):
         np.random.seed(0)
 
         project_path = os.path.dirname(__file__)
-        data_path = project_path + '/test_data/data.csv'
+        data_path = project_path + '/test_data/sp100_prices.csv'
         self.data = pd.read_csv(data_path, parse_dates=True, index_col="Date")
         self.data.dropna(inplace=True)
         self.pair_selector = PairsSelector(self.data)
@@ -67,21 +67,21 @@ class TestPairsSelector(unittest.TestCase):
         # Test Optics clustering without any price data.
         with self.assertRaises(Exception):
             pair_selector = PairsSelector(None)
-            pair_selector.cluster_using_optics({})
+            pair_selector.cluster_using_optics()
 
         # Test Dbscan clustering without any price data.
         with self.assertRaises(Exception):
             pair_selector = PairsSelector(None)
-            pair_selector.cluster_using_dbscan({})
+            pair_selector.cluster_using_dbscan()
 
         self.pair_selector.dimensionality_reduction_by_components(2)
 
         # Test number of generate clusters from the methods offered.
 
-        self.pair_selector.cluster_using_optics({'min_samples': 3})
+        self.pair_selector.cluster_using_optics(min_samples=3)
         self.assertEqual(len(np.unique(self.pair_selector.clust_labels_)), 16)
 
-        self.pair_selector.cluster_using_dbscan({'eps': 0.03, 'min_samples': 3})
+        self.pair_selector.cluster_using_dbscan(eps=0.03, min_samples=3)
         self.assertEqual(len(np.unique(self.pair_selector.clust_labels_)), 1)
 
     def test_generate_pairwise_combinations(self):
@@ -91,7 +91,7 @@ class TestPairsSelector(unittest.TestCase):
 
         # Setup initial variables needed for the test.
         self.pair_selector.dimensionality_reduction_by_components(2)
-        self.pair_selector.cluster_using_optics({'min_samples': 3})
+        self.pair_selector.cluster_using_optics(min_samples=3)
 
         init_labels = self.pair_selector.clust_labels_
         c_labels = np.unique(init_labels[init_labels != -1])
@@ -114,7 +114,7 @@ class TestPairsSelector(unittest.TestCase):
 
         # Setup initial variables needed for the test.
         self.pair_selector.dimensionality_reduction_by_components(2)
-        self.pair_selector.cluster_using_optics({'min_samples': 3})
+        self.pair_selector.cluster_using_optics(min_samples=3)
 
         # Setup needed information to validate the hurst criterion return.
         hedge_ratios = [0.832406370860649, 70]
@@ -137,7 +137,7 @@ class TestPairsSelector(unittest.TestCase):
 
         # Setup initial variables needed for the test.
         self.pair_selector.dimensionality_reduction_by_components(2)
-        self.pair_selector.cluster_using_optics({'min_samples': 3})
+        self.pair_selector.cluster_using_optics(min_samples=3)
 
         hedge_ratios = [0.832406370860649, 70]
         idx = [('A', 'AVB'), ('ABMD', 'AZO')]
@@ -171,7 +171,7 @@ class TestPairsSelector(unittest.TestCase):
 
         # Setup initial variables needed for the test.
         self.pair_selector.dimensionality_reduction_by_components(2)
-        self.pair_selector.cluster_using_optics({'min_samples': 3})
+        self.pair_selector.cluster_using_optics(min_samples=3)
 
         final_pairs = [('BA', 'CF')]
         coint_pairs = [('ABMD', 'AZO'), ('AES', 'BBY'), ('BKR', 'CE')]
@@ -279,7 +279,7 @@ class TestPairsSelector(unittest.TestCase):
 
         # Setup initial variables needed for the test.
         self.pair_selector.dimensionality_reduction_by_components(1)
-        self.pair_selector.cluster_using_optics({'min_samples': 3})
+        self.pair_selector.cluster_using_optics(min_samples=3)
 
         # Test knee plot return object.
         knee_plot_pyplot_obj = self.pair_selector.plot_knee_plot()
