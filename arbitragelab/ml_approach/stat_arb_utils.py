@@ -5,6 +5,7 @@
 This module houses utility functions used by the PairsSelector.
 """
 
+import sys
 import pandas as pd
 import numpy as np
 import statsmodels.api as sm
@@ -12,8 +13,37 @@ from statsmodels.tsa.adfvalues import mackinnonp
 from statsmodels.tsa.stattools import adfuller
 from scipy.odr import ODR, Model, RealData
 
+
+def _print_progress(iteration, max_iterations, prefix='', suffix='', decimals=1, bar_length=50):
+    # pylint: disable=expression-not-assigned
+    """
+    Calls in a loop to create a terminal progress bar.
+    https://gist.github.com/aubricus/f91fb55dc6ba5557fbab06119420dd6a
+    :param iteration: (int) Current iteration.
+    :param max_iterations: (int) Maximum number of iterations.
+    :param prefix: (str) Prefix string.
+    :param suffix: (str) Suffix string.
+    :param decimals: (int) Positive number of decimals in percent completed.
+    :param bar_length: (int) Character length of the bar.
+    """
+    str_format = "{0:." + str(decimals) + "f}"
+    # Calculate the percent completed.
+    percents = str_format.format(100 * (iteration / float(max_iterations)))
+    # Calculate the length of bar.
+    filled_length = int(round(bar_length * iteration / float(max_iterations)))
+    # Fill the bar.
+    block = '█' * filled_length + '-' * (bar_length - filled_length)
+    # Print new line.
+    sys.stdout.write('\r%s |%s| %s%s %s' % (prefix, block, percents, '%', suffix)),
+
+    if iteration == max_iterations:
+        sys.stdout.write('\n')
+    sys.stdout.flush()
+
+
 def _outer_ou_loop(spreads_df: pd.DataFrame, test_period: str,
                    cross_overs_per_delta: int, molecule: list) -> pd.DataFrame:
+    # pylint: disable=too-many-locals
     """
     This function gets mean reversion calculations (half-life and number of
     mean cross overs) for each pair in the molecule. Uses the linear regression
@@ -34,7 +64,7 @@ def _outer_ou_loop(spreads_df: pd.DataFrame, test_period: str,
 
     ou_results = []
 
-    for pair in molecule:
+    for iteration, pair in enumerate(molecule):
 
         spread = spreads_df.loc[:, str(pair)]
         lagged_spread = spread.shift(1).dropna(0)
@@ -73,6 +103,9 @@ def _outer_ou_loop(spreads_df: pd.DataFrame, test_period: str,
         # Append half-life and number of cross overs.
         ou_results.append([np.log(2) / abs(res.params[0]), cross_overs])
 
+        _print_progress(iteration + 1, len(molecule), prefix='Outer OU Loop Progress:',
+                        suffix='Complete')
+
     return pd.DataFrame(ou_results, index=molecule, columns=['hl', 'crossovers'])
 
 def _linear_f(beta: np.array, x_variable: np.array) -> np.array:
@@ -98,7 +131,7 @@ def _outer_cointegration_loop(prices_df: pd.DataFrame, molecule: list) -> pd.Dat
 
     cointegration_results = []
 
-    for pair in molecule:
+    for iteration, pair in enumerate(molecule):
         maxlag = None
         autolag = "aic"
         trend = "c"
@@ -115,6 +148,9 @@ def _outer_cointegration_loop(prices_df: pd.DataFrame, molecule: list) -> pd.Dat
 
         cointegration_results.append((res_adf[0], pval_asy,
                                       res_co.beta[0], res_co.beta[1]))
+
+        _print_progress(iteration + 1, len(molecule), prefix='Outer Cointegration Loop Progress:',
+                        suffix='Complete')
 
     return pd.DataFrame(cointegration_results,
                         index=molecule,
