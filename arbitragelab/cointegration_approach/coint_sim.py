@@ -160,14 +160,14 @@ class CointegrationSimulation:
             ar_coeff = params['ar_coeff']
             white_noise_var = params['white_noise_var']
         except KeyError:
-            print("Missing crucial parameters. The parameter dictionary should contain"
-                  " the following keys:\n"
-                  "1. constant_trend\n"
-                  "2. ar_coeff\n"
-                  "3. white_noise_var\n"
-                  "Call initialize_params() to reset the configuration of the "
-                  "parameters to default.")
-            raise
+
+            raise KeyError("Missing crucial parameters. The parameter dictionary should contain"
+                           " the following keys:\n"
+                           "1. constant_trend\n"
+                           "2. ar_coeff\n"
+                           "3. white_noise_var\n"
+                           "Call initialize_params() to reset the configuration of the "
+                           "parameters to default.")
 
         # If using statsmodel
         if use_statsmodel:

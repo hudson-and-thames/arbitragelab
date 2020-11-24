@@ -105,8 +105,11 @@ class MinimumProfit:
         epsilon_t = train_df.iloc[:, 0] + beta * train_df.iloc[:, 1]
 
         # Fit an AR(1) model to find the AR(1) coefficient
-        ar_fit = sm.tsa.ARMA(epsilon_t, (1, 0)).fit(trend='c', disp=0)
-        _, ar_coeff = ar_fit.params
+
+        with warnings.catch_warnings():  # Silencing specific Statsmodels ValueWarning
+            warnings.filterwarnings('ignore', r'A date index has been provided,')
+            ar_fit = sm.tsa.ARMA(epsilon_t, (1, 0)).fit(trend='c', disp=0)
+            _, ar_coeff = ar_fit.params
 
         return beta, epsilon_t, ar_coeff, ar_fit.resid
 
