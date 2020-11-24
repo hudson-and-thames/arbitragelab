@@ -30,7 +30,7 @@ average number of trades based on the mean first-passage time.
 
 A few assumptions have been made:
 
-- The price of two assets (:math:`S1` and :math:`S2`) are cointegrated over the relevant time period, which includes both in-sample and out-of-sample (trading) period.
+- The price of two assets (:math:`S_1` and :math:`S_2`) are cointegrated over the relevant time period, which includes both in-sample and out-of-sample (trading) period.
 - The cointegration error follows a stationary AR(1) process.
 - The cointegration error is symmetrically distributed so that we can apply the optimal boundary on both sides of the mean.
 - Short sales are permitted or possible through a broker and there is no interest charged for the short sales and no cost for trading.
@@ -263,13 +263,18 @@ Example
 
     # Optimize the pre-set boundaries, retrieve optimal upper bound, optimal minimum total profit,
     # and number of trades.
-    optimal_ub, _, _, optimal_mtp, optimal_num_of_trades = optimizer.optimize(ar_coeff_eg, epsilon_t_eg,
-                                                                              ar_resid_eg, len(train_df))
+    optimal_ub, _, _, optimal_mtp, optimal_num_of_trades = optimizer.optimize(ar_coeff_eg,
+                                                                              epsilon_t_eg,
+                                                                              ar_resid_eg,
+                                                                              len(train_df))
 
     # Generate trading signals based on these optimized parameters
     minimum_profit = 100.
-    trade_signals, num_of_shares, cond_values = optimizer.trade_signal(trade_df, optimal_ub, minimum_profit,
-                                                                       beta_eg, epsilon_t_eg)
+    trade_signals, num_of_shares, cond_values = optimizer.trade_signal(trade_df,
+                                                                       optimal_ub,
+                                                                       minimum_profit,
+                                                                       beta_eg,
+                                                                       epsilon_t_eg)
 
 Research Notebooks
 ##################
