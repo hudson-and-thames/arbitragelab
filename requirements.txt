@@ -15,5 +15,3 @@ pylint==2.5.3
 sphinx==2.2.1 # Docs
 sphinx-rtd-theme==0.4.3 # Docs
 releases==1.6.3 # Docs
-
-tqdm~=4.47.0
