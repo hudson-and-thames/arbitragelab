@@ -284,7 +284,7 @@ class MinimumProfit:
         trade_durations = self._mean_passage_time(0, infinity, ar_coeff, ar_resid, granularity)
 
         # For each upper bound, calculate minimum total profit
-        for ub in tqdm(upper_bounds):
+        for iteration, ub in enumerate(upper_bounds):
             # Calculate trade duration
             td = trade_durations.loc[ub]
 
@@ -303,6 +303,9 @@ class MinimumProfit:
             mtp = ub * num_trades
 
             minimum_trade_profit.append((td, iti, mtp, num_trades))
+
+            # Print progress to inform user
+            self._print_progress(iteration + 1, len(upper_bounds), prefix='Progress:', suffix='Complete')
 
         # Find the optimal upper bound
         minimum_trade_profit = np.array(minimum_trade_profit)
