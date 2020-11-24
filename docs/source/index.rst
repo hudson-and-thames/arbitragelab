@@ -84,6 +84,15 @@ This project is licensed under an all rights reserved licence.
 
 .. toctree::
     :maxdepth: 2
+    :caption: Copula Approach
+    :hidden:
+
+    copula_approach/introduction
+    copula_approach/copula_brief_intro
+    copula_approach/trading_strategies
+
+.. toctree::
+    :maxdepth: 2
     :caption: Optimal Mean Reversion
     :hidden:
 

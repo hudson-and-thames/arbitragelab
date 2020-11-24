@@ -21,6 +21,7 @@ from statsmodels.distributions.empirical_distribution import ECDF
 import numpy as np
 import arbitragelab.copula_approach.copula_generate as cg
 
+
 def find_marginal_cdf(x: np.array, empirical: bool = True, **kwargs):
     """
     Find the cumulative density function (CDF). i.e., P(X<=x).

@@ -9,16 +9,19 @@ import numpy as np
 import arbitragelab.copula_approach.copula_generate as cg
 import arbitragelab.copula_approach.copula_calculation as ccalc
 
+
 class CopulaStrategy:
     """
     Analyze a pair of stock prices using copulas.
 
     We use the convention that the spread is defined as stock 1 in relation to stock 2.
     This class provides the following functionalities:
+
         1. Maximum likelihood fitting to training data. User provides the name and necessary parameters.
         2. Use a given copula to generate trading positions based on test data. By default it uses
-        the fitted copula generated in functionality 1.
+           the fitted copula generated in functionality 1.
         3. Scatter plot of a given copula about its probability density.
+
     """
 
     def __init__(self, copula: cg.Copula = None, position_kind: list = None,
@@ -60,10 +63,12 @@ class CopulaStrategy:
         :param if_renew: (bool) Whether use the fitted copula to replace the copula in CopulaStrategy.
         :param kwargs: Input degree of freedom if using Student-t copula. e.g. nu=10.
         :return: (tuple)
-            result_dict: (dict) The name of the copula and its SIC, AIC, HQIC values.
-            copula: (Copula) The fitted copula with parameters satisfying maximum likelihood.
-            s1_cdf: (func) The cumulative density function for stock 1, using training data.
-            s2_cdf: (func) The cumulative density function for stock 2, using training data.
+
+            - result_dict: (dict) The name of the copula and its SIC, AIC, HQIC values.
+            - copula: (Copula) The fitted copula with parameters satisfying maximum likelihood.
+            - s1_cdf: (func) The cumulative density function for stock 1, using training data.
+            - s2_cdf: (func) The cumulative density function for stock 2, using training data.
+
         """
         nu = kwargs.get('nu', None)  # Degree of freedom for Student-t copula.
         num_of_instances = len(s1_series)  # Number of instances.
@@ -232,9 +237,9 @@ class CopulaStrategy:
         :return positions: (np.array) The suggested positions for the given price data.
         """
         # Update the trading thresholds if there are inputs. Otherwise use the default.
-        if upper_threshold is None:
+        if upper_threshold is not None:
             self.upper_threshold = upper_threshold
-        if lower_threshold is None:
+        if lower_threshold is not None:
             self.lower_threshold = lower_threshold
         # Default starting position is no position.
         if start_position is None:
@@ -385,11 +390,11 @@ class CopulaStrategy:
         ax.scatter(result[:, 0], result[:, 1], **plot_kwargs)
         ax.set_aspect('equal', adjustable='box')  # Equal scale in x and y.
         if copula_name in self.theta_copula_names:
-            ax.set_title(r'{} Copula, $\theta={}$'.format(copula_name, my_copula.theta))
+            ax.set_title(r'{} Copula, $\theta={:.3f}$'.format(copula_name, my_copula.theta))
         elif copula_name == "Gaussian":
-            ax.set_title(r'{} Copula, $\rho={}$'.format(copula_name, my_copula.rho))
+            ax.set_title(r'{} Copula, $\rho={:.3f}$'.format(copula_name, my_copula.rho))
         elif copula_name == "Student":
-            ax.set_title(r'Student-t Copula, $\rho={}$, $\nu={}$'.format(my_copula.rho, my_copula.nu))
+            ax.set_title(r'Student-t Copula, $\rho={:.3f}$, $\nu={}$'.format(my_copula.rho, my_copula.nu))
 
     def _generate_trading_signal(self, prob_u1: float, prob_u2: float,
                                  prev_prob_u1: float, prev_prob_u2: float,
@@ -458,7 +463,7 @@ class CopulaStrategy:
         Looks at probabilities, then decide if one should open a trade position.
 
         Note: This function has no information about the current trading position. Hence its decision is solely
-        based on the current probabilities. Higher level classmethods will assemble this information later for
+        based on the current probabilities. Higher level class methods will assemble this information later for
         suggesting a full trading position.
 
         :param prob_u1: (float) Current marginal C.D.F. for stock 1, given stock 2.

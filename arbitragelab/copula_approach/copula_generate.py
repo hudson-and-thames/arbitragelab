@@ -17,6 +17,7 @@ from scipy.stats import norm
 from scipy.integrate import quad
 import numpy as np
 
+
 class Copula:
     """Copula class houses common functions for each coplula subtype."""
 
@@ -38,6 +39,7 @@ class Copula:
         if if_print:
             print(description)
         return description
+
 
 class Gumbel(Copula):
     """Gumbel Copula."""
@@ -233,7 +235,7 @@ class Frank(Copula):
         """
         Generate one pair of vectors from Frank copula.
 
-        :param v1: (float) i.i.d. uniform random variable in [0,1].
+        :param u1: (float) i.i.d. uniform random variable in [0,1].
         :param v2: (float) i.i.d. uniform random variable in [0,1].
         :param theta: (float) Range in [1, +inf), measurement of correlation.
         :return: (tuple) The sampled pair in [0, 1]x[0, 1].
@@ -330,6 +332,7 @@ class Frank(Copula):
         # Numerically find the root.
         result = brentq(lambda theta: kendall_tau(theta) - tau, -100, 100)
         return result
+
 
 class Clayton(Copula):
     """Clayton copula."""
@@ -785,7 +788,8 @@ class N13(Copula):
         result = brentq(lambda theta: kendall_tau(theta) - tau, 1e-7, 100)
         return result
 
-class N14:
+
+class N14(Copula):
     """N14 Copula (Nelsen 14)."""
 
     def __init__(self, threshold: float = 1e-10, theta: float = None):
@@ -941,6 +945,7 @@ class N14:
         # N14 has a closed form solution
         result = (1 + tau) / (2 - 2 * tau)
         return result
+
 
 class Gaussian(Copula):
     """Bivariate Gaussian Copula."""
