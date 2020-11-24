@@ -4,18 +4,19 @@
 
 """
 Tests function of Minimum Profit Condition Optimization module:
-cointegration_approach/minimum_profit_simulation.py
+cointegration_approach/coint_sim.py
 """
 
 import unittest
 from copy import deepcopy
 
+import matplotlib
 import numpy as np
 
-from arbitragelab.cointegration_approach.minimum_profit_simulation import MinimumProfitSimulation
+from arbitragelab.cointegration_approach.coint_sim import CointegrationSimulation
 
 
-class TestMinimumProfitSimulation(unittest.TestCase):
+class TestCointegrationSimulation(unittest.TestCase):
     """
     Test Minimum Profit Condition Optimization module.
     """
@@ -59,7 +60,7 @@ class TestMinimumProfitSimulation(unittest.TestCase):
         """
 
         # 5 time series, each of 100 length
-        simulation = MinimumProfitSimulation(5, 100)
+        simulation = CointegrationSimulation(5, 100)
 
         # Test getters
         self.assertEqual(simulation.get_price_params(), self.default_price_params)
@@ -71,7 +72,7 @@ class TestMinimumProfitSimulation(unittest.TestCase):
         """
 
         # 5 time series, each of 100 length
-        simulation = MinimumProfitSimulation(5, 100)
+        simulation = CointegrationSimulation(5, 100)
 
         # Test correct setters for price
         for key, value in self.normal_price_params.items():
@@ -91,7 +92,7 @@ class TestMinimumProfitSimulation(unittest.TestCase):
         """
 
         # 5 time series, each of 100 length
-        simulation = MinimumProfitSimulation(5, 100)
+        simulation = CointegrationSimulation(5, 100)
 
         abnormal_value = ('alpha', 1.)
         self.assertRaises(KeyError, simulation.set_price_params, *abnormal_value)
@@ -103,7 +104,7 @@ class TestMinimumProfitSimulation(unittest.TestCase):
         """
 
         # 5 time series, each of 100 length
-        simulation = MinimumProfitSimulation(5, 100)
+        simulation = CointegrationSimulation(5, 100)
 
         simulation.load_params(self.normal_price_params, target='price')
         simulation.load_params(self.normal_coint_params, target='coint')
@@ -120,9 +121,8 @@ class TestMinimumProfitSimulation(unittest.TestCase):
         AR(1) coefficients will get compared to designated value.
         """
 
-        print("Test simulate_ar():")
         # 50 time series, each of 250 length
-        simulation = MinimumProfitSimulation(20, 250)
+        simulation = CointegrationSimulation(20, 250)
 
         simulated_manual = simulation.simulate_ar(self.normal_price_params,
                                                   use_statsmodel=False)
@@ -147,7 +147,7 @@ class TestMinimumProfitSimulation(unittest.TestCase):
                           use_statsmodel=True)
 
         # Check when only 1 series is generated
-        sim_special = MinimumProfitSimulation(1, 250)
+        sim_special = CointegrationSimulation(1, 250)
         sim_spec_manual = sim_special.simulate_ar(self.normal_price_params,
                                                   use_statsmodel=False)
         sim_spec_stats = sim_special.simulate_ar(self.normal_price_params,
@@ -163,9 +163,8 @@ class TestMinimumProfitSimulation(unittest.TestCase):
         Cointegration coefficient will be compared to designated value.
         """
 
-        print("Test simulate_coint():")
         # 50 time series, each of 250 length
-        simulation = MinimumProfitSimulation(20, 250)
+        simulation = CointegrationSimulation(20, 250)
         simulation.load_params(self.normal_price_params, target='price')
         simulation.load_params(self.normal_coint_params, target='coint')
 
@@ -190,7 +189,7 @@ class TestMinimumProfitSimulation(unittest.TestCase):
         self.assertAlmostEqual(beta_mean, self.normal_coint_params['beta'], places=3)
 
         # Check when only 1 cointegrated series pair is generated
-        sim_special = MinimumProfitSimulation(1, 250)
+        sim_special = CointegrationSimulation(1, 250)
         manual_s1, manual_s2, manual_coint = sim_special.simulate_coint(initial_price=100.,
                                                                         use_statsmodel=False)
         stats_s1, stats_s2, stats_coint = sim_special.simulate_coint(initial_price=100.,
@@ -208,9 +207,8 @@ class TestMinimumProfitSimulation(unittest.TestCase):
         Unit test for AR(1) process verification.
         """
 
-        print("Test verify_ar():")
         # 50 time series, each of 250 length
-        simulation = MinimumProfitSimulation(20, 250)
+        simulation = CointegrationSimulation(20, 250)
         manual_series = simulation.simulate_ar(self.normal_price_params,
                                                use_statsmodel=False)
         stats_series = simulation.simulate_ar(self.normal_price_params,
@@ -225,7 +223,7 @@ class TestMinimumProfitSimulation(unittest.TestCase):
         self.assertAlmostEqual(sim_ar_coeff_std, 0.05385757005000903, places=4)
 
         # 1 time series, length of 250
-        sim_spec = MinimumProfitSimulation(1, 250)
+        sim_spec = CointegrationSimulation(1, 250)
         manual_series = sim_spec.simulate_ar(self.normal_price_params,
                                              use_statsmodel=False)
         stats_series = sim_spec.simulate_ar(self.normal_price_params,
@@ -244,9 +242,8 @@ class TestMinimumProfitSimulation(unittest.TestCase):
         Unit tests for cointegration coefficient verification.
         """
 
-        print("Test verify_coint():")
         # 50 time series, each of 250 length
-        simulation = MinimumProfitSimulation(20, 250)
+        simulation = CointegrationSimulation(20, 250)
         simulation.load_params(self.normal_price_params, target='price')
         simulation.load_params(self.normal_coint_params, target='coint')
 
@@ -265,7 +262,7 @@ class TestMinimumProfitSimulation(unittest.TestCase):
         self.assertAlmostEqual(sim_beta_coeff_std, 0.0005001308215110697, places=5)
 
         # 1 time series, length of 250
-        sim_spec = MinimumProfitSimulation(1, 250)
+        sim_spec = CointegrationSimulation(1, 250)
         manual_s1, manual_s2, _ = sim_spec.simulate_coint(initial_price=100.,
                                                           use_statsmodel=False)
 
@@ -280,4 +277,13 @@ class TestMinimumProfitSimulation(unittest.TestCase):
         self.assertAlmostEqual(sim_beta_coeff_mean, self.normal_coint_params['beta'], places=4)
         self.assertEqual(sim_beta_coeff_std, None)
 
+    def test_plot(self):
+        """
+        Test the plot method.
+        """
+        simulation = CointegrationSimulation(20, 250)
 
+        share_s1, share_s2, coint_error = simulation.simulate_coint(initial_price=100.)
+        coint_sim_plot_obj = simulation.plot_coint_series(share_s1[:, 1], share_s2[:, 1], coint_error[:, 1])
+
+        self.assertTrue(issubclass(type(coint_sim_plot_obj), matplotlib.figure.Figure))
