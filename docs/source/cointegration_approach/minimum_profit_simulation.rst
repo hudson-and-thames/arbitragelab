@@ -1,7 +1,7 @@
 .. _cointegration_approach-cointegration_simulation:
 
 .. note::
-    The following documentation follows closely the paper:
+    The following documentation closely follows the paper:
 
     - `Loss protection in pairs trading through minimum profit bounds: a cointegration approach <http://downloads.hindawi.com/archive/2006/073803.pdf>`__ by Lin, Y.-X., McCrae, M., and Gulati, C. (2006)
 
@@ -56,7 +56,7 @@ block.
         \end{eqnarray}
 
 Implementation
-**************
+##############
 
 .. automodule:: arbitragelab.cointegration_approach.coint_sim
 
@@ -67,7 +67,7 @@ Implementation
         .. automethod:: __init__
 
 Example
-*******
+#######
 
 .. code-block::
 

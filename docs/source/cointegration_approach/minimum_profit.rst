@@ -1,7 +1,7 @@
 .. _cointegration_approach-minimum_profit:
 
 .. note::
-    The following documentation follows closely two papers:
+    The following documentation closely follows two papers:
 
     - `Loss protection in pairs trading through minimum profit bounds: a cointegration approach <http://downloads.hindawi.com/archive/2006/073803.pdf>`__ by Lin, Y.-X., McCrae, M., and Gulati, C. (2006)
     - `Finding the optimal pre-set boundaries for pairs trading strategy based on cointegration technique <https://ro.uow.edu.au/cgi/viewcontent.cgi?article=1040&context=cssmwp>`__ by Puspaningrum, H., Lin, Y.-X., and Gulati, C. M. (2010)
@@ -21,7 +21,7 @@ be used interchangeably.
 In order to define a strategy, we need to quantify the concept of "sufficiently far away from the equilibrium of the
 spread", i.e. a pre-set boundary chosen to open a trade, for this boundary can affect the minimum total profit (MTP)
 over a specific trading horizon. The higher the pre-set boundary for opening trades, the higher the profit per trade
-but the lower the trade numbers. The opposite applies for lowering the boundary values. The number of trades over a
+but the lower the trade numbers. The opposite applies to lowering the boundary values. The number of trades over a
 specified trading horizon is determined jointly by the average trade duration and the average inter-trade interval.
 
 This module is designed to find the optimal pre-set boundary that would maximize the MTP for cointegration error
@@ -246,10 +246,11 @@ Example
 .. code-block::
 
     # Importing packages
+    import pandas as pd
     from arbitragelab.cointegration_approach.minimum_profit import MinimumProfit
 
     # Read price series data, set date as index
-    data = pd.read_csv('AME-DOV.csv', parse_dates=['Date'])
+    data = pd.read_csv('X_FILE_PATH.csv', parse_dates=['Date'])
     data.set_index('Date', inplace=True)
 
     # Initialize the optimizer for this data
