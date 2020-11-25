@@ -34,6 +34,7 @@ class MinimumProfitSimulation:
         :param ts_num: (int) Number of time series to simulate.
         :param ts_length: (int) Length of each time series to simulate.
         """
+
         self.ts_num = ts_num
         self.ts_length = ts_length
         self.__price_params, self.__coint_params = self.initialize_params()
@@ -41,22 +42,24 @@ class MinimumProfitSimulation:
     @staticmethod
     def initialize_params() -> Tuple[dict, dict]:
         """
-        Initialize the default parameters for first-order difference of share S2 price series and cointegration error.
+        Initialize the default parameters for first-order difference of share S2 price series
+        and cointegration error.
 
         :return: (dict, dict) Necessary parameters for share S2 price simulation;
             necessary parameters for cointegration error simulation.
         """
+
         price_params = {
             "ar_coeff": 0.1,
             "white_noise_var": 0.5,
-            "constant_trend": 13.
-        }
+            "constant_trend": 13.}
+
         coint_params = {
             "ar_coeff": 0.2,
             "white_noise_var": 1.,
             "constant_trend": 13.,
-            "beta": -0.2
-        }
+            "beta": -0.2}
+
         return price_params, coint_params
 
     def get_price_params(self) -> dict:
@@ -65,6 +68,7 @@ class MinimumProfitSimulation:
 
         :return: price_params: (dict) Necessary parameters for share S2 price simulation.
         """
+
         return self.__price_params
 
     def get_coint_params(self) -> dict:
@@ -73,34 +77,37 @@ class MinimumProfitSimulation:
 
         :return: coint_params: (dict) Necessary parameters for cointegration error simulation.
         """
+
         return self.__coint_params
 
     def set_price_params(self, param: str, value: float):
         """
         Setter for price simulation parameters.
 
-        Change one specific parameter to designated value. Possible parameters are
-            ["ar_coeff", "white_noise_var", "constant_trend"].
+        Change one specific parameter to a designated value. Possible parameters are
+        ["ar_coeff", "white_noise_var", "constant_trend"].
 
-        :param param: (str) Parameter dictionary key
-        :param value: (float) Parameter value
+        :param param: (str) Parameter dictionary key.
+        :param value: (float) Parameter value.
         """
+
         if param not in self.__price_params:
-            raise KeyError("Parameter doesn't exist!")
+            raise KeyError("The input parameter doesn't exist. Please check the input.")
         self.__price_params[param] = value
 
     def set_coint_params(self, param: str, value: float):
         """
         Setter for cointegration error simulation parameters.
 
-        Change one specific parameter to designated value. Possible parameters are
-            ["ar_coeff", "white_noise_var", "constant_trend", "beta"]
+        Change one specific parameter to a designated value. Possible parameters are
+        ["ar_coeff", "white_noise_var", "constant_trend", "beta"]
 
-        :param param: (str) Parameter dictionary key
-        :param value: (float) Parameter value
+        :param param: (str) Parameter dictionary key.
+        :param value: (float) Parameter value.
         """
+
         if param not in self.__coint_params:
-            raise KeyError("Parameter doesn't exist!")
+            raise KeyError("The input parameter doesn't exist. Please check the input.")
         self.__coint_params[param] = value
 
     def load_params(self, params: dict, target: str = "price"):
@@ -112,6 +119,7 @@ class MinimumProfitSimulation:
         :param params: (dict) Parameter dictionary.
         :param target: (str) Indicate which parameter to load. Possible values are "price" and "coint".
         """
+
         # Check which parameters to change
         target_types = ('price', 'coint')
         if target not in target_types:
@@ -149,6 +157,7 @@ class MinimumProfitSimulation:
             otherwise, directly calculate recurrence.
         :return: (np.array) ts_num simulated series generated.
         """
+
         # Store the series
         series_list = []
 
@@ -219,6 +228,7 @@ class MinimumProfitSimulation:
         :return: (np.array, np.array, np.array) Price series of share S1, price series of share S2,
             and cointegration error.
         """
+
         # Read the parameters from the param dictionary
         beta = coint_params['beta']
 
@@ -246,6 +256,7 @@ class MinimumProfitSimulation:
         :return: (np.array, np.array, np.array) Price series of share S1, price series of share S2,
             and cointegration error.
         """
+
         # Read the parameters from the param dictionary
         beta = coint_params['beta']
 
@@ -274,6 +285,7 @@ class MinimumProfitSimulation:
         :return: (np.array, np.array, np.array) Price series of share S1, price series of share S2,
             and cointegration error.
         """
+
         if use_statsmodel:
             return self._simulate_cointegration(self.__price_params,
                                                 self.__coint_params,
@@ -291,6 +303,7 @@ class MinimumProfitSimulation:
         :return: (float, float) The mean AR(1) coefficient of the process;
             the standard deviation of AR(1) coefficient of the process.
         """
+
         # Store all the AR(1) coefficients
         ar_coeff_list = []
 
@@ -325,6 +338,7 @@ class MinimumProfitSimulation:
         :param y_name: (str) Column name for share S2 column of Engle-Granger input dataframe.
         :return: (float, float) Mean of hedge ratio; standard deviation of hedge ratio
         """
+
         # List to store the hedge ratios
         betas_list = []
 

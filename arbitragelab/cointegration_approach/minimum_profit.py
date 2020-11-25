@@ -27,7 +27,7 @@ class MinimumProfit:
 
     The model assumes the cointegration error follows an AR(1) process and utilizes
     mean first-passage time to determine the optimal levels to initiate trades.
-    The trade will be closed when cointegration error reverts to its mean.
+    The trade will be closed when the cointegration error reverts to its mean.
     """
 
     def __init__(self, price_df: pd.DataFrame):
@@ -52,12 +52,13 @@ class MinimumProfit:
         Split the price series into a training set to calculate the cointegration coefficient, beta,
         and a test set to simulate the trades to check trade frequency and PnL.
 
-        Set both cutoff to none to perform an in-sample test.
+        Set both cutoffs to none to perform an in-sample test.
 
         :param date_cutoff: (pd.Timestamp) If the price series has a date index then this will be used for split.
         :param num_cutoff: (int) Number of periods to include in the training set (could be used for any type of index).
         :return: (pd.DataFrame, pd.DataFrame) Training set price series; test set price series.
         """
+
         # If num_cutoff is not None, then date_cutoff should be ignored
         if num_cutoff is not None:
             warnings.warn(
@@ -105,6 +106,8 @@ class MinimumProfit:
             Cointegration error, epsilon_t; AR(1) coefficient;
             AR(1) fit residual on cointegration error.
         """
+
+        # Checking the significance of a test
         if sig_level not in ['90%', '95%', '99%']:
             raise ValueError("Significance level can only be the following:\n "
                              "90%, 95%, or 99%.\n Please check the input.")
@@ -157,6 +160,7 @@ class MinimumProfit:
         with warnings.catch_warnings():
             # Silencing specific statsmodels ValueWarning
             warnings.filterwarnings('ignore', r'A date index has been provided,')
+
             ar_fit = sm.tsa.ARMA(epsilon_t, (1, 0)).fit(trend='c', disp=0)
             _, ar_coeff = ar_fit.params
 
@@ -172,6 +176,7 @@ class MinimumProfit:
         :param ar_resid: (np.array) The residual obtained from AR(1) fit on cointegration error.
         :return: (np.array) The Gaussian kernel (K(u_i, u_j)) matrix.
         """
+
         # Variable integrate_grid is evenly spaced, use np.diff to derive the interval
         grid_h = np.diff(integrate_grid)[0]
 
@@ -211,6 +216,7 @@ class MinimumProfit:
         :return: (pd.Series) Mean first-passage time over interval [a,b] of an AR(1) process,
             starting at y0.
         """
+
         # Build the grid for summation
         grid = granularity * np.arange(lower, upper)
 
@@ -223,6 +229,7 @@ class MinimumProfit:
 
         # Return a pandas.Series indexed by grid points for easy retrieval
         passage_time_df = pd.Series(passage_time, index=grid)
+
         return passage_time_df
 
     @staticmethod
@@ -231,6 +238,7 @@ class MinimumProfit:
         """
         Calls in a loop to create a terminal progress bar.
         https://gist.github.com/aubricus/f91fb55dc6ba5557fbab06119420dd6a
+
         :param iteration: (int) Current iteration.
         :param max_iterations: (int) Maximum number of iterations.
         :param prefix: (str) Prefix string.
@@ -238,6 +246,7 @@ class MinimumProfit:
         :param decimals: (int) Positive number of decimals in percent completed.
         :param bar_length: (int) Character length of the bar.
         """
+
         str_format = "{0:." + str(decimals) + "f}"
         # Calculate the percent completed.
         percents = str_format.format(100 * (iteration / float(max_iterations)))
@@ -255,7 +264,7 @@ class MinimumProfit:
     def optimize(self, ar_coeff: float, epsilon_t: pd.Series, ar_resid: np.array,
                  horizon: int, granularity: float = 0.01) -> Tuple[float, ...]:
         """
-        Optimize the upper bound following the optimization procedure in paper.
+        Optimize the upper bound following the optimization procedure in the paper.
 
         .. note::
 
@@ -271,6 +280,7 @@ class MinimumProfit:
         :return: (float, float, float, float, float) Optimal upper bound; optimal trade duration;
             optimal inter-trades interval; optimal minimum trade profit; optimal number of trades.
         """
+
         minimum_trade_profit = []
 
         # Use 5 times the standard deviation of cointegration error as an approximation of infinity
@@ -330,6 +340,7 @@ class MinimumProfit:
             number of shares to trade for each leg in the cointegration pair;
             exact values of cointegration error for initiating and closing trades.
         """
+
         # According to the paper, trading one unit of the cointegrated pair yields a minimum profit of upper_bound
         # Therefore, minimum_profit cannot be less than upper_bound
         if minimum_profit < upper_bound:

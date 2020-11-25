@@ -36,6 +36,7 @@ class CointegrationSimulation:
         :param ts_num: (int) Number of time series to simulate.
         :param ts_length: (int) Length of each time series to simulate.
         """
+
         self.ts_num = ts_num
         self.ts_length = ts_length
         self.__price_params, self.__coint_params = self.initialize_params()
@@ -43,22 +44,24 @@ class CointegrationSimulation:
     @staticmethod
     def initialize_params() -> Tuple[dict, dict]:
         """
-        Initialize the default parameters for first-order difference of share S2 price series and cointegration error.
+        Initialize the default parameters for first-order difference of share S2 price series
+        and cointegration error.
 
         :return: (dict, dict) Necessary parameters for share S2 price simulation;
             necessary parameters for cointegration error simulation.
         """
+
         price_params = {
             "ar_coeff": 0.1,
             "white_noise_var": 0.5,
-            "constant_trend": 13.
-        }
+            "constant_trend": 13.}
+
         coint_params = {
             "ar_coeff": 0.2,
             "white_noise_var": 1.,
             "constant_trend": 13.,
-            "beta": -0.2
-        }
+            "beta": -0.2}
+
         return price_params, coint_params
 
     def get_price_params(self) -> dict:
@@ -67,6 +70,7 @@ class CointegrationSimulation:
 
         :return: price_params: (dict) Necessary parameters for share S2 price simulation.
         """
+
         return self.__price_params
 
     def get_coint_params(self) -> dict:
@@ -75,34 +79,37 @@ class CointegrationSimulation:
 
         :return: coint_params: (dict) Necessary parameters for cointegration error simulation.
         """
+
         return self.__coint_params
 
     def set_price_params(self, param: str, value: float):
         """
         Setter for price simulation parameters.
 
-        Change one specific parameter to designated value. Possible parameters are
-            ["ar_coeff", "white_noise_var", "constant_trend"].
+        Change one specific parameter to a designated value. Possible parameters are
+        ["ar_coeff", "white_noise_var", "constant_trend"].
 
-        :param param: (str) Parameter dictionary key
-        :param value: (float) Parameter value
+        :param param: (str) Parameter dictionary key.
+        :param value: (float) Parameter value.
         """
+
         if param not in self.__price_params:
-            raise KeyError("Parameter doesn't exist!")
+            raise KeyError("The input parameter doesn't exist. Please check the input.")
         self.__price_params[param] = value
 
     def set_coint_params(self, param: str, value: float):
         """
         Setter for cointegration error simulation parameters.
 
-        Change one specific parameter to designated value. Possible parameters are
-            ["ar_coeff", "white_noise_var", "constant_trend", "beta"]
+        Change one specific parameter to a designated value. Possible parameters are
+        ["ar_coeff", "white_noise_var", "constant_trend", "beta"].
 
-        :param param: (str) Parameter dictionary key
-        :param value: (float) Parameter value
+        :param param: (str) Parameter dictionary key.
+        :param value: (float) Parameter value.
         """
+
         if param not in self.__coint_params:
-            raise KeyError("Parameter doesn't exist!")
+            raise KeyError("The input parameter doesn't exist. Please check the input.")
         self.__coint_params[param] = value
 
     def load_params(self, params: dict, target: str = "price"):
@@ -114,6 +121,7 @@ class CointegrationSimulation:
         :param params: (dict) Parameter dictionary.
         :param target: (str) Indicate which parameter to load. Possible values are "price" and "coint".
         """
+
         # Check which parameters to change
         target_types = ('price', 'coint')
         if target not in target_types:
@@ -128,7 +136,7 @@ class CointegrationSimulation:
         new_keys = set(params.keys())
         if not default_keys <= new_keys:
             missing_keys = default_keys - new_keys
-            raise KeyError("Key parameters {} missing!".format(*missing_keys))
+            raise KeyError("Key parameters {} missing.".format(*missing_keys))
 
         # Set the parameters
         if target == "price":
@@ -138,7 +146,7 @@ class CointegrationSimulation:
 
     def simulate_ar(self, params: dict, burn_in: int = 50, use_statsmodel: bool = True) -> np.array:
         """
-        Simulate an AR(1) process without using the statsmodel package.
+        Simulate an AR(1) process without using the statsmodels package.
         The AR(1) process is defined as the following recurrence relation.
 
         .. math::
@@ -151,6 +159,7 @@ class CointegrationSimulation:
             otherwise, directly calculate recurrence.
         :return: (np.array) ts_num simulated series generated.
         """
+
         # Store the series
         series_list = []
 
@@ -168,7 +177,7 @@ class CointegrationSimulation:
                            "Call initialize_params() to reset the configuration of the "
                            "parameters to default.")
 
-        # If using statsmodel
+        # If using statsmodels
         if use_statsmodel:
             # Specify AR(1) coefficient
             ar = np.array([1, -ar_coeff])
@@ -212,7 +221,8 @@ class CointegrationSimulation:
     def _simulate_cointegration(self, price_params: dict, coint_params: dict,
                                 initial_price: float = 100.) -> Tuple[np.array, np.array, np.array]:
         """
-        Use the statsmodel to generate two price series that are cointegrated. The hedge ratio is defined by beta.
+        Use the statsmodels to generate two price series that are cointegrated.
+        The hedge ratio is defined by beta.
 
         :param price_params: (dict) Parameter dictionary for share S2 price simulation.
         :param coint_params: (dict) Parameter dictionary for cointegration error simulation.
@@ -220,6 +230,7 @@ class CointegrationSimulation:
         :return: (np.array, np.array, np.array) Price series of share S1, price series of share S2,
             and cointegration error.
         """
+
         # Read the parameters from the param dictionary
         beta = coint_params['beta']
 
@@ -239,7 +250,8 @@ class CointegrationSimulation:
     def _simulate_cointegration_raw(self, price_params: dict, coint_params: dict,
                                     initial_price: float = 100.) -> Tuple[np.array, np.array, np.array]:
         """
-        Use the raw simulation method to generate two price series that are cointegrated. The hedge ratio is defined by beta.
+        Use the raw simulation method to generate two price series that are cointegrated.
+        The hedge ratio is defined by beta.
 
         :param price_params: (dict) Parameter dictionary for share S2 price simulation.
         :param coint_params: (dict) Parameter dictionary for cointegration error simulation.
@@ -247,6 +259,7 @@ class CointegrationSimulation:
         :return: (np.array, np.array, np.array) Price series of share S1, price series of share S2,
             and cointegration error.
         """
+
         # Read the parameters from the param dictionary
         beta = coint_params['beta']
 
@@ -271,10 +284,11 @@ class CointegrationSimulation:
 
         :param initial_price: (float) Starting price of share S2.
         :param use_statsmodel: (bool) Use statsmodel API or use raw method.
-            If True, then statsmodel API will be used.
+            If True, then statsmodels API will be used.
         :return: (np.array, np.array, np.array) Price series of share S1, price series of share S2,
             and cointegration error.
         """
+
         if use_statsmodel:
             return self._simulate_cointegration(self.__price_params,
                                                 self.__coint_params,
@@ -292,10 +306,11 @@ class CointegrationSimulation:
         :return: (float, float) The mean AR(1) coefficient of the process;
             the standard deviation of AR(1) coefficient of the process.
         """
+
         # Store all the AR(1) coefficients
         ar_coeff_list = []
 
-        # Use statsmodel to fit the AR(1) process
+        # Use statsmodels to fit the AR(1) process
         for idx in range(self.ts_num):
             # Specify constant trend as the simulated process has one
             ts_fit = sm.tsa.ARMA(price_matrix[:, idx], (1, 0)).fit(trend='c', disp=0)
@@ -316,7 +331,7 @@ class CointegrationSimulation:
     def verify_coint(self, price_series_x: np.array, price_series_y: np.array,
                      x_name: str = "Share S1", y_name: str = "Share S2") -> Tuple[float, Optional[float]]:
         """
-        Use Engle-Granger test to verify if the simulated series are cointegrated.
+        Use the Engle-Granger test to verify if the simulated series are cointegrated.
 
         :param price_series_x: (np.array) A matrix where each column is a simulated
             price series of share S1.
@@ -324,12 +339,13 @@ class CointegrationSimulation:
             price series of share S2.
         :param x_name: (str) Column name for share S1 column of Engle-Granger input dataframe.
         :param y_name: (str) Column name for share S2 column of Engle-Granger input dataframe.
-        :return: (float, float) Mean of hedge ratio; standard deviation of hedge ratio
+        :return: (float, float) Mean of hedge ratio; standard deviation of hedge ratio.
         """
+
         # List to store the hedge ratios
         betas_list = []
 
-        # Initialize an Engle-Granger test class in mlfinlab
+        # Initialize an Engle-Granger test class from arbitragelab
         eg_portfolio = EngleGrangerPortfolio()
 
         for idx in range(self.ts_num):
@@ -362,7 +378,7 @@ class CointegrationSimulation:
 
     @staticmethod
     def plot_coint_series(series_x: np.array, series_y: np.array, coint_error: np.array,
-                          figw: float = 15., figh: float = 10.):
+                          figw: float = 15., figh: float = 10.) -> plt.Figure:
         """
         Plot the simulated cointegrated series.
 
@@ -371,8 +387,12 @@ class CointegrationSimulation:
         :param coint_error: (np.array) Cointegration error.
         :param figw: (float) Figure width.
         :param figh: (float) Figure height.
+        :return: (plt.Figure) Figure with the simulated cointegrated series.
         """
-        fig, [ax1, ax2] = plt.subplots(2, 1, sharex=True, figsize=(figw, figh), gridspec_kw={'height_ratios': [2.5, 1]})
+
+        # Creating a plot
+        fig, [ax1, ax2] = plt.subplots(2, 1, sharex=True, figsize=(figw, figh),
+                                       gridspec_kw={'height_ratios': [2.5, 1]})
 
         # Plot prices
         ax1.plot(series_x, label="Share S1")

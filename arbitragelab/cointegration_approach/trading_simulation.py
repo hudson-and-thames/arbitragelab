@@ -18,8 +18,8 @@ import pandas as pd
 
 class TradingSim:
     """
-    This class simulates the trades based on optimized minimum profit trading signal. It plots the trading signal on
-    the cointegration error and the equity curves as well.
+    This class simulates the trades based on an optimized minimum profit trading signal.
+    It plots the trading signal on the cointegration error and the equity curves as well.
     """
 
     def __init__(self, starting_equity: float = np.Inf):
@@ -28,6 +28,7 @@ class TradingSim:
 
         :param starting_equity: (float) The amount available to trade in this simulation.
         """
+
         # Set position and P&L to 0, fund the account with the dollar amount specified
         self._position = np.zeros((2, ))
         self._base_equity_value = starting_equity
@@ -38,14 +39,14 @@ class TradingSim:
         self._pnl = 0.
         self._mtm = {
             "P&L": [],
-            "Total Equity": []
-        }
+            "Total Equity": []}
 
     def initialize_report(self):
         """
         Initialize the dictionary for trade reports.
         """
-        # Dictionary for generating the equity curve and trade report DataFrame.
+
+        # Dictionary for generating the equity curve and trade report DataFrame
         self._report = {
             "Trade Date": [],
             "Trade Type": [],
@@ -54,8 +55,7 @@ class TradingSim:
             "Leg 1 Price": [],
             "Leg 2": [],
             "Leg 2 Shares": [],
-            "Leg 2 Price": []
-        }
+            "Leg 2 Price": []}
 
     def trade(self, signals: pd.DataFrame, num_of_shares: np.array):
         """
@@ -64,6 +64,7 @@ class TradingSim:
         :param signals: (pd.DataFrame) Dataframe that contains asset prices and trade signals.
         :param num_of_shares: (np.array) Optimized number of shares to trade.
         """
+
         # Generate report
         self.initialize_report()
 
@@ -169,6 +170,7 @@ class TradingSim:
         :return (pd.DataFrame, np.array): A dataframe that contains each opening/closing trade details, P&L,
             and equity curves; a NumPy array that represents the number of U-trade and L-trade over the period
         """
+
         report_df = pd.DataFrame(self._report)
         return report_df
 
@@ -184,6 +186,7 @@ class TradingSim:
         :param start_date: (pd.Timestamp) The starting point of the plot.
         :param end_date: (pd.Timestamp) The end point of the plot.
         """
+
         # Retrieve the trade report for trading dates
         report = self.summary()
 
@@ -256,6 +259,7 @@ class TradingSim:
         :param start_date: (pd.Timestamp) The starting point of the plot.
         :param end_date: (pd.Timestamp) The end point of the plot.
         """
+
         # Build the equity curve dataframe
         equity_curve_df = pd.DataFrame(self._mtm)
 
