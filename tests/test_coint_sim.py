@@ -26,29 +26,32 @@ class TestCointegrationSimulation(unittest.TestCase):
         Set up the parameters for simulations.
         """
 
+        # Fixing random seed
         np.random.seed(42)
+
         self.normal_price_params = {
             "ar_coeff": 0.4,
             "white_noise_var": 1,
-            "constant_trend": 2.
-        }
+            "constant_trend": 2.}
+
         self.normal_coint_params = {
             "ar_coeff": 0.2,
             "white_noise_var": 1.,
             "constant_trend": 5.,
-            "beta": -0.2
-        }
+            "beta": -0.2}
+
         self.default_price_params = {
             "ar_coeff": 0.1,
             "white_noise_var": 0.5,
-            "constant_trend": 13.
-        }
+            "constant_trend": 13.}
+
         self.default_coint_params = {
             "ar_coeff": 0.2,
             "white_noise_var": 1.,
             "constant_trend": 13.,
-            "beta": -0.2
-        }
+            "beta": -0.2}
+
+        # Creating faulty data
         self.faulty_price_params = deepcopy(self.normal_price_params)
         self.faulty_price_params.pop("ar_coeff")
         self.faulty_coint_params = deepcopy(self.normal_coint_params)

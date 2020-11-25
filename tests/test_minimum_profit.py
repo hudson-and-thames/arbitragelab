@@ -30,7 +30,11 @@ class TestMinimumProfit(unittest.TestCase):
         Data: XLF-XLK daily data (1/1/2018 - 11/17/2020)
         :return:
         """
+
+        # Fixing random seed
         np.random.seed(50)
+
+        # Loading the data
         project_path = os.path.dirname(__file__)
         data_path = project_path + '/test_data/ANZ-ADB.csv'
         no_coint_path = project_path + '/test_data/XLF-XLK.csv'
@@ -225,11 +229,3 @@ class TestMinimumProfit(unittest.TestCase):
 
         # Test for warning when the date cutoff point is out of range
         self.assertRaises(AssertionError, optimizer.train_test_split, pd.Timestamp(2021, 1, 1))
-
-
-
-
-
-
-
-
