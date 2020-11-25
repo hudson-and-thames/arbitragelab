@@ -23,7 +23,8 @@ each copula, e.g., tail dependency for capturing rare and/or extreme moments lik
 market.
 
 Briefly speaking, copula is a tool to capture details of how two random variables are "correlated". By having a more
-detailed modeling framework, we expect the pairs trading strategy followed to be more realistic and robust.
+detailed modeling framework, we expect the pairs trading strategy followed to be more realistic and robust and possibly 
+to bring more trading opportunities.
 
 .. figure:: images/copula_marginal_dist_demo.png
     :scale: 30 %
@@ -35,9 +36,23 @@ detailed modeling framework, we expect the pairs trading strategy followed to be
     "Trading strategies with copulas."
     by Stander, Yolanda, Daniël Marais, and Ilse Botha.
 
-Tools presented in this module enable the user to transform and fit pair's price data to a given type of copula,
-sample and plot from a given copula, and generate trading positions given the pair's data using a copula.
-There are 8 commonly used ones that are now available: Gumbel, Frank, Clayton, Joe, N13, N14, Gaussian and Student-t.
+Tools presented in this module enable the user to:
+
+* Transform and fit pair's price data to a given type of copula;
+
+* Sample and plot from a given copula;
+
+* Generate trading positions given the pair's data using a copula:
+
+    - Feed in training lists (i.e., data from 2016-2019) and thus generate a position list.
+
+    - Feed in a single pair's data point (i.e., EOD data from just today) and thus generate a single position.
+
+There are 8 commonly used ones that are now available: :code:`Gumbel`, :code:`Frank`, :code:`Clayton`, :code:`Joe`,
+:code:`N13`, :code:`N14`, :code:`Gaussian` and :code:`Student` (Student-t).
+They are all subclasses of the class :code:`Copula`, and they share some common repertoire of methods and attributes.
+However for the most of the time, the user is not expected to directly use the copulas.
+All trading related functionalities are stated above, and included in the :code:`CopulaStrategy` class.
 
 The user may choose to fit the pair's data to all provided copulas, then compare the information criterion scores (AIC,
 SIC, HQIC) to decide the best copula. One can further use the fitted copula to generate trading positions by giving

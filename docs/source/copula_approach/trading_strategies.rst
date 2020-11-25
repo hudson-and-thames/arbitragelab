@@ -1,4 +1,4 @@
-.. _cointegration_approach-trading_strategies:
+.. _copula_approach-trading_strategies:
 
 ==================
 Trading Strategy
@@ -47,10 +47,10 @@ Then we can calculate the **marginal cumulative probabilities** using trading/te
 Now we define an upper threshold :math:`b_{up}` (e.g. 0.95) and a lower threshold :math:`b_{lo}` (e.g. 0.05),
 then the logic is as follows:
 
-- If :math:`P(U_1\le u_1 | U_2 = u_2) < b_{lo}` and :math:`P(U_2\le u_2 | U_1 = u_1) > b_{up}`, then stock 1 is
+- If :math:`P(U_1\le u_1 | U_2 = u_2) \le b_{lo}` and :math:`P(U_2\le u_2 | U_1 = u_1) \ge b_{up}`, then stock 1 is
   undervalued, and stock 2 is overvalued. Hence we long the spread.
 
-- If :math:`P(U_2\le u_2 | U_1 = u_1) < b_{lo}` and :math:`P(U_1\le u_1 | U_2 = u_2) > b_{up}`, then stock 2 is
+- If :math:`P(U_2\le u_2 | U_1 = u_1) \le b_{lo}` and :math:`P(U_1\le u_1 | U_2 = u_2) \ge b_{up}`, then stock 2 is
   undervalued, and stock 1 is overvalued. Hence we short the spread.
 
 - If one of the conditional probabilities cross the boundary of :math:`0.5` in relation to its previous time step,
@@ -76,13 +76,10 @@ alongside with the Z-Scores and target quantities of the unit portfolio to hold.
 
 Implementation
 **************
-.. py:currentmodule:: arbitragelab.copula_approach.copula_strategy
-.. autoclass:: CopulaStrategy
-
-    .. automethod:: cum_log_return
-    .. automethod:: fit_copula
-    .. automethod:: analyze_time_series
-    .. automethod:: graph_copula
+.. automodule:: arbitragelab.copula_approach.copula_strategy
+        
+    .. autoclass:: CopulaStrategy
+	:members: __init__, cum_log_return, fit_copula, analyze_time_series, graph_copula
 
 Example
 *******

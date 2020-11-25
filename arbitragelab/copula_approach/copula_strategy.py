@@ -1,7 +1,9 @@
 # Copyright 2019, Hudson and Thames Quantitative Research
 # All rights reserved
 # Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
-"""Master module that uses copula for trading strategy."""
+"""
+Master module that uses copula for trading strategy.
+"""
 # pylint: disable = invalid-name, invalid-unary-operand-type
 from typing import Callable
 import matplotlib.pyplot as plt
@@ -26,6 +28,21 @@ class CopulaStrategy:
 
     def __init__(self, copula: cg.Copula = None, position_kind: list = None,
                  default_lower_threshold: float = 0.05, default_upper_threshold: float = 0.95):
+        """
+        Initiate a CopulaStrategy class.
+
+        One can choose to initiate with no arguments, or to initiate with a given copula as the system's
+        Copula.
+
+        :param copula: (Copula) Optional. A copula object that the class will use for all analysis. If there
+            is no input then fit_copula method will create one when called.
+        :param position_kind: (list) Optional. The integers to represent long/short/no positions for the pair's trading
+            framework. By default it uses [1, -1, 0].
+        :param default_lower_threshold: (float) Optional. The default lower threshold for opening a position for
+            trading signal generation. Defaults to 0.05.
+        :param default_upper_threshold: (float) Optional. The default upper threshold for opening a position for
+            trading signal generation. Defaults to 0.95.
+        """
         # Copulas that uses theta as parameter
         self.theta_copula_names = ['Gumbel', 'Clayton', 'Frank',
                                    'Joe', 'N13', 'N14']
@@ -56,19 +73,23 @@ class CopulaStrategy:
             One may use log return or cumulative log return. CopulaStrategy class provides a method to
             calculate cumulative log return.
 
+        The output returns:
+            - result_dict: (dict) The name of the copula and its SIC, AIC, HQIC values;
+            - copula: (Copula) The fitted copula with parameters satisfying maximum likelihood;
+            - s1_cdf: (func) The cumulative density function for stock 1, using training data.
+            - s2_cdf: (func) The cumulative density function for stock 2, using training data.\
+
         :param s1_series: (np.array) 1D stock time series data in desired form.
         :param s2_series: (np.array) 1D stock time series data in desired form.
         :param copula_name: (str) Type of copula to fit.
         :param if_empirical_cdf: (bool) Whether use empirical cumulative density function to fit data.
         :param if_renew: (bool) Whether use the fitted copula to replace the copula in CopulaStrategy.
         :param kwargs: Input degree of freedom if using Student-t copula. e.g. nu=10.
-        :return: (tuple)
-
-            - result_dict: (dict) The name of the copula and its SIC, AIC, HQIC values.
-            - copula: (Copula) The fitted copula with parameters satisfying maximum likelihood.
-            - s1_cdf: (func) The cumulative density function for stock 1, using training data.
-            - s2_cdf: (func) The cumulative density function for stock 2, using training data.
-
+        :return: (dict, Copula, func, func)
+            The name of the copula and its SIC, AIC, HQIC values;
+            The fitted copula with parameters satisfying maximum likelihood;
+            The cumulative density function for stock 1, using training data.
+            The cumulative density function for stock 2, using training data.
         """
         nu = kwargs.get('nu', None)  # Degree of freedom for Student-t copula.
         num_of_instances = len(s1_series)  # Number of instances.
@@ -103,7 +124,8 @@ class CopulaStrategy:
         return result_dict, copula, s1_cdf, s2_cdf
 
     def ic_test(self, s1_test: np.array, s2_test: np.array,
-                cdf1: Callable[[float], float], cdf2: Callable[[float], float]):
+                cdf1: Callable[[float], float], cdf2: Callable[[float], float],
+                copula: cg.Copula = None):
         """
         Run SIC, AIC and HQIC of the fitted copula given data.
 
@@ -117,10 +139,12 @@ class CopulaStrategy:
         :param s2_test: (np.array) 1D stock time series data in desired form.
         :param cdf1: (func) Cumulative density function trained, for the security in s1_test.
         :param cdf2: (func) Cumulative density function trained, for the security in s2_test.
+        :param copula: (Copula) The copula to be evaluated. By default it uses the system's copula.
         :return: (dict) Result of SIC, AIC and HQIC.
         """
         num_of_instances = len(s1_test)
-        copula = self.copula
+        if copula is None:
+            copula = self.copula
         # Get the internal copula's name.
         copula_name = copula.__class__.__name__
         if copula_name not in self.all_copula_names:

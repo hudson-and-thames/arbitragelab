@@ -1,15 +1,15 @@
-.. _cointegration_approach-copula_brief_intro:
+.. _copula_approach-copula_brief_intro:
 
 
 .. note::
    This document was greatly inspired by
 
-    * Nelsen, Roger B. An introduction to copulas. Springer Science & Business Media, 2007.
-    * Nelsen, Roger B. "Properties and applications of copulas: A brief survey." Proceedings of the first brazilian
-      conference on statistical modeling in insurance and finance.
-      University Press USP Sao Paulo, 2003.
-    * Chang, Bo. `Copula: A Very Short Introduction <https://bochang.me/blog/posts/copula/>`__.
-    * Wiecki, Thomas. `An intuitive, visual guide to copulas <https://twiecki.io/blog/2018/05/03/copulas/>`__
+    1. Nelsen, Roger B. An introduction to copulas. Springer Science & Business Media, 2007.
+    2. Nelsen, Roger B. "Properties and applications of copulas: A brief survey." Proceedings of the first brazilian
+       conference on statistical modeling in insurance and finance.
+       University Press USP Sao Paulo, 2003.
+    3. Chang, Bo. `Copula: A Very Short Introduction <https://bochang.me/blog/posts/copula/>`__.
+    4. Wiecki, Thomas. `An intuitive, visual guide to copulas <https://twiecki.io/blog/2018/05/03/copulas/>`__
 
 ==================================
 A Practical Introduction to Copula
@@ -190,8 +190,8 @@ Further, one can draw sample from a given copula, and the use the inverse of mar
 
 For Archimedean copulas, the general methodology for sampling or simulation comes from (Nelsen, 2006):
 
-	1. Generate two uniform i.i.d.'s :math:`(v_1, v_2)`.
-	2. Calculate :math:`w = K_c^{-1}(v_2)`, :math:`K_c^{t} = t - \frac{\phi(t)}{\phi'(t)}`.
+	1. Generate two uniform in :math:`[0, 1]` i.i.d.'s :math:`(v_1, v_2)`.
+	2. Calculate :math:`w = K_c^{-1}(v_2)`, :math:`K_c(t) = t - \frac{\phi(t)}{\phi'(t)}`.
 	3. Calculate :math:`u_1 = \phi^{-1}[v_1 \phi(w)]` and :math:`u_2 = \phi^{-1}[(1-v_1) \phi(w)]`.
 	4. Return :math:`(u_1, u_2)`.
 
@@ -226,11 +226,13 @@ Data transform
 One can use the implied **cumulative log return** (Liew et al., 2013) or **log return** (Stander et al., 2013).
 
 .. Note::
-	One key concern is that, the type of processed data fed in need to be **approximately stationary** .
-	i.e., :math:`\mathbb{E}[X(t_1)] \approx \mathbb{E}[X(t_2)]` for time series :math:`X`, for all :math:`t_1, t_2` in
-	the scope of interest.
-	For example, if we model each stock's price to have a log-Normal distribution, then the price itself cannot be stationary
-	after some time.
+    One key concern is that, the type of processed data fed in need to be **approximately stationary** .
+    i.e., :math:`\mathbb{E}[X(t_1)] \approx \mathbb{E}[X(t_2)]` for time series :math:`X`, for all :math:`t_1, t_2` in
+    the scope of interest.
+    For example, if we model each stock's price to have a log-Normal distribution, then the price itself cannot be stationary
+    after some time.
+    One can consider just using the daily return or its logarithm instead, given that the stock's price has a log-Normal 
+    distribution. i.e., :math:`\frac{X(t+1)}{X(t)}` or :math:`\ln \left( \frac{X(t+1)}{X(t)} \right)`.
 
 Choice of Copula
 ****************

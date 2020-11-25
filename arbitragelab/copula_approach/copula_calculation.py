@@ -13,13 +13,11 @@ Functions include:
     Calculating HQIC (Hannan-Quinn information criterion).
 """
 # pylint: disable = invalid-name
-from scipy.stats import kendalltau
-from scipy.stats import norm
-from scipy.stats import t as student_t
 from sklearn.covariance import EmpiricalCovariance
 from statsmodels.distributions.empirical_distribution import ECDF
 import numpy as np
 import arbitragelab.copula_approach.copula_generate as cg
+import scipy.stats as ss
 
 
 def find_marginal_cdf(x: np.array, empirical: bool = True, **kwargs):
@@ -62,7 +60,7 @@ def ml_theta_hat(x: np.array, y: np.array, copula_name: str):
     :return theta_hat: (float) Empirical theta for the copula.
     """
     # Calculate Kendall's tau from data.
-    tau = kendalltau(x, y)[0]
+    tau = ss.kendalltau(x, y)[0]
     # Calculate theta from the desired copula.
     dud_cov = [[1, 0], [0, 1]]  # To create copula by name. Not involved in calculations.
     # Create copula by its name. Fulfil switch functionality.
@@ -102,7 +100,7 @@ def log_ml(x: np.array, y: np.array, copula_name: str, nu: float = None):
         # 1. Calculate covariance matrix using sklearn.
         # Correct matrix dimension for fitting in sklearn.
         unif_data = np.array([x, y]).reshape(2, -1).T
-        value_data = norm.ppf(unif_data)  # Change from quantile to value.
+        value_data = ss.norm.ppf(unif_data)  # Change from quantile to value.
         # Getting empirical covariance matrix.
         cov_hat = EmpiricalCovariance().fit(value_data).covariance_
 
@@ -113,7 +111,7 @@ def log_ml(x: np.array, y: np.array, copula_name: str, nu: float = None):
         # 1. Calculate covariance matrix using sklearn.
         # Correct matrix dimension for fitting in sklearn.
         unif_data = np.array([x, y]).reshape(2, -1).T
-        t_dist = student_t(df=nu)
+        t_dist = ss.t(df=nu)
         value_data = t_dist.ppf(unif_data)  # Change from quantile to value.
         # Getting empirical covariance matrix.
         cov_hat = EmpiricalCovariance().fit(value_data).covariance_
@@ -168,36 +166,3 @@ def hqic(log_likelihood: float, n: int, k: int = 1):
     """
     hqic_value = 2*np.log(np.log(n))*k - 2*log_likelihood
     return hqic_value
-
-# class EmpiricalCopula:
-#     """
-#     Fit data and return the empirical copula function.
-#     """
-#     def __init__(self):
-#         self.copula = None
-
-#     def fit(self, s1_train, s2_train):
-#         """
-#         """
-#         prob_floor = 1e-10
-#         prob_cap = 1 - prob_floor
-#         # 1. Change r.v.'s into their own quantiles.
-#         # u1_cdf = find_marginal_cdf(s1_train, empirical=True,
-#         #                            prob_floor=0, prob_cap=1)
-#         # u2_cdf = find_marginal_cdf(s2_train, empirical=True,
-#         #                            prob_floor=0, prob_cap=1)
-#         # U1_quantile = u1_cdf(s1_train)
-#         # U2 = u2_cdf(s2_train)
-
-#         # 2. Build the joint C.D.F. from rank of observation.
-#         n_train = len(s1_train)  # Number of instances for empirical data.
-#         def joint_cdf(s1_test, s2_test):
-#             n_test = len(s1_test)
-#             cdfs = np.zeros(n_test)
-#             for i in range(n_test):
-#                 for j in range(n_train):
-#                     count = 0
-#                     if s1_train[j] <= s1_test[i] and s2_train[j]<=s2_test[i]:
-#                         count += 1
-
-#                     instance_cdf = min(count/n_train, prob_cap)
