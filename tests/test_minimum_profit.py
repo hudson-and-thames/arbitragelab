@@ -100,13 +100,13 @@ class TestMinimumProfit(unittest.TestCase):
 
         optimizer = MinimumProfit(self.no_coint_data)
 
-        train_df, _ = optimizer.train_test_split(date_cutoff=pd.Timestamp(2020, 1, 1))
+        _, _ = optimizer.train_test_split(date_cutoff=pd.Timestamp(2020, 1, 1))
         with self.assertWarnsRegex(Warning, 'ADF'):
-            beta_eg, _, _, _ = optimizer.fit(sig_level="95%", use_johansen=False)
+            _, _, _, _ = optimizer.fit(sig_level="95%", use_johansen=False)
         with self.assertWarnsRegex(Warning, 'eigen'):
-            beta_jo, _, _, _ = optimizer.fit(sig_level="90%", use_johansen=True)
+            _, _, _, _ = optimizer.fit(sig_level="90%", use_johansen=True)
         with self.assertWarnsRegex(Warning, 'trace'):
-            beta_jo, _, _, _ = optimizer.fit(sig_level="99%", use_johansen=True)
+            _, _, _, _ = optimizer.fit(sig_level="99%", use_johansen=True)
         with self.assertRaises(ValueError):
             _, _, _, _ = optimizer.fit(sig_level="91%", use_johansen=True)
 
@@ -146,14 +146,14 @@ class TestMinimumProfit(unittest.TestCase):
         optimizer = MinimumProfit(self.data)
 
         # Split data into training and test set
-        train_df, trade_df = optimizer.train_test_split(date_cutoff=pd.Timestamp(2002, 1, 1))
+        train_df, _ = optimizer.train_test_split(date_cutoff=pd.Timestamp(2002, 1, 1))
 
         # Fit the data
         beta_eg, epsilon_t_eg, ar_coeff_eg, ar_resid_eg = optimizer.fit(use_johansen=False)
 
         # Optimize the upper bound
-        optimal_ub, _, _, optimal_mtp, optimal_num_of_trades = optimizer.optimize(ar_coeff_eg, epsilon_t_eg,
-                                                                                  ar_resid_eg, len(train_df))
+        optimal_ub, _, _, optimal_mtp, _ = optimizer.optimize(ar_coeff_eg, epsilon_t_eg,
+                                                              ar_resid_eg, len(train_df))
 
         # Exception check
         with self.assertRaises(Exception):
@@ -230,11 +230,3 @@ class TestMinimumProfit(unittest.TestCase):
 
         # Test for warning when the date cutoff point is out of range
         self.assertRaises(AssertionError, optimizer.train_test_split, pd.Timestamp(2021, 1, 1))
-
-
-
-
-
-
-
-

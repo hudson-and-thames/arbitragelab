@@ -54,7 +54,7 @@ class MinimumProfit:
 
         Set both cutoffs to none to perform an in-sample test.
 
-        :param date_cutoff: (pd.Timestamp) If the price series has a date index then this will be used for split.
+        :param date_cutoff: (pd.Timestamp) If the price series has a date index then this will be used for the split.
         :param num_cutoff: (int) Number of periods to include in the training set (could be used for any type of index).
         :return: (pd.DataFrame, pd.DataFrame) Training set price series; test set price series.
         """
@@ -97,7 +97,7 @@ class MinimumProfit:
         .. note::
 
             Cointegration of the price series is crucial to the success of the optimization. In order for the strategy
-            to work successfully, the prices of the asset pairs should at least be cointegrated at 90% level.
+            to work successfully, the prices of the asset pairs should at least be cointegrated at a 90% level.
 
         :param sig_level: (str) Cointegration test significance level. Possible options are "90%", "95%", and "99%".
         :param use_johansen: (bool) If True, use Johansen to calculate beta;

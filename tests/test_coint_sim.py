@@ -1,6 +1,6 @@
 # Copyright 2019, Hudson and Thames Quantitative Research
 # All rights reserved
-# Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
+# Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 
 """
 Tests function of Minimum Profit Condition Optimization module:
@@ -186,10 +186,10 @@ class TestCointegrationSimulation(unittest.TestCase):
         self.assertEqual(stats_coint.shape, (250, 20))
 
         # Check beta:
-        beta_mean, beta_std = simulation.verify_coint(manual_s1, manual_s2)
+        beta_mean, _ = simulation.verify_coint(manual_s1, manual_s2)
         self.assertAlmostEqual(beta_mean, self.normal_coint_params['beta'], places=3)
 
-        beta_mean, beta_std = simulation.verify_coint(stats_s1, stats_s2)
+        beta_mean, _ = simulation.verify_coint(stats_s1, stats_s2)
         self.assertAlmostEqual(beta_mean, self.normal_coint_params['beta'], places=3)
 
         # Check when only 1 cointegrated series pair is generated

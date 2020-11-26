@@ -44,7 +44,7 @@ class CointegrationSimulation:
     @staticmethod
     def initialize_params() -> Tuple[dict, dict]:
         """
-        Initialize the default parameters for first-order difference of share S2 price series
+        Initialize the default parameters for the first-order difference of share S2 price series
         and cointegration error.
 
         :return: (dict, dict) Necessary parameters for share S2 price simulation;
