@@ -177,17 +177,20 @@ class CopulaStrategy:
 
     def graph_copula(self, copula_name: str, ax: plt.axes = None, **kwargs):
         """
-        Graph the sample from a given copula. Returns axis.
+        Graph the sample from a given copula by its parameters. Returns axis.
 
         Randomly sample using copula density. User may further specify axis parameters for plotting in kwargs.
+
+        kwargs include
+            - num: (int) Number of sample points to plot.
+            - theta: (float) The copula parameter indicating correlation.
+            - cov: (np.array) 2x2 array for covariance matrix, needed for Gaussian and Student-t copula.
+            - nu: (float) Degree of freedom if using Student-t copula.
+            - other plt.axes specific kwargs.
 
         :param copula_name: (str) Name of the copula to graph.
         :param ax: (plt.axes) Plotting axes.
         :param kwargs: Parameters for the copula and the plot axes.
-            num: (int) Number of sample points to plot.
-            theta: (float) The copula parameter indicating correlation.
-            cov: (array_like) 2x2 array for covariance matrix, needed for Gaussian and Student-t copula.
-            nu: (float) Degree of freedom if using Student-t copula.
         :return ax: (plt.axes) Plotting axes.
         """
         num = kwargs.get('num', 2000)  # Num of data points to plot.

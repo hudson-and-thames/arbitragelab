@@ -60,18 +60,18 @@ With an input of portfolio price series, a backward-looking window for a simple 
 window for rolling st. deviation, the function will output a dataframe with portfolio price series
 alongside with the Z-Scores and target quantities of the unit portfolio to hold.
 
-.. figure:: images/BKD_ESC_trading_result.png
-    :scale: 30 %
-    :align: center
-
-    A visualised output of using a Student-t copula with :math:`\nu=4`. The stock pair considered is BKD and ESC. 
-    The thresholds are 0.88 and 0.12.
-	
-.. figure:: images/student_vs_empirical_c_density_plot.png
+.. figure:: images/positions_log_prices.png
     :scale: 50 %
     :align: center
 
-    Sampling from the fitted Student-t copula with :math:`\nu=4`, and plot the empirical density from training data
+    A visualised output of using a Student-t and N13 copula. The stock pair considered is BKD and ESC. 
+    The thresholds are 0.95 and 0.05.
+	
+.. figure:: images/formation_copulas.png
+    :scale: 40 %
+    :align: center
+
+    Sampling from the various fitted copulas, and plot the empirical density from training data
     from BKD and ESC.
 
 Implementation

@@ -144,26 +144,29 @@ Below are densities and conditional probabilities for the bivariate Gaussian and
 
 	- Gaussian: 
 
-	.. math::
-		P(U_1 \le u_1 \mid U_2 = u_2) =
-		\Phi\left(\frac{\Phi^{-1}(u_1) - \rho \Phi^{-1}(u_2)}{\sqrt{1 - \rho^2}} \right)
+    .. math::
+        P(U_1 \le u_1 \mid U_2 = u_2) =
+        \Phi\left(\frac{\Phi^{-1}(u_1) - \rho \Phi^{-1}(u_2)}{\sqrt{1 - \rho^2}} \right)
 
-	.. math::
-		c(u_1, u_2) = \frac{\exp(-\Phi^{-1}(u_1) \Phi^{-1}(u_2) \rho)}{\sqrt{1-\rho^2}}
+    .. math::
+        c(u_1, u_2) = \frac{1}{\sqrt{1-\rho^2}}
+        \exp \left[ \frac{
+        \rho(-2\Phi^{-1}(u_1) \Phi^{-1}(u_2) + (\Phi^{-1}(u_1))^2 \rho + (\Phi^{-1}(u_2))^2 \rho)}
+        {2(\rho^2 - 1)} \right]
 
-	- Student-t:
+    - Student-t:
 
-	.. math::
-		P(U_1 \le u_1 \mid U_2 = u_2) =
-		\Phi_{\nu + 1}\left(
-		(\Phi_{\nu}^{-1}(u_1) - \rho \Phi_{\nu}^{-1}(u_2))
-		\sqrt{\frac{\nu + 1}{(\nu + \Phi_{\nu}^{-1}(u_2))(1-\rho^2)}}
-		\right)
+    .. math::
+        P(U_1 \le u_1 \mid U_2 = u_2) =
+        \Phi_{\nu + 1}\left(
+        (\Phi_{\nu}^{-1}(u_1) - \rho \Phi_{\nu}^{-1}(u_2))
+        \sqrt{\frac{\nu + 1}{(\nu + \Phi_{\nu}^{-1}(u_2))(1-\rho^2)}}
+        \right)
 
-	.. math::
-		c(u_1, u_2) = 
-		\frac{f_{R,\nu}(\Phi_{\nu}^{-1}(u_1), \Phi_{\nu}^{-1}(u_2))}
-		{f_{\nu}(\Phi_{\nu}^{-1}(u_1)) f_{\nu}(\Phi_{\nu}^{-1}(u_2))}
+    .. math::
+        c(u_1, u_2) = 
+        \frac{f_{R,\nu}(\Phi_{\nu}^{-1}(u_1), \Phi_{\nu}^{-1}(u_2))}
+        {f_{\nu}(\Phi_{\nu}^{-1}(u_1)) f_{\nu}(\Phi_{\nu}^{-1}(u_2))}
 
     where :math:`f_{R, \nu}` is the PDF for bivariate Student-t distribution with degrees of
     freedom :math:`\nu` and covariance matrix being the correlation matrix :math:`R`, and
