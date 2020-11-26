@@ -202,34 +202,34 @@ class TradingSim:
         months_fmt = mdates.DateFormatter('%b')
 
         # Plot the price action of each leg as well as the cointegration error
-        fig, [ax1, ax2] = plt.subplots(2, 1, sharex=True, figsize=(figw, figh), gridspec_kw={'height_ratios': [2.5, 1]})
+        fig, axes = plt.subplots(2, 1, sharex=True, figsize=(figw, figh), gridspec_kw={'height_ratios': [2.5, 1]})
 
         # Plot prices
-        ax1.plot(signals.iloc[:, 0], label=signals.columns[0])
-        ax1.plot(signals.iloc[:, 1], label=signals.columns[1])
-        ax1.legend(loc='upper left', fontsize=12)
-        ax1.tick_params(axis='y', labelsize=14)
+        axes[0].plot(signals.iloc[:, 0], label=signals.columns[0])
+        axes[0].plot(signals.iloc[:, 1], label=signals.columns[1])
+        axes[0].legend(loc='upper left', fontsize=12)
+        axes[0].tick_params(axis='y', labelsize=14)
 
         # Plot cointegration error
-        ax2.plot(signals.iloc[:, 2], label='spread')
-        ax2.legend(loc='best', fontsize=12)
+        axes[1].plot(signals.iloc[:, 2], label='spread')
+        axes[1].legend(loc='best', fontsize=12)
 
         # Plot signal lines
-        ax2.axhline(y=cond_lines[1], color='black')  # Closing condition
-        ax2.axhline(y=cond_lines[0], color='red')  # L-trade opens
-        ax2.axhline(y=cond_lines[2], color='green')  # U-trade opens
+        axes[1].axhline(y=cond_lines[1], color='black')  # Closing condition
+        axes[1].axhline(y=cond_lines[0], color='red')  # L-trade opens
+        axes[1].axhline(y=cond_lines[2], color='green')  # U-trade opens
 
         # Formatting the tick labels
-        ax2.xaxis.set_major_locator(years)
-        ax2.xaxis.set_major_formatter(years_fmt)
-        ax2.xaxis.set_minor_locator(months)
-        ax2.xaxis.set_minor_formatter(months_fmt)
-        ax2.tick_params(axis='x', labelsize=14)
-        ax2.tick_params(axis='y', labelsize=14)
+        axes[1].xaxis.set_major_locator(years)
+        axes[1].xaxis.set_major_formatter(years_fmt)
+        axes[1].xaxis.set_minor_locator(months)
+        axes[1].xaxis.set_minor_formatter(months_fmt)
+        axes[1].tick_params(axis='x', labelsize=14)
+        axes[1].tick_params(axis='y', labelsize=14)
 
         # Define the date range of the plot
         if start_date is not None and end_date is not None:
-            ax2.set_xlim((start_date, end_date))
+            axes[1].set_xlim((start_date, end_date))
 
         # Plot arrows for buy and sell signal
         for idx in range(len(report)):
@@ -240,17 +240,17 @@ class TradingSim:
 
             # Green arrow for opening U-trade, red arrow for opening L-trade, black arrow for closing the trade.
             if trade_type == "U-trade Open":
-                ax2.annotate("", (arrow_xpos, arrow_ypos), xytext=(0, 15),
-                             textcoords='offset points', arrowprops=dict(arrowstyle='-|>', color='green'))
+                axes[1].annotate("", (arrow_xpos, arrow_ypos), xytext=(0, 15),
+                                 textcoords='offset points', arrowprops=dict(arrowstyle='-|>', color='green'))
             elif trade_type == "L-trade Open":
-                ax2.annotate("", (arrow_xpos, arrow_ypos), xytext=(0, -15),
-                             textcoords='offset points', arrowprops=dict(arrowstyle='-|>', color='red'))
+                axes[1].annotate("", (arrow_xpos, arrow_ypos), xytext=(0, -15),
+                                 textcoords='offset points', arrowprops=dict(arrowstyle='-|>', color='red'))
             elif trade_type == "L-trade Close":
-                ax2.annotate("", (arrow_xpos, arrow_ypos), xytext=(0, 15),
-                             textcoords='offset points', arrowprops=dict(arrowstyle='-|>', color='black'))
+                axes[1].annotate("", (arrow_xpos, arrow_ypos), xytext=(0, 15),
+                                 textcoords='offset points', arrowprops=dict(arrowstyle='-|>', color='black'))
             else:
-                ax2.annotate("", (arrow_xpos, arrow_ypos), xytext=(0, -15),
-                             textcoords='offset points', arrowprops=dict(arrowstyle='-|>', color='black'))
+                axes[1].annotate("", (arrow_xpos, arrow_ypos), xytext=(0, -15),
+                                 textcoords='offset points', arrowprops=dict(arrowstyle='-|>', color='black'))
 
         fig.suptitle("Optimal Pre-set Boundaries and Trading Signals", fontsize=20)
         return fig
@@ -322,5 +322,3 @@ class TradingSim:
         fig2 = self._plot_pnl_curve(signal, figw=figw, figh=figh, start_date=start_date, end_date=end_date)
 
         return fig1, fig2
-
-
