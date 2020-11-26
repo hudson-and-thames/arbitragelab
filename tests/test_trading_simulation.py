@@ -32,7 +32,8 @@ class TestTradingSimulation(unittest.TestCase):
         project_path = os.path.dirname(__file__)
         data_path = project_path + '/test_data/trading_strategy_example.pkl'
         with open(data_path, 'rb') as signal_f:
-            self.signal, self.num_of_shares, self.cond_lines = pickle.load(signal_f)
+            data = pickle.load(signal_f)
+            self.signal, self.num_of_shares, self.cond_lines = list(data)
 
     def test_initialize(self):
         """
