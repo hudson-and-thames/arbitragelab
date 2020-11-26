@@ -2,7 +2,7 @@
 # All rights reserved
 # Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 
-# pylint: disable=invalid-name
+# pylint: disable=invalid-name, too-many-statements
 """
 This module simulates trading based on the minimum profit trading signal, reports the trades,
 and plots the equity curve.
