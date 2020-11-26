@@ -77,7 +77,7 @@ It can also be normalized using a known upper boundary:
 
 An alternative way of estimating the Mutual information is through using copulas.
 A link between Mutual information and copula entropy was presented in the paper by
-`Ma, Jian & Sun, Zengqi. (2008). Mutual information is copula entropy <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994>`_.
+`Ma, Jian & Sun, Zengqi. (2008). Mutual information is copula entropy <https://ieeexplore.ieee.org/iel5/5971803/6077925/06077935.pdf>`_.
 
 `A blog post by Gautier Marti <https://gmarti.gitlab.io/qfin/2020/07/01/mutual-information-is-copula-entropy.html>`_
 includes descriptions of two alternative estimators of copula entropy:
@@ -283,3 +283,12 @@ The following example highlights how the various metrics behave under various va
    :alt: No Relationship
     
    Indepedent
+
+References
+##########
+
+* `De Prado, M.L., 2020. Codependence (Presentation Slides). Available at SSRN 3512994. <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994>`__
+* `Hacine-Gharbi, A., Ravier, P., Harba, R. and Mohamadi, T., 2012. Low bias histogram-based estimation of mutual information for feature selection. Pattern Recognition Letters, 33(10), pp.1302-1308. <https://www.researchgate.net/publication/257014935_Low_bias_histogram-based_estimation_of_mutual_information_for_feature_selection>`__
+* `Hacine-Gharbi, A. and Ravier, P., 2018. A binning formula of bi-histogram for joint entropy estimation using mean square error minimization. Pattern Recognition Letters, 101, pp.21-28. <https://www.researchgate.net/publication/320887281_A_binning_formula_of_bi-histogram_for_joint_entropy_estimation_using_mean_square_error_minimization>`__
+* `Ma, J. and Sun, Z., 2011. Mutual information is copula entropy. Tsinghua Science & Technology, 16(1), pp.51-54. <https://ieeexplore.ieee.org/iel5/5971803/6077925/06077935.pdf>`__
+* `Marti Gautier, 2020. Mutual Information Is Copula Entropy. Available at personal blog. <https://gmarti.gitlab.io/qfin/2020/07/01/mutual-information-is-copula-entropy.html>`__

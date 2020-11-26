@@ -12,7 +12,7 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
-
+* :release:`0.1.0 <2020-11-18>`
 * :feature:`2` Kalman Filter + Kalman strategy added.
 * :support:`2` Kalman Filter documentation.
 * :feature:`3` Landmark techniques: Engle Granger and Johansen tests for co-integration.
