@@ -260,7 +260,7 @@ Example
     train_df, trade_df = optimizer.train_test_split(date_cutoff=pd.Timestamp(2019, 1, 1))
 
     # Run an Engle-Granger test to retrieve cointegration coefficient
-    beta_eg, epsilon_t_eg, ar_coeff_eg, ar_resid_eg = optimizer.fit(train_df, use_johansen=False)
+    beta_eg, epsilon_t_eg, ar_coeff_eg, ar_resid_eg = optimizer.fit(use_johansen=False)
 
     # Optimize the pre-set boundaries, retrieve optimal upper bound, optimal minimum total profit,
     # and number of trades.
@@ -271,8 +271,7 @@ Example
 
     # Generate trading signals based on these optimized parameters
     minimum_profit = 100.
-    trade_signals, num_of_shares, cond_values = optimizer.trade_signal(trade_df,
-                                                                       optimal_ub,
+    trade_signals, num_of_shares, cond_values = optimizer.trade_signal(optimal_ub,
                                                                        minimum_profit,
                                                                        beta_eg,
                                                                        epsilon_t_eg)
