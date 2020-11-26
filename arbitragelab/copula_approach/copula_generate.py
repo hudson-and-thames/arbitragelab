@@ -114,7 +114,7 @@ class Gumbel(Copula):
         if v2 > self.threshold:
             w = brentq(lambda w1: Kc(w1, theta) - v2, self.threshold, 1)
         else:
-            w = 0  # Below the threshold, gives 0 as the root.
+            w = 1e10  # Below the threshold, gives a large number as root.
         u1 = np.exp(v1 ** (1 / theta) * np.log(w))
         u2 = np.exp((1 - v1) ** (1 / theta) * np.log(w))
 

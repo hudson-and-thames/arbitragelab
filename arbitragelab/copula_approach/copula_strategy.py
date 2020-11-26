@@ -145,10 +145,10 @@ class CopulaStrategy:
         num_of_instances = len(s1_test)
         if copula is None:
             copula = self.copula
-        # Get the internal copula's name.
+        # Get the copula's name.
         copula_name = copula.__class__.__name__
-        if copula_name not in self.all_copula_names:
-            raise ValueError('CopulaStrategy does not have a currently defined copula.')
+        # if copula_name not in self.all_copula_names:
+        #     raise ValueError('CopulaStrategy does not have a currently defined copula.')
         # Get nu (degree of freedom) if it is a Student-t copula.
         if copula_name == 'Student':
             nu = copula.nu
@@ -254,9 +254,9 @@ class CopulaStrategy:
         :param s2_series: (np.array) 1D time series from stock 2.
         :param cdf1: (func) Marginal C.D.F. for stock 1.
         :param cdf2: (func) Marginal C.D.F. for stock 2.
+        :param start_position: (int) Optional. Starting position. Defaults to no position.
         :param upper_threshold: (float) Upper threshold. Class defaults to 0.95.
         :param lower_threshold: (float) Lower threshold. Class defaults to 0.05.
-        :param start_position: (int) Starting position. Default is no position.
 
         :return positions: (np.array) The suggested positions for the given price data.
         """

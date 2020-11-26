@@ -22,6 +22,7 @@ class TestCopulas(unittest.TestCase):
         """Test gumbel copula class."""
         cop = copula_generate.Gumbel(theta=2)
         # Check describe
+        cop.describe(if_print=True)
         descr = cop.describe(if_print=False)
         self.assertEqual(descr['Descriptive Name'], 'Bivariate Gumbel Copula')
         self.assertEqual(descr['Class Name'], 'Gumbel')
@@ -43,6 +44,16 @@ class TestCopulas(unittest.TestCase):
         
         # Check theta(tau)
         self.assertAlmostEqual(cop.theta_hat(0.5), 2, delta=1e-4)
+        
+        # Check edge cases
+        with self.assertRaises(ValueError):
+            cop.generate_pairs()
+        def _Kc(w: float, theta: float):
+            return w * (1 - np.log(w) / theta)
+        result = cop._generate_one_pair(0, 0, 3, Kc=_Kc)
+        expected = np.array([1, 1e10])
+        np.testing.assert_array_almost_equal(result, expected, decimal=3)
+
         
     def test_frank(self):
         """Test Frank copula class."""
@@ -223,6 +234,13 @@ class TestCopulas(unittest.TestCase):
 
         # Check theta(tau)
         self.assertAlmostEqual(cop.theta_hat(2*np.arcsin(0.2)/np.pi), 0.2, delta=1e-4)
+        
+        # log_ml function in ccalc
+        ll,_ = copula_calculation.log_ml(x=np.array([0.1, 0.21, 0.5, 0.8]),
+                                         y=np.array([0.01, 0.25, 0.4,0.7]),
+                                         copula_name='Student',
+                                         nu=5)
+        self.assertAlmostEqual(ll, 2.1357117471178584, delta=1e-5)
 
     def test_signal(self):
         """Test trading signal generation."""
@@ -277,7 +295,11 @@ class TestCopulas(unittest.TestCase):
         expected_clr = np.linspace(start=0, stop=1, num=101) + 1
         clr = CS.cum_log_return(exp_series, start=np.exp(-1))
         np.testing.assert_array_almost_equal(clr, expected_clr, decimal=6)
-        
+
+        # Test __init__ for CopulaStrategy
+        CS_1 = copula_strategy.CopulaStrategy(position_kind=[3,4,5])
+        self.assertEqual(CS_1.position_kind, [3,4,5])
+
     def test_series_condi_prob(self):
         """Test calculating the conditional probabilities of a seires."""
         # Expected value.
@@ -412,7 +434,7 @@ class TestCopulas(unittest.TestCase):
         BKD_series = pair_prices['BKD'].to_numpy()
         ESC_series = pair_prices['ESC'].to_numpy()
 
-        CS = copula_strategy.CopulaStrategy()
+        CS = copula_strategy.CopulaStrategy(default_lower_threshold=0.25, default_upper_threshold=0.75)
         BKD_clr = CS.cum_log_return(BKD_series)
         ESC_clr = CS.cum_log_return(ESC_series)
 
@@ -433,14 +455,13 @@ class TestCopulas(unittest.TestCase):
             if name != 'Student':
                 _, _, cdf1, cdf2 = CS.fit_copula(s1_series=BKD_train, s2_series=ESC_train, copula_name=name)
                 positions = CS.analyze_time_series(s1_series=BKD_test, s2_series=ESC_test,
-                                                    cdf1=cdf1, cdf2=cdf2,
-                                                    lower_threshold=0.75, upper_threshold=0.25)
+                                                    cdf1=cdf1, cdf2=cdf2)
                 positions_data[name] = positions
             else:
                 _, _, cdf1, cdf2 = CS.fit_copula(s1_series=BKD_train, s2_series=ESC_train, copula_name=name, nu=3)
                 positions = CS.analyze_time_series(s1_series=BKD_test, s2_series=ESC_test,
-                                                    cdf1=cdf1, cdf2=cdf2,
-                                                    lower_threshold=0.75, upper_threshold=0.25)
+                                                    cdf1=cdf1, cdf2=cdf2, start_position=0,
+                                                    lower_threshold=0.25, upper_threshold=0.75)
                 positions_data[name] = positions
 
         # Load and compare with theoretical data
@@ -472,8 +493,8 @@ class TestCopulas(unittest.TestCase):
                 for ic in ic_type:
                     ic_dict[name][ic] = result_dict[ic]
             else:  # For Student copula, use nu=3
-                _,_,cdf1,cdf2 = CS.fit_copula(s1_series=BKD_clr, s2_series=ESC_clr, copula_name=name, nu=3)
-                result_dict = CS.ic_test(s1_test=BKD_clr, s2_test=ESC_clr, cdf1=cdf1, cdf2=cdf2)
+                _,t_cop,cdf1,cdf2 = CS.fit_copula(s1_series=BKD_clr, s2_series=ESC_clr, copula_name=name, nu=3)
+                result_dict = CS.ic_test(s1_test=BKD_clr, s2_test=ESC_clr, cdf1=cdf1, cdf2=cdf2, copula=t_cop)
                 for ic in ic_type:
                     ic_dict[name][ic] = result_dict[ic]
 
@@ -500,5 +521,5 @@ class TestCopulas(unittest.TestCase):
             for ic in ic_type:
                 self.assertAlmostEqual(ic_dict[name][ic], ic_dict_expect[name][ic], delta=1e-5)
 
-# if __name__ == "__main__":
-#     unittest.main()
+if __name__ == "__main__":
+    unittest.main()
