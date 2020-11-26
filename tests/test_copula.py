@@ -45,6 +45,12 @@ class TestCopulas(unittest.TestCase):
         # Check theta(tau)
         self.assertAlmostEqual(cop.theta_hat(0.5), 2, delta=1e-4)
         
+        # Check side-loading pairs generation
+        unif_vec = np.random.uniform(low=0, high=1, size=(100, 2))
+        sample_pairs = cop.generate_pairs(unif_vec=unif_vec)
+        self.assertEqual(str(type(sample_pairs)), "<class 'numpy.ndarray'>")
+        self.assertEqual(sample_pairs.shape, (100, 2))
+        
         # Check edge cases
         with self.assertRaises(ValueError):
             cop.generate_pairs()
@@ -81,6 +87,12 @@ class TestCopulas(unittest.TestCase):
         # Check theta(tau)
         self.assertAlmostEqual(cop.theta_hat(0.21389456921960), 2, delta=1e-4)
 
+        # Check side-loading pairs generation
+        unif_vec = np.random.uniform(low=0, high=1, size=(100, 2))
+        sample_pairs = cop.generate_pairs(unif_vec=unif_vec)
+        self.assertEqual(str(type(sample_pairs)), "<class 'numpy.ndarray'>")
+        self.assertEqual(sample_pairs.shape, (100, 2))
+
         # Check edge cases
         with self.assertRaises(ValueError):
             cop.generate_pairs()
@@ -111,6 +123,12 @@ class TestCopulas(unittest.TestCase):
         # Check theta(tau)
         self.assertAlmostEqual(cop.theta_hat(0.5), 2, delta=1e-4)
 
+        # Check side-loading pairs generation
+        unif_vec = np.random.uniform(low=0, high=1, size=(100, 2))
+        sample_pairs = cop.generate_pairs(unif_vec=unif_vec)
+        self.assertEqual(str(type(sample_pairs)), "<class 'numpy.ndarray'>")
+        self.assertEqual(sample_pairs.shape, (100, 2))
+
         # Check edge cases
         with self.assertRaises(ValueError):
             cop.generate_pairs()
@@ -139,6 +157,13 @@ class TestCopulas(unittest.TestCase):
         
         # Check theta(tau)
         self.assertAlmostEqual(cop.theta_hat(0.35506593315175), 2, delta=1e-4)
+
+        # Check side-loading pairs generation
+        unif_vec = np.random.uniform(low=0, high=1, size=(100, 2))
+        sample_pairs = cop.generate_pairs(unif_vec=unif_vec)
+        self.assertEqual(str(type(sample_pairs)), "<class 'numpy.ndarray'>")
+        self.assertEqual(sample_pairs.shape, (100, 2))
+
         # Check edge cases
         with self.assertRaises(ValueError):
             cop.generate_pairs()
@@ -176,6 +201,12 @@ class TestCopulas(unittest.TestCase):
         # Check theta(tau)
         self.assertAlmostEqual(cop.theta_hat(0.222657233776425), 2, delta=1e-4)
 
+        # Check side-loading pairs generation
+        unif_vec = np.random.uniform(low=0, high=1, size=(100, 2))
+        sample_pairs = cop.generate_pairs(unif_vec=unif_vec)
+        self.assertEqual(str(type(sample_pairs)), "<class 'numpy.ndarray'>")
+        self.assertEqual(sample_pairs.shape, (100, 2))
+
         # Check edge cases
         with self.assertRaises(ValueError):
             cop.generate_pairs()
@@ -211,6 +242,12 @@ class TestCopulas(unittest.TestCase):
 
         # Check theta(tau)
         self.assertAlmostEqual(cop.theta_hat(3/5), 2, delta=1e-4)
+
+        # Check side-loading pairs generation
+        unif_vec = np.random.uniform(low=0, high=1, size=(100, 2))
+        sample_pairs = cop.generate_pairs(unif_vec=unif_vec)
+        self.assertEqual(str(type(sample_pairs)), "<class 'numpy.ndarray'>")
+        self.assertEqual(sample_pairs.shape, (100, 2))
 
         # Check edge cases
         with self.assertRaises(ValueError):
@@ -279,7 +316,7 @@ class TestCopulas(unittest.TestCase):
 
         # Check theta(tau)
         self.assertAlmostEqual(cop.theta_hat(2*np.arcsin(0.2)/np.pi), 0.2, delta=1e-4)
-        
+
         # log_ml function in ccalc
         ll,_ = copula_calculation.log_ml(x=np.array([0.1, 0.21, 0.5, 0.8]),
                                          y=np.array([0.01, 0.25, 0.4,0.7]),
