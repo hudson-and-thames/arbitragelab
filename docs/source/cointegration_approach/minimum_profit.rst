@@ -18,8 +18,8 @@ from its equilibrium in anticipation of the spread reverting to the mean. Within
 spread refers to cointegration error, and in the remainder of this documentation "spread" and "cointegration error" will
 be used interchangeably.
 
-In order to define a strategy, we need to quantify the concept of "sufficiently far away from the equilibrium of the
-spread", i.e. a pre-set boundary chosen to open a trade, for this boundary can affect the minimum total profit (MTP)
+In order to define a strategy, the concept of "sufficiently far away from the equilibrium of the spread", i.e. a pre-set
+boundary chosen to open a trade, needs to be clearly defined. The boundary can affect the minimum total profit (MTP)
 over a specific trading horizon. The higher the pre-set boundary for opening trades, the higher the profit per trade
 but the lower the trade numbers. The opposite applies to lowering the boundary values. The number of trades over a
 specified trading horizon is determined jointly by the average trade duration and the average inter-trade interval.
@@ -32,7 +32,7 @@ A few assumptions have been made:
 
 - The price of two assets (:math:`S_1` and :math:`S_2`) are cointegrated over the relevant time period, which includes both in-sample and out-of-sample (trading) period.
 - The cointegration error follows a stationary AR(1) process.
-- The cointegration error is symmetrically distributed so that we can apply the optimal boundary on both sides of the mean.
+- The cointegration error is symmetrically distributed so that the optimal boundary could be applied on both sides of the mean.
 - Short sales are permitted or possible through a broker and there is no interest charged for the short sales and no cost for trading.
 - The cointegration coefficient :math:`\beta > 0`, where a cointegration relationship is defined as:
 
@@ -40,19 +40,19 @@ A few assumptions have been made:
 
     P_{S_1,t} - \beta P_{S_2,t} = \varepsilon_t
 
-In the following sections, we will derive the minimum profit per trade and mean first-passage time of a stationary AR(1)
-process.
+In the following sections, the derivation of the minimum profit per trade and mean first-passage time of a stationary
+AR(1) process in the paper will be presented.
 
 Minimum Profit per Trade
 ########################
 
 Denote a trade opened when the cointegration error :math:`\varepsilon_t` overshoots the pre-set upper boundary :math:`U`
 as a **U-trade**, and similarly a trade opened when :math:`\varepsilon_t` falls through the pre-set lower
-boundary :math:`L` as an **L-trade**. Without loss of generality, we assume the mean of :math:`\varepsilon_t` is 0. Then
-the minimum profit per U-trade can be derived from the following trade setup.
+boundary :math:`L` as an **L-trade**. Without loss of generality, it can be assumed that the mean
+of :math:`\varepsilon_t` equals 0. Then the minimum profit per U-trade can be derived from the following trade setup.
 
-- When :math:`\varepsilon_t \geq U` at :math:`t_o`, we open a trade by selling :math:`N` of asset :math:`S_1` and buying :math:`\beta N` of asset :math:`S_2`.
-- When :math:`\varepsilon_t \leq 0` at :math:`t_c`, we square the trade.
+- When :math:`\varepsilon_t \geq U` at :math:`t_o`, open a trade by selling :math:`N` of asset :math:`S_1` and buying :math:`\beta N` of asset :math:`S_2`.
+- When :math:`\varepsilon_t \leq 0` at :math:`t_c`, square the trade.
 
 The profit per trade would thus be:
 
@@ -60,7 +60,7 @@ The profit per trade would thus be:
 
     P = N (P_{S_1, t_o} - P_{S_1, t_c}) + \beta N (P_{S_2, t_c} - P_{S_2, t_o})
 
-Since the two assets are cointegrated during the trade period, we can substitute the cointegration relationship into
+Since the two assets are cointegrated during the trade period, the cointegration relationship can be substituted into
 the above equation and derive the following:
 
 .. math::
@@ -74,19 +74,19 @@ the above equation and derive the following:
     \end{align*}
 
 Thus, by trading the asset pair with the weight as a proportion of the cointegration coefficient, the profit per U-trade
-is at least :math:`U` dollars when trading one unit of the pair. Should the required minimum profit be higher, then we
-can trade multiple units of the pair weighted by the cointegration coefficient.
+is at least :math:`U` dollars when trading one unit of the pair. Should the required minimum profit be higher, then the
+strategy can trade multiple units of the pair weighted by the cointegration coefficient.
 
-According to the assumptions in the Introduction section, we will set the lower boundary at :math:`-U` due to the
+According to the assumptions in the Introduction section, the lower boundary will be set at :math:`-U` due to the
 symmetric distribution of the cointegration error. The profit of an L-trade can thus be derived from the following trade
 setup.
 
-- When :math:`\varepsilon_t \leq -U` at :math:`t_o`, we open a trade by buying :math:`N` of asset :math:`S_1` and selling :math:`\beta N` of asset :math:`S_2`.
-- When :math:`\varepsilon_t \geq 0` at :math:`t_c`, we square the trade.
+- When :math:`\varepsilon_t \leq -U` at :math:`t_o`, open a trade by buying :math:`N` of asset :math:`S_1` and selling :math:`\beta N` of asset :math:`S_2`.
+- When :math:`\varepsilon_t \geq 0` at :math:`t_c`, square the trade.
 
-Using the same derivation above, we can show the profit per L-trade is also at least :math:`U` dollars per unit.
-Therefore, the boundary is exactly the minimum profit per trade, where we only trade one unit of the cointegrated pair
-weighted by the cointegration coefficient.
+Using the same derivation above, it can be shown that the profit per L-trade is also at least :math:`U` dollars per unit.
+Therefore, the boundary is exactly the minimum profit per trade, where the strategy only trade one unit of the
+cointegrated pair weighted by the cointegration coefficient.
 
 .. figure:: images/AME-DOV.png
     :width: 100 %
@@ -111,7 +111,7 @@ time over interval :math:`\lbrack a, b \rbrack` of :math:`Y_t`, starting at init
 
     E(\mathcal{T}_{a,b}(y_0)) = \frac{1}{\sqrt{2 \pi}\sigma_{\xi}}\int_a^b E(\mathcal{T}_{a,b}(u)) \> \mathrm{exp} \Big( - \frac{(u-\phi y_0)^2}{2 \sigma_{\xi}^2} \Big) du + 1
 
-This integral equation can be solved numerically using the Nystrom method, i.e. by solving the following linear
+This integral equation can be solved numerically using the Nyström method, i.e. by solving the following linear
 equations:
 
 .. math::
@@ -168,7 +168,7 @@ The MTP of U-trades within a specific trading horizon :math:`\lbrack 0, T \rbrac
 where :math:`TD_U` is the trade duration and :math:`I_U` is the inter-trade interval.
 
 From the definition, the MTP is simultaneously determined by :math:`TD_U` and :math:`I_U`, both of which can be derived
-from the mean first-passage time. Also, we know that :math:`U` is the minimum profit per U-trade,
+from the mean first-passage time. Also, it is already known that :math:`U` is the minimum profit per U-trade,
 so :math:`\frac{T}{TD_U + I_U} - 1` can be used to estimate the number of U-trades. Following the assumption that the
 de-meaned cointegration error follows an AR(1) process:
 
@@ -199,16 +199,16 @@ the following relationship:
 
     \sigma_a = \sqrt{1 - \phi^2} \sigma_{\varepsilon}
 
-To approximate the infinity limit for both integrals, we use the following stylized fact: for a stationary AR(1) process
+The following stylized fact helped approximate the infinity limit for both integrals: for a stationary AR(1) process
 :math:`\{ \varepsilon_t \}`, the probability that the absolute value of the process :math:`\vert \varepsilon_t \vert` is
-greater than 5 times the standard deviation of the process :math:`5 \sigma_{\varepsilon}` is close to 0. Therefore, we
-will use :math:`5 \sigma_{\varepsilon}` as an approximation of the infinity limit in the integrals.
+greater than 5 times the standard deviation of the process :math:`5 \sigma_{\varepsilon}` is close to 0. Therefore,
+:math:`5 \sigma_{\varepsilon}` will be used as an approximation of the infinity limit in the integrals.
 
 Optimize the Pre-Set Boundaries that Maximizes MTP
 ##################################################
 
-Based on the above definitions, we will give the numerical algorithm to optimize the pre-set boundaries that maximizes
-MTP.
+Based on the above definitions, the numerical algorithm to optimize the pre-set boundaries that maximizes MTP could be
+given as follows.
 
 1. Perform Engle-Granger or Johansen test (see :ref:`here <cointegration_approach-cointegration_tests>`) to derive the cointegration coefficient :math:`\beta`.
 2. Fit the cointegration error :math:`\varepsilon_t` to an AR(1) process and retrieve the AR(1) coefficient and the fitted residual.
