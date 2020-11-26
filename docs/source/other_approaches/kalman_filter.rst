@@ -192,7 +192,7 @@ The following research notebook can be used to better understand the Kalman Filt
 
 * `Kalman Filter`_
 
-.. _`Kalman Filter`: https://github.com/Hudson-and-Thames-Clients/research/blob/master/Statistical%20Arbitrage/kalman_filter.ipynb
+.. _`Kalman Filter`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Other%20Approaches/kalman_filter.ipynb
 
 References
 ##########

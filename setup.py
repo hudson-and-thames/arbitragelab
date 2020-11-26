@@ -14,3 +14,5 @@ setup()
 
 # Bump version
 # bumpversion major/minor/patch --allow-dirty
+# git push origin [0.1.0]
+
