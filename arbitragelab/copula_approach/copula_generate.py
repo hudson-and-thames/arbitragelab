@@ -1325,8 +1325,7 @@ class Switcher:
         self.nu = kwargs.get('nu', None)
         # Create copula from string names, by using class attributes/methods.
         method_name = '_create_' + str(copula_name).lower()
-        method = getattr(self, method_name,
-                         lambda: print("Invalid copula name"))
+        method = getattr(self, method_name)
         return method()
 
     def _create_gumbel(self):

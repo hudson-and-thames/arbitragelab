@@ -415,9 +415,9 @@ class CopulaStrategy:
         ax.set_aspect('equal', adjustable='box')  # Equal scale in x and y.
         if copula_name in self.theta_copula_names:
             ax.set_title(r'{} Copula, $\theta={:.3f}$'.format(copula_name, my_copula.theta))
-        elif copula_name == "Gaussian":
+        if copula_name == "Gaussian":
             ax.set_title(r'{} Copula, $\rho={:.3f}$'.format(copula_name, my_copula.rho))
-        elif copula_name == "Student":
+        if copula_name == "Student":
             ax.set_title(r'Student-t Copula, $\rho={:.3f}$, $\nu={}$'.format(my_copula.rho, my_copula.nu))
 
     def _generate_trading_signal(self, prob_u1: float, prob_u2: float,
