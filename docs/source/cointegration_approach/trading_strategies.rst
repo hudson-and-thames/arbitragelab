@@ -4,7 +4,12 @@
 Trading Strategies
 ==================
 
-The following are some strategies for trading the spread.These descriptions closely follow the book by Ernest P. Chan: `Algorithmic Trading: Winning Strategies and Their Rationale <https://www.wiley.com/en-us/Algorithmic+Trading%3A+Winning+Strategies+and+Their+Rationale-p-9781118460146>`__.
+The following are some strategies for trading the spread.
+
+.. note::
+   These descriptions closely follow the book by Ernest P. Chan:
+   `Algorithmic Trading: Winning Strategies and Their Rationale <https://www.wiley.com/en-us/Algorithmic+Trading%3A+Winning+Strategies+and+Their+Rationale-p-9781118460146>`__.
+
 
 Linear Trading Strategy
 #######################

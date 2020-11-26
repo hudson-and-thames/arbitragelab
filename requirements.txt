@@ -14,6 +14,8 @@ lxml==4.5.2
 requests_html==0.10.0
 
 #Develop
+bump2version==1.0.1
+bumpversion==0.6.0
 codecov==2.0.15
 coverage==4.5.2
 pylint==2.5.3

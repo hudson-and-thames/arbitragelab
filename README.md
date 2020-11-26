@@ -30,4 +30,4 @@ The best place to contact the team is via the ArbitrageLab Slack channel. Altern
 Looking forward to hearing from you!
 
 ## License
-This project is licensed under an all rights reserved licence.
+This project is licensed under an all rights reserved [licence](https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html).

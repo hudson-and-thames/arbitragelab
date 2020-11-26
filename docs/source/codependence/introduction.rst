@@ -4,9 +4,9 @@
 Introduction
 ============
 
-This module includes implementations of codependence metrics. According to Lopez de Prado:
+This module includes implementations of codependence metrics.
 
-"Two random variables are codependent when knowing the value of one helps us determine the value of the other.
+According to Lopez de Prado: "Two random variables are codependent when knowing the value of one helps us determine the value of the other.
 This should not be confounded with the notion of causality."
 
 Pearson correlation coefficient is the most famous and widely used measure of codependence, however, it has some drawbacks.
