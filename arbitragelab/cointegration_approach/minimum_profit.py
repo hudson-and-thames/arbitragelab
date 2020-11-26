@@ -156,13 +156,9 @@ class MinimumProfit:
         # Calculate the cointegration error, epsilon_t
         epsilon_t = self._train_df.iloc[:, 0] + beta * self._train_df.iloc[:, 1]
 
-        # Fit an AR(1) model to find the AR(1) coefficient
-        with warnings.catch_warnings():
-            # Silencing specific statsmodels ValueWarning
-            warnings.filterwarnings('ignore', r'A date index has been provided,')
-
-            ar_fit = sm.tsa.ARMA(epsilon_t, (1, 0)).fit(trend='c', disp=0)
-            _, ar_coeff = ar_fit.params
+        # The beta coefficient output by statsmodels has opposite signs
+        ar_fit = sm.tsa.arima.ARIMA(epsilon_t, order=(1, 0, 0), trend='c').fit()
+        _, ar_coeff = -1. * ar_fit.polynomial_ar
 
         return beta, epsilon_t, ar_coeff, ar_fit.resid
 
