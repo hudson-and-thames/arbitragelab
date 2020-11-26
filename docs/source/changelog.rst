@@ -31,3 +31,5 @@ Changelog
 * :support:`17` Added Licence, ReadMe, and RoadMap
 * :support:`20` Added API Key Validation.
 * :support:`20` Add install documentation and test on OS/Ubuntu/Windows.
+* :feature:`5` ML Based Pairs Selection (Horta, 2020) and Data Importer added.
+* :support:`5` ML Based Pairs Selection and Data Importer documentation.
