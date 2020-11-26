@@ -8,9 +8,9 @@ cointegration_approach/trading_simulation.py
 """
 
 import os
-import pickle
 import unittest
 
+import numpy as np
 import pandas as pd
 from matplotlib.dates import num2date
 from matplotlib.figure import Figure
@@ -30,10 +30,11 @@ class TestTradingSimulation(unittest.TestCase):
 
         # Load a pre-calculated trade signal
         project_path = os.path.dirname(__file__)
-        data_path = project_path + '/test_data/trading_strategy_example.pkl'
-        with open(data_path, 'rb') as signal_f:
-            data = pickle.load(signal_f)
-            self.signal, self.num_of_shares, self.cond_lines = list(data)
+        data_path = project_path + '/test_data/trading_signals.csv'
+        self.signal = pd.read_csv(data_path, parse_dates=['Date'])
+        self.signal.set_index("Date", inplace=True)
+        self.num_of_shares = np.array([2440., 2316.])
+        self.cond_lines = np.array([-5.49305612, -3.44305612, -1.39305612])
 
     def test_initialize(self):
         """
@@ -72,7 +73,7 @@ class TestTradingSimulation(unittest.TestCase):
 
         # See if the final total profit matches
         final_profit = trader._mtm['Total Equity'][-1] - 1000000.
-        self.assertAlmostEqual(final_profit, 3584.14)
+        self.assertAlmostEqual(final_profit, 176443.12)
 
     def test_plot_strategy(self):
         """

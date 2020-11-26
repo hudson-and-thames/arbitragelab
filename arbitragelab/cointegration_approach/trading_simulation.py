@@ -2,7 +2,7 @@
 # All rights reserved
 # Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 
-# pylint: disable=invalid-name, too-many-statements
+# pylint: disable=invalid-name
 """
 This module simulates trading based on the minimum profit trading signal, reports the trades,
 and plots the equity curve.
@@ -70,8 +70,6 @@ class TradingSim:
         # Generate report
         self.initialize_report()
 
-        print(type(signals))
-        print(signals.head(5))
         # Trading periods in the trade_df
         period = len(signals)
 
