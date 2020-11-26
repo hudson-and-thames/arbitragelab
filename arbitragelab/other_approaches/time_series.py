@@ -64,18 +64,16 @@ class QuantileTimeSeriesTradingStrategy:
         axes[1].set_title('Negative differences KDE')
         plt.show()
 
-    def get_allocation(self, current_value: float, prediction: float, exit_threshold: float = 0) -> int:
+    def get_allocation(self, predicted_difference: float, exit_threshold: float = 0) -> int:
         """
         Get target allocation (-1, 0, 1) based on current spread value, predicted value and exit threshold. -1/1 means
         either to open a new short/long position or stay in long/short trade (if the position has been already opened).
         0 means exit the position.
-        :param current_value: (float) Current spread value.
-        :param prediction: (float) Predicted spread value.
+        :param predicted_difference: (float) Spread predicted value - current spread value
         :param exit_threshold: (float) Difference between predicted and current value threshold to close the trade.
         :return: (int) -1 (short), 0 (exit current position/stay in cash), 1(long) trade signal.
         """
         # New position entry
-        predicted_difference = prediction - current_value
         if predicted_difference >= self.long_diff_threshold:
             return_flag = 1
         elif predicted_difference <= self.short_diff_threshold:

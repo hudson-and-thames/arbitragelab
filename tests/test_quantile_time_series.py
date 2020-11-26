@@ -39,7 +39,7 @@ class TestQuantileTimeSeries(unittest.TestCase):
 
         # Test predictions
         for pred, actual in zip(self.forecast_series.shift(-1), self.spread_series):
-            trading_strategy.get_allocation(actual, pred, exit_threshold=0)
+            trading_strategy.get_allocation(pred-actual, exit_threshold=0)
 
         self.assertEqual(trading_strategy.positions[5], -1)
         self.assertEqual(trading_strategy.positions[9], 1)
