@@ -70,8 +70,10 @@ class TradingSim:
         # Generate report
         self.initialize_report()
 
+        print(type(signals))
+        print(signals.head(5))
         # Trading periods in the trade_df
-        period = signals.shape[0]
+        period = len(signals)
 
         # Add a flag to let the simulator know if a U-trade is currently open or a L-trade
         current_trade = 0
