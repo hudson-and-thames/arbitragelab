@@ -274,5 +274,27 @@ class Heat_potentials():
         sharpe_ratio = (E(T) - a) / np.sqrt(F(T) - E(T) ** 2 + summ_term)
 
         return sharpe_ratio
+    def optimal_levels(self):
+        """
+        """
 
+        stop_loss_guess = self.theta - 6 / np.sqrt(2)
 
+        profit_taking_guess = self.theta + 6 / np.sqrt(2)
+
+        # Setting bounds
+        # max duration > 0, profit-taking level > 0, stop-loss < 0
+        bounds = ((1e-5, None), (None, 1e-5))
+
+        # Initial guesses for theta, mu, sigma
+        initial_guess = np.array((profit_taking_guess, stop_loss_guess))
+
+        result = so.minimize(self.neg_sharpe_calculation, initial_guess, bounds=bounds)
+
+        # Unpacking optimal values
+        profit_taking, stop_loss = result.x
+
+        # Undo negation
+        max_sharpe = -result.fun
+
+        return profit_taking, stop_loss, max_sharpe
