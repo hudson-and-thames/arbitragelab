@@ -1,13 +1,14 @@
 # Copyright 2019, Hudson and Thames Quantitative Research
 # All rights reserved
-# Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
+# Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 """
 Master module that uses copula for trading strategy.
 """
-# pylint: disable = invalid-name, invalid-unary-operand-type
+# pylint: disable = invalid-name
 from typing import Callable
 import matplotlib.pyplot as plt
 import numpy as np
+
 import arbitragelab.copula_approach.copula_generate as cg
 import arbitragelab.copula_approach.copula_calculation as ccalc
 
@@ -43,6 +44,7 @@ class CopulaStrategy:
         :param default_upper_threshold: (float) Optional. The default upper threshold for opening a position for
             trading signal generation. Defaults to 0.95.
         """
+
         # Copulas that uses theta as parameter
         self.theta_copula_names = ['Gumbel', 'Clayton', 'Frank',
                                    'Joe', 'N13', 'N14']
@@ -50,6 +52,7 @@ class CopulaStrategy:
         self.cov_copula_names = ['Gaussian', 'Student']
         self.all_copula_names = self.theta_copula_names \
                                 + self.cov_copula_names
+
         # Default trading positions.
         # 1: Long the spread.
         # -1: Short the spread.
@@ -60,12 +63,13 @@ class CopulaStrategy:
             self.position_kind = position_kind
         # To be used for the test data set.
         self.copula = copula
+
         # Default thresholds for opening trading positions.
         self.lower_threshold = default_lower_threshold
         self.upper_threshold = default_upper_threshold
 
     def fit_copula(self, s1_series: np.array, s2_series: np.ndarray, copula_name: str,
-                   if_empirical_cdf: bool = True, if_renew: bool = True, **kwargs):
+                   if_empirical_cdf: bool = True, if_renew: bool = True, **kwargs: dict) -> tuple:
         r"""
         Conduct a max likelihood estimation and information criterion.
 
@@ -76,21 +80,22 @@ class CopulaStrategy:
         The output returns:
             - result_dict: (dict) The name of the copula and its SIC, AIC, HQIC values;
             - copula: (Copula) The fitted copula with parameters satisfying maximum likelihood;
-            - s1_cdf: (func) The cumulative density function for stock 1, using training data.
-            - s2_cdf: (func) The cumulative density function for stock 2, using training data.\
+            - s1_cdf: (func) The cumulative density function for stock 1, using training data;
+            - s2_cdf: (func) The cumulative density function for stock 2, using training data.
 
         :param s1_series: (np.array) 1D stock time series data in desired form.
         :param s2_series: (np.array) 1D stock time series data in desired form.
         :param copula_name: (str) Type of copula to fit.
         :param if_empirical_cdf: (bool) Whether use empirical cumulative density function to fit data.
         :param if_renew: (bool) Whether use the fitted copula to replace the copula in CopulaStrategy.
-        :param kwargs: Input degree of freedom if using Student-t copula. e.g. nu=10.
+        :param kwargs (dict): Input degree of freedom if using Student-t copula. e.g. nu=10.
         :return: (dict, Copula, func, func)
             The name of the copula and its SIC, AIC, HQIC values;
             The fitted copula with parameters satisfying maximum likelihood;
-            The cumulative density function for stock 1, using training data.
+            The cumulative density function for stock 1, using training data;
             The cumulative density function for stock 2, using training data.
         """
+
         nu = kwargs.get('nu', None)  # Degree of freedom for Student-t copula.
         num_of_instances = len(s1_series)  # Number of instances.
 
@@ -125,9 +130,9 @@ class CopulaStrategy:
 
     def ic_test(self, s1_test: np.array, s2_test: np.array,
                 cdf1: Callable[[float], float], cdf2: Callable[[float], float],
-                copula: cg.Copula = None):
+                copula: cg.Copula = None) -> dict:
         """
-        Run SIC, AIC and HQIC of the fitted copula given data.
+        Run SIC, AIC, and HQIC of the fitted copula given data.
 
         This method only works if CopulaStrategy has fitted a copula given training data.
 
@@ -142,6 +147,7 @@ class CopulaStrategy:
         :param copula: (Copula) The copula to be evaluated. By default it uses the system's copula.
         :return: (dict) Result of SIC, AIC and HQIC.
         """
+
         num_of_instances = len(s1_test)
         if copula is None:
             copula = self.copula
@@ -175,7 +181,7 @@ class CopulaStrategy:
 
         return result_dict
 
-    def graph_copula(self, copula_name: str, ax: plt.axes = None, **kwargs):
+    def graph_copula(self, copula_name: str, ax: plt.axes = None, **kwargs: dict) -> plt.axes:
         """
         Graph the sample from a given copula by its parameters. Returns axis.
 
@@ -191,8 +197,9 @@ class CopulaStrategy:
         :param copula_name: (str) Name of the copula to graph.
         :param ax: (plt.axes) Plotting axes.
         :param kwargs: Parameters for the copula and the plot axes.
-        :return ax: (plt.axes) Plotting axes.
+        :return: (plt.axes) Plotting axes.
         """
+
         num = kwargs.get('num', 2000)  # Num of data points to plot.
         # Copula specific parameters.
         theta = kwargs.get('theta', None)
@@ -245,7 +252,7 @@ class CopulaStrategy:
     def analyze_time_series(self, s1_series: np.array, s2_series: np.array,
                             cdf1: Callable[[float], float], cdf2: Callable[[float], float],
                             upper_threshold: float = None, lower_threshold: float = None,
-                            start_position: int = None):
+                            start_position: int = None) -> np.array:
         """
         Generate positions given time series of two stocks.
 
@@ -260,9 +267,9 @@ class CopulaStrategy:
         :param start_position: (int) Optional. Starting position. Defaults to no position.
         :param upper_threshold: (float) Upper threshold. Class defaults to 0.95.
         :param lower_threshold: (float) Lower threshold. Class defaults to 0.05.
-
-        :return positions: (np.array) The suggested positions for the given price data.
+        :return: (np.array) The suggested positions for the given price data.
         """
+
         # Update the trading thresholds if there are inputs. Otherwise use the default.
         if upper_threshold is not None:
             self.upper_threshold = upper_threshold
@@ -293,10 +300,11 @@ class CopulaStrategy:
                                        prev_prob_u1=probs_1[idx - 1],
                                        prev_prob_u2=probs_2[idx - 1],
                                        current_pos=positions[idx - 1])
+
         return positions
 
     def get_next_position(self, prob_u1: float, prob_u2: float,
-                          prev_prob_u1: float, prev_prob_u2: float, current_pos: int):
+                          prev_prob_u1: float, prev_prob_u2: float, current_pos: int) -> int:
         """
         Get the next trading position.
 
@@ -316,6 +324,7 @@ class CopulaStrategy:
         :param current_pos: (int) Most recent trading position.
         :return: (int) Suggested trading position after assessment.
         """
+
         open_signal, exit_signal = self._generate_trading_signal(prob_u1,
                                                                  prob_u2,
                                                                  prev_prob_u1,
@@ -332,11 +341,12 @@ class CopulaStrategy:
         # then hold no position.
         elif exit_signal is True:
             return self.position_kind[2]
+
         # By default, hold the current position.
         return current_pos
 
     @staticmethod
-    def cum_log_return(price_series: np.array, start: float = None):
+    def cum_log_return(price_series: np.array, start: float = None) -> np.array:
         """
         Convert a price time series to cumulative log return.
 
@@ -344,8 +354,9 @@ class CopulaStrategy:
 
         :param price_series: (np.array) 1D price time series.
         :param start: (float) Initial price. Default to the starting element of price_series.
-        :return clr: (np.array) 1D cumulative log return series.
+        :return: (np.array) 1D cumulative log return series.
         """
+
         if start is None:
             start = price_series[0]
         log_start = np.log(start)
@@ -358,7 +369,7 @@ class CopulaStrategy:
         return clr
 
     def series_condi_prob(self, s1_series: np.array, s2_series: np.array,
-                          cdf1: Callable[[float], float], cdf2: Callable[[float], float]):
+                          cdf1: Callable[[float], float], cdf2: Callable[[float], float]) -> np.array:
         """
         Calculate the cumulative conditional probabilities for two time series.
 
@@ -372,8 +383,9 @@ class CopulaStrategy:
         :param s2_series: (np.array) 1D time series from stock 2.
         :param cdf1: (func) Marginal C.D.F. for stock 1.
         :param cdf2: (func) Marginal C.D.F. for stock 2.
-        :return prob_series: (np.array) (N, 2) shaped array storing the conditional C.D.F. pair for the stock pair.
+        :return: (np.array) (N, 2) shaped array storing the conditional C.D.F. pair for the stock pair.
         """
+
         num_of_instances = len(s1_series)
 
         prob_series = np.zeros((num_of_instances, 2))
@@ -387,19 +399,24 @@ class CopulaStrategy:
         return prob_series
 
     @staticmethod
-    def _create_copula_by_name(**kwargs):
+    def _create_copula_by_name(**kwargs: dict) -> object:
         """
         Construct a copula given name (str) and parameters.
 
         Wrapper function around a switch emulator.
+
+        :param kwargs: (dict) Input arguments.
+        :return: (Copula) Constructed copula.
         """
+
         # Use the Switch class to generate copula given name and parameter(s).
         Switch = cg.Switcher()
         result = Switch.choose_copula(**kwargs)
+
         return result
 
     def _graph_copula(self, my_copula: cg.Copula, copula_name: str, result: np.array,
-                      ax: plt.axes = None, **kwargs):
+                      ax: plt.axes = None, **kwargs: dict) -> tuple:
         """
         Create figure and axis.
 
@@ -410,6 +427,7 @@ class CopulaStrategy:
         :param kwargs: (dict) Kwargs specifying plotting features.
         :return: (plt.fig, plt.axis) Plotting fig and axex.
         """
+
         # Unpacking plotting kwargs.
         plot_kwargs = kwargs
 
@@ -425,13 +443,13 @@ class CopulaStrategy:
 
     def _generate_trading_signal(self, prob_u1: float, prob_u2: float,
                                  prev_prob_u1: float, prev_prob_u2: float,
-                                 current_pos: int):
+                                 current_pos: int) -> tuple:
         """
         Generate trading signal given pairs probabilities and positions.
 
         There are two signals:
             open_type: -1, 1, or None, indicating the type of position one should open. None means do not open.
-            to_exit: bool, inidicating if one should exit the current position.
+            to_exit: bool, indicating if one should exit the current position.
 
         :param prob_u1: (float) Current marginal C.D.F. for stock 1, given stock 2.
         :param prob_u2: (float) Current marginal C.D.F. for stock 2, given stock 1.
@@ -440,6 +458,7 @@ class CopulaStrategy:
         :param current_pos: (int) Most recent trading position.
         :return: (tuple) Suggested trading signal after assessment.
         """
+
         # Default values.
         open_type = None
         to_exit = False
@@ -454,6 +473,7 @@ class CopulaStrategy:
         else:
             to_exit = self._check_if_cross(prob_u1, prob_u2,
                                            prev_prob_u1, prev_prob_u2)
+
             return open_type, to_exit
 
     def _condi_prob(self, s1: np.array, s2: np.array,
@@ -474,6 +494,7 @@ class CopulaStrategy:
         :param cdf2: (func) Marginal C.D.F. for stock 2.
         :return: (tuple) P(U1<=u1 | U2=u2), P(U2<=u2 | U1=u1).
         """
+
         u1 = cdf1(s1)
         u2 = cdf2(s2)
         # P(U1<=u1 | U2=u2)
@@ -483,7 +504,7 @@ class CopulaStrategy:
 
         return prob_u1_given_u2, prob_u2_given_u1
 
-    def _check_open_position(self, prob_u1: float, prob_u2: float):
+    def _check_open_position(self, prob_u1: float, prob_u2: float) -> int:
         """
         Check if open position from price quantile data given threshold.
 
@@ -495,8 +516,9 @@ class CopulaStrategy:
 
         :param prob_u1: (float) Current marginal C.D.F. for stock 1, given stock 2.
         :param prob_u2: (float) Current marginal C.D.F. for stock 2, given stock 1.
-        :return pairs_action: Suggested opening position after assessment.
+        :return: (int) Suggested opening position after assessment.
         """
+
         # Use the class attribute for thresholds.
         lower_threshold = self.lower_threshold
         upper_threshold = self.upper_threshold
@@ -520,7 +542,7 @@ class CopulaStrategy:
         Check if to exit position from conditional probability.
 
         When any one of the conditional probability crosses the threshold band, we
-        attemp to close the position.
+        attempt to close the position.
 
         :param prob_u1: (float) Current marginal C.D.F. for stock 1, given stock 2.
         :param prob_u2: (float) Current marginal C.D.F. for stock 2, given stock 1.
@@ -530,6 +552,7 @@ class CopulaStrategy:
         :param lower_exit_threshold: (float) Lower bound of the threshold band. Defaults to 0.5.
         :return: (int) Suggested trading position after assessment.
         """
+
         prob_u1_x_up = (prev_prob_u1 <= lower_exit_threshold
                         and prob_u1 >= upper_exit_threshold)  # Prob u1 crosses upward
         prob_u1_x_down = (prev_prob_u1 >= upper_exit_threshold
