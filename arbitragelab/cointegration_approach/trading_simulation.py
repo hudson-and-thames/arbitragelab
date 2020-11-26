@@ -8,7 +8,7 @@ This module simulates trading based on the minimum profit trading signal, report
 and plots the equity curve.
 """
 
-from typing import Optional
+from typing import Optional, Tuple
 
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
@@ -37,9 +37,7 @@ class TradingSim:
 
         # Record mark-to-market P&L everyday to give a proper view of drawdowns during the trades
         self._pnl = 0.
-        self._mtm = {
-            "P&L": [],
-            "Total Equity": []}
+        self._mtm = None
 
     def initialize_report(self):
         """
@@ -57,7 +55,11 @@ class TradingSim:
             "Leg 2 Shares": [],
             "Leg 2 Price": []}
 
-    def trade(self, signals: pd.DataFrame, num_of_shares: np.array):
+        self._mtm = {
+            "P&L": [],
+            "Total Equity": []}
+
+    def _trade(self, signals: pd.DataFrame, num_of_shares: np.array):
         """
         Trade the cointegrated pairs based on the optimized signal.
 
@@ -72,9 +74,6 @@ class TradingSim:
         period = signals.shape[0]
 
         # Add a flag to let the simulator know if a U-trade is currently open or a L-trade
-        # No open position = 0
-        # U-trade = 1
-        # L-trade = -1
         current_trade = 0
 
         # Start trading
@@ -163,32 +162,38 @@ class TradingSim:
 
                 # Will not close the trade on the same day (using elif)
 
-    def summary(self) -> pd.DataFrame:
+    def summary(self, signals: pd.DataFrame, num_of_shares: np.array) -> pd.DataFrame:
         """
-        Generate the trade reports.
+        Trade the strategy and generate the trade reports.
 
+        :param signals: (pd.DataFrame) Dataframe that contains asset prices and trade signals.
+        :param num_of_shares: (np.array) Optimized number of shares to trade.
         :return (pd.DataFrame, np.array): A dataframe that contains each opening/closing trade details, P&L,
             and equity curves; a NumPy array that represents the number of U-trade and L-trade over the period
         """
 
+        self._trade(signals, num_of_shares)
         report_df = pd.DataFrame(self._report)
         return report_df
 
-    def plot_signals(self, signals: pd.DataFrame, cond_lines: np.array, figw: float = 15, figh: float = 10,
-                     start_date: Optional[pd.Timestamp] = None, end_date: Optional[pd.Timestamp] = None):
+    def _plot_signals(self, signals: pd.DataFrame, num_of_shares: np.array, cond_lines: np.array,
+                      figw: float = 15, figh: float = 10, start_date: Optional[pd.Timestamp] = None,
+                      end_date: Optional[pd.Timestamp] = None) -> plt.Figure:
         """
         Plot the spread and the signals
 
         :param signals: (pd.DataFrame) Dataframe that contains the trading signal.
+        :param num_of_shares: (np.array) Numpy array that contains the number of shares.
         :param cond_lines: (np.array) Numpy array that contains the trade initiation/close signal line.
         :param figw: (float) Figure width.
         :param figh: (float) Figure height.
         :param start_date: (pd.Timestamp) The starting point of the plot.
         :param end_date: (pd.Timestamp) The end point of the plot.
+        :return: (plt.Figure) The object of the plot.
         """
 
         # Retrieve the trade report for trading dates
-        report = self.summary()
+        report = self.summary(signals, num_of_shares)
 
         # Define the ticks on the x-axis
         years = mdates.YearLocator()  # every year
@@ -246,10 +251,13 @@ class TradingSim:
             else:
                 ax2.annotate("", (arrow_xpos, arrow_ypos), xytext=(0, -15),
                              textcoords='offset points', arrowprops=dict(arrowstyle='-|>', color='black'))
+
+        fig.suptitle("Optimal Pre-set Boundaries and Trading Signals", fontsize=20)
         return fig
 
-    def plot_equity_curve(self, signal: pd.DataFrame, figw: float = 15., figh: float = 10.,
-                          start_date: Optional[pd.Timestamp] = None, end_date: Optional[pd.Timestamp] = None):
+    def _plot_pnl_curve(self, signal: pd.DataFrame, figw: float = 15., figh: float = 10.,
+                        start_date: Optional[pd.Timestamp] = None,
+                        end_date: Optional[pd.Timestamp] = None) -> plt.Figure:
         """
         Plot the equity curve (marked to market daily) trading the strategy.
 
@@ -258,6 +266,7 @@ class TradingSim:
         :param figh: (float) Figure heght.
         :param start_date: (pd.Timestamp) The starting point of the plot.
         :param end_date: (pd.Timestamp) The end point of the plot.
+        :return: (plt.Figure) The object of the plot.
         """
 
         # Build the equity curve dataframe
@@ -288,4 +297,30 @@ class TradingSim:
         if start_date is not None and end_date is not None:
             ax.set_xlim((start_date, end_date))
 
+        fig.suptitle("P&L Curve of the Trading Strategy", fontsize=20)
         return fig
+
+    def plot_strategy(self, signal: pd.DataFrame, num_of_shares: np.array, cond_lines: np.array,
+                      figw: float = 15, figh: float = 10, start_date: Optional[pd.Timestamp] = None,
+                      end_date: Optional[pd.Timestamp] = None) -> Tuple[plt.Figure, plt.Figure]:
+        """
+        Plot the trading signal and the PnL curve of the trading strategy
+
+        :param signal: (pd.DataFrame) Dataframe containing the trading signal.
+        :param num_of_shares: (np.array) Numpy array that contains the number of shares.
+        :param cond_lines: (np.array) Numpy array that contains the trade initiation/close signal line.
+        :param figw: (float) Figure width.
+        :param figh: (float) Figure heght.
+        :param start_date: (pd.Timestamp) The starting point of the plot.
+        :param end_date: (pd.Timestamp) The end point of the plot.
+        :return: (plt.Figure, plt.Figure) The object of the trading signal plot; the object of the P&L curve plot.
+        """
+
+        # A wrapper function to plot two figures
+        fig1 = self._plot_signals(signal, num_of_shares, cond_lines, figw=figw, figh=figh,
+                                  start_date=start_date, end_date=end_date)
+        fig2 = self._plot_pnl_curve(signal, figw=figw, figh=figh, start_date=start_date, end_date=end_date)
+
+        return fig1, fig2
+
+
