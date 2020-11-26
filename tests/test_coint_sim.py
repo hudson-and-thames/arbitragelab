@@ -140,8 +140,7 @@ class TestCointegrationSimulation(unittest.TestCase):
         manual_mean, manual_std = simulation.verify_ar(simulated_manual)
         stats_mean, stats_std = simulation.verify_ar(simulated_statsmodel)
         target = self.normal_price_params['ar_coeff']
-        print(manual_mean, manual_std)
-        print(stats_mean, stats_std)
+
         self.assertTrue(manual_mean - manual_std <= target <= manual_mean + manual_std)
         self.assertTrue(stats_mean - stats_std <= target <= stats_mean + stats_std)
 

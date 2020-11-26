@@ -67,7 +67,6 @@ class TestMinimumProfit(unittest.TestCase):
         Unit tests for cointegration coefficient calculation.
         """
 
-        print("Test_fit():")
         optimizer = MinimumProfit(self.data)
 
         _, _ = optimizer.train_test_split(date_cutoff=pd.Timestamp(2002, 1, 1))
@@ -78,7 +77,7 @@ class TestMinimumProfit(unittest.TestCase):
         self.assertAlmostEqual(beta_eg, -1.8378837809650117)
         self.assertAlmostEqual(beta_jo, -1.8647763422880634)
         self.assertAlmostEqual(ar_coeff_eg, 0.8933437089287942)
-        self.assertAlmostEqual(ar_coeff_jo, 0.892487910270181)
+        self.assertAlmostEqual(ar_coeff_jo, 0.8924885761351791)
 
         # Check if the cointegration error and residual error follows the following relationship:
         # sigma_epsilon = \sqrt{1 - phi^2} sigma_a
@@ -99,7 +98,6 @@ class TestMinimumProfit(unittest.TestCase):
         Unit tests for warnings triggered when the series pair is not cointegrated.
         """
 
-        print("Test_fit_warning():")
         optimizer = MinimumProfit(self.no_coint_data)
 
         train_df, _ = optimizer.train_test_split(date_cutoff=pd.Timestamp(2020, 1, 1))
@@ -119,7 +117,6 @@ class TestMinimumProfit(unittest.TestCase):
         Use specified parameters here instead of fit from data.
         """
 
-        print("Test_optimize():")
         # Use an empty Dataframe to initialize an instance of optimizer
         empty_df = pd.DataFrame(columns=['Share S1', 'Share S2'])
         optimizer = MinimumProfit(empty_df)
