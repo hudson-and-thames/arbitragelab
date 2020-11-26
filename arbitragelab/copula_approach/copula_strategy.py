@@ -212,7 +212,7 @@ class CopulaStrategy:
                                **plot_kwargs)
 
         # Gaussian copula uses cov (covariance matrix) as parameter.
-        elif copula_name == 'Gaussian':
+        if copula_name == 'Gaussian':
             # Generate data for plotting.
             my_copula = self._create_copula_by_name(copula_name=copula_name,
                                                     cov=cov)
@@ -224,7 +224,7 @@ class CopulaStrategy:
                                **plot_kwargs)
 
         # Student-t copula uses cov (covariance matrix) and nu (degree of freedom) as parameters.
-        elif copula_name == 'Student':
+        if copula_name == 'Student':
             # Generate data for plotting.
             my_copula = self._create_copula_by_name(copula_name=copula_name,
                                                     cov=cov,

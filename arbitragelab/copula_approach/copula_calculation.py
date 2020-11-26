@@ -96,7 +96,7 @@ def log_ml(x: np.array, y: np.array, copula_name: str, nu: float = None):
         theta = ml_theta_hat(x, y, copula_name)
         my_copula = switch.choose_copula(copula_name=copula_name,
                                          theta=theta)
-    elif copula_name == 'Gaussian':
+    if copula_name == 'Gaussian':
         # 1. Calculate covariance matrix using sklearn.
         # Correct matrix dimension for fitting in sklearn.
         unif_data = np.array([x, y]).reshape(2, -1).T
@@ -107,7 +107,7 @@ def log_ml(x: np.array, y: np.array, copula_name: str, nu: float = None):
         # 2. Construct copula with fitted parameter.
         my_copula = switch.choose_copula(copula_name=copula_name,
                                          cov=cov_hat)
-    elif copula_name == 'Student':
+    if copula_name == 'Student':
         # 1. Calculate covariance matrix using sklearn.
         # Correct matrix dimension for fitting in sklearn.
         unif_data = np.array([x, y]).reshape(2, -1).T

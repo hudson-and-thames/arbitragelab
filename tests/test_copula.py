@@ -502,7 +502,8 @@ class TestCopulas(unittest.TestCase):
                 result_dict,_,_,_ = CS.fit_copula(s1_series=BKD_clr, s2_series=ESC_clr, copula_name=name)
                 aics[name] = result_dict['AIC']
             else:  # For Student copula
-                result_dict,_,_,_ = CS.fit_copula(s1_series=BKD_clr, s2_series=ESC_clr, copula_name=name, nu=3)
+                result_dict,_,_,_ = CS.fit_copula(s1_series=BKD_clr, s2_series=ESC_clr, copula_name=name, nu=3,
+                                                  if_renew=False)
                 aics[name] = result_dict['AIC']
 
         expeced_aics = {'Gumbel': -1996.8584204971112, 'Clayton': -1982.1106036413414,
