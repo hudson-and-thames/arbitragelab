@@ -160,7 +160,6 @@ class CointegrationSimulation:
         :return: (np.array) ts_num simulated series generated.
         """
 
-        print("simulate_ar():")
         # Store the series
         series_list = []
 
@@ -308,7 +307,6 @@ class CointegrationSimulation:
             the standard deviation of AR(1) coefficient of the process.
         """
 
-        print("Test verify_ar():")
         # Store all the AR(1) coefficients
         ar_coeff_list = []
 
