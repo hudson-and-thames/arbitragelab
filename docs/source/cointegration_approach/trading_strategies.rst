@@ -4,7 +4,12 @@
 Trading Strategies
 ==================
 
-The following are some strategies for trading the spread.These descriptions closely follow the book by Ernest P. Chan: `Algorithmic Trading: Winning Strategies and Their Rationale <https://www.wiley.com/en-us/Algorithmic+Trading%3A+Winning+Strategies+and+Their+Rationale-p-9781118460146>`__.
+The following are some strategies for trading the spread.
+
+.. note::
+   These descriptions closely follow the book by Ernest P. Chan:
+   `Algorithmic Trading: Winning Strategies and Their Rationale <https://www.wiley.com/en-us/Algorithmic+Trading%3A+Winning+Strategies+and+Their+Rationale-p-9781118460146>`__.
+
 
 Linear Trading Strategy
 #######################
@@ -134,7 +139,7 @@ The following research notebook can be used to better understand the mean-revert
 
 * `Mean Reversion`_
 
-.. _`Mean Reversion`: https://github.com/Hudson-and-Thames-Clients/research/blob/master/Statistical%20Arbitrage/mean_reversion.ipynb
+.. _`Mean Reversion`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Cointegration%20Approach/mean_reversion.ipynb
 
 References
 ##########

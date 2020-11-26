@@ -226,7 +226,7 @@ The following research notebook can be used to better understand the distance ap
 
 * `Basic Distance Approach`_
 
-.. _`Basic Distance Approach`: https://github.com/Hudson-and-Thames-Clients/research/blob/master/Statistical%20Arbitrage/distance_approach.ipynb
+.. _`Basic Distance Approach`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Distance%20Approach/basic_distance_approach.ipynb
 
 
 References

@@ -261,3 +261,12 @@ The following examples show how the described above correlation-based metrics ca
 
     # Calculate the Norm distance between two correlation matrices
     dist = norm_distance(corr_18, corr_19)
+
+References
+##########
+* `De Prado, M.L., 2016. Building diversified portfolios that outperform out of sample. The Journal of Portfolio Management, 42(4), pp.59-69. <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2708678>`__
+* `De Prado, M.L., 2020. Codependence (Presentation Slides). Available at SSRN 3512994. <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994>`__
+* `Johnson, D. and Sinanovic, S., 2001. Symmetrizing the kullback-leibler distance. IEEE Transactions on Information Theory. <https://scholarship.rice.edu/bitstream/handle/1911/19969/Joh2001Mar1Symmetrizi.PDF?sequence=1>`__
+* `Newton, M.A., 2010. Introducing the discussion paper by Szekely and Rizzo. arXiv preprint arXiv:1010.3575. <https://arxiv.org/pdf/1010.3575>`__
+* `Székely, G.J., Rizzo, M.L. and Bakirov, N.K., 2007. Measuring and testing dependence by correlation of distances. The annals of statistics, 35(6), pp.2769-2794. <https://projecteuclid.org/download/pdfview_1/euclid.aos/1201012979>`__
+* `Tumminello, M., Lillo, F. and Mantegna, R.N., 2007. Kullback-Leibler distance as a measure of the information filtered from multivariate data. Physical Review E, 76(3), p.031123. <https://arxiv.org/pdf/0706.0168>`__

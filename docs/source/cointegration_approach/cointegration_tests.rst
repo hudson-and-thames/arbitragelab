@@ -226,7 +226,7 @@ Research Notebooks
 
 * `Mean Reversion`_
 
-.. _`Mean Reversion`: https://github.com/Hudson-and-Thames-Clients/research/blob/master/Statistical%20Arbitrage/mean_reversion.ipynb
+.. _`Mean Reversion`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Cointegration%20Approach/mean_reversion.ipynb
 
 References
 ##########
