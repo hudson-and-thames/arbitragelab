@@ -21,6 +21,40 @@ class Heat_potentials():
         self.optimal_profit = None
         self.optimal_stop_loss = None
         self.delta_grid = None
+        self.sharpe = None
+        self.T = None
+
+    def fit(self, ou_params, delta_grid, T=None):
+        """
+        """
+        # theta, mu, sigma = ou.optimal_coefficients(ou_data)
+
+        theta, mu, sigma = ou_params
+        self.delta_grid = delta_grid
+
+        if T is not None:
+            self.T = mu * T
+
+        self.theta = np.sqrt(mu) * theta / sigma
+
+        profit_taking, stop_loss, max_sharpe = self.optimal_levels()
+
+        self.optimal_profit = sigma * profit_taking / np.sqrt(mu)
+
+        self.optimal_stop_loss = sigma * profit_taking / np.sqrt(mu)
+
+    def description(self):
+        """
+        """
+        # Calculating the default data values
+        data = [self.optimal_profit, self.optimal_stop_loss, self.T / mu]
+        # Setting the names for the data indexes
+        index = ['profit-taking threshold', 'stop-loss level', 'max duration of the trade']
+
+        # Combine data and indexes into the pandas Series
+        output = pd.Series(data=data, index=index)
+
+        return output
 
     def v(self, T: float):
         """
