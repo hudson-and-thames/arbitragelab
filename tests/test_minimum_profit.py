@@ -30,11 +30,7 @@ class TestMinimumProfit(unittest.TestCase):
         Data: XLF-XLK daily data (1/1/2018 - 11/17/2020)
         :return:
         """
-
-        # Fixing random seed
         np.random.seed(50)
-
-        # Loading the data
         project_path = os.path.dirname(__file__)
         data_path = project_path + '/test_data/ANZ-ADB.csv'
         no_coint_path = project_path + '/test_data/XLF-XLK.csv'
@@ -71,6 +67,7 @@ class TestMinimumProfit(unittest.TestCase):
         Unit tests for cointegration coefficient calculation.
         """
 
+        print("Test_fit():")
         optimizer = MinimumProfit(self.data)
 
         _, _ = optimizer.train_test_split(date_cutoff=pd.Timestamp(2002, 1, 1))
@@ -80,7 +77,7 @@ class TestMinimumProfit(unittest.TestCase):
         # Check the AR(1) coefficient and cointegration coefficient
         self.assertAlmostEqual(beta_eg, -1.8378837809650117)
         self.assertAlmostEqual(beta_jo, -1.8647763422880634)
-        self.assertAlmostEqual(ar_coeff_eg, 0.8933542389605265)
+        self.assertAlmostEqual(ar_coeff_eg, 0.8933437089287942)
         self.assertAlmostEqual(ar_coeff_jo, 0.892487910270181)
 
         # Check if the cointegration error and residual error follows the following relationship:
@@ -102,6 +99,7 @@ class TestMinimumProfit(unittest.TestCase):
         Unit tests for warnings triggered when the series pair is not cointegrated.
         """
 
+        print("Test_fit_warning():")
         optimizer = MinimumProfit(self.no_coint_data)
 
         train_df, _ = optimizer.train_test_split(date_cutoff=pd.Timestamp(2020, 1, 1))
@@ -121,6 +119,7 @@ class TestMinimumProfit(unittest.TestCase):
         Use specified parameters here instead of fit from data.
         """
 
+        print("Test_optimize():")
         # Use an empty Dataframe to initialize an instance of optimizer
         empty_df = pd.DataFrame(columns=['Share S1', 'Share S2'])
         optimizer = MinimumProfit(empty_df)
@@ -229,3 +228,11 @@ class TestMinimumProfit(unittest.TestCase):
 
         # Test for warning when the date cutoff point is out of range
         self.assertRaises(AssertionError, optimizer.train_test_split, pd.Timestamp(2021, 1, 1))
+
+
+
+
+
+
+
+

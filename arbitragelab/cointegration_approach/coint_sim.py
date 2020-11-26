@@ -160,6 +160,7 @@ class CointegrationSimulation:
         :return: (np.array) ts_num simulated series generated.
         """
 
+        print("simulate_ar():")
         # Store the series
         series_list = []
 
@@ -307,19 +308,20 @@ class CointegrationSimulation:
             the standard deviation of AR(1) coefficient of the process.
         """
 
+        print("Test verify_ar():")
         # Store all the AR(1) coefficients
         ar_coeff_list = []
 
         # Use statsmodels to fit the AR(1) process
         for idx in range(self.ts_num):
             # Specify constant trend as the simulated process has one
-            ts_fit = sm.tsa.ARMA(price_matrix[:, idx], (1, 0)).fit(trend='c', disp=0)
+            ts_fit = sm.tsa.arima.ARIMA(price_matrix[:, idx], order=(1, 0, 0), trend='c').fit()
 
             # Retrieve the constant trend and the AR(1) coefficient
-            _, ar_coeff = ts_fit.params
+            _, ar_coeff = ts_fit.polynomial_ar
 
             # Save the AR(1) coefficients
-            ar_coeff_list.append(ar_coeff)
+            ar_coeff_list.append(-1. * ar_coeff)
 
         # Cover the corner case where there is only one series
         if self.ts_num == 1:
@@ -376,8 +378,7 @@ class CointegrationSimulation:
         betas = np.array(betas_list)
         return betas.mean(), betas.std()
 
-    @staticmethod
-    def plot_coint_series(series_x: np.array, series_y: np.array, coint_error: np.array,
+    def plot_coint_series(self, series_x: np.array, series_y: np.array, coint_error: np.array,
                           figw: float = 15., figh: float = 10.) -> plt.Figure:
         """
         Plot the simulated cointegrated series.
@@ -403,5 +404,9 @@ class CointegrationSimulation:
         # Plot cointegration error
         ax2.plot(coint_error, label='spread')
         ax2.legend(loc='best', fontsize=12)
+
+        # Plot the title
+        fig.suptitle(r"Simulated cointegrated series and the cointegration error, "
+                     r"$\beta = {}$".format(self.__coint_params['beta']), fontsize=20)
 
         return fig
