@@ -1,6 +1,7 @@
 # Copyright 2019, Hudson and Thames Quantitative Research
 # All rights reserved
-# Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
+# Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
+
 """
 Tests function of Statistical Arbitrage Cointegration module:
 cointegration_approach/base.py, engle_granger.py, johansen.py, signals.py
