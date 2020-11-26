@@ -18,7 +18,7 @@ from arbitragelab.cointegration_approach.coint_sim import CointegrationSimulatio
 
 class TestCointegrationSimulation(unittest.TestCase):
     """
-    Test Minimum Profit Condition Optimization module.
+    Test Minimum Profit Condition Optimization module: cointegrated simulation.
     """
 
     def setUp(self):

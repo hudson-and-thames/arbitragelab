@@ -19,7 +19,7 @@ from arbitragelab.cointegration_approach.minimum_profit import MinimumProfit
 
 class TestMinimumProfit(unittest.TestCase):
     """
-    Test Minimum Profit Condition Optimization module.
+    Test Minimum Profit Condition Optimization module: minimum profit optimization.
     """
 
     def setUp(self):
@@ -152,9 +152,8 @@ class TestMinimumProfit(unittest.TestCase):
         beta_eg, epsilon_t_eg, ar_coeff_eg, ar_resid_eg = optimizer.fit(use_johansen=False)
 
         # Optimize the upper bound
-        trade_days = len(trade_df)
         optimal_ub, _, _, optimal_mtp, optimal_num_of_trades = optimizer.optimize(ar_coeff_eg, epsilon_t_eg,
-                                                                                  ar_resid_eg, trade_days)
+                                                                                  ar_resid_eg, len(train_df))
 
         # Exception check
         with self.assertRaises(Exception):
@@ -172,13 +171,19 @@ class TestMinimumProfit(unittest.TestCase):
         self.assertTrue("ctc_L" in trade_signals.columns)
 
         # Check if the number of shares is calculated correctly
-        self.assertEqual(num_of_shares[0], 8)
-        self.assertEqual(num_of_shares[1], 13)
+        self.assertEqual(num_of_shares[0], 9)
+        self.assertEqual(num_of_shares[1], 16)
 
         # Check if the condition values are calculated correctly
-        self.assertAlmostEqual(cond_values[0], 4.05987711757588)
-        self.assertAlmostEqual(cond_values[1], 4.34987711757588)
-        self.assertAlmostEqual(cond_values[2], 4.63987711757588)
+        self.assertAlmostEqual(cond_values[0], 3.97987712)
+        self.assertAlmostEqual(cond_values[1], 4.34987712)
+        self.assertAlmostEqual(cond_values[2], 4.71987712)
+
+        # Finally check in-sample/out-of-sample switch
+        trade_signals_is, _, _ = optimizer.trade_signal(optimal_ub, optimal_mtp,
+                                                        beta_eg, epsilon_t_eg, insample=True)
+        self.assertEqual(len(trade_signals), 168)
+        self.assertEqual(len(trade_signals_is), 253)
 
     def test_split_dataset(self):
         """

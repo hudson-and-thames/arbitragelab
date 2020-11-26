@@ -96,8 +96,8 @@ class MinimumProfit:
 
         .. note::
 
-            Cointegration of the price series is crucial to the success of the optimization. The strategy performance
-            could be affected if the price series are not cointegrated at 95% level.
+            Cointegration of the price series is crucial to the success of the optimization. In order for the strategy
+            to work successfully, the prices of the asset pairs should at least be cointegrated at 90% level.
 
         :param sig_level: (str) Cointegration test significance level. Possible options are "90%", "95%", and "99%".
         :param use_johansen: (bool) If True, use Johansen to calculate beta;
@@ -322,8 +322,8 @@ class MinimumProfit:
         # Retrieve optimal parameter set
         return (upper_bounds[max_idx], *minimum_trade_profit[max_idx, :])
 
-    def trade_signal(self, upper_bound: float, minimum_profit: float,
-                     beta: float, epsilon_t: np.array) -> Tuple[pd.DataFrame, np.array, np.array]:
+    def trade_signal(self, upper_bound: float, minimum_profit: float, beta: float,
+                     epsilon_t: np.array, insample: bool = False) -> Tuple[pd.DataFrame, np.array, np.array]:
         """
         Generate the trade signal and calculate the number of shares to trade.
 
@@ -332,6 +332,8 @@ class MinimumProfit:
             optimization.
         :param beta: (float) Fitted cointegration coefficient, beta.
         :param epsilon_t: (np.array) Cointegration error obtained from training set.
+        :param insample: (bool) Use in-sample data or out-of-sample data to trade. If True, use in-sample data.
+            Otherwise, use out-of-sample data.
         :return: (pd.DataFrame, np.array, np.array) Dataframe with trading conditions;
             number of shares to trade for each leg in the cointegration pair;
             exact values of cointegration error for initiating and closing trades.
@@ -356,9 +358,13 @@ class MinimumProfit:
         share_s2_count = np.ceil(minimum_profit * np.abs(beta) / upper_bound)
         share_s1_count = np.ceil(share_s2_count / abs(beta))
 
+        if insample:
+            target_df = self._train_df
+        else:
+            target_df = self._trade_df
         # Now calculate the cointegration error for the trade_df
-        trade_epsilon_t = self._trade_df.iloc[:, 0] + beta * self._trade_df.iloc[:, 1]
-        trade_df_with_cond = self._trade_df.assign(coint_error=trade_epsilon_t)
+        trade_epsilon_t = target_df.iloc[:, 0] + beta * target_df.iloc[:, 1]
+        trade_df_with_cond = target_df.assign(coint_error=trade_epsilon_t)
 
         # U-trade triggers
         trade_df_with_cond = trade_df_with_cond.assign(otc_U=trade_df_with_cond['coint_error'] >= overbought)
