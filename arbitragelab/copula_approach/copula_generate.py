@@ -55,11 +55,11 @@ class Gumbel(Copula):
         r"""
         Initiate a Gumbel copula object.
 
-        :param threshold: (float) Optional. Below this threshold, a percentile will be considered 0.
+        :param threshold: (float) Optional. Below this threshold, a percentile will be rounded to threshold.
         :param theta: (float) Range in [1, +inf), measurement of correlation.
         """
         super().__init__()
-        # Lower than this amount will be considered 0.
+        # Lower than this amount will be rounded to threshold.
         self.threshold = threshold
         self.theta = theta  # Gumbel copula parameter.
 
@@ -212,11 +212,11 @@ class Frank(Copula):
         r"""
         Initiate a Frank copula object.
 
-        :param threshold: (float) Optional. Below this threshold, a percentile will be considered 0.
+        :param threshold: (float) Optional. Below this threshold, a percentile will be rounded to threshold.
         :param theta: (float) All reals except for 0, measurement of correlation.
         """
         super().__init__()
-        # Lower than this amount will be considered 0
+        # Lower than this amount will be rounded to threshold
         self.threshold = threshold
         self.theta = theta  # Default input
 
@@ -364,11 +364,11 @@ class Clayton(Copula):
         r"""
         Initiate a Clayton copula object.
 
-        :param threshold: (float) Optional. Below this threshold, a percentile will be considered 0.
+        :param threshold: (float) Optional. Below this threshold, a percentile will be rounded to threshold.
         :param theta: (float) Range in [-1, +inf) \ {0}, measurement of correlation.
         """
         super().__init__()
-        # Lower than this amount will be considered 0
+        # Lower than this amount will be rounded to threshold
         self.threshold = threshold
         self.theta = theta  # Default input
 
@@ -505,11 +505,11 @@ class Joe(Copula):
         r"""
         Initiate a Joe copula object.
 
-        :param threshold: (float) Optional. Below this threshold, a percentile will be considered 0.
+        :param threshold: (float) Optional. Below this threshold, a percentile will be rounded to threshold.
         :param theta: (float) Range in [1, +inf), measurement of correlation.
         """
         self.theta = theta  # Default input
-        # Lower than this amount will be considered 0
+        # Lower than this amount will be rounded to threshold
         self.threshold = threshold
         super().__init__()
 
@@ -564,7 +564,7 @@ class Joe(Copula):
             w = brentq(lambda w1: Kc(w1, theta) - v2,
                        self.threshold, 1 - self.threshold)
         else:
-            w = 0  # Below the threshold, gives 0 as the root
+            w = self.threshold  # Below the threshold, gives the threshold
         u1 = 1 - (1 - (1 - (1 - w)**theta)**v1)**(1 / theta)
 
         u2 = 1 - (1 - (1 - (1 - w)**theta)**(1 - v1))**(1 / theta)
@@ -668,10 +668,10 @@ class N13(Copula):
         r"""
         Initiate an N13 copula object.
 
-        :param threshold: (float) Optional. Below this threshold, a percentile will be considered 0.
+        :param threshold: (float) Optional. Below this threshold, a percentile will be rounded to threshold.
         :param theta: (float) Range in [0, +inf), measurement of correlation.
         """
-        # Lower than this amount will be considered 0
+        # Lower than this amount will be rounded to threshold
         self.threshold = threshold
         self.theta = theta  # Default input
         super().__init__()
@@ -726,7 +726,7 @@ class N13(Copula):
             w = brentq(lambda w1: Kc(w1, theta) - v2,
                        self.threshold, 1 - self.threshold)
         else:
-            w = 0  # Below the threshold, gives 0 as the root.
+            w = self.threshold  # Below the threshold, gives threshold as the root.
         u1 = np.exp(
             1 - (v1 * ((1 - np.log(w))**theta - 1) + 1)**(1 / theta))
 
@@ -843,10 +843,10 @@ class N14(Copula):
         r"""
         Initiate an N14 copula object.
 
-        :param threshold: (float) Optional. Below this threshold, a percentile will be considered 0.
+        :param threshold: (float) Optional. Below this threshold, a percentile will be rounded to threshold.
         :param theta: (float) Range in [1, +inf), measurement of correlation.
         """
-        # Lower than this amount will be considered 0.
+        # Lower than this amount will be rounded to threshold.
         self.threshold = threshold
         self.theta = theta  # Default input.
         super().__init__()
@@ -900,7 +900,7 @@ class N14(Copula):
             w = brentq(lambda w1: Kc(w1, theta) - v2,
                        self.threshold, 1 - self.threshold)
         else:
-            w = 0  # Below the threshold, gives 0 as the root.
+            w = self.threshold  # Below the threshold, gives threshold as the root.
         u1 = (1 + (v1 * (w**(-1 / theta) - 1)**theta) ** (1 / theta))**(-theta)
         u2 = (1 + ((1 - v1) * (w**(-1 / theta) - 1)**theta)**(1 / theta))**(-theta)
 

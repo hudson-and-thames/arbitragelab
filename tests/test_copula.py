@@ -48,6 +48,7 @@ class TestCopulas(unittest.TestCase):
         # Check edge cases
         with self.assertRaises(ValueError):
             cop.generate_pairs()
+
         def _Kc(w: float, theta: float):
             return w * (1 - np.log(w) / theta)
         result = cop._generate_one_pair(0, 0, 3, Kc=_Kc)
@@ -80,6 +81,11 @@ class TestCopulas(unittest.TestCase):
         # Check theta(tau)
         self.assertAlmostEqual(cop.theta_hat(0.21389456921960), 2, delta=1e-4)
 
+        # Check edge cases
+        with self.assertRaises(ValueError):
+            cop.generate_pairs()
+
+
     def test_clayton(self):
         """Test Clayton copula class."""
         cop = copula_generate.Clayton(theta=2)
@@ -105,6 +111,10 @@ class TestCopulas(unittest.TestCase):
         # Check theta(tau)
         self.assertAlmostEqual(cop.theta_hat(0.5), 2, delta=1e-4)
 
+        # Check edge cases
+        with self.assertRaises(ValueError):
+            cop.generate_pairs()
+
     def test_joe(self):
         """Test Joe copula class."""
         cop = copula_generate.Joe(theta=6)
@@ -129,6 +139,17 @@ class TestCopulas(unittest.TestCase):
         
         # Check theta(tau)
         self.assertAlmostEqual(cop.theta_hat(0.35506593315175), 2, delta=1e-4)
+        # Check edge cases
+        with self.assertRaises(ValueError):
+            cop.generate_pairs()
+        
+        def _Kc(w: float, theta: float):
+            return w - 1 / theta * (
+                (np.log(1 - (1 - w)**theta)) * (1 - (1 - w)**theta)
+                / ((1 - w)**(theta - 1)))
+        result = cop._generate_one_pair(0, 0, 3, Kc=_Kc)
+        expected = np.array([1, 0])
+        np.testing.assert_array_almost_equal(result, expected, decimal=3)
 
     def test_n13(self):
         """Test N14 Copula class."""
@@ -155,6 +176,17 @@ class TestCopulas(unittest.TestCase):
         # Check theta(tau)
         self.assertAlmostEqual(cop.theta_hat(0.222657233776425), 2, delta=1e-4)
 
+        # Check edge cases
+        with self.assertRaises(ValueError):
+            cop.generate_pairs()
+
+        def _Kc(w: float, theta: float):
+            return w + 1 / theta * (
+                w - w * np.power((1 - np.log(w)), 1 - theta) - w * np.log(w))
+        result = cop._generate_one_pair(0, 0, 3, Kc=_Kc)
+        expected = np.array([1, 0])
+        np.testing.assert_array_almost_equal(result, expected, decimal=3)
+
     def test_n14(self):
         """Test N14 Copula class."""
         cop = copula_generate.N14(theta=3)
@@ -179,6 +211,16 @@ class TestCopulas(unittest.TestCase):
 
         # Check theta(tau)
         self.assertAlmostEqual(cop.theta_hat(3/5), 2, delta=1e-4)
+
+        # Check edge cases
+        with self.assertRaises(ValueError):
+            cop.generate_pairs()
+
+        def _Kc(w: float, theta: float):
+            return -w * (-2 + w**(1/theta))
+        result = cop._generate_one_pair(0, 0, 3, Kc=_Kc)
+        expected = np.array([1, 0])
+        np.testing.assert_array_almost_equal(result, expected, decimal=3)
 
     def test_gaussian(self):
         """Test Gaussian copula class."""
@@ -208,6 +250,9 @@ class TestCopulas(unittest.TestCase):
 
         # Check theta(tau)
         self.assertAlmostEqual(cop.theta_hat(2*np.arcsin(0.2)/np.pi), 0.2, delta=1e-4)
+
+        # Check edge cases
+        self.assertEqual(str(type(cop.generate_pairs(num=1))), "<class 'numpy.ndarray'>")
 
 
     def test_student(self):
@@ -241,6 +286,9 @@ class TestCopulas(unittest.TestCase):
                                          copula_name='Student',
                                          nu=5)
         self.assertAlmostEqual(ll, 2.1357117471178584, delta=1e-5)
+
+        # Check edge cases
+        self.assertEqual(str(type(cop.generate_pairs(num=1))), "<class 'numpy.ndarray'>")
 
     def test_signal(self):
         """Test trading signal generation."""
