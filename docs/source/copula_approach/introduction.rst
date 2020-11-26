@@ -1,10 +1,11 @@
 .. _copula_approach-introduction:
 
 .. Note::
-
     These descriptions closely follow the following two papers:
-        * Liew, Rong Qi, and Yuan Wu. "Pairs trading: a copula approach." (2013).
-        * Stander, Yolanda, Daniël Marais, and Ilse Botha. "Trading strategies with copulas." Journal of Economic and Financial Sciences 6.1 (2013): 83-107.
+
+    `Pairs trading: a copula approach. (2013) <https://link.springer.com/article/10.1057/jdhf.2013.1>`__ by Liew, Rong Qi, and Yuan Wu.
+
+    `Trading strategies with copulas. (2013) <https://www.researchgate.net/publication/318054326>`__ by Stander, Yolanda, Daniël Marais, and Ilse Botha.
 
 ============
 Introduction
@@ -51,7 +52,7 @@ Tools presented in this module enable the user to:
 There are 8 commonly used ones that are now available: :code:`Gumbel`, :code:`Frank`, :code:`Clayton`, :code:`Joe`,
 :code:`N13`, :code:`N14`, :code:`Gaussian` and :code:`Student` (Student-t).
 They are all subclasses of the class :code:`Copula`, and they share some common repertoire of methods and attributes.
-However for the most of the time, the user is not expected to directly use the copulas.
+However, most of the time, the user is not expected to directly use the copulas.
 All trading related functionalities are stated above, and included in the :code:`CopulaStrategy` class.
 
 The user may choose to fit the pair's data to all provided copulas, then compare the information criterion scores (AIC,

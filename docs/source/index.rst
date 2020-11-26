@@ -89,7 +89,7 @@ This project is licensed under an all rights reserved licence.
 
     copula_approach/introduction
     copula_approach/copula_brief_intro
-    copula_approach/trading_strategies
+    copula_approach/trading_strategy
 
 .. toctree::
     :maxdepth: 2

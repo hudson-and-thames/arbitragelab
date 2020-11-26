@@ -1,16 +1,17 @@
-.. _copula_approach-trading_strategies:
+.. _copula_approach-trading_strategy:
 
-==================
+================
 Trading Strategy
-==================
+================
 
 .. Note::
     The following strategy closely follow the implementations:
 
-        * Liew, Rong Qi, and Yuan Wu. "Pairs trading: a copula approach." (2013).
-        * Stander, Yolanda, Daniël Marais, and Ilse Botha. "Trading strategies with copulas." (2013).
+    `Pairs trading: a copula approach. (2013) <https://link.springer.com/article/10.1057/jdhf.2013.1>`__ by Liew, Rong Qi, and Yuan Wu.
 
-The trading strategy using copula is implemented as a long-short pairs trading scheme, and uses rules from general
+    `Trading strategies with copulas. (2013) <https://www.researchgate.net/publication/318054326>`__ by Stander, Yolanda, Daniël Marais, and Ilse Botha.
+
+The trading strategy using copula is implemented as a long-short pairs trading scheme, and uses rules from the general
 long-short pairs trading framework.
 
 .. figure:: images/trading_opportunities.png
@@ -22,13 +23,14 @@ long-short pairs trading framework.
 
 Probability Threshold Strategy
 ##############################
+
 We start with a pair of stocks of interest :math:`S_1` and :math:`S_2`, which can be selected by various methods.
-For example, using Engle-Granger test for cointegration.
+For example, using the Engle-Granger test for cointegration.
 By consensus, we define the spread as :math:`S_1` in relation to :math:`S_2`.
 e.g. Short the spread means buying :math:`S_1` and/or selling :math:`S_2`.
 
-Use **cumulative log return** data of the stocks during the training/formation period, we proceed a pseudo-MLE
-fit to establish a copula that reflects the relation of the two stocks during training/formation period.
+Use **cumulative log return** data of the stocks during the training/formation period, we proceed with a pseudo-MLE
+fit to establish a copula that reflects the relation of the two stocks during the training/formation period.
 
 Then we can calculate the **marginal cumulative probabilities** using trading/testing period data:
 
@@ -76,6 +78,7 @@ alongside with the Z-Scores and target quantities of the unit portfolio to hold.
 
 Implementation
 **************
+
 .. automodule:: arbitragelab.copula_approach.copula_strategy
         
     .. autoclass:: CopulaStrategy
@@ -93,6 +96,17 @@ Example
 
    # Instantiating the module
    CS = CopulaStrategy()
+
+   # Loading the data
+   s1_price = pd.read_csv('X_FILE_PATH.csv').set_index('Date').dropna()
+   s2_price = pd.read_csv('Y_FILE_PATH.csv').set_index('Date').dropna()
+
+   # Split data into train and test sets
+   s1_price_train = s1_price[:int(len(s1_price)*0.7)]
+   s1_price_test = s1_price[int(len(s1_price)*0.7):]
+
+   s2_price_train = s2_price[:int(len(s2_price)*0.7)]
+   s2_price_test = s2_price[int(len(s2_price)*0.7):]
 
    # Converting price data to cumulative log returns
    s1_clr_train = CS.cum_log_return(s1_price_train)
@@ -120,7 +134,7 @@ Example
                                       upper_threshold=0.90)
    
    # Graph from the fitted copula
-   fig, ax = plt.subplot()
+   ax = plt.subplot()
    CS.graph_copula(copula_name='Student', ax=ax, cov=copula.cov, nu=copula.nu)
    plt.show()
    
@@ -130,8 +144,8 @@ Example
 Research Notebooks
 ##################
 
-The following research notebook can be used to better understand the mean-reverting tools described above.
+The following research notebook can be used to better understand the copula strategy described above.
 
-* `To be added`_
+* `Basic Copula Strategy`_
 
-.. _`To be added`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Cointegration%20Approach/mean_reversion.ipynb
+.. _`Basic Copula Strategy`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Cointegration%20Approach/mean_reversion.ipynb
