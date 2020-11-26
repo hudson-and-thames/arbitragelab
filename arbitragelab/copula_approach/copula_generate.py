@@ -63,14 +63,13 @@ class Gumbel(Copula):
         self.threshold = threshold
         self.theta = theta  # Gumbel copula parameter.
 
-    def generate_pairs(self, num: int = None, theta: float = None, unif_vec: np.array = None):
+    def generate_pairs(self, num: int = None, unif_vec: np.array = None):
         """
         Generate pairs according to P.D.F., stored in a 2D np.array.
 
         User may choose to side load independent uniformly distributed data in [0, 1].
 
         :param num: (int) Number of points to generate.
-        :param theta: (float) Range in [1, +inf), measurement of correlation.
         :param unif_vec: (np.array) Shape=(num, 2) array, two independent uniformly distributed sets of data.
             Default uses numpy pseudo-random generators.
         :return sample_pairs: (np.array) Shape=(num, 2) array, sampled data for this copula.
@@ -78,8 +77,7 @@ class Gumbel(Copula):
         if num is None and unif_vec is None:
             raise ValueError("Please either input num or unif_vec")
 
-        if theta is None and self.theta is not None:
-            theta = self.theta  # Use the default input
+        theta = self.theta  # Use the default input
 
         # Distribution of C(U1, U2). To be used for numerically solving the inverse.
         def _Kc(w: float, theta: float):
@@ -220,14 +218,13 @@ class Frank(Copula):
         self.threshold = threshold
         self.theta = theta  # Default input
 
-    def generate_pairs(self, num: int = None, theta: float = None, unif_vec: np.array = None):
+    def generate_pairs(self, num: int = None, unif_vec: np.array = None):
         """
         Generate pairs according to P.D.F., stored in a 2D np.array.
 
         User may choose to side load independent uniformly distributed data in [0, 1]
 
         :param num: (int) Number of points to generate.
-        :param theta: (float) All reals except for 0, measurement of correlation.
         :param unif_vec: (np.array) Shape=(num, 2) array, two independent uniformly distributed sets of data.
             Default uses numpy pseudo-random generators.
         :return sample_pairs: (np.array) Shape=(num, 2) array, sampled data for this copula.
@@ -235,8 +232,7 @@ class Frank(Copula):
         if num is None and unif_vec is None:
             raise ValueError("Please either input num or unif_vec")
 
-        if theta is None and self.theta is not None:
-            theta = self.theta  # Use the default input.
+        theta = self.theta  # Use the default input.
 
         # Generate pairs of indep uniform dist vectors. Use numpy to generate.
         if unif_vec is None:
@@ -372,7 +368,7 @@ class Clayton(Copula):
         self.threshold = threshold
         self.theta = theta  # Default input
 
-    def generate_pairs(self, num: int = None, theta: float = None, unif_vec: np.array = None):
+    def generate_pairs(self, num: int = None, unif_vec: np.array = None):
         r"""
         Generate pairs according to P.D.F., stored in a 2D np.array.
 
@@ -381,7 +377,6 @@ class Clayton(Copula):
         Note: Large theta might suffer from accuracy issues.
 
         :param num: (int) Number of points to generate.
-        :param theta: (float) Range in [-1, +inf) \ {0}., measurement of correlation.
         :param unif_vec: (np.array) Shape=(num, 2) array, two independent uniformly distributed sets of data.
             Default uses numpy pseudo-random generators.
         :return sample_pairs: (np.array) Shape=(num, 2) array, sampled data for this copula.
@@ -389,8 +384,7 @@ class Clayton(Copula):
         if num is None and unif_vec is None:
             raise ValueError("Please either input num or unif_vec")
 
-        if theta is None and self.theta is not None:
-            theta = self.theta  # Use the default input
+        theta = self.theta  # Use the default input
 
         # Generate pairs of indep uniform dist vectors. Use numpy to generate.
         if unif_vec is None:
@@ -513,14 +507,13 @@ class Joe(Copula):
         self.threshold = threshold
         super().__init__()
 
-    def generate_pairs(self, num: int = None, theta: float = None, unif_vec: np.array = None):
+    def generate_pairs(self, num: int = None, unif_vec: np.array = None):
         """
         Generate pairs according to P.D.F., stored in a 2D np.array.
 
         User may choose to side load independent uniformly distributed data in [0, 1].
 
         :param num: (int) Number of points to generate.
-        :param theta: (float) Range in [1, +inf), measurement of correlation.
         :param unif_vec: (np.array) Shape=(num, 2) array, two independent uniformly distributed sets of data.
             Default uses numpy pseudo-random generators.
         :return sample_pairs: (np.array) Shape=(num, 2) array, sampled data for this copula.
@@ -528,8 +521,7 @@ class Joe(Copula):
         if num is None and unif_vec is None:
             raise ValueError("Please either input num or unif_vec")
 
-        if theta is None and self.theta is not None:
-            theta = self.theta  # Use the default input
+        theta = self.theta  # Use the default input
 
         def _Kc(w: float, theta: float):
             return w - 1 / theta * (
@@ -676,14 +668,13 @@ class N13(Copula):
         self.theta = theta  # Default input
         super().__init__()
 
-    def generate_pairs(self, num: int = None, theta: float = None, unif_vec: np.array = None):
+    def generate_pairs(self, num: int = None, unif_vec: np.array = None):
         """
         Generate pairs according to P.D.F., stored in a 2D np.array.
 
         User may choose to side load independent uniformly distributed data in [0, 1].
 
         :param num: (int) Number of points to generate.
-        :param theta: (float) Range in [0, +inf), measurement of correlation.
         :param unif_vec: (np.array) Shape=(num, 2) array, two independent uniformly distributed sets of data.
             Default uses numpy pseudo-random generators.
         :return sample_pairs: (np.array) Shape=(num, 2) array, sampled data for this copula.
@@ -691,8 +682,7 @@ class N13(Copula):
         if num is None and unif_vec is None:
             raise ValueError("Please either input num or unif_vec")
 
-        if theta is None and self.theta is not None:
-            theta = self.theta  # Use the default input
+        theta = self.theta  # Use the default input
 
         def _Kc(w: float, theta: float):
             return w + 1 / theta * (
@@ -851,14 +841,13 @@ class N14(Copula):
         self.theta = theta  # Default input.
         super().__init__()
 
-    def generate_pairs(self, num: int = None, theta: float = None, unif_vec: np.array = None):
+    def generate_pairs(self, num: int = None, unif_vec: np.array = None):
         """
         Generate pairs according to P.D.F., stored in a 2D np.array.
 
         User may choose to side load independent uniformly distributed data in [0, 1].
 
         :param num: (int) Number of points to generate.
-        :param theta: (float) Range in [1, +inf), measurement of correlation.
         :param unif_vec: (np.array) Shape=(num, 2) array, two independent uniformly distributed sets of data.
             Default uses numpy pseudo-random generators.
         :return sample_pairs: (np.array) Shape=(num, 2) array, sampled data for this copula.
@@ -866,8 +855,7 @@ class N14(Copula):
         if num is None and unif_vec is None:
             raise ValueError("Please either input num or unif_vec")
 
-        if theta is None and self.theta is not None:
-            theta = self.theta  # Use the default input.
+        theta = self.theta  # Use the default input.
 
         def _Kc(w: float, theta: float):
             return -w * (-2 + w**(1/theta))
@@ -1017,18 +1005,16 @@ class Gaussian(Copula):
         self.rho = cov[0][1] / (np.sqrt(cov[0][0]) * np.sqrt(cov[1][1]))
         super().__init__()
 
-    def generate_pairs(self, num: int = None, cov: np.array = None):
+    def generate_pairs(self, num: int = None):
         """
         Generate pairs according to P.D.F., stored in a 2D np.array.
 
         User may choose to side load independent uniformly distributed data in [0, 1].
 
         :param num: (int) Number of points to generate.
-        :param cov: (np.array) 2 by 2 covariance matrix.
         :return sample_pairs: (np.array) Shape=(num, 2) array, sampled data for this copula.
         """
-        if cov is None:
-            cov = self.cov
+        cov = self.cov
 
         gaussian_pairs = self._generate_corr_gaussian(num, cov)
         sample_pairs = ss.norm.cdf(gaussian_pairs)
@@ -1155,21 +1141,17 @@ class Student(Copula):
         self.rho = cov[0][1] / (np.sqrt(cov[0][0]) * np.sqrt(cov[1][1]))
         super().__init__()
 
-    def generate_pairs(self, num: int = None, nu: float = None, cov: np.array = None):
+    def generate_pairs(self, num: int = None):
         """
         Generate pairs according to P.D.F., stored in a 2D np.array.
 
         User may choose to side load independent uniformly distributed data in [0, 1].
 
         :param num: (int) Number of points to generate.
-        :param nu: (float) Degree of freedom.
-        :param cov: (np.array) 2 by 2 covariance matrix.
         :return sample_pairs: (np.array) Shape=(num, 2) array, sampled data for this copula.
         """
-        if cov is None:
-            cov = self.cov
-        if nu is None:
-            nu = self.nu
+        cov = self.cov
+        nu = self.nu
 
         student_pairs = self._generate_corr_student(num, cov, nu)
         t_dist = ss.t(df=nu)
