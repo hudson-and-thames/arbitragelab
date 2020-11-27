@@ -146,7 +146,7 @@ class TestMinimumProfit(unittest.TestCase):
         optimizer = MinimumProfit(self.data)
 
         # Split data into training and test set
-        train_df, _ = optimizer.train_test_split(date_cutoff=pd.Timestamp(2002, 1, 1))
+        _, _ = optimizer.train_test_split(date_cutoff=pd.Timestamp(2002, 1, 1))
 
         # Fit the data
         beta_eg, epsilon_t_eg, _, _ = optimizer.fit(use_johansen=False)
