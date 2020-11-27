@@ -82,7 +82,7 @@ symmetric distribution of the cointegration error. The profit of an L-trade can 
 setup.
 
 - When :math:`\varepsilon_t \leq -U` at :math:`t_o`, open a trade by buying :math:`N` of asset :math:`S_1` and selling :math:`\beta N` of asset :math:`S_2`.
-- When :math:`\varepsilon_t \geq 0` at :math:`t_c`, square the trade.
+- When :math:`\varepsilon_t \geq 0` at :math:`t_c`, close the trade.
 
 Using the same derivation above, it can be shown that the profit per L-trade is also at least :math:`U` dollars per unit.
 Therefore, the boundary is exactly the minimum profit per trade, where the strategy only trade one unit of the

@@ -158,8 +158,9 @@ class MinimumProfit:
 
         # The beta coefficient output by statsmodels has opposite signs
 
-        with warnings.catch_warnings():  # Silencing specific Statsmodels ValueWarning
+        with warnings.catch_warnings():  # Silencing specific Statsmodels ValueWarnings
             warnings.filterwarnings('ignore', r'A date index has been provided,')
+            warnings.filterwarnings('ignore', r'No frequency information was provided,')
 
             ar_fit = sm.tsa.arima.ARIMA(epsilon_t, order=(1, 0, 0), trend='c').fit()
             _, ar_coeff = -1. * ar_fit.polynomial_ar
