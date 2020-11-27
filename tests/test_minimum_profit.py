@@ -123,12 +123,12 @@ class TestMinimumProfit(unittest.TestCase):
 
         # Parameters
         ar_coeff = -0.2
-        sigma_a = 0.5
+        sigma_a = 0.1
         horizon = 1000
 
         # Results on paper
-        upper_bounds = 0.47
-        mtps = 66.92441657550803
+        upper_bounds = 0.09
+        mtps = 13.369806195172025
 
         # Only do two tests as this process is quite time consuming.
         ar_resid = np.random.normal(0, sigma_a, 1000)
