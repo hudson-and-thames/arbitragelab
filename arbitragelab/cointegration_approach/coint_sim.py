@@ -144,7 +144,7 @@ class CointegrationSimulation:
         else:
             self.__coint_params = params
 
-    def simulate_ar(self, params: dict, burn_in: int = 50, use_statsmodel: bool = True) -> np.array:
+    def simulate_ar(self, params: dict, burn_in: int = 50, use_statsmodels: bool = True) -> np.array:
         """
         Simulate an AR(1) process without using the statsmodels package.
         The AR(1) process is defined as the following recurrence relation.
@@ -155,7 +155,7 @@ class CointegrationSimulation:
         :param params: (dict) A parameter dictionary containing AR(1) coefficient, constant trend,
             and white noise variance.
         :param burn_in: (int) The amount of data used to burn in the process.
-        :param use_statsmodel: (bool) If True, use statsmodel;
+        :param use_statsmodel: (bool) If True, use statsmodels;
             otherwise, directly calculate recurrence.
         :return: (np.array) ts_num simulated series generated.
         """
@@ -178,7 +178,7 @@ class CointegrationSimulation:
                            "parameters to default.")
 
         # If using statsmodels
-        if use_statsmodel:
+        if use_statsmodels:
             # Specify AR(1) coefficient
             ar = np.array([1, -ar_coeff])
 
@@ -234,13 +234,13 @@ class CointegrationSimulation:
         # Read the parameters from the param dictionary
         beta = coint_params['beta']
 
-        share_s2_diff = self.simulate_ar(price_params, use_statsmodel=True)
+        share_s2_diff = self.simulate_ar(price_params, use_statsmodels=True)
 
         # Do a cumulative sum to get share s2 price for each column
         share_s2 = initial_price + np.cumsum(share_s2_diff, axis=0)
 
         # Now generate the cointegration series
-        coint_error = self.simulate_ar(coint_params, use_statsmodel=True)
+        coint_error = self.simulate_ar(coint_params, use_statsmodels=True)
 
         # Generate share s1 price according to the cointegration relation
         share_s1 = coint_error - beta * share_s2
@@ -264,13 +264,13 @@ class CointegrationSimulation:
         beta = coint_params['beta']
 
         # Generate share S2 price difference with an AR(1) process
-        share_s2_diff = self.simulate_ar(price_params, use_statsmodel=False)
+        share_s2_diff = self.simulate_ar(price_params, use_statsmodels=False)
 
         # Sum up to get share S2 price
         share_s2 = initial_price + np.cumsum(share_s2_diff, axis=0)
 
         # Generate cointegration error with an AR(1) process
-        coint_error = self.simulate_ar(coint_params, use_statsmodel=False)
+        coint_error = self.simulate_ar(coint_params, use_statsmodels=False)
 
         # Get share S1 price according to the hedge ratio
         share_s1 = coint_error - beta * share_s2
@@ -278,18 +278,18 @@ class CointegrationSimulation:
         return share_s1, share_s2, coint_error
 
     def simulate_coint(self, initial_price: float,
-                       use_statsmodel: bool = False) -> Tuple[np.array, np.array, np.array]:
+                       use_statsmodels: bool = False) -> Tuple[np.array, np.array, np.array]:
         """
         Generate cointegrated price series and cointegration error series.
 
         :param initial_price: (float) Starting price of share S2.
-        :param use_statsmodel: (bool) Use statsmodel API or use raw method.
+        :param use_statsmodels: (bool) Use statsmodels API or use raw method.
             If True, then statsmodels API will be used.
         :return: (np.array, np.array, np.array) Price series of share S1, price series of share S2,
             and cointegration error.
         """
 
-        if use_statsmodel:
+        if use_statsmodels:
             return self._simulate_cointegration(self.__price_params,
                                                 self.__coint_params,
                                                 initial_price=initial_price)

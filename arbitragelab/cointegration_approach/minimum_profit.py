@@ -69,7 +69,7 @@ class MinimumProfit:
             self._train_df, self._trade_df = train_series, test_series
             return train_series, test_series
 
-        # Both cutoff is None, do in-sample test. So training set and test set are the same.
+        # Both cutoff is None, do in-sample test. So training set and test set are the same
         if date_cutoff is None:
             self._train_df, self._trade_df = self.price_df, self.price_df
             return self.price_df, self.price_df
@@ -118,7 +118,7 @@ class MinimumProfit:
             jo_portfolio = JohansenPortfolio()
             jo_portfolio.fit(self._train_df, det_order=0)
 
-            # Check eigenvalue and trace statistics to see if the pairs are cointegrated at 90% level.
+            # Check eigenvalue and trace statistics to see if the pairs are cointegrated at 90% level
             eigen_stats = jo_portfolio.johansen_eigen_statistic
             trace_stats = jo_portfolio.johansen_trace_statistic
 
@@ -141,10 +141,10 @@ class MinimumProfit:
             eg_portfolio = EngleGrangerPortfolio()
             eg_portfolio.fit(self._train_df, add_constant=True)
 
-            # Check ADF statistics to see if the pairs are cointegrated at 90% level.
+            # Check ADF statistics to see if the pairs are cointegrated at 90% level
             adf_stats = eg_portfolio.adf_statistics
 
-            # ADF stats are negative. The largest one is the least significant.
+            # ADF stats are negative. The largest one is the least significant
             if (adf_stats.loc['statistic_value'] > adf_stats.loc[sig_level]).all():
                 warnings.warn("The asset pair is not cointegrated at {} level "
                               "based on ADF statistics.".format(sig_level))
@@ -157,8 +157,12 @@ class MinimumProfit:
         epsilon_t = self._train_df.iloc[:, 0] + beta * self._train_df.iloc[:, 1]
 
         # The beta coefficient output by statsmodels has opposite signs
-        ar_fit = sm.tsa.arima.ARIMA(epsilon_t, order=(1, 0, 0), trend='c').fit()
-        _, ar_coeff = -1. * ar_fit.polynomial_ar
+
+        with warnings.catch_warnings():  # Silencing specific Statsmodels ValueWarning
+            warnings.filterwarnings('ignore', r'A date index has been provided,')
+
+            ar_fit = sm.tsa.arima.ARIMA(epsilon_t, order=(1, 0, 0), trend='c').fit()
+            _, ar_coeff = -1. * ar_fit.polynomial_ar
 
         return beta, epsilon_t, ar_coeff, ar_fit.resid
 
@@ -244,13 +248,14 @@ class MinimumProfit:
         """
 
         str_format = "{0:." + str(decimals) + "f}"
-        # Calculate the percent completed.
+        # Calculate the percent completed
         percents = str_format.format(100 * (iteration / float(max_iterations)))
-        # Calculate the length of bar.
+        # Calculate the length of bar
         filled_length = int(round(bar_length * iteration / float(max_iterations)))
-        # Fill the bar.
+
+        # Fill the bar
         block = '█' * filled_length + '-' * (bar_length - filled_length)
-        # Print new line.
+        # Print new line
         sys.stdout.write('\r%s |%s| %s%s %s' % (prefix, block, percents, '%', suffix)),
 
         if iteration == max_iterations:
@@ -265,7 +270,7 @@ class MinimumProfit:
         .. note::
 
             The Nyström method used to estimate the inter-trade interval is computationally intensive and could take
-            considerable amount of time to yield the final result, especially when cointegration error has a large
+            a considerable amount of time to yield the final result, especially when cointegration error has a large
             standard deviation.
 
         :param ar_coeff: (float) AR(1) coefficient of the cointegrated spread.
@@ -285,7 +290,7 @@ class MinimumProfit:
         # Generate a sequence of pre-set upper-bounds
         upper_bounds = granularity * np.arange(0, infinity)
 
-        # For trade duration calculation, the integration is on fixed interval [0, inf].
+        # For trade duration calculation, the integration is on fixed interval [0, inf]
         # Only calculate once to be efficient.
         trade_durations = self._mean_passage_time(0, infinity, ar_coeff, ar_resid, granularity)
 
@@ -294,7 +299,7 @@ class MinimumProfit:
             # Calculate trade duration
             td = trade_durations.loc[ub]
 
-            # Calculate inter-trade interval.
+            # Calculate inter-trade interval
             # Need to calculate every time as the upper bound is floating
             inter_trade_interval = self._mean_passage_time(-infinity, np.floor(ub / 0.01 + 1),
                                                            ar_coeff, ar_resid, granularity)

@@ -128,17 +128,17 @@ class TestCointegrationSimulation(unittest.TestCase):
         simulation = CointegrationSimulation(20, 250)
 
         simulated_manual = simulation.simulate_ar(self.normal_price_params,
-                                                  use_statsmodel=False)
-        simulated_statsmodel = simulation.simulate_ar(self.normal_price_params,
-                                                      use_statsmodel=True)
+                                                  use_statsmodels=False)
+        simulated_statsmodels = simulation.simulate_ar(self.normal_price_params,
+                                                       use_statsmodels=True)
 
         # Check shape: we really do have 50 time series with 250 length
         self.assertEqual(simulated_manual.shape, (250, 20))
-        self.assertEqual(simulated_statsmodel.shape, (250, 20))
+        self.assertEqual(simulated_statsmodels.shape, (250, 20))
 
         # Check AR(1) coefficient
         manual_mean, manual_std = simulation.verify_ar(simulated_manual)
-        stats_mean, stats_std = simulation.verify_ar(simulated_statsmodel)
+        stats_mean, stats_std = simulation.verify_ar(simulated_statsmodels)
         target = self.normal_price_params['ar_coeff']
 
         self.assertTrue(manual_mean - manual_std <= target <= manual_mean + manual_std)
@@ -146,16 +146,16 @@ class TestCointegrationSimulation(unittest.TestCase):
 
         # Now check for faulty parameters
         self.assertRaises(KeyError, simulation.simulate_ar, self.faulty_price_params,
-                          use_statsmodel=False)
+                          use_statsmodels=False)
         self.assertRaises(KeyError, simulation.simulate_ar, self.faulty_price_params,
-                          use_statsmodel=True)
+                          use_statsmodels=True)
 
         # Check when only 1 series is generated
         sim_special = CointegrationSimulation(1, 250)
         sim_spec_manual = sim_special.simulate_ar(self.normal_price_params,
-                                                  use_statsmodel=False)
+                                                  use_statsmodels=False)
         sim_spec_stats = sim_special.simulate_ar(self.normal_price_params,
-                                                 use_statsmodel=True)
+                                                 use_statsmodels=True)
 
         self.assertEqual(sim_spec_manual.shape, (250, 1))
         self.assertEqual(sim_spec_stats.shape, (250, 1))
@@ -173,9 +173,9 @@ class TestCointegrationSimulation(unittest.TestCase):
         simulation.load_params(self.normal_coint_params, target='coint')
 
         manual_s1, manual_s2, manual_coint = simulation.simulate_coint(initial_price=100.,
-                                                                       use_statsmodel=False)
+                                                                       use_statsmodels=False)
         stats_s1, stats_s2, stats_coint = simulation.simulate_coint(initial_price=100.,
-                                                                    use_statsmodel=True)
+                                                                    use_statsmodels=True)
 
         # Check shape:
         self.assertEqual(manual_s1.shape, (250, 20))
@@ -195,9 +195,9 @@ class TestCointegrationSimulation(unittest.TestCase):
         # Check when only 1 cointegrated series pair is generated
         sim_special = CointegrationSimulation(1, 250)
         manual_s1, manual_s2, manual_coint = sim_special.simulate_coint(initial_price=100.,
-                                                                        use_statsmodel=False)
+                                                                        use_statsmodels=False)
         stats_s1, stats_s2, stats_coint = sim_special.simulate_coint(initial_price=100.,
-                                                                     use_statsmodel=True)
+                                                                     use_statsmodels=True)
 
         self.assertEqual(manual_s1.shape, (250, 1))
         self.assertEqual(manual_s2.shape, (250, 1))
@@ -214,9 +214,9 @@ class TestCointegrationSimulation(unittest.TestCase):
         # 50 time series, each of 250 length
         simulation = CointegrationSimulation(20, 250)
         manual_series = simulation.simulate_ar(self.normal_price_params,
-                                               use_statsmodel=False)
+                                               use_statsmodels=False)
         stats_series = simulation.simulate_ar(self.normal_price_params,
-                                              use_statsmodel=True)
+                                              use_statsmodels=True)
 
         sim_ar_coeff_mean, sim_ar_coeff_std = simulation.verify_ar(manual_series)
         self.assertAlmostEqual(sim_ar_coeff_mean, 0.3774837331120529, places=4)
@@ -229,9 +229,9 @@ class TestCointegrationSimulation(unittest.TestCase):
         # 1 time series, length of 250
         sim_spec = CointegrationSimulation(1, 250)
         manual_series = sim_spec.simulate_ar(self.normal_price_params,
-                                             use_statsmodel=False)
+                                             use_statsmodels=False)
         stats_series = sim_spec.simulate_ar(self.normal_price_params,
-                                            use_statsmodel=False)
+                                            use_statsmodels=False)
 
         sim_ar_coeff_mean, sim_ar_coeff_std = sim_spec.verify_ar(manual_series)
         self.assertAlmostEqual(sim_ar_coeff_mean, 0.41788812286870847, places=4)
@@ -252,10 +252,10 @@ class TestCointegrationSimulation(unittest.TestCase):
         simulation.load_params(self.normal_coint_params, target='coint')
 
         manual_s1, manual_s2, _ = simulation.simulate_coint(initial_price=100.,
-                                                            use_statsmodel=False)
+                                                            use_statsmodels=False)
 
         stats_s1, stats_s2, _ = simulation.simulate_coint(initial_price=100.,
-                                                          use_statsmodel=True)
+                                                          use_statsmodels=True)
 
         sim_beta_coeff_mean, sim_beta_coeff_std = simulation.verify_coint(manual_s1, manual_s2)
         self.assertAlmostEqual(sim_beta_coeff_mean, self.normal_coint_params['beta'], places=3)
@@ -268,10 +268,10 @@ class TestCointegrationSimulation(unittest.TestCase):
         # 1 time series, length of 250
         sim_spec = CointegrationSimulation(1, 250)
         manual_s1, manual_s2, _ = sim_spec.simulate_coint(initial_price=100.,
-                                                          use_statsmodel=False)
+                                                          use_statsmodels=False)
 
         stats_s1, stats_s2, _ = sim_spec.simulate_coint(initial_price=100.,
-                                                        use_statsmodel=True)
+                                                        use_statsmodels=True)
 
         sim_beta_coeff_mean, sim_beta_coeff_std = sim_spec.verify_coint(manual_s1, manual_s2)
         self.assertAlmostEqual(sim_beta_coeff_mean, self.normal_coint_params['beta'], places=4)
