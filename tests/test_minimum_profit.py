@@ -149,11 +149,12 @@ class TestMinimumProfit(unittest.TestCase):
         train_df, _ = optimizer.train_test_split(date_cutoff=pd.Timestamp(2002, 1, 1))
 
         # Fit the data
-        beta_eg, epsilon_t_eg, ar_coeff_eg, ar_resid_eg = optimizer.fit(use_johansen=False)
+        beta_eg, epsilon_t_eg, _, _ = optimizer.fit(use_johansen=False)
 
-        # Optimize the upper bound
-        optimal_ub, _, _, optimal_mtp, _ = optimizer.optimize(ar_coeff_eg, epsilon_t_eg,
-                                                              ar_resid_eg, len(train_df))
+        # Optimize the upper bound. The result has been pre-runned to save build time.
+        # optimal_ub, _, _, optimal_mtp, _ = optimizer.optimize(ar_coeff_eg, epsilon_t_eg, ar_resid_eg, len(train_df))
+        optimal_ub = 0.37
+        optimal_mtp = 3.1276935677285995
 
         # Exception check
         with self.assertRaises(Exception):
