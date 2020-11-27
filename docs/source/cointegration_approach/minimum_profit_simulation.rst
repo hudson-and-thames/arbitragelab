@@ -81,22 +81,20 @@ Example
     price_params = {
     "ar_coeff": 0.95,
     "white_noise_var": 0.5,
-    "constant_trend": 1.5
-    }
+    "constant_trend": 1.5}
 
     coint_params = {
         "ar_coeff": 0.9,
         "white_noise_var": 1.,
         "constant_trend": 0.05,
-        "beta": -0.6
-    }
+        "beta": -0.6}
 
     coint_simulator.load_params(price_params, target='price')
     coint_simulator.load_params(coint_params, target='coint')
 
     # Perform simulation
     s1_series, s2_series, coint_errors = coint_simulator.simulate_coint(initial_price=100.,
-                                                                        use_statsmodel=True)
+                                                                        use_statsmodels=True)
 
     # Verify if the simulated series are cointegrated and the cointegration coefficient is equal to beta
     beta_mean, beta_std = coint_simulator.verify_coint(s1_series, s2_series)

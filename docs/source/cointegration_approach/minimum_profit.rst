@@ -28,7 +28,7 @@ This module is designed to find the optimal pre-set boundary that would maximize
 following an AR(1) process by numerically estimating the average trade duration, average inter-trade interval, and the
 average number of trades based on the mean first-passage time.
 
-A few assumptions have been made:
+In this strategy, the following assumptions are made:
 
 - The price of two assets (:math:`S_1` and :math:`S_2`) are cointegrated over the relevant time period, which includes both in-sample and out-of-sample (trading) period.
 - The cointegration error follows a stationary AR(1) process.
@@ -40,8 +40,8 @@ A few assumptions have been made:
 
     P_{S_1,t} - \beta P_{S_2,t} = \varepsilon_t
 
-In the following sections, the derivation of the minimum profit per trade and mean first-passage time of a stationary
-AR(1) process in the paper will be presented.
+In the following sections, as originally shown in the paper, the derivation of the minimum profit per trade and the mean
+first-passage time of a stationary AR(1) process is presented.
 
 Minimum Profit per Trade
 ########################
@@ -52,7 +52,7 @@ boundary :math:`L` as an **L-trade**. Without loss of generality, it can be assu
 of :math:`\varepsilon_t` equals 0. Then the minimum profit per U-trade can be derived from the following trade setup.
 
 - When :math:`\varepsilon_t \geq U` at :math:`t_o`, open a trade by selling :math:`N` of asset :math:`S_1` and buying :math:`\beta N` of asset :math:`S_2`.
-- When :math:`\varepsilon_t \leq 0` at :math:`t_c`, square the trade.
+- When :math:`\varepsilon_t \leq 0` at :math:`t_c`, close the trade.
 
 The profit per trade would thus be:
 
@@ -207,7 +207,7 @@ greater than 5 times the standard deviation of the process :math:`5 \sigma_{\var
 Optimize the Pre-Set Boundaries that Maximizes MTP
 ##################################################
 
-Based on the above definitions, the numerical algorithm to optimize the pre-set boundaries that maximizes MTP could be
+Based on the above definitions, the numerical algorithm to optimize the pre-set boundaries that maximize MTP could be
 given as follows.
 
 1. Perform Engle-Granger or Johansen test (see :ref:`here <cointegration_approach-cointegration_tests>`) to derive the cointegration coefficient :math:`\beta`.
