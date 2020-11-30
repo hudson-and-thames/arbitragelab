@@ -3,7 +3,15 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
 
-def get_rolling_correlation(frame, lookback, scale=False):
+def get_rolling_correlation(frame: pd.DataFrame, lookback: int, scale: bool = False) -> pd.Series:
+    """
+    
+    :param frame: (pd.DataFrame)
+    :param lookback: (int)
+    :param scale: (bool)
+    :return: (pd.Series)
+    """
+    
     two_legged_df = frame.iloc[:, 0:2] 
     
     daily_corr = two_legged_df.rolling(lookback, min_periods=lookback).corr()
@@ -23,10 +31,16 @@ def get_rolling_correlation(frame, lookback, scale=False):
     return final_corr
     
 
-def get_events_by_corr_filter(frame: pd.DataFrame,
-                              lookback=30,
-                              buy_threshold=0.4,
-                              sell_threshold=0.8):
+def get_events_by_corr_filter(frame: pd.DataFrame, lookback: int = 30, buy_threshold: float = 0.4,
+                              sell_threshold: float = 0.8) -> pd.DataFrame:
+    """
+    
+    :param frame: (pd.DataFrame)
+    :param lookback: (int)
+    :param buy_threshold: (float)
+    :param sell_threshold: (float)
+    :return: (pd.DataFrame)
+    """
     
     two_legged_df = frame.iloc[:, 0:2] 
     corr_series = get_rolling_correlation(two_legged_df, lookback, scale=True).diff()
@@ -43,22 +57,34 @@ def get_events_by_corr_filter(frame: pd.DataFrame,
 
 
 
-def get_events_by_asym_filter(spread: pd.Series, 
-                              buy_threshold: int, 
-                              sell_threshold: int,
+def get_events_by_asym_filter(spread: pd.Series, buy_threshold: int, sell_threshold: int,
                               p_1: float, p_2: float) -> pd.DataFrame:
+    """
+    
+    :param spread: (pd.Series)
+    :param buy_threshold: (int)
+    :param sell_threshold: (int)
+    :param p_1: (float)
+    :param p_2: (float)
+    :return: (pd.DataFrame)
+    """
     
     buy_threshold = abs(p_1)*buy_threshold
     sell_threshold = abs(p_2)*sell_threshold
   
-    return get_events_by_threshold_filter(spread=spread, 
-                                          buy_threshold=buy_threshold, 
+    return get_events_by_threshold_filter(spread=spread, buy_threshold=buy_threshold, 
                                           sell_threshold=sell_threshold)
 
 
-def get_events_by_threshold_filter(spread: pd.Series, 
-                             buy_threshold: int, 
-                             sell_threshold: int) -> pd.DataFrame:
+def get_events_by_threshold_filter(spread: pd.Series, buy_threshold: int, 
+                                   sell_threshold: int) -> pd.DataFrame:
+    """
+    
+    :param spread: (pd.Series)
+    :param buy_threshold: (int)
+    :param sell_threshold: (int)
+    :return: (pd.DataFrame)
+    """
     
     frame = spread.copy().to_frame()
     
@@ -74,6 +100,11 @@ def get_events_by_threshold_filter(spread: pd.Series,
 
 
 def plot_events(frame: pd.DataFrame):
+    """
+    
+    :param frame: (pd.DataFrame)
+    :return: (Axes)
+    """
     
     plt.figure(figsize=(15,10))
     
@@ -89,6 +120,14 @@ def plot_events(frame: pd.DataFrame):
 
 def plot_corr(two_legged_df: pd.Series, lookback: int = 30, 
                   buy_threshold: int = 0.2, sell_threshold: int = 0.9):
+    """
+    
+    :param two_legged_df: (pd.Series)
+    :param lookback: (int)
+    :param buy_threshold: (int)
+    :param sell_threshold: (int)
+    :return: (Axes)
+    """
 
     spread = two_legged_df.iloc[:, 0] - two_legged_df.iloc[:, 1]
     
@@ -115,10 +154,16 @@ def plot_corr(two_legged_df: pd.Series, lookback: int = 30,
         plt.axvline(trade_evnt, color="tab:red", alpha=0.2)
 
 
-def get_events_by_cusum_corr_filter(frame: pd.DataFrame,
-                              lookback=30,
-                              buy_threshold=0.1,
-                              sell_threshold=0.9):
+def get_events_by_cusum_corr_filter(frame: pd.DataFrame, lookback: int = 30,
+                              buy_threshold: float = 0.1, sell_threshold: float = 0.9):
+    """
+    
+    :param frame: (pd.DataFrame)
+    :param lookback: (int)
+    :param buy_threshold: (float)
+    :param sell_threshold: (float)
+    :return: (pd.DataFrame)
+    """
     
     two_legged_df = frame.iloc[:, 0:2] 
     
@@ -137,8 +182,16 @@ def get_events_by_cusum_corr_filter(frame: pd.DataFrame,
     
     return frame
 
-def plot_corr_cusum(two_legged_df: pd.Series,lookback: int = 30, 
-                    buy_threshold=0.1, sell_threshold=0.9):
+def plot_corr_cusum(two_legged_df: pd.Series, lookback: int = 30, 
+                    buy_threshold: float = 0.1, sell_threshold: float = 0.9):
+    """
+    
+    :param two_legged_df: (pd.DataFrame)
+    :param lookback: (int)
+    :param buy_threshold: (float)
+    :param sell_threshold: (float)
+    :return: (Axes)
+    """
     
     spread = two_legged_df.iloc[:, 0] - two_legged_df.iloc[:, 1]
 

@@ -3,6 +3,6 @@ This module houses the ML Based Approaches.
 """
 
 from arbitragelab.ml_approach.tar import TAR
-from arbitragelab.ml_approach.pi_sigma_regressor import PiSigmaRegressor
-from arbitragelab.ml_approach.mlp_regressor import MLPRegressor
-from arbitragelab.ml_approach.mlp_classifier import MLPClassifier
+from arbitragelab.ml_approach.pi_sigma import PiSigmaNeuralNetwork
+from arbitragelab.ml_approach.mlp import MultiLayerPerceptron
+from arbitragelab.ml_approach.rnn import RecurrentNeuralNetwork

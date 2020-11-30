@@ -1,10 +1,15 @@
 import numpy as np
 
-
 class FeatureExpander:
     
-    def __init__(self, methods=[]):
+    def __init__(self, methods=[], n_orders=1):
+        """
+        
+        :param methods: (list) Possible expansion methods [chebyshev, legendre, laguerre, power].
+        :param n_orders: (int) Number of orders.
+        """
         self.methods = methods
+        self.n_orders = n_orders
         
     def _chebyshev(self, x, degree):
         return np.polynomial.chebyshev.chebvander(x, degree)
@@ -20,25 +25,25 @@ class FeatureExpander:
     
     def fit(self, X, y=None):
         """
-        Compute number of output features.
-        Parameters
-        ----------
-        X : array-like, shape (n_samples, n_features)
-            The data.
-        Returns
-        -------
-        self : instance
+        :param X: (np.array) dataset
         """
-        n_samples, n_features = self._validate_data(
-            X, accept_sparse=True).shape
-        combinations = self._combinations(n_features, self.degree,
-                                          self.interaction_only,
-                                          self.include_bias)
-        self.n_input_features_ = n_features
-        self.n_output_features_ = sum(1 for _ in combinations)
+        self.dataset = X
         return self
 
-    def transform(self, X):
+    def transform(self) -> list:
         """
         Transform data to polynomial features
+        
+        :return: List of lists of the expanded values.
         """
+        new_dataset = []
+        
+        for x in self.dataset:
+            expanded_x = list(x)
+            for deg in range(1, self.n_orders):
+                for meth in self.methods:
+                    expanded_x.extend( np.ravel( getattr(self, '_' + meth)(x, deg) ) )
+                
+            new_dataset.append( np.ravel(expanded_x).tolist() )
+            
+        return new_dataset

@@ -1,0 +1,76 @@
+import numpy as np
+import pandas as pd
+from arbitragelab.util.base_futures_roller import BaseFuturesRoller
+
+class CrudeOilFutureRoller(BaseFuturesRoller):
+    """
+    Rolls the contract data provided under the assumption 
+    trading terminates 3 business day prior to the 25th calendar day
+    of the month prior to the contract month. If the 25th calendar 
+    day is not a business day, trading terminates 4 business days prior to
+    the 25th calendar day of the month prior to the contract month.
+    
+    *NOTE*
+    If you have reasons to believe that the termination dates / expiration
+    method changed throughout the time series, direct your attention to:
+    
+    https://www.cmegroup.com/tools-information/advisory-archive.html
+    
+    may god have mercy on your soul.
+    """
+    
+    def _get_rolldates(self, dataset: pd.DataFrame) -> pd.Series:
+        """
+        
+        :param dataset: (pd.DataFrame)
+        :return: (pd.Series)
+        """
+        
+        # Get all monthly 25ths in the date range specified in the dataset 
+        cl_final_df = super().get_all_possible_static_dates_in(dataset.index, 25)
+
+        # Remove duplicate dates from the list
+        twnty_fives = cl_final_df['target_date'].drop_duplicates()
+
+        working_frame = pd.DataFrame(twnty_fives)
+        working_frame['is_in_original_index'] = pd.Series(twnty_fives.isin(cl_final_df['original_index']))
+
+        # Diagnostic check; How many 25ths actually occur in the dataset?
+        # working_frame['is_in_original_index'].value_counts()
+        # (True: 230, False: 92, Name: is_in_original_index, dtype: int64)
+
+        # CRITICAL ASSUMPTION HERE :
+        # ALL HOLIDAYS SHOULD HAVE NO PRICING DATA BECAUSE IT'S A HOLIDAY 
+
+        futures_df_index = list(dataset.index)
+
+        # Get all 25ths that have occured (ie. have price data), and get 2 days prior to them.
+        roll_over_dates_for_business_days = [futures_df_index.index(i)-2 for i in working_frame
+                                        [working_frame['is_in_original_index'] == True]['target_date'].values]
+
+        # DIAGNOSIS PRINT:
+        # futures_prices_df.iloc[roll_over_dates_for_business_days].index.values
+
+        # Get all 25ths that did not occur (ie. they were holidays so no price data for that day).
+        roll_over_dates_on_holidays = working_frame[working_frame['is_in_original_index'] == False]['target_date']
+
+        roll_over_dates_for_holidays = []
+
+        # Get x business days prior to (non business day) 25th that are available in the dataset. 
+        for date in roll_over_dates_on_holidays:
+            roll_over_dates_for_holidays.append( 
+                super().get_x_days_prior_missing_target_date(dataset, date.to_period('M'), 3) )
+
+        roll_over_dates_for_holidays = np.ravel(roll_over_dates_for_holidays)
+
+        # DIAGNOSIS PRINT:
+        # roll_over_dates_for_holidays    
+
+        all_roll_overs =pd.concat([ pd.Series(roll_over_dates_for_holidays),
+                              pd.Series(dataset.iloc[roll_over_dates_for_business_days].index.values) ])
+
+        # DIAGNOSIS PRINT:
+        # is_expiry_busines_day(pd.DataFrame(all_roll_overs, 
+        #            columns=['roll_over_dates']), 'roll_over_dates')['is_in_original_index'].value_counts()
+
+        return all_roll_overs.sort_values().values

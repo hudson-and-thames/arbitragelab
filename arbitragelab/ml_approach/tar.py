@@ -17,17 +17,21 @@ class TAR(JohansenPortfolio):
     Threshold AutoRegressive Model.
     """
     
-    def __init__(self, price_data: pd.DataFrame):
+    def __init__(self, price_data: pd.DataFrame, calculate_spread: bool = True):
         """
         Init function.
 
         :param price_data: (pd.DataFrame) Collection of time series to
             construct to spread from.
         """
-
-        super().fit(price_data)
-        self.spread = super().construct_mean_reverting_portfolio(price_data)
-
+        
+        if calculate_spread:
+            super().fit(price_data)
+            self.spread = super().construct_mean_reverting_portfolio(price_data)
+        else:
+            self.spread = price_data
+            
+            
     def _tag_regime(self, series: pd.Series) -> pd.DataFrame:
         """
         Tags up/down swings in different vectors.
@@ -53,9 +57,10 @@ class TAR(JohansenPortfolio):
         :return: (RegressionResults) 
         """
 
-        jspread = pd.DataFrame(self.spread)
+        jspread = pd.DataFrame(self.spread.values)
         jspread.columns = ['spread']
-        jspread['rets'] = jspread['spread'].diff()
+        jspread['rets'] = jspread['spread']
+        jspread['rets'] = jspread['rets'].diff()
         jspread['spread_lag1'] = jspread['spread'].shift(1)
         jspread.dropna(inplace=True)
 
