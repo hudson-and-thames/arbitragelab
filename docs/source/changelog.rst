@@ -31,5 +31,6 @@ Changelog
 * :support:`17` Added Licence, ReadMe, and RoadMap
 * :support:`20` Added API Key Validation.
 * :support:`20` Add install documentation and test on OS/Ubuntu/Windows.
-* :feature:`21` Copula strategy added (Liew et al. 2013).
-* :support:`21` Copula strategy documentation (Liew et al. 2013).
+* :feature:`8` Copula strategy added (Liew et al. 2013): Log price (or equivalently, cumulative log returns) based copula strategy.
+* :feature:`8` Copulas supported: Gumbel, Frank, Clayton, Joe, N13, N14, Gaussian, Student(Student-t).
+* :support:`8` Copula strategy documentation (Liew et al. 2013) for log price based copula strategy.
