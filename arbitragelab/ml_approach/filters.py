@@ -13,12 +13,13 @@ def get_rolling_correlation(frame: pd.DataFrame, lookback: int, scale: bool = Fa
     """
     
     two_legged_df = frame.iloc[:, 0:2] 
-    
+    two_legged_df.index.name = '_index_'
+
     daily_corr = two_legged_df.rolling(lookback, min_periods=lookback).corr()
     daily_corr = daily_corr.iloc[:, 0].reset_index().dropna()
     
     final_corr = daily_corr[daily_corr['level_1'] == two_legged_df.columns[1]]
-    final_corr.set_index('date', inplace=True)
+    final_corr.set_index('_index_', inplace=True)
     final_corr.drop(['level_1'], axis=1, inplace=True)
     final_corr.dropna(inplace=True)
     
@@ -48,12 +49,14 @@ def get_events_by_corr_filter(frame: pd.DataFrame, lookback: int = 30, buy_thres
     buy_signal = frame.index.isin( corr_series[corr_series > buy_threshold].index )
     sell_signal = frame.index.isin( corr_series[corr_series < sell_threshold].index )
     
-    frame['side'] = 0
+    index_name = frame.index.name
+    frame.reset_index(inplace=True)
+    frame.loc[:, 'side'] = 0
     frame.loc[buy_signal, 'side'] = 1 
     frame.loc[sell_signal, 'side'] = -1 
     frame['side'] = frame['side'].shift(1)
     
-    return frame
+    return frame.set_index(index_name)
 
 
 
