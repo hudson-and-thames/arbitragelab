@@ -99,3 +99,42 @@ According to the trading rule we exit the trade in one of the three scenarios:
 
 Hence, we can restrict ourself to case with :math:`\theta \geq 0'
 
+Sharpe ratio calculation
+########################
+
+After a number of substitutions we can write down the formula for the Sharpe ratio.
+
+.. math::
+    SR = \frac{\cap{E}(\Upsilon,\bar{\omega}) - \frac{\bar{\omega}-\theta}{ln(1-2\Upsilon)}}{\sqrt{\cap{F}(\Upsilon,\bar{\omega})} - (\cap{E}(\Upsilon,\bar{\omega}))^2 + \frac{4(\Upsilon + ln(1-2\Upsilon)(\bar{\omega})\cap{E}(\Upsilon,\bar{\omega})}{(ln(1-2\Upsilon))^2}}
+
+
+To compute the approximate SR we need to perform the four-step numerical evaluation.
+
+**Step 1: Defining a tome grid**
+
+First of all we define the time grid :math:`\upsilon` based on which we will perform our numerical calculation:
+
+.. math::
+
+    0=\upsilon_0<\upsilon_1<...<\upsilon_n=\Upsilon,\  \upsilon(t) = \frac{1 - e^{-2(T-t)}}{2}
+
+**Step 2: Numerically calculate helper functions \bar{\epsilon}, \underbar{\epsilon}, \bar{\phi}, \underbar{\phi},**
+
+We are going to use the classical method of heat potentials to calculate the SR.
+As a preparation , in this step we solve the two sets of Volterra equations by using the trapezoidal rule of integral calculation.
+
+**Step 3: Calculate the values of :math:`\cap{E}(\Upsilon,\bar{\omega})` and :math:`\cap{F}(\Upsilon,\bar{\omega})`
+
+We need compute these functions at one point, which can be done by approximation of the integrals using the
+trapezoidal rule:
+
+.. math::
+
+    \cap{E}(\Upsilon,\bar{\omega}) = \frac{1}{2} \sum_{i=1}^k(\underbar{w}_{n,i}\underbar{\epsilon}_i + \underbar{w}_{n,i-1}\underbar{\epsilon}_{i-1} + \bar{w}_{n,i}\bar{\epsilon}_i + \bar{w}_{n,i-1}\bar{\epsilon}_{i-1})(\upsilon_i - \upsilon_{i-1})
+
+    \cap{F}(\Upsilon,\bar{\omega}) = \frac{1}{2} \sum_{i=1}^k(\underbar{w}_{n,i}\underbar{\phi}_i + \underbar{w}_{n,i-1}\underbar{\phi}_{i-1} + \bar{w}_{n,i}\bar{\phi}_i + \bar{w}_{n,i-1}\bar{\phi}_{i-1})(\upsilon_i - \upsilon_{i-1})
+
+Where w are the weights.
+
+**Step 4: calculate the SR using the obtained values**
+
