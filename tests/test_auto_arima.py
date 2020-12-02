@@ -58,12 +58,16 @@ class TestAutoARIMA(unittest.TestCase):
 
         auto_arima_model = AutoARIMAForecast(start_p=3, start_q=3, max_p=10, max_q=10)
 
-        with warnings.catch_warnings():  # Silencing specific Statsmodels ConvergenceWarning
+        with warnings.catch_warnings():  # Testing with warnings
             warnings.filterwarnings('ignore', r'Maximum Likelihood optimization failed to converge.')
 
-            auto_arima_model.get_best_arima_model(y_train, verbose=False)
+            auto_arima_model.get_best_arima_model(y_train, verbose=False, silence_warnings=False)
 
-        recursive_arima_prediction = auto_arima_model.predict(y=y_test, retrain_freq=1, train_window=None)
+        # And without warnings
+        auto_arima_model.get_best_arima_model(y_train, verbose=False, silence_warnings=True)
+
+        recursive_arima_prediction = auto_arima_model.predict(y=y_test, retrain_freq=1, train_window=None,
+                                                              silence_warnings=True)
         non_recursive_arima_prediction = auto_arima_model.predict(y=y_test, retrain_freq=1, train_window=30)
 
         self.assertAlmostEqual(recursive_arima_prediction.mean(), 6.72, delta=1e-2)
