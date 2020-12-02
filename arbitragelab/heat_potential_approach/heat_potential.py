@@ -13,16 +13,12 @@ import pandas as pd
 
 class HeatPotentials():
     """
-
     This class implements the algorithm for finding
     profit-taking and stop-loss levels for p/l
     that follow an Ornstein-Uhlenbeck process using the
     heat potential method. The following implementation is based on the work
     of Alexandr Lipton and Marcos Lopez de Prado "A closed-form solution for
     optimal mean-reverting trading strategies"<https://ssrn.com/abstract=3534445>`_
-
-
-
     """
 
     def __init__(self):
@@ -60,9 +56,12 @@ class HeatPotentials():
 
         self.optimal_stop_loss = sigma * stop_loss / np.sqrt(self.mu)
 
-    def description(self):
+    def description(self) -> pd.Series:
         """
+        Returns the statistics of the model. The optimal thresholds are converted back to the
+        terms of the original data.
 
+        :return: (pd.Series) Summary data for model parameters and optimal levels.
         """
         # Calculating the default data values
         data = [self.optimal_profit, self.optimal_stop_loss, self.max_trade_duration / self.mu]

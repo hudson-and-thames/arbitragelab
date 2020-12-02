@@ -50,14 +50,14 @@ value of opportunity i if it were liquidated at the price observed in the market
 we can compute the MtM p/l of opportunity i after t transactions as :math:`\pi_{i,T_i}=m(P_{1,t}-P_{i,0})`
 The exiting opportunity arizes in the following scenarios:
 
-* :math:`\pi_{i,T_i}\geq \bar{\pi}, where \bar{\pi}>0 is a profit-taking threshold
-* :math:`\pi_{i,T_i}\leq \underbar{\pi}, where \underbar{\pi}<0 is a stop-loss level
+* :math:`\pi_{i,T_i}\geq \bar{\pi}`, where :math:`\bar{\pi}>0` is a profit-taking threshold
+* :math:`\pi_{i,T_i}\leq \underline{\pi}`, where :math:`\underline{\pi}<0` is a stop-loss level
 
 Consider the OU process representing the :math:`{P_i}` series of prices
 
 .. math::
 
-    P_i{i,t} - \mathbb{E}_0[P_i{i,t}] = \mu(\mathbb{E}_0 - P_i{i,t-1}) + \sigma\epsilon_{i,t}
+    P_{i,t} - \mathbb{E}_0[P_{i,t}] = \mu(\mathbb{E}_0 - P_{i,t-1}) + \sigma\epsilon_{i,t}
 
 In order to calculate the Sharpe ratio we need to reformulate our problem in terms of heat potentials.
 
@@ -65,9 +65,9 @@ Suppose *S* - long investment strategy with p/l driven by the OU process:
 
 .. math::
 
-    dx' = \mu'(\theta'-x')dt'+sigma'dW_{t'}, x'(0) = 0
+    dx' = \mu'(\theta'-x')dt'+\sigma'dW_{t'}, x'(0) = 0
 
-and a trading rule :math:`R = {\bar{\pi}',\underbar{\pi}',T'}`. Now we transform it to use its steady-state
+and a trading rule :math:`R = {\bar{\pi}',\underline{\pi}',T'}`. Now we transform it to use its steady-state
 by performing scaling to remove superfluous parameters.
 
 .. math::
@@ -75,66 +75,101 @@ by performing scaling to remove superfluous parameters.
     t = \mu't',\ , T = \mu'T', x = \frac{\sqrt{\mu'}}{\sigma'} x',
 
     \theta = \frac{\sqrt{\mu'}}{\sigma'} \theta',\ \bar{\pi} = \frac{\sqrt{\mu'}}{\sigma'} \bar{\pi}',
-    \ \underbar{\pi} = \frac{\sqrt{\mu'}}{\sigma'} \underbar{\pi}'
+    \ \underline{\pi} = \frac{\sqrt{\mu'}}{\sigma'} \underline{\pi}'
 
 and get
 
 .. math::
 
-    dx = (\theta-x)dt + dW_t, \ \bar{\pi}' \leq x \leq \underbar{\pi},\ 0 \leq t \leq T
+    dx = (\theta-x)dt + dW_t, \ \bar{\pi}' \leq x \leq \underline{\pi},\ 0 \leq t \leq T
 
-where :math:`\theta` is an expected value and its standart deviation is given by :math:`frac{1}{\sqrt{2}}`
+where :math:`\theta` is an expected value and its standart deviation is given by :math:`\Omega=\frac{1}{\sqrt{2}}`
 
 According to the trading rule we exit the trade in one of the three scenarios:
 
-* price hits a targeted profit \bar{\pi}
-* price hits \underbar{\pi} stop-loss level
+* price hits a targeted profit :math:`\bar{\pi}`
+* price hits :math:`\underline{\pi}` stop-loss level
 * the trade expires at t=T
 
 .. tip::
 
-    For a short strategy reverses the roles of :math:`{\bar{\pi}',\underbar{\pi}}',
-    :math:`-\underbar{\pi}` equals the profit taken when the price hits :math:`\underbar{\pi}` and
+    For a short strategy reverses the roles of :math:`{\bar{\pi}',\underline{\pi}'}`,
+    :math:`-\underline{\pi}` equals the profit taken when the price hits :math:`\underline{\pi}` and
     :math:`-\bar{\pi}` losses are incurred while price hits :math:`-\bar{\pi}`
 
-Hence, we can restrict ourself to case with :math:`\theta \geq 0'
+Hence, we can restrict ourself to case with :math:`\theta \geq 0`
 
 Sharpe ratio calculation
 ########################
 
-After a number of substitutions we can write down the formula for the Sharpe ratio.
-
-.. math::
-    SR = \frac{\cap{E}(\Upsilon,\bar{\omega}) - \frac{\bar{\omega}-\theta}{ln(1-2\Upsilon)}}{\sqrt{\cap{F}(\Upsilon,\bar{\omega})} - (\cap{E}(\Upsilon,\bar{\omega}))^2 + \frac{4(\Upsilon + ln(1-2\Upsilon)(\bar{\omega})\cap{E}(\Upsilon,\bar{\omega})}{(ln(1-2\Upsilon))^2}}
-
-
 To compute the approximate SR we need to perform the four-step numerical evaluation.
 
-**Step 1: Defining a tome grid**
+**Step 1: Defining a calculation grid**
 
-First of all we define the time grid :math:`\upsilon` based on which we will perform our numerical calculation:
+First of all we define the grid :math:`\upsilon` based on which we will perform our numerical calculation:
 
 .. math::
 
     0=\upsilon_0<\upsilon_1<...<\upsilon_n=\Upsilon,\  \upsilon(t) = \frac{1 - e^{-2(T-t)}}{2}
 
-**Step 2: Numerically calculate helper functions \bar{\epsilon}, \underbar{\epsilon}, \bar{\phi}, \underbar{\phi},**
+**Step 2: Numerically calculate helper functions** :math:`\bar{\epsilon}, \underline{\epsilon}, \bar{\phi}, \underline{\phi}`
 
 We are going to use the classical method of heat potentials to calculate the SR.
 As a preparation , in this step we solve the two sets of Volterra equations by using the trapezoidal rule of integral calculation.
 
-**Step 3: Calculate the values of :math:`\cap{E}(\Upsilon,\bar{\omega})` and :math:`\cap{F}(\Upsilon,\bar{\omega})`
+**Step 3: Calculate the values of** :math:`\hat{E}(\Upsilon,\bar{\omega})` **and** :math:`\hat{F}(\Upsilon,\bar{\omega})`
 
 We need compute these functions at one point, which can be done by approximation of the integrals using the
 trapezoidal rule:
 
 .. math::
 
-    \cap{E}(\Upsilon,\bar{\omega}) = \frac{1}{2} \sum_{i=1}^k(\underbar{w}_{n,i}\underbar{\epsilon}_i + \underbar{w}_{n,i-1}\underbar{\epsilon}_{i-1} + \bar{w}_{n,i}\bar{\epsilon}_i + \bar{w}_{n,i-1}\bar{\epsilon}_{i-1})(\upsilon_i - \upsilon_{i-1})
+    \hat{E}(\Upsilon,\bar{\omega}) = \frac{1}{2} \sum_{i=1}^k(\underline{w}_{n,i}\underline{\epsilon}_i + \underline{w}_{n,i-1}\underline{\epsilon}_{i-1} + \bar{w}_{n,i}\bar{\epsilon}_i + \bar{w}_{n,i-1}\bar{\epsilon}_{i-1})(\upsilon_i - \upsilon_{i-1})
 
-    \cap{F}(\Upsilon,\bar{\omega}) = \frac{1}{2} \sum_{i=1}^k(\underbar{w}_{n,i}\underbar{\phi}_i + \underbar{w}_{n,i-1}\underbar{\phi}_{i-1} + \bar{w}_{n,i}\bar{\phi}_i + \bar{w}_{n,i-1}\bar{\phi}_{i-1})(\upsilon_i - \upsilon_{i-1})
+    \hat{F}(\Upsilon,\bar{\omega}) = \frac{1}{2} \sum_{i=1}^k(\underline{w}_{n,i}\underline{\phi}_i + \underline{w}_{n,i-1}\underline{\phi}_{i-1} + \bar{w}_{n,i}\bar{\phi}_i + \bar{w}_{n,i-1}\bar{\phi}_{i-1})(\upsilon_i - \upsilon_{i-1})
 
-Where w are the weights.
+Where *w* are the weights.
 
 **Step 4: calculate the SR using the obtained values**
 
+The previously computed functions :math:`\hat{E}(\Upsilon,\bar{\omega})` and :math:`\hat{F}(\Upsilon,\bar{\omega})`
+are substituted into the following formula to calculate the Sharpe ratio.
+
+.. math::
+    SR = \frac{\hat{E}(\Upsilon,\bar{\omega}) - \frac{\bar{\omega}-\theta}{ln(1-2\Upsilon)}}{\sqrt{\hat{F}(\Upsilon,\bar{\omega})} - (\hat{E}(\Upsilon,\bar{\omega}))^2 + \frac{4(\Upsilon + ln(1-2\Upsilon)(\bar{\omega})\hat{E}(\Upsilon,\bar{\omega})}{(ln(1-2\Upsilon))^2}}
+
+To find the optimal thresholds for the data provided by user we maximize the calculated SR with respect to
+:math:`\bar{\pi}\geq0,\underline{\pi}\leq0`
+
+.. math::
+
+    {\bar{\pi}*,\underline{\pi}*}=\underset{\bar{\pi}\geq0,\underline{\pi}\leq0}{\arg\max}\ SR
+
+
+The ``HeatPotentials`` module of the ArbitrageLab package allows the user to gcalculate the treshold levels for their
+data, the provided parameters are transformed to a steady-state solutions internally and calculates the reverse transformation
+for the optimal threshold values.
+
+Implementation
+##############
+
+First of all the user has to use ``fit`` for the parameters to be scaled to remove superfluous parameters,
+and set up the delta for the grid calculation and maximum duration of trade.
+
+
+.. py:currentmodule:: arbitragelab.heat_potential_approach.heat_potential.HeatPotentials
+
+.. autofunction:: fit
+
+To separately perform the optimization process we use the ``optimal_levels`` function.
+
+.. autofunction:: optimal_levels
+
+There is also a possibility to calculate the Sharpe ratio for chosen optimal levels and the maximim duration of the
+trade of choice.
+
+.. autofunction:: sharpe_calculation
+
+To view the optimal levels scaled back to initial parameters the ``description`` function is used.
+
+.. autofunction:: description
