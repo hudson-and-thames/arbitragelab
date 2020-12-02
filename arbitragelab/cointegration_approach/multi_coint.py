@@ -2,7 +2,7 @@
 # All rights reserved
 # Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 """
-This module generates trading signals of three or more cointegrated assets
+This module generates trading signals of three or more cointegrated assets.
 """
 
 import warnings
@@ -15,7 +15,7 @@ from arbitragelab.cointegration_approach import JohansenPortfolio
 
 class MultivariateCointegration:
     """
-    Calculate trading signal
+    Calculate trading signal.
     """
 
     def __init__(self, asset_df: pd.DataFrame):
@@ -26,13 +26,14 @@ class MultivariateCointegration:
 
         :param asset_df: (pd.Dataframe) Raw price dataframe of the assets.
         """
+
         self.__asset_df = asset_df
         self.__log_df = None
         self.__coint_vec = None
 
     def calc_log_price(self, nan_method: str = 'spline', order: int = 3) -> pd.DataFrame:
         """
-        Calculate the log price of each assets for cointegration coefficient calculation.
+        Calculate the log price of each asset for cointegration coefficient calculation.
         Fill missing value with two options: front-fill or cubic spline.
 
         :param nan_method: (str) Missing value imputation method. If "ffill" then use front-fill;
@@ -40,6 +41,7 @@ class MultivariateCointegration:
         :param order: (int) Polynomial order for spline function.
         :return: (pd.DataFrame) Log prices of the assets.
         """
+
         if nan_method == "ffill":
             # Use front-fill to impute.
             self.__asset_df.fillna(method='ffill', inplace=True)
@@ -52,6 +54,7 @@ class MultivariateCointegration:
             raise ValueError("The value of argument nan_method must be 'ffill' or 'spline'")
 
         self.__log_df = self.__asset_df.apply(np.log)
+
         return self.__log_df
 
     @property
@@ -61,6 +64,7 @@ class MultivariateCointegration:
 
         :return: (pd.DataFrame) Dataframe of asset prices.
         """
+
         return self.__asset_df
 
     @property
@@ -70,12 +74,13 @@ class MultivariateCointegration:
 
         :return: (pd.DataFrame) Dataframe of log asset prices.
         """
+
         return self.__log_df
 
     def fit(self, nan_method: str = 'spline', order: int = 3, sig_level: str = "95%",
             rolling_window_size: Optional[int] = 1500) -> np.array:
         """
-        Use Johansen test to retrieve the cointegration vector.
+        Use the Johansen test to retrieve the cointegration vector.
 
         :param nan_method: (str) Missing value imputation method. If "ffill" then use front-fill;
             if "spline" then use cubic spline.
@@ -85,6 +90,7 @@ class MultivariateCointegration:
             then use cumulative window, i.e. the entire dataset
         :return: (np.array) The cointegration vector, b.
         """
+
         # Checking the significance of a test.
         if sig_level not in ['90%', '95%', '99%']:
             raise ValueError("Significance level can only be the following:\n "
@@ -119,12 +125,13 @@ class MultivariateCointegration:
 
     def trading_signal(self, nlags: int = 30, dollar_invest: float = 1.e7) -> Tuple[np.array, ...]:
         """
-        Calculate daily trading signal as the number of shares need to be traded.
+        Calculate the daily trading signal as the number of shares that need to be traded.
 
         :param nlags: Number of lag for cointegrated returns sum, corresponding to the parameter P in the paper.
         :param dollar_invest: The value of long-short positions, corresponding to the parameter C in the paper.
-        :return:
+        :return (np.array, np.array): Arrays with numbers of shares to sell and buy.
         """
+
         # Calculate the cointegration error Y_t, recover the date index.
         coint_error = np.dot(self.__log_df, self.__coint_vec)
         coint_error_df = pd.DataFrame(coint_error)
