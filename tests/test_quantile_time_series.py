@@ -1,6 +1,6 @@
 # Copyright 2019, Hudson and Thames Quantitative Research
 # All rights reserved
-# Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
+# Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information
 
 """
 Tests AUTO ARIMA prediction functions.
@@ -10,7 +10,7 @@ import unittest
 import numpy as np
 import pandas as pd
 
-from arbitragelab.other_approaches import QuantileTimeSeriesTradingStrategy
+from arbitragelab.time_series_approach import QuantileTimeSeriesTradingStrategy
 
 
 class TestQuantileTimeSeries(unittest.TestCase):
