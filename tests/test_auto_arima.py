@@ -12,7 +12,7 @@ import os
 import numpy as np
 import pandas as pd
 
-from arbitragelab.auto_arima import get_trend_order, AutoARIMAForecast
+from arbitragelab.time_series_approach import get_trend_order, AutoARIMAForecast
 
 
 class TestAutoARIMA(unittest.TestCase):
@@ -43,6 +43,10 @@ class TestAutoARIMA(unittest.TestCase):
         non_stationary_trend_order = get_trend_order(self.non_stationary_series)
         self.assertEqual(stationary_trend_order, 0)
         self.assertEqual(non_stationary_trend_order, 1)
+
+        # Testing the extit from loop
+        high_trend_order = get_trend_order(self.non_stationary_series, 0)
+        self.assertEqual(high_trend_order, 0)
 
     def test_auto_arima(self):
         """

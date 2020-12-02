@@ -19,7 +19,7 @@ class QuantileTimeSeriesTradingStrategy:
     We enter a position if y_hat - y <= bottom quantile or y_hat - y >= top quantile.
     """
 
-    def __init__(self, long_quantile: int = 0.9, short_quantile: int = 0.1):
+    def __init__(self, long_quantile: float = 0.9, short_quantile: float = 0.1):
         """
         Class constructor.
 
