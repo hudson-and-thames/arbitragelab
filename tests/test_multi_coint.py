@@ -244,4 +244,3 @@ class TestMultivariateCointegration(unittest.TestCase):
         self.assertTrue(np.isclose(coint_vec_time_evo_short['FTSE'], coint_vec_time_evo_short['FTSE'].mean()).all())
         self.assertTrue(np.isclose(coint_vec_time_evo_short['CAC'], coint_vec_time_evo_short['CAC'].mean()).all())
         self.assertTrue(np.isclose(coint_vec_time_evo_short['DAX'], coint_vec_time_evo_short['DAX'].mean()).all())
-
