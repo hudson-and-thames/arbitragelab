@@ -2,8 +2,8 @@
 # All rights reserved
 # Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
 
-# pylint: disable=missing-module-docstring, invalid-name, too-many-instance-attributes
-import warnings
+# pylint: disable=missing-module-docstring, invalid-name, too-many-locals, too-many-arguments
+#import warnings
 import numpy as np
 #import matplotlib.pyplot as plt
 import scipy.optimize as so
@@ -31,7 +31,7 @@ class HeatPotentials():
         self.max_trade_duration = None
         self.mu = None
 
-    def fit(self, ou_params:list, delta_grid:float, max_trade_duration=None):
+    def fit(self, ou_params: list, delta_grid: float, max_trade_duration=None):
         """
         Fits the steady-state distribution to given OU model, assigns the
         grid density with respect to t, maximum duration of the trade.
@@ -55,6 +55,8 @@ class HeatPotentials():
         self.optimal_profit = sigma * profit_taking / np.sqrt(self.mu)
 
         self.optimal_stop_loss = sigma * stop_loss / np.sqrt(self.mu)
+
+        self.sharpe = max_sharpe
 
     def description(self) -> pd.Series:
         """
@@ -90,7 +92,8 @@ class HeatPotentials():
 
         return output
 
-    def upsilon(self, max_trade_duration: float) -> float:
+    @staticmethod
+    def upsilon(max_trade_duration: float) -> float:
         """
         Calculates the helper function that correspond to v(0).
         (p.5)
@@ -190,19 +193,20 @@ class HeatPotentials():
         return e_upper, e_lower, f_upper, f_lower
 
     def _numerical_calculation_helper(self, max_trade_duration: float,
-                                     optimal_profit: float,
-                                     optimal_stop_loss: float) -> np.ndarray:
+                                      optimal_profit: float,
+                                      optimal_stop_loss: float) -> np.ndarray:
         """
-        Numerically calculates helping integral functions to solve the Volterra equations. Later it uses
-        the acquired values to calculate epsilon and phi values necessary for Sharpe ratio calculation.
+        Numerically calculates helping integral functions to solve
+        the Volterra equations. Later it uses the acquired values to calculate epsilon
+        and phi values necessary for Sharpe ratio calculation.
         (p.8)
 
         :param max_trade_duration: (float) Maximum duration of the trade.
         :param optimal_profit: (float) Optimal profit-taking threshold.
         :param optimal_stop_loss: (float) Optimal stop-loss level.
 
-        :return: (np.array) List of calculated values of lower and upper epsilon and phi functions for every
-        element in grid v(t).
+        :return: (np.array) List of calculated values of lower and upper epsilon and phi functions
+        for every element in grid v(t).
         """
 
         # Setting up the set of lambda functions that represent the integrated expressions
@@ -241,20 +245,22 @@ class HeatPotentials():
         v = self.v(max_trade_duration)[:-1]
 
         # Calculating the helper values for Volterra equations
-        e_l, e_u, f_l, f_u = self._heat_potential_helper(max_trade_duration, optimal_profit, optimal_stop_loss)
+        e_l, e_u, f_l, f_u = self._heat_potential_helper(max_trade_duration, optimal_profit,
+                                                         optimal_stop_loss)
 
         # Solving the two sets of Volterra equations
         eps_lower, eps_upper = self._numerical_calculation_equations(v, K_1_1, K_1_1_v, K_1_2,
                                                                      K_2_1, K_2_2, K_2_2_v,
-                                                                    e_l, e_u)
+                                                                     e_l, e_u)
 
         phi_lower, phi_upper = self._numerical_calculation_equations(v, K_1_1, K_1_1_v, K_1_2,
                                                                      K_2_1, K_2_2, K_2_2_v,
-                                                                    f_l, f_u)
+                                                                     f_l, f_u)
 
         return eps_lower, eps_upper, phi_lower, phi_upper
 
-    def _numerical_calculation_equations(self, v, K_11, K_11_v, K_12, K_21, K_22, K_22_v, f1, f2):
+    @staticmethod
+    def _numerical_calculation_equations(v, K_11, K_11_v, K_12, K_21, K_22, K_22_v, f1, f2):
         """
         Numerically calculates general solution for system of Volterra integral equations.
         (p.8)
@@ -267,8 +273,8 @@ class HeatPotentials():
         :param K_22: (function) Function that calculates the K_2_2(v,s).
         :param K_22_v: (function) Function that calculates the approximation of K_2_2(v,v).
 
-        :return: (np.array) List of calculated solutions for two coupled system of Volterra integral equations
-        for every element in grid v(t).
+        :return: (np.array) List of calculated solutions for two coupled system of Volterra
+        integral equations for every element in grid v(t).
         """
 
         n = len(v)
@@ -323,7 +329,8 @@ class HeatPotentials():
 
         return nu_1, nu_2
 
-    def _sharpe_helper_functions(self, max_trade_duration: float, optimal_profit: float, optimal_stop_loss: float) -> np.ndarray:
+    def _sharpe_helper_functions(self, max_trade_duration: float, optimal_profit: float,
+                                 optimal_stop_loss: float) -> np.ndarray:
         """
         Numerically calculates the main helper functions E and F for the Sharpe function
         calculation.
@@ -337,8 +344,10 @@ class HeatPotentials():
         element in grid v(t).
         """
         # Calculate the core helper values
-        eps_lower, eps_upper, phi_lower, phi_upper = self._numerical_calculation_helper(max_trade_duration, optimal_profit,
-                                                                                       optimal_stop_loss)
+        eps_lower, eps_upper,\
+        phi_lower, phi_upper = self._numerical_calculation_helper(max_trade_duration,
+                                                                  optimal_profit,
+                                                                  optimal_stop_loss)
         # Setting up the grid
         v = self.v(max_trade_duration)
 
@@ -377,20 +386,23 @@ class HeatPotentials():
 
         # Calculate the E and F functions
         for i in range(1, k):
-            E_vect[i - 1] = (w_l[i - 1] * eps_lower[i] + w_l[i - 2] * eps_lower[i - 1] + w_l[i - 1] * eps_upper[i] +
-                             w_l[i - 2] * eps_upper[i - 1]) * (v[i] - v[i - 1])
+            E_vect[i - 1] = ((w_l[i - 1] * eps_lower[i] + w_l[i - 2] * eps_lower[i - 1]
+                              + w_l[i - 1] * eps_upper[i] +
+                              w_l[i - 2] * eps_upper[i - 1]) * (v[i] - v[i - 1]))
 
         E = 0.5 * sum(E_vect)
 
         for i in range(1, k):
-            F_vect[i - 1] = (w_l[i - 1] * phi_lower[i] + w_l[i - 2] * phi_lower[i - 1] + w_l[i - 1] * phi_upper[i] +
-                             w_l[i - 2] * phi_upper[i - 1]) * (v[i] - v[i - 1])
+            F_vect[i - 1] = ((w_l[i - 1] * phi_lower[i] + w_l[i - 2] * phi_lower[i - 1]
+                              + w_l[i - 1] * phi_upper[i] +
+                              w_l[i - 2] * phi_upper[i - 1]) * (v[i] - v[i - 1]))
 
         F = 0.5 * sum(F_vect)
 
         return E, F
 
-    def sharpe_calculation(self, max_trade_duration: float, optimal_profit: float, optimal_stop_loss: float) -> np.ndarray:
+    def sharpe_calculation(self, max_trade_duration: float, optimal_profit: float,
+                           optimal_stop_loss: float) -> np.ndarray:
         """
         Calculates the Sharpe ratio.
         (p.6 )
@@ -410,7 +422,8 @@ class HeatPotentials():
 
         a = 2 * (omega + self.theta) / np.log(1 - 2 * upsilon)
 
-        summ_term = 4 * (upsilon + np.log(1 - 2 * upsilon) * (omega + self.theta) * E) / (np.log(1 - 2 * upsilon)) ** 2
+        summ_term = (4 * (upsilon + np.log(1 - 2 * upsilon) * (omega + self.theta) * E) /
+                     (np.log(1 - 2 * upsilon)) ** 2)
 
         # Calculating the Sharpe ratio
         sharpe_ratio = (E - a) / np.sqrt(F - E ** 2 + summ_term)
@@ -440,7 +453,8 @@ class HeatPotentials():
 
         a = 2 * (omega + self.theta) / np.log(1 - 2 * upsilon)
 
-        summ_term = 4 * (upsilon + np.log(1 - 2 * upsilon) * (omega + self.theta) * E) / (np.log(1 - 2 * upsilon)) ** 2
+        summ_term = (4 * (upsilon + np.log(1 - 2 * upsilon) * (omega + self.theta) * E) /\
+                     (np.log(1 - 2 * upsilon)) ** 2)
 
         # Calculate the Sharpe ratio
         sharpe_ratio = (E - a) / np.sqrt(F - E ** 2 + summ_term)

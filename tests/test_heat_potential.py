@@ -1,3 +1,10 @@
+# Copyright 2019, Hudson and Thames Quantitative Research
+# All rights reserved
+# Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
+
+"""
+Tests the heat potentials approach from the HeatPotentials module of ArbitrageLab.
+"""
 import unittest
 import numpy as np
 
@@ -5,8 +12,14 @@ from arbitragelab.heat_potential_approach.heat_potential import HeatPotentials
 
 
 class TestHeatPotentials(unittest.TestCase):
+    """
+    Tests the HeatPotentials module
+    """
 
     def setUp(self) -> None:
+        """
+        Sets up the universal testing values
+        """
 
         self.params = (1.8557, 0.00653, 0.15)
 
