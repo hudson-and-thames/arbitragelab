@@ -232,12 +232,15 @@ class TestMultivariateCointegration(unittest.TestCase):
         self.assertTupleEqual(coint_vec_time_evo.shape, (110, 4))
 
         # Check the value of the calculation results. Check head and tail.
-        self.assertListEqual(list(signals.iloc[0].values), [20740.0, -610.0, -1245.0, -144.0])
-        self.assertListEqual(list(signals.iloc[-1].values), [19624.0, -609.0, -1190.0, -169.0])
-        self.assertListEqual(list(coint_vec_time_evo.iloc[0].values),
-                             [30.507755593162194, -12.048910113397362, -27.2487683546217, -2.6950408603345077])
-        self.assertListEqual(list(coint_vec_time_evo.iloc[-1].values),
-                             [31.07014821383982, -13.140996130452553, -25.550218022060093, -3.1229310063460174])
+        self.assertIsNone(np.testing.assert_allclose(signals.iloc[0].values,
+                                                     np.array([20740.0, -610.0, -1245.0, -144.0])))
+        self.assertIsNone(np.testing.assert_allclose(signals.iloc[-1].values,
+                                                     np.array([19624.0, -609.0, -1190.0, -169.0])))
+        target_head = np.array([30.507755593162194, -12.048910113397362, -27.2487683546217, -2.6950408603345077])
+        self.assertIsNone(np.testing.assert_allclose(coint_vec_time_evo.iloc[0].values, target_head, rtol=1e-5))
+
+        target_tail = np.array([31.07014821383982, -13.140996130452553, -25.550218022060093, -3.1229310063460174])
+        self.assertIsNone(np.testing.assert_allclose(coint_vec_time_evo.iloc[-1].values, target_tail, rtol=1e-5))
 
         # If cointegration vector is not updated, then the cointegration vector should be the same for each data point.
         self.assertTrue(np.isclose(coint_vec_time_evo_short['AEX'], coint_vec_time_evo_short['AEX'].mean()).all())
