@@ -14,7 +14,7 @@ import numpy as np
 import pandas as pd
 import statsmodels.api as sm
 
-from arbitragelab.cointegration_approach.multi_coint import MultivariateCointegration
+from arbitragelab.cointegration_approach import MultivariateCointegration
 
 
 class TestMultivariateCointegration(unittest.TestCase):
