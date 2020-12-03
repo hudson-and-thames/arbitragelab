@@ -11,7 +11,7 @@ from typing import Tuple, Optional
 import numpy as np
 import pandas as pd
 
-from arbitragelab.cointegration_approach import EngleGrangerPortfolio, JohansenPortfolio
+from arbitragelab.cointegration_approach import JohansenPortfolio
 
 
 class MultivariateCointegration:
@@ -158,6 +158,7 @@ class MultivariateCointegration:
         # Assign the correct sign to the number of shares according to the sign of CC.
         return -1. * np.floor(pos_shares), np.floor(neg_shares)
 
+    # pylint: disable=invalid-name
     def trading_signal(self, nlags: int, nan_method: str = "ffill", dollar_invest: float = 1.e7,
                        rolling_window_size: Optional[int] = None, update_freq: int = 22,
                        spline_order: int = 3) -> Tuple[pd.DataFrame, pd.DataFrame]:
