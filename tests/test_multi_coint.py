@@ -29,10 +29,16 @@ class TestMultivariateCointegration(unittest.TestCase):
         Data: AEX, DAX, CAC40, and FTSE100 data from Jan 1st 1996 to Dec 31st 2006.
         """
 
+        # Read data.
         project_path = os.path.dirname(__file__)
         data_path = project_path + '/test_data/multi_coint.csv'
         self.data = pd.read_csv(data_path, parse_dates=['Date'])
         self.data.set_index("Date", inplace=True)
+
+        # Split the data into in-sample and out-of-sample subset.
+        trade_date = pd.Timestamp(2001, 11, 6)
+        self.train_data = self.data.loc[:trade_date]
+        self.trade_data = self.data.loc[trade_date:]
 
     def test_calc_log_price_ffill(self):
         """
@@ -40,7 +46,7 @@ class TestMultivariateCointegration(unittest.TestCase):
         """
 
         # Test missing data forward fill imputation.
-        ffill_test = MultivariateCointegration(self.data)
+        ffill_test = MultivariateCointegration(self.data, None)
 
         # Test if the price dataframe has been properly read.
         self.assertEqual(len(ffill_test.asset_df), 2836)
@@ -65,7 +71,7 @@ class TestMultivariateCointegration(unittest.TestCase):
         """
 
         # Test missing data cubic spline imputation.
-        spline_test = MultivariateCointegration(self.data)
+        spline_test = MultivariateCointegration(self.data, None)
 
         # Do missing data imputation.
         spline_test.calc_log_price(nan_method='spline', order=3)
@@ -87,7 +93,7 @@ class TestMultivariateCointegration(unittest.TestCase):
         """
 
         # Test missing data but with wrong parameters.
-        error_test = MultivariateCointegration(self.data)
+        error_test = MultivariateCointegration(self.data, self.trade_data)
 
         # Raise ValueError.
         self.assertRaises(ValueError, error_test.calc_log_price, 'ignore')
@@ -98,12 +104,12 @@ class TestMultivariateCointegration(unittest.TestCase):
         """
 
         # Use ffill to test as it is faster.
-        result_test = MultivariateCointegration(self.data)
+        result_test = MultivariateCointegration(self.data, None)
 
         # Do missing data imputation and log price calculation.
         result_test.calc_log_price(nan_method='ffill')
 
-        result_test_sample = result_test.log_df.tail(1)
+        result_test_sample = result_test.log_asset_df.tail(1)
 
         self.assertAlmostEqual(result_test_sample['AEX'].values[0], 6.205244395469226)
         self.assertAlmostEqual(result_test_sample['DAX'].values[0], 8.794358152425072)
@@ -116,7 +122,7 @@ class TestMultivariateCointegration(unittest.TestCase):
         """
 
         # Initialize the trading signal generator.
-        fit_test = MultivariateCointegration(self.data)
+        fit_test = MultivariateCointegration(self.data, None)
 
         # Provide a wrong parameter.
         self.assertRaises(ValueError, fit_test.fit, sig_level='91%')
@@ -127,7 +133,7 @@ class TestMultivariateCointegration(unittest.TestCase):
         """
 
         # Initialize the trading signal generator.
-        roll_window = MultivariateCointegration(self.data)
+        roll_window = MultivariateCointegration(self.data, None)
 
         # Use all data, no rolling window.
         no_rw_coint_vec = roll_window.fit(nan_method='ffill', rolling_window_size=None)
@@ -143,7 +149,7 @@ class TestMultivariateCointegration(unittest.TestCase):
         """
 
         # Initialize the trading signal generator.
-        roll_window = MultivariateCointegration(self.data)
+        roll_window = MultivariateCointegration(self.data, None)
 
         # Use all data, no rolling window.
         rw_coint_vec = roll_window.fit(nan_method='ffill', rolling_window_size=1500)
@@ -172,21 +178,23 @@ class TestMultivariateCointegration(unittest.TestCase):
 
         # Fit and catch the warning.
         no_coint_data = pd.DataFrame(np.vstack((asset1, asset2, asset3)).T)
-        no_coint = MultivariateCointegration(no_coint_data)
+        no_coint = MultivariateCointegration(no_coint_data, None)
         with self.assertWarnsRegex(Warning, 'trace'):
             no_coint.fit(sig_level="99%", rolling_window_size=None)
+        with self.assertWarnsRegex(Warning, 'eigen'):
+            no_coint.fit(sig_level="99%", rolling_window_size=None)
 
-    def test_trading_signal(self):
+    def test_num_of_shares(self):
         """
-        Test trading signal generation.
+        Test the calculation of number of shares to trade.
         """
 
         # Find the cointegration vector, calculate the trading signal, i.e. the number of shares.
-        trade_signal_test = MultivariateCointegration(self.data)
-        trade_signal_test.fit(nan_method='ffill', rolling_window_size=None)
+        num_of_shares_test = MultivariateCointegration(self.data, None)
+        num_of_shares_test.fit(nan_method='ffill', rolling_window_size=None)
 
         # Default trading position is 10,000,000 currency
-        pos_shares, neg_shares = trade_signal_test.trading_signal()
+        pos_shares, neg_shares = num_of_shares_test.num_of_shares()
 
         # Check if the share numbers are correct.
         self.assertEqual(pos_shares.values[0], -4504)
@@ -195,7 +203,7 @@ class TestMultivariateCointegration(unittest.TestCase):
         self.assertEqual(neg_shares.values[1], 315)
 
         # Verify if the positions are dollar-neutral.
-        last_price = trade_signal_test.asset_df.iloc[-1]
+        last_price = num_of_shares_test.asset_df.iloc[-1]
         neg_pos = pd.concat([last_price, neg_shares], axis=1).dropna()
         neg_pos_dollar_value = neg_pos.iloc[:, 0] @ neg_pos.iloc[:, 1]
 
@@ -205,3 +213,35 @@ class TestMultivariateCointegration(unittest.TestCase):
         # Rounding error will always cause positions not exactly dollar neutral.
         # As long as it is close to neutral it should be passing the test.
         self.assertTrue(abs(neg_pos_dollar_value + pos_pos_dollar_value) / 1.e7 < 5.e-4)
+
+    def test_trade_signal(self):
+        """
+        Test trading signal generation.
+        """
+
+        # Initialize two trading signal generator. Short one do not trigger a cointegration vector update.
+        trade_signal_test = MultivariateCointegration(self.train_data, self.trade_data.iloc[:110, :])
+        trade_signal_short_test = MultivariateCointegration(self.train_data, self.trade_data.iloc[:21, :])
+
+        # Generate trading signals
+        signals, coint_vec_time_evo = trade_signal_test.trading_signal(30, rolling_window_size=None)
+        _, coint_vec_time_evo_short = trade_signal_short_test.trading_signal(15, rolling_window_size=None)
+
+        # Check the shape of signal and cointegration vector evolution dataframe
+        self.assertTupleEqual(signals.shape, (110, 4))
+        self.assertTupleEqual(coint_vec_time_evo.shape, (110, 4))
+
+        # Check the value of the calculation results. Check head and tail.
+        self.assertListEqual(list(signals.iloc[0].values), [20740.0, -610.0, -1245.0, -144.0])
+        self.assertListEqual(list(signals.iloc[-1].values), [19624.0, -609.0, -1190.0, -169.0])
+        self.assertListEqual(list(coint_vec_time_evo.iloc[0].values),
+                             [30.507755593162194, -12.048910113397362, -27.2487683546217, -2.6950408603345077])
+        self.assertListEqual(list(coint_vec_time_evo.iloc[-1].values),
+                             [31.07014821383982, -13.140996130452553, -25.550218022060093, -3.1229310063460174])
+
+        # If cointegration vector is not updated, then the cointegration vector should be the same for each data point.
+        self.assertTrue(np.isclose(coint_vec_time_evo_short['AEX'], coint_vec_time_evo_short['AEX'].mean()).all())
+        self.assertTrue(np.isclose(coint_vec_time_evo_short['FTSE'], coint_vec_time_evo_short['FTSE'].mean()).all())
+        self.assertTrue(np.isclose(coint_vec_time_evo_short['CAC'], coint_vec_time_evo_short['CAC'].mean()).all())
+        self.assertTrue(np.isclose(coint_vec_time_evo_short['DAX'], coint_vec_time_evo_short['DAX'].mean()).all())
+
