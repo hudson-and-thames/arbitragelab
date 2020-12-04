@@ -92,6 +92,14 @@ This project is licensed under an all rights reserved licence.
 
 .. toctree::
     :maxdepth: 2
+    :caption: Time Series Approach
+    :hidden:
+
+    time_series_approach/introduction
+    time_series_approach/quantile_time_series_strategy
+
+.. toctree::
+    :maxdepth: 2
     :caption: Other Approaches
     :hidden:
 

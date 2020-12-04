@@ -3,7 +3,7 @@
 # Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
 """
 This module implements the quantile time series approach described in
-Sarmento and Nuno Horta in `"A Machine Learning based Pairs Trading Investment Strategy." <http://premio-vidigal.inesc.pt/pdf/SimaoSarmentoMSc-resumo.pdf>`__.
+Sarmento and Nuno Horta in `"A Machine Learning based Pairs Trading Investment Strategy" <https://www.springer.com/gp/book/9783030472504>`__.
 """
 
 import pandas as pd

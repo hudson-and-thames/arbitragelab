@@ -67,7 +67,7 @@ class TestAutoARIMA(unittest.TestCase):
         auto_arima_model.get_best_arima_model(y_train, verbose=False, silence_warnings=True)
 
         recursive_arima_prediction = auto_arima_model.predict(y=y_test, retrain_freq=1, train_window=None,
-                                                              silence_warnings=True)
+                                                              silence_warnings=False)
         non_recursive_arima_prediction = auto_arima_model.predict(y=y_test, retrain_freq=1, train_window=30)
 
         self.assertAlmostEqual(recursive_arima_prediction.mean(), 6.72, delta=1e-2)
