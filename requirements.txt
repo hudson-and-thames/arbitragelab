@@ -8,6 +8,7 @@ matplotlib==3.2.1
 cython==0.29.21
 POT==0.7.0
 keras==2.3.1
+tensorflow==2.2.1
 
 #Develop
 codecov==2.0.15
