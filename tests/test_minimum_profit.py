@@ -1,6 +1,6 @@
 # Copyright 2019, Hudson and Thames Quantitative Research
 # All rights reserved
-# Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
+# Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 
 """
 Tests function of Minimum Profit Condition Optimization module:
@@ -28,8 +28,8 @@ class TestMinimumProfit(unittest.TestCase):
 
         Data: ANZ-ADB daily data (1/1/2001 - 8/30/2002)
         Data: XLF-XLK daily data (1/1/2018 - 11/17/2020)
+        :return:
         """
-
         np.random.seed(50)
         project_path = os.path.dirname(__file__)
         data_path = project_path + '/test_data/ANZ-ADB.csv'
@@ -112,12 +112,12 @@ class TestMinimumProfit(unittest.TestCase):
 
     def test_optimize(self):
         """
-        Unit test for the optimization procedure.
+        Unit test for optimization procedure.
 
         Use specified parameters here instead of fit from data.
         """
 
-        # Use an empty Dataframe to initialize an instance of the optimizer
+        # Use an empty Dataframe to initialize an instance of optimizer
         empty_df = pd.DataFrame(columns=['Share S1', 'Share S2'])
         optimizer = MinimumProfit(empty_df)
 
@@ -130,7 +130,7 @@ class TestMinimumProfit(unittest.TestCase):
         upper_bounds = 0.09
         mtps = 13.369806195172025
 
-        # Only do two tests as this process is quite time consuming
+        # Only do two tests as this process is quite time consuming.
         ar_resid = np.random.normal(0, sigma_a, 1000)
         sigma_epsilon = sigma_a / np.sqrt(1 - ar_coeff ** 2)
         epsilon_t = pd.Series(np.random.normal(0, sigma_epsilon, 1000))
