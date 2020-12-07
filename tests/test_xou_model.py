@@ -32,7 +32,7 @@ class TestExponentialOrnsteinUhlenbeck(unittest.TestCase):
         test = ExponentialOrnsteinUhlenbeck()
 
         # Correct data for testing the module
-        np.random.seed(30)
+        np.random.seed(31)
         self.delta_t = 1/252
         self.xou_example = test.ou_model_simulation(n=1000, theta_given=1,
                                                     mu_given=0.6, sigma_given=0.2,
@@ -46,7 +46,7 @@ class TestExponentialOrnsteinUhlenbeck(unittest.TestCase):
         # Assign the element of the class
         test = ExponentialOrnsteinUhlenbeck()
         # Generating the XOU data based on given parameters
-        np.random.seed(30)
+        np.random.seed(31)
         xou_generated = test.xou_model_simulation(n=1000, theta_given=1,
                                                   mu_given=0.6, sigma_given=0.2,
                                                   delta_t_given=self.delta_t)
@@ -67,7 +67,7 @@ class TestExponentialOrnsteinUhlenbeck(unittest.TestCase):
         """
         test = ExponentialOrnsteinUhlenbeck()
         # Generating the XOU data based on given parameters
-        np.random.seed(30)
+        np.random.seed(31)
         test.fit(self.xou_example, data_frequency="D", discount_rate=0.05,
                  transaction_cost=[0.02, 0.02])
         asset_prices = np.array([self.xou_example, self.xou_example]).transpose()
@@ -89,7 +89,7 @@ class TestExponentialOrnsteinUhlenbeck(unittest.TestCase):
         """
         # Assign the element of the class
         test = ExponentialOrnsteinUhlenbeck()
-        np.random.seed(30)
+        np.random.seed(31)
         incorrect_data = test.ou_model_simulation(n=1000, theta_given=1,
                                                   mu_given=30, sigma_given=0.2,
                                                   delta_t_given=self.delta_t)
@@ -143,8 +143,8 @@ class TestExponentialOrnsteinUhlenbeck(unittest.TestCase):
                                    test.xou_optimal_entry_interval()[1],
                                    ]
         # Result we will be comparing our calculations to
-        desired_result = [1.281336, -8.19363, 0.82046,
-                          1.281336, -8.19363, 0.82046]
+        desired_result = [1.05623, -9.7139, 0.70871,
+                          1.05623, -9.7139, 0.70871]
 
         np.testing.assert_almost_equal(optimal_stopping_levels, desired_result, decimal=4)
 
@@ -161,6 +161,6 @@ class TestExponentialOrnsteinUhlenbeck(unittest.TestCase):
         optimal_switching_levels = [test.optimal_switching_levels()[0], test.optimal_switching_levels()[1],
                                     test.optimal_switching_levels()[0], test.optimal_switching_levels()[1]]
 
-        desired_result = [0.97522591, 1.17959083, 0.97522591, 1.17959083]
+        desired_result = [0.83884, 0.97899, 0.83884, 0.97899]
 
         np.testing.assert_almost_equal(optimal_switching_levels, desired_result, decimal=4)
