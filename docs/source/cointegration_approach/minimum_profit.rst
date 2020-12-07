@@ -1,10 +1,10 @@
 .. _cointegration_approach-minimum_profit:
 
 .. note::
-    The following documentation closely follows two papers:
+    The following documentation closely follows two papers
 
-    - `Loss protection in pairs trading through minimum profit bounds: a cointegration approach <http://downloads.hindawi.com/archive/2006/073803.pdf>`__ by Lin, Y.-X., McCrae, M., and Gulati, C. (2006)
-    - `Finding the optimal pre-set boundaries for pairs trading strategy based on cointegration technique <https://ro.uow.edu.au/cgi/viewcontent.cgi?article=1040&context=cssmwp>`__ by Puspaningrum, H., Lin, Y.-X., and Gulati, C. M. (2010)
+    1. `Loss protection in pairs trading through minimum profit bounds: a cointegration approach <http://downloads.hindawi.com/archive/2006/073803.pdf>`__ by Lin, Y.-X., McCrae, M., and Gulati, C. (2006)
+    2. `Finding the optimal pre-set boundaries for pairs trading strategy based on cointegration technique <https://ro.uow.edu.au/cgi/viewcontent.cgi?article=1040&context=cssmwp>`__ by Puspaningrum, H., Lin, Y.-X., and Gulati, C. M. (2010)
 
 ===========================
 Minimum Profit Optimization
