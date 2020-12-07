@@ -14,10 +14,11 @@ Functions include:
 """
 # pylint: disable = invalid-name
 from typing import Callable
-from sklearn.covariance import EmpiricalCovariance
-from statsmodels.distributions.empirical_distribution import ECDF
 import numpy as np
 import scipy.stats as ss
+from statsmodels.distributions.empirical_distribution import ECDF
+from sklearn.covariance import EmpiricalCovariance
+
 import arbitragelab.copula_approach.copula_generate as cg
 
 

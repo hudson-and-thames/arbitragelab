@@ -7,6 +7,7 @@ Module that houses all copula classes and the parent copula class.
 Also include a Switcher class to create copula by its name and parameters,
 to emulate a switch functionality.
 """
+
 # pylint: disable = invalid-name, too-many-lines
 from typing import Callable
 from scipy.optimize import brentq

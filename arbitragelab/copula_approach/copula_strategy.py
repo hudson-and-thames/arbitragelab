@@ -4,6 +4,7 @@
 """
 Master module that uses copula for trading strategy.
 """
+
 # pylint: disable = invalid-name
 from typing import Callable
 import matplotlib.pyplot as plt
@@ -70,7 +71,7 @@ class CopulaStrategy:
 
     def fit_copula(self, s1_series: np.array, s2_series: np.ndarray, copula_name: str,
                    if_empirical_cdf: bool = True, if_renew: bool = True, **kwargs: dict) -> tuple:
-        r"""
+        """
         Conduct a max likelihood estimation and information criterion.
 
         Note: s1_series and s2_series need to be pre-processed. In general, raw price data is depreciated.
