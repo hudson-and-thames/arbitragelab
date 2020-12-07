@@ -31,7 +31,7 @@ class Copula:
         """
 
     def describe(self, if_print: bool = True) -> pd.Series:
-        r"""
+        """
         Print the description of the copula's name and parameter as a pd.Series.
 
         Note: the descriptive name is different from the copula's class name, but its full actual name.
