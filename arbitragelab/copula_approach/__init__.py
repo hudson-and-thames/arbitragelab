@@ -7,3 +7,4 @@ from arbitragelab.copula_approach.copula_calculation import (find_marginal_cdf, 
 from arbitragelab.copula_approach.copula_generate import (Copula, Gumbel, Frank, Clayton, Joe, N13,
                                                           N14, Gaussian, Student, Switcher)
 from arbitragelab.copula_approach.copula_strategy import CopulaStrategy
+from arbitragelab.copula_approach.copula_strategy_mpi import CopulaStrategyMPI
