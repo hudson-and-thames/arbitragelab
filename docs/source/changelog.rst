@@ -30,6 +30,8 @@ Changelog
 * :support:`16` OU-model documentation.
 * :support:`17` Added Licence, ReadMe, and RoadMap
 * :feature:`19` Minimum profit optimization module added (Lin et al. 2006, Puspaningrum et al. 2010): Finding optimal pre-set boundaries for cointegrated pairs trading strategy.
+* :feature:`19` Cointegrated time series simulation module added (Lin et al. 2006): Simulate cointegrated series that follows AR(1) dynamics.
 * :support:`19` Minimum profit optimization documentation for cointegrated pairs trading strategy.
+* :support:`19` Cointegrated time sries simulation documentation.
 * :support:`20` Added API Key Validation.
 * :support:`20` Add install documentation and test on OS/Ubuntu/Windows.
