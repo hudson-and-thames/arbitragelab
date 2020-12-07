@@ -104,6 +104,7 @@ class AutoARIMAForecast:
         """
         Calls in a loop to create a terminal progress bar.
         https://gist.github.com/aubricus/f91fb55dc6ba5557fbab06119420dd6a
+
         :param iteration: (int) Current iteration.
         :param max_iterations: (int) Maximum number of iterations.
         :param prefix: (str) Prefix string.

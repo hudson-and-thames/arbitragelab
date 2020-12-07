@@ -31,3 +31,5 @@ Changelog
 * :support:`17` Added Licence, ReadMe, and RoadMap
 * :support:`20` Added API Key Validation.
 * :support:`20` Add install documentation and test on OS/Ubuntu/Windows.
+* :feature:`24` Quantile Time Series Strategy (SM Sarmento, N Horta, 2020) and Auto ARIMA model added.
+* :support:`24` Quantile Time Series Strategy and Auto ARIMA model documentation.

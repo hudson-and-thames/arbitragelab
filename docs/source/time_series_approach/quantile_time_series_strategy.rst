@@ -57,6 +57,14 @@ are the model parameters.
 If the input series are cointegrated of order zero, then :math:`x_{t} = X_{t}`, where :math:`X_{t}` is the
 input time series. If the cointegration order is one, then :math:`x_{t} = X_{t} - X_{t-1}` and so on.
 
+The best fitting ARIMA model is chosen using the Akaike Information Criterion (AIC):
+
+.. math::
+
+    AIC = 2k - 2ln(L)
+
+Where :math:`k` is the number of moel parameters and :math:`L` is the likelihood function.
+
 .. figure:: images/auto_arima_prediction.png
     :scale: 80 %
     :align: center
@@ -204,7 +212,7 @@ The following research notebook can be used to better understand the time series
 
 * `Quantile Time Series Strategy`_
 
-.. _`Quantile Time Series Strategy`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Distance%20Approach/basic_distance_approach.ipynb
+.. _`Quantile Time Series Strategy`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Time%20Series%20Approach/quantile_time_series.ipynb
 
 References
 ##########
