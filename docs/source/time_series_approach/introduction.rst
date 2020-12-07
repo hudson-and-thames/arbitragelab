@@ -7,8 +7,8 @@ Introduction
 Time Series Approach
 ####################
 
-This approach is not focusing on picking the a set of comoving securities, but assumes that they have
-been chosen in the prior stage using either a standard cointegration test or one of the other methods.
+This approach is not focusing on picking a set of comoving securities, but assumes that they have already
+been chosen in the prior stage using either a standard cointegration test or one of the alternative methods.
 The core idea of the time series approach is to model the spread of the pair or a set of assets, and
 therefore generating the optimized trading signals.
 
@@ -22,4 +22,5 @@ therefore generating the optimized trading signals.
     `"A Machine Learning based Pairs Trading Investment Strategy" <https://www.springer.com/gp/book/9783030472504>`__.
 
 Tools that can be used to model the spread include, but are not limited to: a time series model,
-a state space model, a Bayesian approach.
+a state-space model, a Bayesian approach, models based on the OU processes, nonparametric approach
+with renko and kagi.
