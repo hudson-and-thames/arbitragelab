@@ -7,6 +7,7 @@ Test functions from CIR model of the Optimal Mean Reversion module.
 """
 
 # pylint: disable=protected-access
+import os
 import unittest
 import numpy as np
 import pandas as pd
@@ -22,6 +23,14 @@ class TestCoxIngersollRoss(unittest.TestCase):
         """
         Set up testing data
         """
+
+        project_path = os.path.dirname(__file__)
+        self.path = project_path + '/test_data/incorrect_data.csv'
+        data = pd.read_csv(self.path)
+        data = data.set_index('Date')
+
+        # Incorrect data (non-logarithmized asset prices) for testing the module exceptions
+        self.dataframe = data[['GDX', 'GLD']]
 
         test = CoxIngersollRoss()
 
@@ -91,6 +100,14 @@ class TestCoxIngersollRoss(unittest.TestCase):
         test._check_optimal_switching()
         with self.assertWarns(Warning):
             test.optimal_switching_levels()
+
+        # Assert warning about not optimal market re-entering
+        test.fit(self.dataframe, data_frequency="D", discount_rate=0.05,
+                 transaction_cost=[0.001, 0.001])
+        with self.assertWarns(Warning):
+            test.optimal_switching_levels()
+        with self.assertRaises(Exception):
+            test.cir_plot_levels(self.dataframe)
 
     def test_optimal_stopping(self):
         """
