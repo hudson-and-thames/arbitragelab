@@ -67,11 +67,14 @@ class TestExponentialOrnsteinUhlenbeck(unittest.TestCase):
         np.random.seed(31)
         xou_fitted_generated = test.xou_model_simulation(n=1000)
 
+        np.random.seed(31)
+        ou_fitted_generated = test.ou_model_simulation(n=1000)
+
         # Calculating the summary difference
-        diff1 = sum(np.exp(self.xou_example) - xou_fitted_generated)
+        diff_fitted = sum(np.exp(ou_fitted_generated) - xou_fitted_generated)
 
         # Testing that the generated values are close
-        self.assertAlmostEqual(diff1, 51.3771332555977)
+        self.assertEqual(diff_fitted, 0)
 
     def test_descriptive(self):
         """
