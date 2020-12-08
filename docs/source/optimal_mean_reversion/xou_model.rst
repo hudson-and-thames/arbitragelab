@@ -349,3 +349,17 @@ Example
 
     # Or you can view the model statistics
     example.xou_description(switching=True)
+
+Research Notebook
+#################
+
+The following research notebook can be used to better understand the concepts of trading under the Exponential Ornstein-Uhlenbeck Model.
+
+* `Trading Under the Exponential Ornstein-Uhlenbeck Model`_
+
+.. _`Trading Under the Exponential Ornstein-Uhlenbeck Model`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Optimal%20Mean%20Reversion/xou_model.ipynb
+
+References
+##########
+
+1. `Leung, T.S.T. and Li, X., 2015. Optimal mean reversion trading: Mathematical analysis and practical applications (Vol. 1). World Scientific. <https://www.amazon.co.uk/Optimal-Mean-Reversion-Trading-Mathematical/dp/9814725919/>`__

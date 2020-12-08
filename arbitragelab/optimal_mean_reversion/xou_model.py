@@ -25,15 +25,15 @@ class ExponentialOrnsteinUhlenbeck(OrnsteinUhlenbeck):
 
     def __init__(self):
         """
-        Initializes the module parameters
+        Initializes the module parameters.
         """
 
         super().__init__()
         self.a_tilde = None
 
 
-    def fit(self, data, data_frequency, discount_rate, transaction_cost, start=None, end=None,
-            stop_loss=None):
+    def fit(self, data: pd.DataFrame, data_frequency: str, discount_rate: tuple, transaction_cost: tuple,
+            start: str = None, end: str = None, stop_loss: float = None):
         """
         Fits the Exponential Ornstein-Uhlenbeck model to given data and assigns the discount rates,
         transaction costs and stop-loss level for further exit or entry-level calculation.
@@ -55,7 +55,7 @@ class ExponentialOrnsteinUhlenbeck(OrnsteinUhlenbeck):
         OrnsteinUhlenbeck.fit(self, data, data_frequency, discount_rate, transaction_cost, start,
                               end, stop_loss)
 
-    def fit_to_portfolio(self, data=None, start=None, end=None):
+    def fit_to_portfolio(self, data: np.array = None, start: str = None, end: str = None):
         """
         Fits the Exponential Ornstein-Uhlenbeck model to time series for portfolio prices.
 
@@ -67,7 +67,7 @@ class ExponentialOrnsteinUhlenbeck(OrnsteinUhlenbeck):
         # Using this structure to rewrite the method docstring
         OrnsteinUhlenbeck.fit_to_portfolio(self, data, start, end)
 
-    def fit_to_assets(self, data=None, start=None, end=None):
+    def fit_to_assets(self, data: np.array = None, start: str = None, end: str = None):
         """
         Creates the optimal portfolio in terms of the Exponential Ornstein-Uhlenbeck model
         from two given time series for asset prices and fits the values of the model's parameters. (p.13)
