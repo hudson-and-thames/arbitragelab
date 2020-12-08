@@ -146,7 +146,7 @@ class TestExponentialOrnsteinUhlenbeck(unittest.TestCase):
         desired_result = [1.05623, -9.7139, 0.70871,
                           1.05623, -9.7139, 0.70871]
 
-        np.testing.assert_almost_equal(optimal_stopping_levels, desired_result, decimal=4)
+        np.testing.assert_almost_equal(optimal_stopping_levels, desired_result, decimal=3)
 
     def test_optimal_switching(self):
         """
@@ -163,4 +163,4 @@ class TestExponentialOrnsteinUhlenbeck(unittest.TestCase):
 
         desired_result = [0.83884, 0.97899, 0.83884, 0.97899]
 
-        np.testing.assert_almost_equal(optimal_switching_levels, desired_result, decimal=4)
+        np.testing.assert_almost_equal(optimal_switching_levels, desired_result, decimal=3)
