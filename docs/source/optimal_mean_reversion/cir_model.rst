@@ -1,4 +1,4 @@
-.. _optimal_mean_reversion-cir_model:
+.. _optimal_mean_reverting_strategies-cir_model:
 
 .. note::
    The following implementations and documentation closely follow the work of Tim Leung:
@@ -31,7 +31,7 @@ Model fitting
 
 
 
-We establish **Cox-Ingersoll-Ross process** driven by the SDE:
+We establish a **Cox-Ingersoll-Ross process** driven by the SDE:
 
 .. math::
     :nowrap:
@@ -84,8 +84,8 @@ Optimal Timing of Trades
 
 To find the optimal timing of trades we have implemented two approaches - optimal stopping and optimal switching.
 The main difference between the two is the assumption about the number of trades in regards to which we are searching
-for the optimal timing of trades. In case of optimal stopping problem, we assume that we want to search for such
-optimal levels that will maximize the output of single entry-exit pair of trades. On the other hand, the optimal 
+for the optimal timing of trades. In case of an optimal stopping problem, we assume that we want to search for such
+optimal levels that will maximize the output of a single entry-exit pair of trades. On the other hand, the optimal
 switching approach is aimed at maximizing the infinite amount of entry-exit trades, thus accounting for any number 
 of consequent trades our investor might want to carry out.
 
@@ -155,12 +155,10 @@ and recall the classical solution of the differential equation
     U(a,b,z) = \frac{\Gamma(1-b)}{\Gamma(a-b+1)}M(a,b,z) + \frac{\Gamma(b-1)}{\Gamma(a)}z^{1-b}M(a-b+1,2-b,z)
 
 
-Then we are able to formulate the following theorems
-
-(proven in `Optimal Mean reversion Trading:
-Mathematical Analysis and Practical Applications by Tim Leung and Xin Li
-<https://www.amazon.com/Optimal-Mean-Reversion-Trading-Mathematical/dp/9814725919>`_) to provide the solutions to
-following problems:
+Then we are able to formulate the following theorems (proven in `Optimal Mean reversion Trading:
+Mathematical Analysis and Practical Applications
+<https://www.amazon.com/Optimal-Mean-Reversion-Trading-Mathematical/dp/9814725919>`_  by Tim Leung and Xin Li)
+to provide the solutions to the following problems:
 
 
 Theorem 4.2 (p.85):
@@ -219,7 +217,7 @@ To find the optimal levels, first, two critical constants have to be denoted:
 
 Theorem 4.7 (p.56):
 
-**Under optimal switching approach it is optimal to re-enter the market if and only if all of the following conditions
+**Under the optimal switching approach it is optimal to re-enter the market if and only if all of the following conditions
 hold true:**
 
 a) If :math:`y_b>0`
@@ -244,13 +242,13 @@ the CIR model.
 Step 1: Model fitting
 *********************
 
-During the module fitting stage, we need to use :code:`fit` function to fit the XOU model to our training data. The data provided
+During the module fitting stage, we need to use :code:`fit` function to fit the CIR model to our training data. The data provided
 should consist of a log-price of an already created mean-reverting portfolio.
 
 Implementation
 ==============
 
-.. py:currentmodule:: mlfinlab.optimal_mean_reversion.cir_model.CoxIngersollRoss
+.. py:currentmodule:: arbitragelab.optimal_mean_reversion.cir_model.CoxIngersollRoss
 
 .. autofunction:: fit
 
@@ -361,7 +359,21 @@ Example
     d_switch, b_switch = example.optimal_switching_levels()
 
     # You can display the results using the plot
-    fig = example.cir_plot_levels(xou_example, switching=True)
+    fig = example.cir_plot_levels(cir_example, switching=True)
 
     # Or you can view the model statistics
     example.cir_description(switching=True)
+
+Research Notebook
+#################
+
+The following research notebook can be used to better understand the concepts of trading under the Cox-Ingersoll-Ross Model.
+
+* `Trading Under the Cox-Ingersoll-Ross Model`_
+
+.. _`Trading Under the Cox-Ingersoll-Ross Model`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Optimal%20Mean%20Reversion/cir_model.ipynb
+
+References
+##########
+
+1. `Leung, T.S.T. and Li, X., 2015. Optimal mean reversion trading: Mathematical analysis and practical applications (Vol. 1). World Scientific. <https://www.amazon.co.uk/Optimal-Mean-Reversion-Trading-Mathematical/dp/9814725919/>`__
