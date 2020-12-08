@@ -1,4 +1,4 @@
-.. _optimal_mean_reversion-xou_model:
+.. _optimal_mean_reverting_strategies-xou_model:
 
 .. note::
    The following implementations and documentation closely follow the work of Tim Leung:
@@ -23,7 +23,7 @@ Model fitting
 
    Since in terms of mean-reversion we care only about the ratio between :math:`\alpha` and :math:`\beta`, without the
    loss of generality we can set :math:`\alpha = const` and A = $1, while varying :math:`\beta` to find the optimal strategy
-   :math:`(\alpha,\beta^*)`
+   :math:`(\alpha,\beta^*)` .
 
 The Exponential Ornstein-Uhlenbeck (XOU) process is defined the following way:
 
@@ -36,13 +36,13 @@ where :math:`X` is the Ornstein-Uhlenbeck process.
 .. note::
 
     The definition of the OU process and the fitting procedure details are presented in
-    :ref:`Trading Under the Exponential Ornstein-Uhlenbeck Model <optimal_mean_reversion-ou_model>`.
+    :ref:`Trading Under the Exponential Ornstein-Uhlenbeck Model <optimal_mean_reverting_strategies-ou_model>`.
 
 In other words, :math:`X` is a *log-price* of a positive XOU
 process :math:`\xi`.
 
 .. figure:: images/xou_vs_ou.png
-   :scale: 70 %
+   :scale: 80 %
    :align: center
    :figclass: align-center
 
@@ -163,7 +163,7 @@ Optimal Switching Approach
 ##########################
 
 If there is no limit on the number of times the investor will open or close the position, the sequential trading times
-are modelled by the stopping times :math:`\nu_1,\tau_1,\nu_2,\tau_2,... \in T` such that
+are modeled by the stopping times :math:`\nu_1,\tau_1,\nu_2,\tau_2,... \in T` such that
 
 .. math::
 
@@ -173,7 +173,7 @@ Where :math:`\nu_i` are times when the share of a risky asset was bought and :ma
 of pairs trading, we consider our spread as such an asset.
 
 Naturally, the optimal timing of trades would depend on the initial position at the beginning of the training period.
-Under the XOU model, if the investor starts with **zero position** the first move to make in that case would be
+Under the XOU model, if the investor starts with a **zero position** the first move to make in that case would be
 to **buy** the share. Therefore, we can formulate the following problem :
 
 .. math::
@@ -185,9 +185,9 @@ Where :math:`\Lambda_0` is the set of admissible times, and helper functions den
 
 .. math::
 
-    h^{\xi}_s=e^x-c_s\ and\ h^{\xi}_s=e^x+c_b
+    h^{\xi}_s=e^x-c_s\ \text{and}\ h^{\xi}_s=e^x+c_b
 
-However, if the investor already holds a position in said asset, the first action would be to sell, and the problem will
+However, if the investor already holds a position in a said asset, the first action would be to sell, and the problem will
 look the following way:
 
 .. math::
@@ -208,7 +208,7 @@ To find the optimal levels, first, two helper functions have to be denoted:
 
 Theorem 3.7 (p.56):
 
-Under optimal switching approach it is optimal to re-enter the market if and only if **all** of the following conditions hold true:
+Under the optimal switching approach it is optimal to re-enter the market if and only if **all** of the following conditions hold true:
 
 a) There are two distinct roots to :math:`f_b:\ x_{b1},x_{b2}`
 b) :math:`\exists \tilde{a}^* \in (x_{b1},x_{b2})` satisfying :math:`F(\tilde{a}^*)e^{\tilde{a}^*}=F'(\tilde{a}^*)(e^{\tilde{a}^*}+c_b)`
@@ -218,7 +218,7 @@ c) The following inequality must hold true:
 
     \frac{e^{\tilde{a}^*}+c_b}{F(\tilde{a}^*)}\geq\frac{b^{\xi*}-c_s}{F(b^{\xi*})}
 
-In case any of the conditions are not met - re-entering the market is deemed not optimal it would be advised to exit
+In case any of the conditions are not met - re-entering the market is deemed not optimal. It would be advised to exit
 at the optimal liquidation price without re-entering in the case when the investor had already entered the market beforehand,
 or don't enter the market at all in the case when he or she starts with a zero position.
 
@@ -231,13 +231,13 @@ or to the optimal switching problem that accounts for multiple entries and exit 
 Step 1: Model fitting
 *********************
 
-During the module fitting stage, we need to use :code:`fit` function to fit the XOU model to our training data. The data provided
+During the module fitting stage, we need to use the :code:`fit` function to fit the XOU model to our training data. The data provided
 should consist of a log-price of an already created mean-reverting portfolio.
 
 Implementation
 ==============
 
-.. py:currentmodule:: mlfinlab.optimal_mean_reversion.xou_model.ExponentialOrnsteinUhlenbeck
+.. py:currentmodule:: arbitragelab.optimal_mean_reversion.xou_model.ExponentialOrnsteinUhlenbeck
 
 .. autofunction:: fit
 
@@ -298,7 +298,7 @@ Similarly to the fit step you have a choice whether to use portfolio prices or a
 the latter optimal coefficient found during the fit stage will be used to create a portfolio.
 
 .. figure:: images/optimal_switching.png
-   :scale: 70 %
+   :scale: 80 %
    :align: center
    :figclass: align-center
 
@@ -320,7 +320,7 @@ Example
 .. code-block::
 
     import numpy as np
-    from mlfinlab.optimal_mean_reversion import ExponentialOrnsteinUhlenbeck
+    from arbitragelab.optimal_mean_reversion import ExponentialOrnsteinUhlenbeck
 
     example = ExponentialOrnsteinUhlenbeck()
 
