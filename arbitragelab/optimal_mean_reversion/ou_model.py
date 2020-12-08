@@ -175,7 +175,7 @@ class OrnsteinUhlenbeck:
 
     def fit_to_portfolio(self, data=None, start=None, end=None):
         """
-        Fits the model to time series
+        Fits the Ornstein-Uhlenbeck model to time series
         for portfolio prices.
 
         :param data: (np.array) All given prices of two assets to construct a portfolio from.
@@ -238,7 +238,7 @@ class OrnsteinUhlenbeck:
 
     def fit_to_assets(self, data=None, start=None, end=None):
         """
-        Creates the optimal portfolio in terms of Ornstein-Uhlenbeck or OU-like model
+        Creates the optimal portfolio in terms of Ornstein-Uhlenbeck model
         from two given time series for asset prices and fits the values
         of the model's parameters. (p.13)
 

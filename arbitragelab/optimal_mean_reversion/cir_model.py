@@ -1,6 +1,6 @@
 # Copyright 2019, Hudson and Thames Quantitative Research
 # All rights reserved
-# Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
+# Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 
 # pylint: disable=missing-module-docstring, invalid-name, no-name-in-module
 
@@ -11,15 +11,17 @@ from scipy.special import ive, hyp1f1, gamma
 import matplotlib.pyplot as plt
 import scipy.optimize as so
 import pandas as pd
+from matplotlib.figure import Figure
+
 from arbitragelab.optimal_mean_reversion.ou_model import OrnsteinUhlenbeck
 
 
 class CoxIngersollRoss(OrnsteinUhlenbeck):
     """
     This class implements the algorithms for optimal stopping and optimal switching problems for
-    assets with mean-reverting tendencies based on Cox-Ingresoll-Ross model mentioned in the following
-    publication:'Tim Leung and Xin Li Optimal Mean reversion Trading: Mathematical Analysis and
-    Practical Applications(November 26, 2015)'
+    assets with mean-reverting tendencies based on the Cox-Ingersoll-Ross model mentioned in the
+    following publication:'Tim Leung and Xin Li Optimal Mean reversion Trading: Mathematical Analysis
+    and Practical Applications(November 26, 2015)'
     <https://www.amazon.com/Optimal-Mean-Reversion-Trading-Mathematical/dp/9814725919>`_
 
     Constructing a portfolio with mean-reverting properties is usually attempted by
@@ -29,7 +31,7 @@ class CoxIngersollRoss(OrnsteinUhlenbeck):
 
     Optimal stopping problem is established on the premise of maximizing the output of
     one optimal enter-exit pair of trades, optimal switching, on the other hand, aims
-    to maximize the cumulative reward of infinite number of trades made at respective optimal levels.
+    to maximize the cumulative reward of an infinite number of trades made at respective optimal levels.
 
     To find the liquidation and entry price levels for both optimal switching and optimal stopping
     for each approach we formulate an optimal double-stopping problem that gives the optimal entry
@@ -40,12 +42,62 @@ class CoxIngersollRoss(OrnsteinUhlenbeck):
         """
         Initializes the module
         """
+
         super().__init__()
         self.B_value = None
 
-    def cir_model_simulation(self, n, theta_given=None, mu_given=None, sigma_given=None, delta_t_given=None):
+    def fit(self, data: pd.DataFrame, data_frequency: str, discount_rate: tuple, transaction_cost: tuple,
+            start: str = None, end: str = None, stop_loss: float = None):
         """
-        Simulates values of a CIR process with given parameters or parameters fitted to our data
+        Fits the Cox-Ingersoll-Ross model to given data and assigns the discount rates,
+        transaction costs and stop-loss level for further exit or entry-level calculation.
+
+        :param data: (np.array/pd.DataFrame) An array with time series of portfolio prices / An array with
+            time series of of two assets prices. The dimensions should be either nx1 or nx2.
+        :param data_frequency: (str) Data frequency ["D" - daily, "M" - monthly, "Y" - yearly].
+        :param discount_rate: (float/tuple) A discount rate either for both entry and exit time
+            or a list/tuple of discount rates with exit rate and entry rate in respective order.
+        :param transaction_cost: (float/tuple) A transaction cost either for both entry and exit time
+            or a list/tuple of transaction costs with exit cost and entry cost in respective order.
+        :param start: (Datetime) A date from which you want your training data to start.
+        :param end: (Datetime) A date at which you want your training data to end.
+        :param stop_loss: (float/int) A stop-loss level - the position is assumed to be closed
+            immediately upon reaching this pre-defined price level.
+        """
+
+        # Using this structure to rewrite the method docstring
+        OrnsteinUhlenbeck.fit(self, data, data_frequency, discount_rate, transaction_cost, start,
+                              end, stop_loss)
+
+    def fit_to_portfolio(self, data: np.array = None, start: str = None, end: str = None):
+        """
+        Fits the Cox-Ingersoll-Ross model to time series for portfolio prices.
+
+        :param data: (np.array) All given prices of two assets to construct a portfolio from.
+        :param start: (Datetime) A date from which you want your training data to start.
+        :param end: (Datetime) A date at which you want your training data to end.
+        """
+
+        # Using this structure to rewrite the method docstring
+        OrnsteinUhlenbeck.fit_to_portfolio(self, data, start, end)
+
+    def fit_to_assets(self, data: np.array = None, start: str = None, end: str = None):
+        """
+        Creates the optimal portfolio in terms of the Cox-Ingersoll-Ross model
+        from two given time series for asset prices and fits the values of the model's parameters. (p.13)
+
+        :param data: (np.array) All given prices of two assets to construct a portfolio from.
+        :param start: (Datetime) A date from which you want your training data to start.
+        :param end: (Datetime) A date at which you want your training data to end.
+        """
+
+        # Using this structure to rewrite the method docstring
+        OrnsteinUhlenbeck.fit_to_assets(self, data, start, end)
+
+    def cir_model_simulation(self, n: int, theta_given: float = None, mu_given: float = None,
+                             sigma_given: float = None, delta_t_given: float = None) -> np.array:
+        """
+        Simulates values of a CIR process with given parameters or parameters fitted to our data.
 
         :param n: (int) Number of simulated values.
         :param theta_given: (float) Long-term mean.
@@ -54,13 +106,15 @@ class CoxIngersollRoss(OrnsteinUhlenbeck):
         :param delta_t_given: (float) Delta between observations, calculated in years.
         :return: (np.array) simulated portfolio prices.
         """
+
         # Initializing the variable for process values
         x = np.zeros(n)
 
         # Checking whether to use given parameters or parameters of the fitted model
 
+        # Use given data parameters
         if all(param is not None for param in
-               [theta_given, mu_given, sigma_given, delta_t_given]):  # Use given data parameters
+               [theta_given, mu_given, sigma_given, delta_t_given]):
             x[0] = theta_given
             theta = theta_given
             mu = mu_given
@@ -82,10 +136,11 @@ class CoxIngersollRoss(OrnsteinUhlenbeck):
         return x
 
     @staticmethod
-    def _compute_log_likelihood(params, *args):
+    def _compute_log_likelihood(params: tuple, *args: tuple) -> float:
         """
         Computes the average Log Likelihood.
-        Borodin and Salminen (2002)
+
+        From Borodin and Salminen (2002).
 
         :param params: (tuple) A tuple of three elements representing theta, mu and sigma_squared.
         :param args: (tuple) All other values that are passed to self._compute_log_likelihood()
@@ -112,13 +167,13 @@ class CoxIngersollRoss(OrnsteinUhlenbeck):
 
         return -log_likelihood
 
-    def optimal_coefficients(self, portfolio):
+    def optimal_coefficients(self, portfolio: np.array) -> tuple:
         """
         Finds the optimal CIR model coefficients depending
-        on the portfolio prices time series given.(p.13)
+        on the portfolio prices time series given. (p.13)
 
         :param portfolio: (np.array) Portfolio prices.
-        :return: (tuple) Optimal parameters (theta, mu, sigma_square, max_LL)
+        :return: (tuple) Optimal parameters (theta, mu, sigma_square, max_LL).
         """
 
         # Setting bounds
@@ -141,7 +196,7 @@ class CoxIngersollRoss(OrnsteinUhlenbeck):
 
         return theta, mu, sigma_square, max_log_likelihood
 
-    def _F(self, price, rate):
+    def _F(self, price: float, rate: float) -> float:
         """
         Calculates helper function to further define the exit/enter level. (p.84)
 
@@ -149,6 +204,7 @@ class CoxIngersollRoss(OrnsteinUhlenbeck):
         :param rate: (float) Discounting rate.
         :return: (float) Value of F function.
         """
+
         # Setting up the function variables
         a = rate / self.mu
 
@@ -161,7 +217,7 @@ class CoxIngersollRoss(OrnsteinUhlenbeck):
 
         return output
 
-    def _G(self, price, rate):
+    def _G(self, price: float, rate: float) -> float:
         """
         Calculates helper function to further define the exit/enter level. (p.84)
 
@@ -169,6 +225,7 @@ class CoxIngersollRoss(OrnsteinUhlenbeck):
         :param rate: (float) Discounting rate.
         :return: (float) Value of G function.
         """
+
         # Setting up the function variables
         a = rate / self.mu
 
@@ -182,7 +239,7 @@ class CoxIngersollRoss(OrnsteinUhlenbeck):
 
         return output
 
-    def optimal_liquidation_level(self):
+    def optimal_liquidation_level(self) -> float:
         """
         Calculates the optimal liquidation portfolio level. (p.85)
 
@@ -210,7 +267,7 @@ class CoxIngersollRoss(OrnsteinUhlenbeck):
 
         return output
 
-    def optimal_entry_level(self):
+    def optimal_entry_level(self) -> float:
         """
         Calculates the optimal entry portfolio level. (p.86)
 
@@ -241,11 +298,11 @@ class CoxIngersollRoss(OrnsteinUhlenbeck):
 
         return output
 
-    def _critical_constants(self):
+    def _critical_constants(self) -> list:
         """
         Calculates critical constants for the CIR model.
 
-        :return: (list) Critical constants of CIR model.
+        :return: (list) Critical constants of the CIR model.
         """
         # Calculating the critical constants for exit and entry
         output = [(self.mu * self.theta + self.r[0] * self.c[0]) / (self.mu + self.r[0]),
@@ -253,12 +310,13 @@ class CoxIngersollRoss(OrnsteinUhlenbeck):
 
         return output
 
-    def _check_optimal_switching(self):
+    def _check_optimal_switching(self) -> bool:
         """
         Checks if it is optimal to re-enter the market.
 
         :return: (bool) The result of the test.
         """
+
         # Calculating the optimal liquidation level
         b = self.optimal_liquidation_level()
 
@@ -273,7 +331,7 @@ class CoxIngersollRoss(OrnsteinUhlenbeck):
 
         return output
 
-    def _optimal_switching_equations(self, x):
+    def _optimal_switching_equations(self, x: list) -> list:
         """
         Defines the system of equations needed to calculate the optimal entry and exit levels for
         the optimal switching problem.
@@ -301,7 +359,7 @@ class CoxIngersollRoss(OrnsteinUhlenbeck):
 
         return output
 
-    def optimal_switching_levels(self):
+    def optimal_switching_levels(self) -> np.array:
         """
         Calculates the optimal switching levels.
 
@@ -327,9 +385,10 @@ class CoxIngersollRoss(OrnsteinUhlenbeck):
                 self.liquidation_level[1] = output[1]
         else:
             output = np.array([self.entry_level[1], self.liquidation_level[1]])
+
         return output
 
-    def cir_plot_levels(self, data, switching=False):
+    def cir_plot_levels(self, data: pd.DataFrame, switching: bool = False) -> Figure:
         """
         Plots the found optimal exit and entry levels on the graph
         alongside with the given data.
@@ -368,15 +427,17 @@ class CoxIngersollRoss(OrnsteinUhlenbeck):
 
         return fig
 
-    def cir_description(self, switching=False):
+    def cir_description(self, switching: bool = False) -> pd.Series:
         """
         Returns all the general parameters of the model, training interval timestamps if provided,
         the goodness of fit, allocated trading costs and discount rates, which stands for the optimal
         ratio between two assets in the created portfolio, default optimal levels calculated.
         If re-entering the market is optimal shows optimal switching levels.
+
         :param switching: (bool) Flag that signals whether to output switching data.
         :return: (pd.Series) Summary data for all model parameters and optimal levels.
         """
+
         # Calculating the default data values
         data = [self.training_period, self.theta, self.mu, np.sqrt(self.sigma_square),
                 self.r, self.c, self.B_value,
