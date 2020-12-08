@@ -8,6 +8,8 @@ from scipy.optimize import root_scalar, fsolve, minimize
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
+
 from arbitragelab.optimal_mean_reversion.ou_model import OrnsteinUhlenbeck
 
 
@@ -22,11 +24,64 @@ class ExponentialOrnsteinUhlenbeck(OrnsteinUhlenbeck):
     """
 
     def __init__(self):
-        # Initializing the module parameters
+        """
+        Initializes the module parameters
+        """
+
         super().__init__()
         self.a_tilde = None
 
-    def xou_model_simulation(self, n, theta_given=None, mu_given=None, sigma_given=None, delta_t_given=None):
+
+    def fit(self, data, data_frequency, discount_rate, transaction_cost, start=None, end=None,
+            stop_loss=None):
+        """
+        Fits the Exponential Ornstein-Uhlenbeck model to given data and assigns the discount rates,
+        transaction costs and stop-loss level for further exit or entry-level calculation.
+
+        :param data: (np.array/pd.DataFrame) An array with time series of portfolio prices / An array with
+            time series of of two assets prices. The dimensions should be either nx1 or nx2.
+        :param data_frequency: (str) Data frequency ["D" - daily, "M" - monthly, "Y" - yearly].
+        :param discount_rate: (float/tuple) A discount rate either for both entry and exit time
+            or a list/tuple of discount rates with exit rate and entry rate in respective order.
+        :param transaction_cost: (float/tuple) A transaction cost either for both entry and exit time
+            or a list/tuple of transaction costs with exit cost and entry cost in respective order.
+        :param start: (Datetime) A date from which you want your training data to start.
+        :param end: (Datetime) A date at which you want your training data to end.
+        :param stop_loss: (float/int) A stop-loss level - the position is assumed to be closed
+            immediately upon reaching this pre-defined price level.
+        """
+
+        # Using this structure to rewrite the method docstring
+        OrnsteinUhlenbeck.fit(self, data, data_frequency, discount_rate, transaction_cost, start,
+                              end, stop_loss)
+
+    def fit_to_portfolio(self, data=None, start=None, end=None):
+        """
+        Fits the Exponential Ornstein-Uhlenbeck model to time series for portfolio prices.
+
+        :param data: (np.array) All given prices of two assets to construct a portfolio from.
+        :param start: (Datetime) A date from which you want your training data to start.
+        :param end: (Datetime) A date at which you want your training data to end.
+        """
+
+        # Using this structure to rewrite the method docstring
+        OrnsteinUhlenbeck.fit_to_portfolio(self, data, start, end)
+
+    def fit_to_assets(self, data=None, start=None, end=None):
+        """
+        Creates the optimal portfolio in terms of the Exponential Ornstein-Uhlenbeck model
+        from two given time series for asset prices and fits the values of the model's parameters. (p.13)
+
+        :param data: (np.array) All given prices of two assets to construct a portfolio from.
+        :param start: (Datetime) A date from which you want your training data to start.
+        :param end: (Datetime) A date at which you want your training data to end.
+        """
+
+        # Using this structure to rewrite the method docstring
+        OrnsteinUhlenbeck.fit_to_assets(self, data, start, end)
+
+    def xou_model_simulation(self, n: int, theta_given: float = None, mu_given: float = None,
+                             sigma_given: float = None, delta_t_given: float = None) -> np.array:
         """
         Simulates values of an XOU process with given parameters or parameters fitted to our data.
 
@@ -37,6 +92,7 @@ class ExponentialOrnsteinUhlenbeck(OrnsteinUhlenbeck):
         :param delta_t_given: (float) Delta between observations, calculated in years.
         :return: (np.array) Simulated portfolio prices.
         """
+
         # Check if the parameters were assigned
         if all(param is not None for param in
                [theta_given, mu_given, sigma_given, delta_t_given]):
@@ -49,12 +105,13 @@ class ExponentialOrnsteinUhlenbeck(OrnsteinUhlenbeck):
 
         return output
 
-    def _check_xou(self):
+    def _check_xou(self) -> bool:
         """
         Performs the check necessary for the existence of the solutions of the optimal problems.
 
         :return: (bool) Boolean value that corresponds to the check results.
         """
+
         # Setting bounds for the x variable
         bounds = ((None, None),)
 
@@ -73,7 +130,7 @@ class ExponentialOrnsteinUhlenbeck(OrnsteinUhlenbeck):
 
         return output
 
-    def V_XOU(self, price):
+    def V_XOU(self, price: float) -> float:
         """
         Calculates the expected discounted value of liquidation of the position. (p.54)
 
@@ -94,7 +151,7 @@ class ExponentialOrnsteinUhlenbeck(OrnsteinUhlenbeck):
 
         return output
 
-    def _V_XOU_derivative(self, price, h=1e-4):
+    def _V_XOU_derivative(self, price: float, h: float = 1e-4) -> float:
         """
         Calculates the derivative of the expected discounted value of
         liquidation of the position.
@@ -109,7 +166,7 @@ class ExponentialOrnsteinUhlenbeck(OrnsteinUhlenbeck):
 
         return output
 
-    def xou_optimal_liquidation_level(self):
+    def xou_optimal_liquidation_level(self) -> float:
         """
         Calculates the optimal liquidation portfolio level. (p.54)
 
@@ -139,7 +196,7 @@ class ExponentialOrnsteinUhlenbeck(OrnsteinUhlenbeck):
 
         return output
 
-    def xou_optimal_entry_interval(self):
+    def xou_optimal_entry_interval(self) -> tuple:
         """
         Calculates the optimal entry interval for the portfolio price. (p.35)
 
@@ -183,20 +240,21 @@ class ExponentialOrnsteinUhlenbeck(OrnsteinUhlenbeck):
 
         return output
 
-    def _fb(self, price):
+    def _fb(self, price: float) -> float:
         """
         Helper function for solving the optimal switching problem regarding
         the entry level.
 
-        :param price: Price of an asset.
+        :param price: (float) Price of an asset.
         :return: (float) Value of the helper function calculated with respect to given asset price.
         """
+
         output = ((self.mu * self.theta + 0.5 * self.sigma_square - self.r[0])
                   - self.mu * price
                   - self.r[0] * self.c[1] * np.exp(-price))
         return output
 
-    def _fb_root(self):
+    def _fb_root(self) -> list:
         """
         Calculates the root(s) for _fb function or returns the False if it doesn't exist.
 
@@ -212,12 +270,13 @@ class ExponentialOrnsteinUhlenbeck(OrnsteinUhlenbeck):
 
         return output
 
-    def _condition_optimal_switching_a(self):
+    def _condition_optimal_switching_a(self) -> bool:
         """
         Checks the condition of optimality of re-entering the market. If a_tilde exists then finds it.
 
         :return: (bool) Whether the condition is satisfied or not.
         """
+
         # Setting the initial flag value
         output = True
 
@@ -240,12 +299,13 @@ class ExponentialOrnsteinUhlenbeck(OrnsteinUhlenbeck):
 
         return output
 
-    def _condition_optimal_switching_inequality(self):
+    def _condition_optimal_switching_inequality(self) -> bool:
         """
         Ensures that inequality that is required for the optimality of re-entering the market is true.
 
         :return: (bool) Result of the inequality check.
         """
+
         output = False
 
         a = self._condition_optimal_switching_a()
@@ -258,7 +318,7 @@ class ExponentialOrnsteinUhlenbeck(OrnsteinUhlenbeck):
             output = True
         return output
 
-    def _check_optimal_switching(self):
+    def _check_optimal_switching(self) -> bool:
         """
         Checks if all the conditions are satisfied for re-entering the market to be optimal.
 
@@ -281,7 +341,7 @@ class ExponentialOrnsteinUhlenbeck(OrnsteinUhlenbeck):
 
         return output
 
-    def _optimal_switching_equations(self, x):
+    def _optimal_switching_equations(self, x: list) -> list:
         """
         Defines the system of equations needed to calculate the optimal entry and exit levels for
         the optimal switching problem.
@@ -309,7 +369,7 @@ class ExponentialOrnsteinUhlenbeck(OrnsteinUhlenbeck):
 
         return output
 
-    def optimal_switching_levels(self):
+    def optimal_switching_levels(self) -> np.array:
         """
         Calculates the optimal switching levels.
 
@@ -334,9 +394,10 @@ class ExponentialOrnsteinUhlenbeck(OrnsteinUhlenbeck):
                 self.liquidation_level[1] = output[1]
         else:
             output = np.array([self.entry_level[1][1], self.liquidation_level[1]])
+
         return output
 
-    def xou_plot_levels(self, data, switching=False):
+    def xou_plot_levels(self, data: pd.DataFrame, switching: bool = False) -> Figure:
         """
         Plots the found optimal exit and entry levels on the graph
         alongside with the given data.
@@ -378,9 +439,8 @@ class ExponentialOrnsteinUhlenbeck(OrnsteinUhlenbeck):
 
         return fig
 
-    def xou_description(self, switching=False):
+    def xou_description(self, switching: bool = False) -> pd.Series:
         """
-
         Returns all the general parameters of the model, training interval timestamps if provided,
         the goodness of fit, allocated trading costs and discount rates, which stands for the optimal
         ratio between two assets in the created portfolio, default optimal levels calculated.
@@ -389,6 +449,7 @@ class ExponentialOrnsteinUhlenbeck(OrnsteinUhlenbeck):
         :param switching: (bool) Flag that signals whether to output switching data.
         :return: (pd.Series) Summary data for all model parameters and optimal levels.
         """
+
         # Calling _fit_data to create a helper variable
         portfolio = self._fit_data(self.training_period[0], self.training_period[1]).transpose()
 
