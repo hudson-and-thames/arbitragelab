@@ -35,7 +35,6 @@ class MultivariateCointegration:
         self.__trade_df = trade_df
         self.__coint_vec = None
 
-
     @staticmethod
     def missing_impute(price_df: pd.DataFrame, nan_method: str = 'ffill', order: int = 3):
         """
@@ -112,20 +111,16 @@ class MultivariateCointegration:
         """
         return self.__trade_df
 
-    def fit(self, log_price: pd.DataFrame, nan_method: str = "ffill", sig_level: str = "95%",
-            rolling_window_size: Optional[int] = 1500, suppress_warnings: bool = False,
-            spline_order: int = 3) -> np.array:
+    def fit(self, log_price: pd.DataFrame, sig_level: str = "95%", rolling_window_size: Optional[int] = 1500,
+            suppress_warnings: bool = False) -> np.array:
         """
         Use Johansen test to retrieve the cointegration vector.
 
         :param log_price: (pd.DataFrame) Log price dataframe used to derive cointegration vector.
-        :param nan_method: (str) Missing value imputation method. If "ffill" then use front-fill;
-            if "spline" then use cubic spline.
         :param sig_level: (str) Cointegration test significance level. Possible options are "90%", "95%", and "99%".
         :param rolling_window_size: (int) Number of data points used for training with rolling window. If None,
             then use cumulative window, i.e. the entire dataset.
         :param suppress_warnings: (bool) Boolean flag to suppress the cointegration warning message.
-        :param spline_order: (int) Polynomial order for spline function.
         :return: (np.array) The cointegration vector, b.
         """
         # Checking the significance of a test.
@@ -194,7 +189,7 @@ class MultivariateCointegration:
         return -1. * np.floor(pos_shares), np.floor(neg_shares)
 
     @staticmethod
-    def rebal_pnl(signal: pd.Series, price_diff: pd.Series) -> Tuple[float, float]:
+    def _rebal_pnl(signal: pd.Series, price_diff: pd.Series) -> Tuple[float, float]:
         """
         Calculate the P&L of one day's trade.
 
@@ -265,13 +260,13 @@ class MultivariateCointegration:
             pos_shares, neg_shares = self.num_of_shares(log_train_df, self.__trade_df.iloc[t], nlags=nlags,
                                                         dollar_invest=dollar_invest)
 
-            # Calculate the PnL for one day's trade
-            long_pnl, short_pnl = self.rebal_pnl(pd.concat([pos_shares, neg_shares]), price_diff.iloc[t])
+            # Calculate the PnL for one day's trade and daily returns
+            long_pnl, short_pnl = self._rebal_pnl(pd.concat([pos_shares, neg_shares]), price_diff.iloc[t])
+            returns = (long_pnl + short_pnl) / (2 * dollar_invest)
 
             # Bookkeeping: Record the signals and the cointegration vector time evolution.
             signals.append(pd.concat([pos_shares, neg_shares]))
             coint_vec_evo.append(self.__coint_vec)
-            returns = (long_pnl + short_pnl) / (2 * dollar_invest)
             returns_df.append(returns)
 
             # Update the training dataframe.
