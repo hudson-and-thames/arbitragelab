@@ -51,6 +51,7 @@ This project is licensed under an all rights reserved licence.
     getting_started/installation
     getting_started/research_tools
     getting_started/roadmap
+    getting_started/equity_curve_convention
 
 .. toctree::
     :maxdepth: 2
