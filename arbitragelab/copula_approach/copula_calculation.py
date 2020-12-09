@@ -14,10 +14,12 @@ Functions include:
 """
 # pylint: disable = invalid-name
 from typing import Callable
-from sklearn.covariance import EmpiricalCovariance
-from statsmodels.distributions.empirical_distribution import ECDF
 import numpy as np
 import scipy.stats as ss
+from scipy.optimize import minimize
+from statsmodels.distributions.empirical_distribution import ECDF
+from sklearn.covariance import EmpiricalCovariance
+
 import arbitragelab.copula_approach.copula_generate as cg
 
 
@@ -32,7 +34,7 @@ def find_marginal_cdf(x: np.array, empirical: bool = True, **kwargs) -> Callable
     :param kwargs: (dict) Setting the floor and cap of probability.
         prob_floor: (float) Probability floor.
         prob_cap: (float) Probability cap.
-    :return fitted_cdf: (func) The cumulative density function from data.
+    :return: (func) The cumulative density function from data.
     """
 
     # Make sure it is an np.array.
@@ -53,17 +55,18 @@ def find_marginal_cdf(x: np.array, empirical: bool = True, **kwargs) -> Callable
 
 def ml_theta_hat(x: np.array, y: np.array, copula_name: str) -> float:
     """
-    Calculate empirical theta (theta_hat) for a type of copula by maximum likelihood.
+    Calculate empirical theta (theta_hat) for a type of copula by pseudo-maximum likelihood.
 
-    x, y need to be uniformly distributed respectively. Use Kendall's tau value to
-    calculate theta hat.
+    Theta is the parameter that characterizes dependency of the two random variables for bivariate Archimedean copulas.
+    And theta_hat is its empirical estimation from data. Here we use Kendall's tau value to calculate theta hat.
+    Once theta_hat is determined for a type of Archimedean copula, the copula is then fitted.
 
     Note: Gaussian and Student-t copula do not use this function.
 
-    :param x: (np.array) 1D vector data.
-    :param y: (np.array) 1D vector data.
+    :param x: (np.array) 1D vector data. Need to be uniformly distributed in [0, 1].
+    :param y: (np.array) 1D vector data. Need to be uniformly distributed in [0, 1].
     :param copula_name: (str) Name of the copula.
-    :return theta_hat: (float) Empirical theta for the copula.
+    :return: (float) Empirical theta for the copula.
     """
 
     # Calculate Kendall's tau from data.
@@ -99,6 +102,7 @@ def log_ml(x: np.array, y: np.array, copula_name: str, nu: float = None) -> tupl
         my_copula: (Copula) Copula with its parameter fitted to data.
     """
 
+    # Archimedean copulas uses theta as the parameter.
     theta_copula_names = ['Gumbel', 'Clayton', 'Frank', 'Joe', 'N13', 'N14']
     # Find log max likelihood given all the data.
     switch = cg.Switcher()
@@ -150,7 +154,7 @@ def sic(log_likelihood: float, n: int, k: int = 1) -> float:
     :param log_likelihood: (float) Sum of log-likelihood of some data.
     :param n: (int) Number of instances.
     :param k: (int) Number of parameters estimated by max likelihood.
-    :return sic_value: (float) Value of SIC.
+    :return: (float) Value of SIC.
     """
 
     sic_value = np.log(n)*k - 2*log_likelihood
@@ -180,9 +184,40 @@ def hqic(log_likelihood: float, n: int, k: int = 1) -> float:
     :param log_likelihood: (float) Sum of log-likelihood of some data.
     :param n: (int) Number of instances.
     :param k: (int) Number of parameters estimated by max likelihood.
-    :return sic_value (float): Value of HQIC.
+    :return: (float) Value of HQIC.
     """
 
     hqic_value = 2*np.log(np.log(n))*k - 2*log_likelihood
 
     return hqic_value
+
+def fit_nu_for_t_copula(x: np.array, y: np.array, nu_tol: float = None) -> float:
+    r"""
+    Find the best fit value nu for Student-t copula.
+
+    This method finds the best value of nu for a Student-t copula by maximum likelihood, using COBYLA method from
+    `scipy.optimize.minimize`. nu's fit range is [1, 15]. When the user wishes to use nu > 15, please delegate to
+    Gaussian copula instead. This step is relatively slow.
+
+    :param x: (np.array) 1D vector data. Need to be uniformly distributed.
+    :param y: (np.array) 1D vector data. Need to be uniformly distributed.
+    :param nu_tol: (float) The final accuracy for finding nu.
+    :return: (float) The best fit of nu by maximum likelihood.
+    """
+
+    # Define the objective function
+    def neg_log_likelihood_for_t_copula(nu):
+        log_likelihood, _ = log_ml(x, y, 'Student', nu)
+
+        return -log_likelihood  # Minimizing the negative of likelihood.
+
+    # Optimizing to find best nu
+    nu0 = np.array([3])
+    # Constraint: nu between [1, 15]. Too large nu value will lead to calculation issues for gamma function.
+    cons = ({'type': 'ineq', 'fun': lambda nu: nu + 1},  # x - 1 > 0
+            {'type': 'ineq', 'fun': lambda nu: -nu + 15})  # -x + 15 > 0 (i.e., x - 10 < 0)
+
+    res = minimize(neg_log_likelihood_for_t_copula, nu0, method='COBYLA', constraints=cons,
+                   options={'disp': False}, tol=nu_tol)
+
+    return res['x'][0]

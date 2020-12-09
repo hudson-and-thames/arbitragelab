@@ -4,6 +4,7 @@
 """
 Master module that uses copula for trading strategy.
 """
+
 # pylint: disable = invalid-name
 from typing import Callable
 import matplotlib.pyplot as plt
@@ -50,8 +51,7 @@ class CopulaStrategy:
                                    'Joe', 'N13', 'N14']
         # Copulas that uses cov (covariance matrix) as parameter
         self.cov_copula_names = ['Gaussian', 'Student']
-        self.all_copula_names = self.theta_copula_names \
-                                + self.cov_copula_names
+        self.all_copula_names = self.theta_copula_names + self.cov_copula_names
 
         # Default trading positions.
         # 1: Long the spread.
@@ -69,13 +69,17 @@ class CopulaStrategy:
         self.upper_threshold = default_upper_threshold
 
     def fit_copula(self, s1_series: np.array, s2_series: np.ndarray, copula_name: str,
-                   if_empirical_cdf: bool = True, if_renew: bool = True, **kwargs: dict) -> tuple:
-        r"""
+                   if_empirical_cdf: bool = True, if_renew: bool = True, nu_tol: float = 0.05) -> tuple:
+        """
         Conduct a max likelihood estimation and information criterion.
 
         Note: s1_series and s2_series need to be pre-processed. In general, raw price data is depreciated.
             One may use log return or cumulative log return. CopulaStrategy class provides a method to
             calculate cumulative log return.
+
+        If fitting a Student-t copula, it also includes a max likelihood fit for nu using COBYLA method from
+        scipy.optimize.minimize. nu's fit range is [1, 15]. When the user wishes to use nu > 15, please delegate to
+        Gaussian copula instead. This step is relatively slow.
 
         The output returns:
             - result_dict: (dict) The name of the copula and its SIC, AIC, HQIC values;
@@ -88,7 +92,7 @@ class CopulaStrategy:
         :param copula_name: (str) Type of copula to fit.
         :param if_empirical_cdf: (bool) Whether use empirical cumulative density function to fit data.
         :param if_renew: (bool) Whether use the fitted copula to replace the copula in CopulaStrategy.
-        :param kwargs (dict): Input degree of freedom if using Student-t copula. e.g. nu=10.
+        :param nu_tol: (float) Optional. The final accuracy for finding nu for Student-t copula. Defaults to 0.05.
         :return: (dict, Copula, func, func)
             The name of the copula and its SIC, AIC, HQIC values;
             The fitted copula with parameters satisfying maximum likelihood;
@@ -96,7 +100,6 @@ class CopulaStrategy:
             The cumulative density function for stock 2, using training data.
         """
 
-        nu = kwargs.get('nu', None)  # Degree of freedom for Student-t copula.
         num_of_instances = len(s1_series)  # Number of instances.
 
         # Finding an inverse cumulative density distribution (quantile) for each stock price series.
@@ -108,8 +111,12 @@ class CopulaStrategy:
         u2_series = s2_cdf(s2_series)
 
         # Get log-likelihood value and the copula with parameters fitted to training data.
-        log_likelihood, copula = ccalc.log_ml(u1_series, u2_series,
-                                              copula_name, nu)
+        if copula_name == 'Student':
+            fitted_nu = ccalc.fit_nu_for_t_copula(u1_series, u2_series, nu_tol)
+            log_likelihood, copula = ccalc.log_ml(u1_series, u2_series,
+                                                  copula_name, fitted_nu)
+        else:
+            log_likelihood, copula = ccalc.log_ml(u1_series, u2_series, copula_name)
 
         # Information criterion for evaluating model fitting performance.
         sic_value = ccalc.sic(log_likelihood, n=num_of_instances)
@@ -205,7 +212,7 @@ class CopulaStrategy:
         theta = kwargs.get('theta', None)
         cov = kwargs.get('cov', None)
         nu = kwargs.get('nu', None)
-        # Seperate plotting kwargs from copula parameters.
+        # Separate plotting kwargs from copula parameters.
         copula_params = ['theta', 'cov', 'nu', 'num']
         plot_kwargs = {k: v for k, v in kwargs.items() if k not in copula_params}
 
@@ -279,7 +286,7 @@ class CopulaStrategy:
         if start_position is None:
             start_position = self.position_kind[2]
 
-        # Cumulative conditional probability series for 2 stocks.
+        # Conditional probability series for 2 stocks.
         prob_series = self.series_condi_prob(s1_series, s2_series,
                                              cdf1, cdf2)
         probs_1 = prob_series[:, 0]
@@ -371,7 +378,7 @@ class CopulaStrategy:
     def series_condi_prob(self, s1_series: np.array, s2_series: np.array,
                           cdf1: Callable[[float], float], cdf2: Callable[[float], float]) -> np.array:
         """
-        Calculate the cumulative conditional probabilities for two time series.
+        Calculate the conditional probabilities for two time series.
 
         i.e., P(U1 <= u1 | U2 = u2) and P(U2 <= u2 | U1 = u1)
 
@@ -464,7 +471,7 @@ class CopulaStrategy:
         to_exit = False
 
         # If currently hold no position, then check if can open position
-        if current_pos == self.position_kind[2]:  #pylint: disable = no-else-return
+        if current_pos == self.position_kind[2]:  # pylint: disable = no-else-return
             open_type = self._check_open_position(prob_u1,
                                                   prob_u2)
             return open_type, to_exit

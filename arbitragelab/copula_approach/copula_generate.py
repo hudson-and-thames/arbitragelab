@@ -7,7 +7,9 @@ Module that houses all copula classes and the parent copula class.
 Also include a Switcher class to create copula by its name and parameters,
 to emulate a switch functionality.
 """
+
 # pylint: disable = invalid-name, too-many-lines
+from abc import ABC
 from typing import Callable
 from scipy.optimize import brentq
 from scipy.special import gamma as gm
@@ -17,7 +19,7 @@ import numpy as np
 import pandas as pd
 
 
-class Copula:
+class Copula(ABC):
     """
     Copula class houses common functions for each coplula subtype.
     """
@@ -29,21 +31,18 @@ class Copula:
         This is a helper superclass for all named copulas in this module. There is no need to directly initiate.
         """
 
-    def describe(self, if_print: bool = True) -> pd.Series:
-        r"""
+    def describe(self) -> pd.Series:
+        """
         Print the description of the copula's name and parameter as a pd.Series.
 
         Note: the descriptive name is different from the copula's class name, but its full actual name.
         E.g. The Student copula class has its descriptive name as 'Bivariate Student-t Copula'.
 
-        :param if_print: (bool) Whether prints the description. Defaults to True.
         :return description: (pd.Series) The description of the copula, including its descriptive name, class name,
             and its parameter(s) when applicable.
         """
 
         description = pd.Series(self._get_param())
-        if if_print:
-            print(description)
 
         return description
 
@@ -58,7 +57,7 @@ class Gumbel(Copula):
         Initiate a Gumbel copula object.
 
         :param threshold: (float) Optional. Below this threshold, a percentile will be rounded to the threshold.
-        :param theta: (float) Range in [1, +inf), measurement of correlation.
+        :param theta: (float) Range in [1, +inf), measurement of copula dependency.
         """
 
         super().__init__()
@@ -109,7 +108,7 @@ class Gumbel(Copula):
 
         :param v1: (float) I.I.D. uniform random variable in [0, 1].
         :param v2: (float) I.I.D. uniform random variable in [0, 1].
-        :param theta: (float) Range in [1, +inf), measurement of correlation.
+        :param theta: (float) Range in [1, +inf), measurement of copula dependency.
         :param Kc: (func) Conditional probability function, for numerical inverse.
         :return: (tuple) The sampled pair in [0, 1]x[0, 1].
         """
@@ -187,7 +186,7 @@ class Gumbel(Copula):
 
     def condi_cdf(self, u: float, v: float) -> float:
         """
-        Calculate conditional cumulative density function: P(U<=u | V=v).
+        Calculate conditional probability function: P(U<=u | V=v).
 
         Result is analytical.
 
@@ -226,7 +225,7 @@ class Frank(Copula):
         Initiate a Frank copula object.
 
         :param threshold: (float) Optional. Below this threshold, a percentile will be rounded to the threshold.
-        :param theta: (float) All reals except for 0, measurement of correlation.
+        :param theta: (float) All reals except for 0, measurement of copula dependency.
         """
 
         super().__init__()
@@ -271,7 +270,7 @@ class Frank(Copula):
 
         :param u1: (float) I.I.D. uniform random variable in [0,1].
         :param v2: (float) I.I.D. uniform random variable in [0,1].
-        :param theta: (float) Range in [1, +inf), measurement of correlation.
+        :param theta: (float) Range in [1, +inf), measurement of copula dependency.
         :return: (tuple) The sampled pair in [0, 1]x[0, 1].
         """
 
@@ -337,7 +336,7 @@ class Frank(Copula):
 
     def condi_cdf(self, u: float, v: float) -> float:
         """
-        Calculate conditional cumulative density function: P(U<=u | V=v).
+        Calculate conditional probability function: P(U<=u | V=v).
 
         Result is analytical.
 
@@ -398,7 +397,7 @@ class Clayton(Copula):
         Initiate a Clayton copula object.
 
         :param threshold: (float) Optional. Below this threshold, a percentile will be rounded to the threshold.
-        :param theta: (float) Range in [-1, +inf) \ {0}, measurement of correlation.
+        :param theta: (float) Range in [-1, +inf) \ {0}, measurement of copula dependency.
         """
 
         super().__init__()
@@ -445,7 +444,7 @@ class Clayton(Copula):
 
         :param v1: (float) I.I.D. uniform random variable in [0,1].
         :param v2: (float) I.I.D. uniform random variable in [0,1].
-        :param theta: (float) Range in [1, +inf), measurement of correlation.
+        :param theta: (float) Range in [1, +inf), measurement of copula dependency.
         :return: (tuple) The sampled pair in [0, 1]x[0, 1].
         """
 
@@ -508,7 +507,7 @@ class Clayton(Copula):
 
     def condi_cdf(self, u: float, v: float) -> float:
         """
-        Calculate conditional cumulative density function: P(U<=u | V=v).
+        Calculate conditional probability function: P(U<=u | V=v).
 
         Result is analytical.
 
@@ -549,7 +548,7 @@ class Joe(Copula):
         Initiate a Joe copula object.
 
         :param threshold: (float) Optional. Below this threshold, a percentile will be rounded to the threshold.
-        :param theta: (float) Range in [1, +inf), measurement of correlation.
+        :param theta: (float) Range in [1, +inf), measurement of copula dependency.
         """
 
         super().__init__()
@@ -586,10 +585,7 @@ class Joe(Copula):
         # Compute Joe copulas from the unif i.i.d. pairs.
         sample_pairs = np.zeros_like(unif_vec)
         for row, pair in enumerate(unif_vec):
-            sample_pairs[row] = self._generate_one_pair(pair[0],
-                                                        pair[1],
-                                                        theta=theta,
-                                                        Kc=_Kc)
+            sample_pairs[row] = self._generate_one_pair(pair[0], pair[1], theta=theta, Kc=_Kc)
 
         return sample_pairs
 
@@ -599,7 +595,7 @@ class Joe(Copula):
 
         :param v1: (float) I.I.D. uniform random variable in [0,1].
         :param v2: (float) I.I.D. uniform random variable in [0,1].
-        :param theta: (float) Range in [1, +inf), measurement of correlation.
+        :param theta: (float) Range in [1, +inf), measurement of copula dependency.
         :param Kc: (func) conditional probability function, for numerical inverse.
         :return: (tuple) The sampled pair in [0, 1]x[0, 1].
         """
@@ -672,7 +668,7 @@ class Joe(Copula):
 
     def condi_cdf(self, u: float, v: float) -> float:
         """
-        Calculate conditional cumulative density function: P(U<=u | V=v).
+        Calculate conditional probability function: P(U<=u | V=v).
 
         Result is analytical.
 
@@ -686,8 +682,7 @@ class Joe(Copula):
         theta = self.theta
         u_part = (1 - u) ** theta
         v_part = (1 - v) ** theta
-        result = -(-1 + u_part) * (u_part + v_part - u_part * v_part)**(-1 + 1/theta) \
-            * v_part / (1 - v)
+        result = -(-1 + u_part) * (u_part + v_part - u_part * v_part)**(-1 + 1/theta) * v_part / (1 - v)
 
         return result
 
@@ -723,7 +718,7 @@ class N13(Copula):
         Initiate an N13 copula object.
 
         :param threshold: (float) Optional. Below this threshold, a percentile will be rounded to the threshold.
-        :param theta: (float) Range in [0, +inf), measurement of correlation.
+        :param theta: (float) Range in [0, +inf), measurement of copula dependency.
         """
 
         super().__init__()
@@ -772,7 +767,7 @@ class N13(Copula):
 
         :param v1: (float) I.I.D. uniform random variable in [0,1].
         :param v2: (float) I.I.D. uniform random variable in [0,1].
-        :param theta: (float) Range in [1, +inf), measurement of correlation.
+        :param theta: (float) Range in [1, +inf), measurement of copula dependency.
         :param Kc: (func) Conditional probability function, for numerical inverse.
         :return: (tuple) The sampled pair in [0, 1]x[0, 1].
         """
@@ -853,7 +848,7 @@ class N13(Copula):
 
     def condi_cdf(self, u, v) -> float:
         """
-        Calculate conditional cumulative density function: P(U<=u | V=v).
+        Calculate conditional probability function: P(U<=u | V=v).
 
         Result is analytical.
 
@@ -908,7 +903,7 @@ class N14(Copula):
         Initiate an N14 copula object.
 
         :param threshold: (float) Optional. Below this threshold, a percentile will be rounded to the threshold.
-        :param theta: (float) Range in [1, +inf), measurement of correlation.
+        :param theta: (float) Range in [1, +inf), measurement of copula dependency.
         """
 
         super().__init__()
@@ -943,10 +938,7 @@ class N14(Copula):
         # Compute Gumbel copulas from the unif pairs.
         sample_pairs = np.zeros_like(unif_vec)
         for row, pair in enumerate(unif_vec):
-            sample_pairs[row] = self._generate_one_pair(pair[0],
-                                                        pair[1],
-                                                        theta=theta,
-                                                        Kc=_Kc)
+            sample_pairs[row] = self._generate_one_pair(pair[0], pair[1], theta=theta, Kc=_Kc)
 
         return sample_pairs
 
@@ -956,7 +948,7 @@ class N14(Copula):
 
         :param v1: (float) I.I.D. uniform random variable in [0,1].
         :param v2: (float) I.I.D. uniform random variable in [0,1].
-        :param theta: (float) Range in [1, +inf), measurement of correlation.
+        :param theta: (float) Range in [1, +inf), measurement of copula dependency.
         :param Kc: (func) Conditional probability function, for numerical inverse.
         :return: (tuple) The sampled pair in [0, 1]x[0, 1].
         """
@@ -1035,7 +1027,7 @@ class N14(Copula):
 
     def condi_cdf(self, u: float, v: float) -> float:
         """
-        Calculate conditional cumulative density function: P(U<=u | V=v).
+        Calculate conditional probability function: P(U<=u | V=v).
 
         Result is analytical.
 
@@ -1120,9 +1112,7 @@ class Gaussian(Copula):
 
         # Generate bivariate normal with mean 0 and intended covariance.
         rand_generator = np.random.default_rng()
-        result = rand_generator.multivariate_normal(mean=[0, 0],
-                                                    cov=cov,
-                                                    size=num)
+        result = rand_generator.multivariate_normal(mean=[0, 0], cov=cov, size=num)
 
         return result
 
@@ -1187,7 +1177,7 @@ class Gaussian(Copula):
 
     def condi_cdf(self, u, v) -> float:
         """
-        Calculate conditional cumulative density function: P(U<=u | V=v).
+        Calculate conditional probability function: P(U<=u | V=v).
 
         Result is analytical.
 
@@ -1332,7 +1322,7 @@ class Student(Copula):
 
     def condi_cdf(self, u: float, v: float) -> float:
         """
-        Calculate conditional cumulative density function: P(U<=u | V=v).
+        Calculate conditional probability function: P(U<=u | V=v).
 
         Result is analytical.
 

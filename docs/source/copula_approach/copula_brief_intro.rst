@@ -179,14 +179,15 @@ Below are densities and conditional probabilities for the bivariate Gaussian and
 Notice that all bivariate Archimedean copulas and Gaussian copula have only one parameter :math:`\theta`
 or :math:`\rho` to be uniquely determined (and thus to be estimated from data),
 whereas Student-t copula has two parameters :math:`\rho` and :math:`\nu` to be determined.
-Estimation of :math:`\nu` from stock's time series is still an open topic, and this module lets the
-user to determine the quantity of :math:`\nu`.
+Estimation of :math:`\nu` from stock's time series is still an open topic, and this module uses maximum likelihood
+to choose :math:`\nu`.
 
 .. Note::
-	Using :math:`\nu = (` sample size :math:`- 1 )` for correlated time series data is strongly discouraged, since each
-	data point is not independent from others. Also one should keep :math:`\nu` to be reasonably small
-	so that it makes sense to use Student-t to model.
-	In general, for :math:`\nu > 12`, one should use the Gaussian copula instead.
+    Using :math:`\nu = (` sample size :math:`- 1 )` for correlated time series data is strongly discouraged, since each
+    data point is not independent from others. Also one should keep :math:`\nu` to be reasonably small
+    so that it makes sense to use Student-t to model.
+    In general, for :math:`\nu > 12`, especially when there is obviously no tail dependency from data, one should use the
+    Gaussian copula instead.
 
 
 Sample Generation from a Copula
@@ -259,10 +260,6 @@ might have been neglected.
 Determine Parameter(s)
 **********************
 
-First and foremost, for Student-t copula, the user needs to determine :math:`\nu` (degrees of freedom) to begin with, since
-how to determine it from data is still an open problem.
-Once :math:`\nu` is determined, then we have only one parameter to estimate for every copula.
-
 For all Archimedean copulas in this module, we follow a two-step pseudo-MLE approach as below:
 
 	1. Use Empirical CDF (ECDF) to map each marginal data to its quantile.
@@ -277,12 +274,23 @@ For all Archimedean copulas in this module, we follow a two-step pseudo-MLE appr
 	Then one inversely solve :math:`\hat\theta(\hat\tau)`. For some copulas, the inversion has a closed-form solution. For
 	others, one has to use numerical methods.
 
+For elliptic copulas, we calculate the covariance matrix :math:`\mathbf{\sigma}_{2 \times 2}` (though technically speaking, for bivariate
+copulas, only correlation :math:`\rho` is needed) from the quantile data, then use :math:`\mathbf{\sigma}_{2 \times 2}` for 
+a Gaussian or Student-t copula.
+In the future, we will add the choice of fitting by Spearman's :math:`\rho` for elliptic copulas for more flexibility.
+
+Also note that, theoretically speaking, for Student-t copula, Determing :math:`\nu` (degrees of freedom) analytically from
+arbitrary time series is still an open problem.
+Therefore we opted to use a maximum likelihood fit for :math:`\nu` for the family of Student-t copulas initated by
+:math:`\mathbf{\sigma}_{2 \times 2}`.
+This calculation is relatively slow.
+
 Research Notebooks
 ##################
 
 * `Basic Copula Strategy`_
 
-.. _`Basic Copula Strategy`: https://github.com/hudson-and-thames/arbitrage_research/blob/copula_approach/copula_approach/Copula_Notebook_Liew_etal.ipynb
+.. _`Basic Copula Strategy`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Copula%20Approach/Copula_Notebook_Liew_etal.ipynb
 
 References
 ##########
