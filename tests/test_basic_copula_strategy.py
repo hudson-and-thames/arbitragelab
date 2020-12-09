@@ -622,7 +622,7 @@ class TestCopulaStrategy(unittest.TestCase):
                         'Gaussian': -2211.4486204860873, 'Student': -2275.069087841567}
 
         for key in aics:
-            self.assertAlmostEqual(aics[key], expeced_aics[key], delta=1e-5)
+            self.assertAlmostEqual(aics[key], expeced_aics[key], delta=1)
 
     def test_analyze_time_series(self):
         """
@@ -707,4 +707,4 @@ class TestCopulaStrategy(unittest.TestCase):
         # 4. Check with ic_test value.
         for name in copulas:
             for ic in ic_type:
-                self.assertAlmostEqual(ic_dict[name][ic], ic_dict_expect[name][ic], delta=1e-5)
+                self.assertAlmostEqual(ic_dict[name][ic], ic_dict_expect[name][ic], delta=1)
