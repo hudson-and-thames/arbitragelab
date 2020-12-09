@@ -198,8 +198,8 @@ class TestCopulaStrategy(unittest.TestCase):
 
         def _Kc(w: float, theta: float):
             return w - 1 / theta * (
-                    (np.log(1 - (1 - w) ** theta)) * (1 - (1 - w) ** theta)
-                    / ((1 - w) ** (theta - 1)))
+                (np.log(1 - (1 - w) ** theta)) * (1 - (1 - w) ** theta)
+                / ((1 - w) ** (theta - 1)))
 
         result = cop._generate_one_pair(0, 0, 3, Kc=_Kc)
         expected = np.array([1, 0])
@@ -244,7 +244,7 @@ class TestCopulaStrategy(unittest.TestCase):
 
         def _Kc(w: float, theta: float):
             return w + 1 / theta * (
-                    w - w * np.power((1 - np.log(w)), 1 - theta) - w * np.log(w))
+                w - w * np.power((1 - np.log(w)), 1 - theta) - w * np.log(w))
 
         result = cop._generate_one_pair(0, 0, 3, Kc=_Kc)
         expected = np.array([1, 0])
