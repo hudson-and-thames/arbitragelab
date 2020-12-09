@@ -81,6 +81,7 @@ This project is licensed under an all rights reserved licence.
     cointegration_approach/cointegration_tests
     cointegration_approach/half_life
     cointegration_approach/trading_strategies
+    cointegration_approach/multivariate_cointegration
 
 .. toctree::
     :maxdepth: 2

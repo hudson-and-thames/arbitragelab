@@ -14,10 +14,10 @@ Introduction
 
 The cointegration relations between time series imply that the time series are bound together. Over time the time series
 might drift apart for a short period of time, but they ought to re-converge. This could serve as the basis of a
-profitable pairs trading strategy, as shown in the
-:ref:`Minimum Profit Optimization <cointegration_approach-minimum_profit>` module, and this module extends the
-framework to three or more cointegrated assets. The corresponding trading strategy was illustrated with an empirical
-application to trading four European stock market indices at daily frequency.
+profitable pairs trading strategy, as shown in the :ref:`Minimum Profit Optimization <cointegration_approach-minimum_profit>`
+module. The current module extends the Minimum Profit Optimization framework to three or more cointegrated assets.
+The corresponding trading strategy was illustrated with an empirical application to trading four European stock market
+indices at a daily frequency.
 
 Multivariate Cointegration
 ##########################
@@ -97,10 +97,14 @@ The expectation of the profit is thus:
              & = 0.5 \: C \text{ Var} Z_t > 0
     \end{align*}
 
-In the above derivation, the two conditions introduced in the previous section were applied: 1) :math:`E[Z_t] = 0`, and
-2) :math:`\text{Var }Z_t = -2 \sum_{p=1}^{\infty} \text{Cov} \lbrack Z_t, Z_{t-p} \rbrack`. By definition, both :math:`C`
-and the variance :math:`\text{Var } Z_t` are positive values, which means the expected profit of this strategy is
-positive. However, the portfolio resulting from the strategy is not dollar neutral.
+In the above derivation, the two conditions introduced in the previous section were applied:
+
+1) :math:`E[Z_t] = 0`, and
+
+2) :math:`\text{Var }Z_t = -2 \sum_{p=1}^{\infty} \text{Cov} \lbrack Z_t, Z_{t-p} \rbrack`.
+
+By definition, both :math:`C` and the variance :math:`\text{Var } Z_t` are positive values, which means the
+expected profit of this strategy is positive. However, the portfolio resulting from the strategy is not dollar neutral.
 
 To construct a dollar neutral portfolio, the assets need to be partitioned based on the sign of the cointegration
 coefficient of each asset, :math:`b^i`, into two disjoint sets, :math:`L` and :math:`S`.
@@ -127,30 +131,30 @@ where :math:`\text{sgn(x)}` is the sign function that returns the sign of :math:
     * The expected profit of the strategy is defined by the log-returns, so altering the notional value of the positions will not change the returns.
     * The strategy will **NOT** always long the assets in the set :math:`L` (or always short the assets in the set :math:`S`).
 
-In real implementation, the price history of the assets are finite, which indicates that the true value of
+In a real implementation, the price history of the assets is finite, which indicates that the true value of
 :math:`\sum_{p=1}^\infty Z_{t-p}` cannot be obtained. The assumptions of the multivariate cointegration framework
-suggests that returns of further history do not have predictability about the current returns
+suggest that returns of further history do not have predictability about the current returns
 (:math:`\lim_{p \to \infty} \text{Cov} \lbrack Y_t, Y_{t-p} \rbrack = 0`). Therefore, a lag parameter :math:`P` will be
 introduced and the infinite summation will be replaced by a finite sum :math:`\sum_{p=1}^P Z_{t-p}`.
 
-The trading strategy will be fleshed out based on the above theoretical results.
+**The trading strategy will be fleshed out based on the above theoretical results:**
 
 1. Estimate the cointegration vector :math:`\hat{\mathbf{b}}` with Johansen test using training data.
 2. Construct the realization :math:`\hat{Y}_t` of the process :math:`Y_t` by calculating :math:`\hat{\mathbf{b}}^T \ln P_t`, and calculate :math:`\hat{Z}_t = \hat{Y}_t - \hat{Y}_{t-1}`.
 3. Compute the finite sum :math:`\sum_{p=1}^P \hat{Z}_{t-p}`, where the lag :math:`P` is an input argument.
 4. Partition the assets into two sets :math:`L` and :math:`S` according to the sign of the element in the cointegration vector :math:`\hat{\mathbf{b}}`.
-5. Following the formulae below, calculate the amount of assets to trade so that the notional of the positions would equal to :math:`C`.
+5. Following the formulae below, calculate the number of assets to trade so that the notional of the positions would equal to :math:`C`.
 
 .. math::
 
-    \frac{-b^i C \text{ sgn} \bigg( \sum_{p=1}^{\infty} Z_{t-p} \bigg)}{P_t^i \sum_{j \in L} b^j}, \: i \in L
+    \frac{-b^i C \text{ sgn} \bigg( \sum_{p=1}^{P} Z_{t-p} \bigg)}{P_t^i \sum_{j \in L} b^j}, \: i \in L
 
-    \frac{b^i C \text{ sgn} \bigg( \sum_{p=1}^{\infty} Z_{t-p} \bigg)}{P_t^i \sum_{j \in L} b^j}, \: i \in S
+    \frac{b^i C \text{ sgn} \bigg( \sum_{p=1}^{P} Z_{t-p} \bigg)}{P_t^i \sum_{j \in L} b^j}, \: i \in S
 
 .. note::
 
     The trading signal is determined by :math:`\sum_{p=1}^{\infty} Z_{t-p}`, which sums to time period :math:`t-1`.
-    The price used to convert the notional to the amount of shares/contracts to trade is the closing price of time :math:`t`.
+    The price used to convert the notional to the number of shares/contracts to trade is the closing price of time :math:`t`.
     This ensures that no look-ahead bias will be introduced.
 
 6. Open the positions on time :math:`t` and close the positions on time :math:`t+1`.
@@ -189,9 +193,23 @@ Example
     test_data = data.loc[split_point:]
 
     # Initialize the trading signal generator
-    multi_coint_signal = MultivariateCointegration(train_df, trade_df)
+    multi_coint_signal = MultivariateCointegration(train_data, test_data)
 
     # Generating the signal, recording the cointegration vector time evolution,
     # and calculate portfolio daily percentage returns
     signal, coint_vec, port_returns = multi_coint_signal.trading_signal(nlags=30,
                                                                         rolling_window_size=1500)
+
+Research Notebooks
+##################
+
+The following research notebook can be used to better understand the Multivariate Cointegration Strategy described above.
+
+* `Multivariate Cointegration Strategy`_
+
+.. _`Multivariate Cointegration Strategy`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Cointegration%20Approach/multivariate_cointegration.ipynb
+
+References
+##########
+
+* `Galenko, A., Popova, E. and Popova, I., 2012. Trading in the presence of cointegration. The Journal of Alternative Investments, 15(1), pp.85-97. <http://www.ntuzov.com/Nik_Site/Niks_files/Research/papers/stat_arb/Galenko_2007.pdf>`_
