@@ -88,6 +88,8 @@ This project is licensed under an all rights reserved licence.
     cointegration_approach/cointegration_tests
     cointegration_approach/half_life
     cointegration_approach/trading_strategies
+    cointegration_approach/minimum_profit_simulation
+    cointegration_approach/minimum_profit
 
 .. toctree::
     :maxdepth: 2
