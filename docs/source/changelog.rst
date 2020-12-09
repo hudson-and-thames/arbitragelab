@@ -31,5 +31,15 @@ Changelog
 * :support:`17` Added Licence, ReadMe, and RoadMap
 * :support:`20` Added API Key Validation.
 * :support:`20` Add install documentation and test on OS/Ubuntu/Windows.
+* :release:`0.2.0 <2020-12-11>`
+* :feature:`5` ML Based Pairs Selection (Horta, 2020) and Data Importer added.
+* :support:`5` ML Based Pairs Selection and Data Importer documentation.
+* :feature:`8` Copula strategy added (Liew et al. 2013): Log price (or equivalently, cumulative log returns) based copula strategy.
+* :feature:`8` Copulas supported: Gumbel, Frank, Clayton, Joe, N13, N14, Gaussian, Student(Student-t).
+* :support:`8` Copula strategy documentation (Liew et al. 2013) for log price based copula strategy.
+* :feature:`19` Minimum profit optimization module added (Lin et al. 2006, Puspaningrum et al. 2010): Finding optimal pre-set boundaries for cointegrated pairs trading strategy.
+* :feature:`19` Cointegrated time series simulation module added (Lin et al. 2006): Simulate cointegrated series that follows AR(1) dynamics.
+* :support:`19` Minimum profit optimization documentation for cointegrated pairs trading strategy.
+* :support:`19` Cointegrated time series simulation documentation.
 * :feature:`27` CIR-model to the Optimal Mean Reversion module added.
 * :support:`27` CIR-model documentation.
