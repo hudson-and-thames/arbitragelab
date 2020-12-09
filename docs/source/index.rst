@@ -54,6 +54,13 @@ This project is licensed under an all rights reserved licence.
 
 .. toctree::
     :maxdepth: 2
+    :caption: Data
+    :hidden:
+
+    data/data_importer
+
+.. toctree::
+    :maxdepth: 2
     :caption: Distance Approach
     :hidden:
 
@@ -81,6 +88,8 @@ This project is licensed under an all rights reserved licence.
     cointegration_approach/cointegration_tests
     cointegration_approach/half_life
     cointegration_approach/trading_strategies
+    cointegration_approach/minimum_profit_simulation
+    cointegration_approach/minimum_profit
 
 .. toctree::
     :maxdepth: 2
@@ -108,11 +117,20 @@ This project is licensed under an all rights reserved licence.
     other_approaches/pca_approach
 
 .. toctree::
+    :maxdepth: 2
+    :caption: ML Approach
+    :hidden:
+
+    ml_approach/introduction
+    ml_approach/ml_based_pairs_selection
+
+.. toctree::
     :maxdepth: 3
     :caption: Developer Guide
     :hidden:
 
     changelog
+
 
 .. toctree::
     :maxdepth: 2
