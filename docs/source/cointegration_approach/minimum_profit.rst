@@ -281,7 +281,7 @@ Research Notebooks
 
 * `Minimum Profit Optimization`_
 
-.. _`Minimum Profit Optimization`: https://github.com/Hudson-and-Thames-Clients/research/blob/master/Statistical%20Arbitrage/mean_reversion.ipynb
+.. _`Minimum Profit Optimization`: https://github.com/Hudson-and-Thames-Clients/research/blob/master/Statistical%20Arbitrage/minimum_profit_optimization.ipynb
 
 References
 ##########
