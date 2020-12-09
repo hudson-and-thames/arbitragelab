@@ -4,7 +4,7 @@
 """
 Unit tests for basic copula strategy.
 """
-# pylint: disable = invalid-name,  protected-access
+# pylint: disable = invalid-name,  protected-access, too-many-locals
 
 import os
 import unittest
@@ -388,27 +388,28 @@ class TestCopulaStrategy(unittest.TestCase):
         copula_names = ['Gumbel', 'Clayton', 'Frank', 'Joe', 'N13', 'N14', 'Gaussian', 'Student']
         archimedeans = ['Gumbel', 'Clayton', 'Frank', 'Joe', 'N13', 'N14']
         elliptics = ['Gaussian', 'Student']
+        num_of_cop = len(copulas)
 
         # Generate pairs.
         np.random.seed(724)
         sample_pairs = {}
-        for i in range(len(copulas)):
+        for i in range(num_of_cop):
             sample_pairs[copula_names[i]] = copulas[i].generate_pairs(num=4000)
 
         # Calculate kendall's tau from generated data.
         kendalls_taus = {}
-        for i in range(len(copulas)):
+        for i in range(num_of_cop):
             x = sample_pairs[copula_names[i]][:, 0]
             y = sample_pairs[copula_names[i]][:, 1]
             kendalls_taus[copula_names[i]] = ss.kendalltau(x, y)[0]
 
         # Calculate theta (or correlation) for each copula based on tau.
         thetas = {}
-        for i in range(len(copulas)):
+        for i in range(num_of_cop):
             thetas[copula_names[i]] = copulas[i].theta_hat(kendalls_taus[copula_names[i]])
 
         # Compare results for copulas.
-        for i in range(len(copulas)):
+        for i in range(num_of_cop):
             if copula_names[i] in archimedeans:
                 self.assertAlmostEqual(3, thetas[copula_names[i]], delta=0.3)  # Compare theta
                 continue
@@ -593,7 +594,7 @@ class TestCopulaStrategy(unittest.TestCase):
 
         # Expected values.
         expected_theta = np.array([4.823917032678924, 7.6478340653578485, 17.479858671919537, 8.416268109560686,
-                                    13.006445455285089, 4.323917032678924, 0.9474504200741508, 0.9474504200741508])
+                                   13.006445455285089, 4.323917032678924, 0.9474504200741508, 0.9474504200741508])
 
         np.testing.assert_array_almost_equal(theta_hats, expected_theta, decimal=6)
 
@@ -649,21 +650,21 @@ class TestCopulaStrategy(unittest.TestCase):
             if name != 'Student':
                 _, _, cdf1, cdf2 = CS.fit_copula(s1_series=BKD_train, s2_series=ESC_train, copula_name=name)
                 positions = CS.analyze_time_series(s1_series=BKD_test, s2_series=ESC_test,
-                                                    cdf1=cdf1, cdf2=cdf2)
+                                                   cdf1=cdf1, cdf2=cdf2)
                 positions_data[name] = positions
             else:
                 _, _, cdf1, cdf2 = CS.fit_copula(s1_series=BKD_train, s2_series=ESC_train, copula_name=name)
                 positions = CS.analyze_time_series(s1_series=BKD_test, s2_series=ESC_test,
-                                                    cdf1=cdf1, cdf2=cdf2, start_position=0,
-                                                    lower_threshold=0.25, upper_threshold=0.75)
+                                                   cdf1=cdf1, cdf2=cdf2, start_position=0,
+                                                   lower_threshold=0.25, upper_threshold=0.75)
                 positions_data[name] = positions
 
         # Load and compare with theoretical data
         expected_positions_df = pd.read_csv(self.data_path + r'/BKD_ESC_unittest_positions.csv')
         for name in copulas:
             np.testing.assert_array_almost_equal(positions_data[name],
-                                                  expected_positions_df[name].to_numpy(),
-                                                  decimal=3)
+                                                 expected_positions_df[name].to_numpy(),
+                                                 decimal=3)
 
     def test_ic_test(self):
         """
