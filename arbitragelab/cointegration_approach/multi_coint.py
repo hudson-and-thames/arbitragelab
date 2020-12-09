@@ -21,22 +21,23 @@ class MultivariateCointegration:
     and plot the equity curves and cointegration vector time evolution.
     """
 
-    def __init__(self, asset_df: pd.DataFrame, trade_df: Optional[pd.DataFrame]):
+    def __init__(self, asset_df: pd.DataFrame, trade_df: Optional[pd.DataFrame] = None):
         """
         Constructor of the multivariate cointegration trading signal class.
 
         The log price dataframe and the cointegration vectors are stored for repeating use.
 
         :param asset_df: (pd.Dataframe) Raw in-sample price dataframe of the assets.
-        :param trade_df: (pd.Dataframe) Raw out-of-sample price dataframe of the assets. Use None if only in-sample
-            properties are desired.
+        :param trade_df: (pd.Dataframe) Raw out-of-sample price dataframe of the assets.
+            Use None if only in-sample properties are desired.
         """
+
         self.__asset_df = asset_df
         self.__trade_df = trade_df
         self.__coint_vec = None
 
     @staticmethod
-    def missing_impute(price_df: pd.DataFrame, nan_method: str = 'ffill', order: int = 3):
+    def missing_impute(price_df: pd.DataFrame, nan_method: str = 'ffill', order: int = 3) -> pd.DataFrame:
         """
         Fill the missing values of the asset prices with two options: front-fill or cubic spline.
 
@@ -46,6 +47,7 @@ class MultivariateCointegration:
         :param order: (int) Polynomial order for spline function.
         :return: (pd.DataFrame) Imputed dataframe.
         """
+
         if nan_method == "ffill":
             # Use front-fill to impute.
             price_df = price_df.fillna(method='ffill')
@@ -59,7 +61,7 @@ class MultivariateCointegration:
 
         return price_df
 
-    def calc_log_price(self, price_df: pd.DataFrame, nan_method: str = 'ffill', order: int = 3):
+    def calc_log_price(self, price_df: pd.DataFrame, nan_method: str = 'ffill', order: int = 3) -> pd.DataFrame:
         """
         Calculate the log price of each asset for cointegration coefficient calculation.
 
@@ -76,7 +78,7 @@ class MultivariateCointegration:
         # Return log price.
         return price_df.apply(np.log)
 
-    def calc_price_diff(self, price_df: pd.DataFrame, nan_method: str = 'ffill', order: int = 3):
+    def calc_price_diff(self, price_df: pd.DataFrame, nan_method: str = 'ffill', order: int = 3) -> pd.DataFrame:
         """
         Calculate the price difference of day t and day t-1 of each asset for P&L calculation.
 
@@ -90,7 +92,7 @@ class MultivariateCointegration:
         # Impute missing data
         price_df = self.missing_impute(price_df, nan_method=nan_method, order=order)
 
-        # Drop first row of NA and return the price difference.
+        # Drop first row of NA and return the price difference
         return price_df.diff().dropna()
 
     @property
@@ -100,6 +102,7 @@ class MultivariateCointegration:
 
         :return: (pd.DataFrame) Dataframe of asset prices.
         """
+
         return self.__asset_df
 
     @property
@@ -109,46 +112,48 @@ class MultivariateCointegration:
 
         :return: (pd.DataFrame) Dataframe of log asset prices.
         """
+
         return self.__trade_df
 
     def fit(self, log_price: pd.DataFrame, sig_level: str = "95%", rolling_window_size: Optional[int] = 1500,
             suppress_warnings: bool = False) -> np.array:
         """
-        Use Johansen test to retrieve the cointegration vector.
+        Use the Johansen test to retrieve the cointegration vector.
 
         :param log_price: (pd.DataFrame) Log price dataframe used to derive cointegration vector.
         :param sig_level: (str) Cointegration test significance level. Possible options are "90%", "95%", and "99%".
         :param rolling_window_size: (int) Number of data points used for training with rolling window. If None,
-            then use cumulative window, i.e. the entire dataset.
+            then use a cumulative window, i.e. the entire dataset.
         :param suppress_warnings: (bool) Boolean flag to suppress the cointegration warning message.
         :return: (np.array) The cointegration vector, b.
         """
-        # Checking the significance of a test.
+
+        # Checking the significance of a test
         if sig_level not in ['90%', '95%', '99%']:
             raise ValueError("Significance level can only be the following:\n "
                              "90%, 95%, or 99%.\n Please check the input.")
 
-        # Calculate the cointegration vector with Johansen test.
+        # Calculate the cointegration vector with Johansen test
         jo_portfolio = JohansenPortfolio()
 
-        # Select if applying rolling window.
+        # Select if applying rolling window
         if rolling_window_size is None:
             jo_portfolio.fit(log_price, det_order=0)
         else:
             jo_portfolio.fit(log_price.iloc[-rolling_window_size:], det_order=0)
 
-        # Check statistics to see if the pairs are cointegrated at the specified significance level.
+        # Check statistics to see if the pairs are cointegrated at the specified significance level
         eigen_stats = jo_portfolio.johansen_eigen_statistic
         trace_stats = jo_portfolio.johansen_trace_statistic
         eigen_not_coint = (eigen_stats.loc['eigen_value'] < eigen_stats.loc[sig_level]).all()
         trace_not_coint = (trace_stats.loc['trace_statistic'] < trace_stats.loc[sig_level]).all()
 
-        # If not cointegrated then warn the users that the performance might be affected.
+        # If not cointegrated then warn the users that the performance might be affected
         if not suppress_warnings and (eigen_not_coint or trace_not_coint):
             warnings.warn("The asset pair is not cointegrated at "
                           "{} level based on eigenvalue or trace statistics.".format(sig_level))
 
-        # Retrieve the cointegration vector and store it.
+        # Retrieve the cointegration vector and store it
         coint_vec = jo_portfolio.cointegration_vectors.loc[0]
         self.__coint_vec = coint_vec
 
@@ -157,7 +162,7 @@ class MultivariateCointegration:
     def num_of_shares(self, log_price: pd.DataFrame, last_price: pd.Series, nlags: int = 30,
                       dollar_invest: float = 1.e7) -> Tuple[np.array, ...]:
         """
-        Calculate the number of shares that needs to be traded given a notional value.
+        Calculate the number of shares that need to be traded given a notional value.
 
         :param log_price: (pd.DataFrame) Dataframe of log prices of training data.
         :param last_price: (pd.Series) Last price for trading signal generation.
@@ -166,18 +171,18 @@ class MultivariateCointegration:
         :return: (np.array, np.array) The number of shares to trade.
         """
 
-        # Calculate the cointegration error Y_t, recover the date index.
+        # Calculate the cointegration error Y_t, recover the date index
         coint_error = np.dot(log_price, self.__coint_vec)
         coint_error_df = pd.DataFrame(coint_error)
         coint_error_df.index = log_price.index
 
-        # Calculate the return Z_t by taking the difference. Drop the NaN of the first data point.
+        # Calculate the return Z_t by taking the difference. Drop the NaN of the first data point
         realization = coint_error_df.diff().dropna()
 
         # Calculate the direction of the trade.
         sign = np.sign(realization.iloc[-nlags:].sum()).values[0]
 
-        # Classify the assets into positive cointegration coefficient (CC) group and negative CC group.
+        # Classify the assets into positive cointegration coefficient (CC) group and negative CC group
         pos_coef_asset = self.__coint_vec[self.__coint_vec >= 0]
         neg_coef_asset = self.__coint_vec[self.__coint_vec < 0]
 
@@ -185,7 +190,7 @@ class MultivariateCointegration:
         pos_shares = pos_coef_asset * sign * dollar_invest / pos_coef_asset.sum() / last_price[pos_coef_asset.index]
         neg_shares = neg_coef_asset * sign * dollar_invest / neg_coef_asset.sum() / last_price[neg_coef_asset.index]
 
-        # Assign the correct sign to the number of shares according to the sign of CC.
+        # Assign the correct sign to the number of shares according to the sign of CC
         return -1. * np.floor(pos_shares), np.floor(neg_shares)
 
     @staticmethod
@@ -204,7 +209,7 @@ class MultivariateCointegration:
         :return: (float, float) Long P&L; Short P&L.
         """
 
-        # Join the trading signal and price difference by asset names.
+        # Join the trading signal and price difference by asset names
         day_pnl_df = pd.concat([signal, price_diff], axis=1)
 
         # Rename the columns
@@ -232,14 +237,15 @@ class MultivariateCointegration:
             then use cumulative window, i.e. the entire dataset.
         :param update_freq: (int) Frequency to update the cointegration vector for out-of-sample test. Default is
             monthly (22 trading days).
-        :return: (pd.DataFrame, pd.DataFrame) Trading signal dataframe; cointegration vector time evolution dataframe.
+        :return: (pd.DataFrame, pd.DataFrame, pd.DataFrame) Trading signal dataframe;
+            Cointegration vector time evolution dataframe; Returns dataframe.
         """
 
-        # Signal DF, cointegration vector evolution DF, and portfolio value DF for PnL and returns calculation.
+        # Signal DF, cointegration vector evolution DF, and portfolio value DF for PnL and returns calculation
         signals, coint_vec_evo, returns_df = [], [], []
 
         # Create a copy of the original training DF so we can preserve the data because we will update the original
-        # training data with incoming trading data.
+        # training data with incoming trading data
         train_df = deepcopy(self.__asset_df)
 
         # Get trading period and daily price difference
@@ -249,9 +255,9 @@ class MultivariateCointegration:
         # Assign the notional value of the portfolio
         returns_df.append(0.)
 
-        # Generate the trading signal for each day using a loop.
+        # Generate the trading signal for each day using a loop
         for t in range(trading_period):
-            # Update the cointegration vector according to the update frequency.
+            # Update the cointegration vector according to the update frequency
             if t % update_freq == 0:
                 log_train_df = self.calc_log_price(train_df)
                 self.fit(log_train_df, rolling_window_size=rolling_window_size, suppress_warnings=True)
@@ -264,7 +270,7 @@ class MultivariateCointegration:
             long_pnl, short_pnl = self._rebal_pnl(pd.concat([pos_shares, neg_shares]), price_diff.iloc[t])
             returns = (long_pnl + short_pnl) / (2 * dollar_invest)
 
-            # Bookkeeping: Record the signals and the cointegration vector time evolution.
+            # Bookkeeping: Record the signals and the cointegration vector time evolution
             signals.append(pd.concat([pos_shares, neg_shares]))
             coint_vec_evo.append(self.__coint_vec)
             returns_df.append(returns)
@@ -272,11 +278,11 @@ class MultivariateCointegration:
             # Update the training dataframe.
             train_df = train_df.append(self.__trade_df.iloc[t])
 
-        # Concatenate the signals and convert the signal into a dataframe.
+        # Concatenate the signals and convert the signal into a dataframe
         signals_df = pd.concat(signals, axis=1).T
         signals_df.index = price_diff.index
 
-        # Concatenate the time evolution of cointegration vectors and convert it into a dataframe.
+        # Concatenate the time evolution of cointegration vectors and convert it into a dataframe
         coint_vec_evo_df = pd.concat(coint_vec_evo, axis=1).T
         coint_vec_evo_df.index = self.__trade_df.index[:-1]
 
