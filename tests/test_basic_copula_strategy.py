@@ -672,7 +672,7 @@ class TestCopulaStrategy(unittest.TestCase):
 
     def test_ic_test(self):
         """
-        Test ic_test from CopulaStrategy for each copula.pip
+        Test ic_test from CopulaStrategy for each copula.
         """
 
         # Change price to cumulative log return. Here we fit the whole set.

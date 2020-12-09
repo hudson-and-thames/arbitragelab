@@ -290,7 +290,7 @@ Research Notebooks
 
 * `Basic Copula Strategy`_
 
-.. _`Basic Copula Strategy`: https://github.com/hudson-and-thames/arbitrage_research/blob/copula_approach/copula_approach/Copula_Notebook_Liew_etal.ipynb
+.. _`Basic Copula Strategy`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Copula%20Approach/Copula_Notebook_Liew_etal.ipynb
 
 References
 ##########

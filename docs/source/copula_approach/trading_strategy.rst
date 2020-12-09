@@ -147,4 +147,10 @@ The following research notebook can be used to better understand the copula stra
 
 * `Basic Copula Strategy`_
 
-.. _`Basic Copula Strategy`: https://github.com/hudson-and-thames/arbitrage_research/blob/copula_approach/copula_approach/Copula_Notebook_Liew_etal.ipynbipynb
+.. _`Basic Copula Strategy`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Copula%20Approach/Copula_Notebook_Liew_etal.ipynb
+
+References
+##########
+
+* `Liew, R.Q. and Wu, Y., 2013. Pairs trading: A copula approach. Journal of Derivatives & Hedge Funds, 19(1), pp.12-30. <https://link.springer.com/article/10.1057/jdhf.2013.1>`__
+* `Stander, Y., Marais, D. and Botha, I., 2013. Trading strategies with copulas. Journal of Economic and Financial Sciences, 6(1), pp.83-107. <https://www.researchgate.net/publication/318054326>`__
