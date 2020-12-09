@@ -198,8 +198,8 @@ class TestCopulaStrategy(unittest.TestCase):
 
         def _Kc(w: float, theta: float):
             return w - 1 / theta * (
-                (np.log(1 - (1 - w) ** theta)) * (1 - (1 - w) ** theta)
-                / ((1 - w) ** (theta - 1)))
+                    (np.log(1 - (1 - w) ** theta)) * (1 - (1 - w) ** theta)
+                    / ((1 - w) ** (theta - 1)))
 
         result = cop._generate_one_pair(0, 0, 3, Kc=_Kc)
         expected = np.array([1, 0])
@@ -244,7 +244,7 @@ class TestCopulaStrategy(unittest.TestCase):
 
         def _Kc(w: float, theta: float):
             return w + 1 / theta * (
-                w - w * np.power((1 - np.log(w)), 1 - theta) - w * np.log(w))
+                    w - w * np.power((1 - np.log(w)), 1 - theta) - w * np.log(w))
 
         result = cop._generate_one_pair(0, 0, 3, Kc=_Kc)
         expected = np.array([1, 0])
@@ -608,13 +608,17 @@ class TestCopulaStrategy(unittest.TestCase):
         BKD_clr = CS.cum_log_return(self.BKD_series)
         ESC_clr = CS.cum_log_return(self.ESC_series)
 
-        # Fit through the copulas and watch out for Student-t
+        # Fit through the copulas and the last one we do not update.
         copulas = ['Gumbel', 'Clayton', 'Frank', 'Joe', 'N13', 'N14', 'Gaussian', 'Student']
         aics = dict()
 
         for name in copulas:
             result_dict, _, _, _ = CS.fit_copula(s1_series=BKD_clr, s2_series=ESC_clr, copula_name=name)
             aics[name] = result_dict['AIC']
+
+        # Check the renew functionality. It should still be a Student-t copula internally.
+        _, _, _, _ = CS.fit_copula(s1_series=BKD_clr, s2_series=ESC_clr, copula_name='Gumbel', if_renew=False)
+        self.assertIsInstance(CS.copula, copula_generate.Student)
 
         expeced_aics = {'Gumbel': -1996.8584204971112, 'Clayton': -1982.1106036413414,
                         'Frank': -2023.0991514138464, 'Joe': -1139.896265173598,
@@ -668,7 +672,7 @@ class TestCopulaStrategy(unittest.TestCase):
 
     def test_ic_test(self):
         """
-        Test ic_test from CopulaStrategy for each copula.
+        Test ic_test from CopulaStrategy for each copula.pip
         """
 
         # Change price to cumulative log return. Here we fit the whole set.
@@ -677,14 +681,19 @@ class TestCopulaStrategy(unittest.TestCase):
         ESC_clr = CS.cum_log_return(self.ESC_series)
 
         # 2. Fit to every copula, and get the SIC, AIC, HQIC data from ic_test
-        copulas = ['Gumbel', 'Clayton', 'Frank', 'Joe', 'N13', 'N14', 'Gaussian', 'Student']
+        copulas = ['Gumbel', 'Clayton', 'Frank', 'Joe', 'N13', 'N14', 'Gaussian', 'Student', 'Loaded-t']
         ic_type = ['SIC', 'AIC', 'HQIC']
         ic_dict = {copula: {ic: None for ic in ic_type} for copula in copulas}
-        for name in copulas:
-            _, _, cdf1, cdf2 = CS.fit_copula(s1_series=BKD_clr, s2_series=ESC_clr, copula_name=name)
+        for name in copulas[: -1]:
+            _, fitted_copula, cdf1, cdf2 = CS.fit_copula(s1_series=BKD_clr, s2_series=ESC_clr, copula_name=name)
             result_dict = CS.ic_test(s1_test=BKD_clr, s2_test=ESC_clr, cdf1=cdf1, cdf2=cdf2)
             for ic in ic_type:
                 ic_dict[name][ic] = result_dict[ic]
+
+        # Test side loading functionality. The last one should be a Student-t copula
+        result_dict = CS.ic_test(s1_test=BKD_clr, s2_test=ESC_clr, cdf1=cdf1, cdf2=cdf2, copula=fitted_copula)
+        for ic in ic_type:
+            ic_dict['Loaded-t'][ic] = result_dict[ic]
 
         # 3. Hard coded theoretical value.
         ic_dict_expect = {'Gumbel':
@@ -702,6 +711,8 @@ class TestCopulaStrategy(unittest.TestCase):
                           'Gaussian':
                               {'SIC': -2206.539865701486, 'AIC': -2211.4486204860873, 'HQIC': -2209.585875534039},
                           'Student':
+                              {'SIC': -2270.160333056966, 'AIC': -2275.069087841567, 'HQIC': -2273.206342889519},
+                          'Loaded-t':
                               {'SIC': -2270.160333056966, 'AIC': -2275.069087841567, 'HQIC': -2273.206342889519}}
 
         # 4. Check with ic_test value.
