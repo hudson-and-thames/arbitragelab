@@ -32,7 +32,7 @@ e.g. Short the spread means buying :math:`S_1` and/or selling :math:`S_2`.
 Use **cumulative log return** data of the stocks during the training/formation period, we proceed with a pseudo-MLE
 fit to establish a copula that reflects the relation of the two stocks during the training/formation period.
 
-Then we can calculate the **marginal cumulative probabilities** using trading/testing period data:
+Then we can calculate the **conditional probabilities** using trading/testing period data:
 
 .. math::
     \begin{align}
@@ -114,11 +114,10 @@ Example
    s1_clr_test = CS.cum_log_return(s1_price_test, start=s1_price_train[0])
    s2_clr_test = CS.cum_log_return(s2_price_test, start=s2_price_train[0])
 
-   # Fitting to a Student-t copula with nu(DOF)=3
+   # Fitting to a Student-t copula
    result_dict, copula, s1_cdf, s2_cdf = CS.fit_copula(s1_series=s1_clr_train,
                                                        s2_series=s2_clr_train,
-                                                       copula_name='Student',
-                                                       nu=3)
+                                                       copula_name='Student')
 													   
    # Printing fit scores (AIC, SIC, HQIC)
    print(result_dict)
@@ -148,4 +147,4 @@ The following research notebook can be used to better understand the copula stra
 
 * `Basic Copula Strategy`_
 
-.. _`Basic Copula Strategy`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Cointegration%20Approach/mean_reversion.ipynb
+.. _`Basic Copula Strategy`: https://github.com/hudson-and-thames/arbitrage_research/blob/copula_approach/copula_approach/Copula_Notebook_Liew_etal.ipynbipynb
