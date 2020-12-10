@@ -7,10 +7,17 @@ scikit-learn==0.23.1
 matplotlib==3.2.1
 cython==0.29.21
 POT==0.7.0
+yfinance==0.1.54
+yahoo-fin==0.8.6
+mpldatacursor==0.7.1
+lxml==4.5.2
+requests_html==0.10.0
 keras==2.3.1
 tensorflow==2.2.1
 
 #Develop
+bump2version==1.0.1
+bumpversion==0.6.0
 codecov==2.0.15
 coverage==4.5.2
 pylint==2.5.3

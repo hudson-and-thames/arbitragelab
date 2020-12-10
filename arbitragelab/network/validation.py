@@ -1,6 +1,6 @@
 # Copyright 2019, Hudson and Thames Quantitative Research
 # All rights reserved
-# Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
+# Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 
 """
 This module validates your API key. Please note that making changes to this file or any of the files in this library is
@@ -41,6 +41,7 @@ class Security:
     @staticmethod
     def __import_libraries():
         # pylint: disable=import-outside-toplevel, unused-import
+        import arbitragelab.ml_approach as ml_approach
         import arbitragelab.codependence as codependence
         import arbitragelab.cointegration_approach as cointegration_approach
         import arbitragelab.distance_approach as distance_approach

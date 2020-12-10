@@ -1,6 +1,7 @@
 # Copyright 2019, Hudson and Thames Quantitative Research
 # All rights reserved
-# Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
+# Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
+
 """
 Implementation of the statistical arbitrage distance approach proposed by
 Gatev, E., Goetzmann, W. N., and Rouwenhorst, K. G. in
