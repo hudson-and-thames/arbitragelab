@@ -1,8 +1,8 @@
 # Copyright 2019, Hudson and Thames Quantitative Research
 # All rights reserved
-# Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
+# Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 """
-This module implements the Multi Layer Perceptron.
+This module implements the Multi-Layer Perceptron.
 """
 
 from keras.models import Model
@@ -14,7 +14,7 @@ from arbitragelab.ml_approach.base import BaseNeuralNetwork
 
 class MultiLayerPerceptron(BaseNeuralNetwork):
     """
-    Multi Layer Perceptron implementation.
+    Multi-Layer Perceptron implementation.
 
     Regression: loss_fn="mean_squared_error", optmz="adam", metrics=["r2_score"]
     num_outputs=1

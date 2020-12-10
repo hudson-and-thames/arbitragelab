@@ -1,6 +1,6 @@
 # Copyright 2019, Hudson and Thames Quantitative Research
 # All rights reserved
-# Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
+# Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 """
 This module implements the Correlation Filter described in Dunis et al. (2005).
 """
@@ -29,15 +29,18 @@ class CorrelationFilter:
         self.sell_threshold = sell_threshold
         self.corr_series = None
 
-    def fit(self, frame: pd.DataFrame):
+    def fit(self, frame: pd.DataFrame) -> CorrelationFilter:
         """
         Sets the correlation benchmark inside of the class object.
 
         :param frame: (pd.DataFrame) Time series consisting of both legs of the spread.
+        :return: (CorrelationFilter) Returns calss itself.
         """
 
+        # Making a copy of the input data
         frame = frame.copy()
 
+        # Calculating the correlation delta series
         two_legged_df = frame.iloc[:, 0:2]
         corr_series = self._get_rolling_correlation(
             two_legged_df, lookback=self.lookback).diff().dropna()
@@ -56,8 +59,10 @@ class CorrelationFilter:
             information.
         """
 
+        # Making a copy of the input data
         working_frame = frame.copy()
 
+        # Generating signals
         buy_signal = working_frame.index.isin(
             self.corr_series[self.corr_series > self.buy_threshold].index)
         sell_signal = working_frame.index.isin(
@@ -86,6 +91,7 @@ class CorrelationFilter:
         two_legged_df = frame.iloc[:, 0:2]
         two_legged_df.index.name = '_index_'
 
+        # Rolling correlation calculation
         daily_corr = two_legged_df.rolling(
             lookback, min_periods=lookback).corr()
         daily_corr = daily_corr.iloc[:, 0].reset_index().dropna()
@@ -96,6 +102,7 @@ class CorrelationFilter:
         final_corr.drop(['level_1'], axis=1, inplace=True)
         final_corr.dropna(inplace=True)
 
+        # Scaling to [0,1] if needed
         scaler = MinMaxScaler()
         scaled_corr = scaler.fit_transform(
             final_corr.iloc[:, 0].values.reshape(-1, 1))  # .diff()
