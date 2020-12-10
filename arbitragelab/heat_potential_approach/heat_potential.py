@@ -4,6 +4,7 @@
 
 # pylint: disable=missing-module-docstring, invalid-name, too-many-locals, too-many-arguments
 #import warnings
+from typing import Callable
 import numpy as np
 #import matplotlib.pyplot as plt
 import scipy.optimize as so
@@ -31,7 +32,7 @@ class HeatPotentials():
         self.max_trade_duration = None
         self.mu = None
 
-    def fit(self, ou_params: list, delta_grid: float, max_trade_duration=None):
+    def fit(self, ou_params: list, delta_grid: float, max_trade_duration=None) -> None:
         """
         Fits the steady-state distribution to given OU model, assigns the
         grid density with respect to t, maximum duration of the trade.
@@ -260,7 +261,15 @@ class HeatPotentials():
         return eps_lower, eps_upper, phi_lower, phi_upper
 
     @staticmethod
-    def _numerical_calculation_equations(v, K_11, K_11_v, K_12, K_21, K_22, K_22_v, f1, f2):
+    def _numerical_calculation_equations(v: np.ndarray,
+                                         K_11: Callable[[float], float],
+                                         K_11_v: Callable[[float], float],
+                                         K_12: Callable[[float], float],
+                                         K_21: Callable[[float], float],
+                                         K_22: Callable[[float], float],
+                                         K_22_v: Callable[[float], float],
+                                         f1: np.ndarray,
+                                         f2: np.ndarray) -> tuple:
         """
         Numerically calculates general solution for system of Volterra integral equations.
         (p.8)
@@ -273,7 +282,7 @@ class HeatPotentials():
         :param K_22: (function) Function that calculates the K_2_2(v,s).
         :param K_22_v: (function) Function that calculates the approximation of K_2_2(v,v).
 
-        :return: (np.array) List of calculated solutions for two coupled system of Volterra
+        :return: (tuple) List of calculated solutions for two coupled system of Volterra
         integral equations for every element in grid v(t).
         """
 

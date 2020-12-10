@@ -7,6 +7,7 @@ Tests the heat potentials approach from the HeatPotentials module of ArbitrageLa
 """
 import unittest
 import numpy as np
+import pandas as pd
 
 from arbitragelab.heat_potential_approach.heat_potential import HeatPotentials
 
@@ -57,12 +58,13 @@ class TestHeatPotentials(unittest.TestCase):
 
         omega = test.omega(test.max_trade_duration)
 
-        # Testing
+        # Testing helper functions calculation
         self.assertAlmostEqual(grid[-1], upsilon, delta=1e-4)
 
         self.assertAlmostEqual(omega, -0.14095, delta=1e-4)
 
-        test.description()
+        # Tests if the description function returns the instance of the correct class
+        self.assertIsInstance(test.description(), pd.Series)
 
     def test_core_functionality(self) -> None:
         """
@@ -79,4 +81,4 @@ class TestHeatPotentials(unittest.TestCase):
         # Testing the optimal levels and sharpe calculation
         np.testing.assert_almost_equal(test.optimal_levels(), expected_output, decimal=4)
 
-        self.assertAlmostEqual(test.sharpe_calculation(test.T, 5.2423, -3.243), expected_output[2], delta=1e-3)
+        self.assertAlmostEqual(test.sharpe_calculation(test.max_trade_duration, 5.2423, -3.243), expected_output[2], delta=1e-3)
