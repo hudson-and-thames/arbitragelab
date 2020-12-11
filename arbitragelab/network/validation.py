@@ -41,12 +41,14 @@ class Security:
     @staticmethod
     def __import_libraries():
         # pylint: disable=import-outside-toplevel, unused-import
+        import arbitragelab.ml_approach as ml_approach
         import arbitragelab.codependence as codependence
         import arbitragelab.cointegration_approach as cointegration_approach
         import arbitragelab.distance_approach as distance_approach
         import arbitragelab.other_approaches as other_approaches
         import arbitragelab.util as util
         import arbitragelab.optimal_mean_reversion as optimal_mean_reversion
+        import arbitragelab.time_series_approach as time_series_approach
 
     # pylint: disable=missing-function-docstring
     def __validate(self):
