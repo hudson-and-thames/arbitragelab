@@ -1,21 +1,21 @@
-.. _heat_potentials-heat_potentials:
+.. _optimal_mean_reversion-heat_potentials:
 
 
 .. note::
    The following documentation closely follows the article by Alexandr Lipton and Marcos Lopez de Prado:
-   `"A closed-form solution for optimal mean-reverting trading strategies"<https://ssrn.com/abstract=3534445>`__
+   `"A closed-form solution for optimal mean-reverting trading strategies" <https://ssrn.com/abstract=3534445>`__
 
    As well as the book by Marcos Lopez de Prado:
-   `"Advances in Financial Machine Learning"<https://www.amazon.com/Advances-Financial-Machine-Learning-Marcos/dp/1119482089>`__
+   `"Advances in Financial Machine Learning" <https://www.amazon.com/Advances-Financial-Machine-Learning-Marcos/dp/1119482089>`__
 
 ====================================================================
 A closed-form solution for optimal mean-reverting trading strategies
 ====================================================================
 
-As stated in the the paper by Marcos Lopez de Prado: "When prices reflect all available information,
+As stated in the paper by Marcos Lopez de Prado: "When prices reflect all available information,
 they oscillate around an equilibrium level. This oscillation is the result of the temporary market impact caused by
-waves of buyers and sellers." Which means that if we can consider the asset prices to be mean-reverted, then we have
-a clear toolkit for it's approximation, namely, the Ornstein-Uhlenbeck process.
+waves of buyers and sellers." Which means that if we can consider the asset prices to be mean-reverted, then there is a
+clear toolkit for it's approximation, namely, the Ornstein-Uhlenbeck process.
 
 Attempting to monetize this oscillations market makers provide liquidity by entering the long position if the asset is
 underpriced - hence, the price is lower than the equilibrium, and short position if the situation is reversed. The
@@ -26,15 +26,15 @@ position is then held until one of three outcomes occurs:
 * the position is held longer then the maximum tolerated horizon
 
 The main problem that arises now is how to define the optimal profit-taking and stop-loss levels. In this module to
-obtain the solution we utilize the method introduced by Alexandr Lipton and Marcos Lopez de Prado that utilizes
-the method of heat potentials widely applied in physics to Sharpe ratio (later SR) maximization problem with respect to the border
-values of our exit corridor.
+obtain the solution we utilize the method introduced by Alexandr Lipton and Marcos Lopez de Prado that applies the widely
+applied in physics method of heat potentials to Sharpe ratio maximization problem. The maximization is performed
+with respect to the border values of our exit corridor.
 
 Problem definition
 ##################
 
 We suppose an investment strategy S invests in i = 1,...I opportunities or bets. At each opportunity i, S takes
-a position of :math:`m_i` units of security X, where :math:`m_i \in (\infty; -\infty). The transaction that
+a position of :math:`m_i` units of security X, where :math:`m_i \in (\infty; -\infty)`. The transaction that
 entered such opportunity was priced at a value :math:`m_i P_{1,0}`, where :math:`P_{i,0}` is the average price per unit
 at which the mi securities were transacted.
 
@@ -48,7 +48,7 @@ As other market participants continue to transact security X, we can mark-to-mar
 that opportunity i after t observed transactions as :math:`m_i P_{1,t}`. Where :math:`m_i P_{1,t}` represents the
 value of opportunity i if it were liquidated at the price observed in the market after t transactions. Accordingly,
 we can compute the MtM p/l of opportunity i after t transactions as :math:`\pi_{i,T_i}=m(P_{1,t}-P_{i,0})`
-The exiting opportunity arizes in the following scenarios:
+The exiting opportunity arises in the following scenarios:
 
 * :math:`\pi_{i,T_i}\geq \bar{\pi}`, where :math:`\bar{\pi}>0` is a profit-taking threshold
 * :math:`\pi_{i,T_i}\leq \underline{\pi}`, where :math:`\underline{\pi}<0` is a stop-loss level
@@ -72,7 +72,7 @@ by performing scaling to remove superfluous parameters.
 
 .. math::
 
-    t = \mu't',\ , T = \mu'T', x = \frac{\sqrt{\mu'}}{\sigma'} x',
+    t = \mu't',\ T = \mu'T',\ x = \frac{\sqrt{\mu'}}{\sigma'} x',\
 
     \theta = \frac{\sqrt{\mu'}}{\sigma'} \theta',\ \bar{\pi} = \frac{\sqrt{\mu'}}{\sigma'} \bar{\pi}',
     \ \underline{\pi} = \frac{\sqrt{\mu'}}{\sigma'} \underline{\pi}'
@@ -83,7 +83,7 @@ and get
 
     dx = (\theta-x)dt + dW_t, \ \bar{\pi}' \leq x \leq \underline{\pi},\ 0 \leq t \leq T
 
-where :math:`\theta` is an expected value and its standart deviation is given by :math:`\Omega=\frac{1}{\sqrt{2}}`
+where :math:`\theta` is an expected value and its standard deviation is given by :math:`\Omega=\frac{1}{\sqrt{2}}`
 
 According to the trading rule we exit the trade in one of the three scenarios:
 
@@ -93,8 +93,10 @@ According to the trading rule we exit the trade in one of the three scenarios:
 
 .. tip::
 
-    For a short strategy reverses the roles of :math:`{\bar{\pi}',\underline{\pi}'}`,
+    Short strategy reverses the roles of :math:`{\bar{\pi}',\underline{\pi}'}`:
+
     :math:`-\underline{\pi}` equals the profit taken when the price hits :math:`\underline{\pi}` and
+
     :math:`-\bar{\pi}` losses are incurred while price hits :math:`-\bar{\pi}`
 
 Hence, we can restrict ourself to case with :math:`\theta \geq 0`
@@ -115,11 +117,11 @@ First of all we define the grid :math:`\upsilon` based on which we will perform 
 **Step 2: Numerically calculate helper functions** :math:`\bar{\epsilon}, \underline{\epsilon}, \bar{\phi}, \underline{\phi}`
 
 We are going to use the classical method of heat potentials to calculate the SR.
-As a preparation , in this step we solve the two sets of Volterra equations by using the trapezoidal rule of integral calculation.
+As a preparation, in this step we solve the two sets of Volterra equations by using the trapezoidal rule of integral calculation.
 
 **Step 3: Calculate the values of** :math:`\hat{E}(\Upsilon,\bar{\omega})` **and** :math:`\hat{F}(\Upsilon,\bar{\omega})`
 
-We need compute these functions at one point, which can be done by approximation of the integrals using the
+We need to compute these functions at one point :math:`\Upsilon,\bar{\omega}`, which can be done by approximation of the integrals using the
 trapezoidal rule:
 
 .. math::
@@ -146,9 +148,9 @@ To find the optimal thresholds for the data provided by user we maximize the cal
     {\bar{\pi}*,\underline{\pi}*}=\underset{\bar{\pi}\geq0,\underline{\pi}\leq0}{\arg\max}\ SR
 
 
-The ``HeatPotentials`` module of the ArbitrageLab package allows the user to gcalculate the treshold levels for their
-data, the provided parameters are transformed to a steady-state solutions internally and calculates the reverse transformation
-for the optimal threshold values.
+The ``HeatPotentials`` module of the ArbitrageLab package allows the user to calculate the threshold levels that
+establish the trading rule for their data, the provided parameters are transformed to a steady-state solutions
+internally and the reverse transformation is performed for the optimal threshold values.
 
 Implementation
 ##############
@@ -157,7 +159,7 @@ First of all the user has to use ``fit`` for the parameters to be scaled to remo
 and set up the delta for the grid calculation and maximum duration of trade.
 
 
-.. py:currentmodule:: arbitragelab.heat_potential_approach.heat_potential.HeatPotentials
+.. py:currentmodule:: arbitragelab.optimal_mean_reversion.heat_potential.HeatPotentials
 
 .. autofunction:: fit
 
@@ -165,7 +167,7 @@ To separately perform the optimization process we use the ``optimal_levels`` fun
 
 .. autofunction:: optimal_levels
 
-There is also a possibility to calculate the Sharpe ratio for chosen optimal levels and the maximim duration of the
+There is also a possibility to calculate the Sharpe ratio for chosen optimal levels and the maximum duration of the
 trade of choice.
 
 .. autofunction:: sharpe_calculation
@@ -173,3 +175,52 @@ trade of choice.
 To view the optimal levels scaled back to initial parameters the ``description`` function is used.
 
 .. autofunction:: description
+
+Example
+#######
+
+.. code-block::
+
+    from arbitragelab.optimal_mean_reversion import HeatPotentials
+    from arbitragelab.optimal_mean_reversion.ou_model import OrnsteinUhlenbeck
+
+    # Create the class object
+    example = HeatPotentials()
+
+    # Generating the sample OU data
+    ou_data = OrnsteinUhlenbeck()
+
+    data = ou_data.ou_model_simulation(n=1000, theta_given=0.03711, mu_given=65.3333,
+                                sigma_given=0.3, delta_t_given=1/255)
+
+    # To get the model parameters we need to fit the OU model to the data.
+
+    # Assign the delta value
+    ou_data.delta_t = 1/252
+
+    # Model fitting
+    ou_data.fit_to_portfolio(data)
+
+    # Now we obtained the parameters to use for our optimization procedure
+    theta,mu,sigma = ou_data.theta,ou_data.mu,np.sqrt(ou_data.sigma_square)
+
+    # Establish the instance of the class
+    example = HeatPotentials()
+
+    # Fit the model and establish the maximum duration of the trade
+    example.fit(ou_params=(theta, mu, sigma), delta_grid=0.1, max_trade_duration=0.03)
+
+
+    # Calculate the initial optimal levels
+    levels = example.optimal_levels()
+
+    print(levels)
+
+    # We can also calculate the Sharpe ratio for given scaled parameters
+    sr = example.sharpe_calculation(max_trade_duration=1.9599, optimal_profit=5.07525, optimal_stop_loss=-3.41002)
+
+    print(sr)
+
+    # To get the results scaled back to our initial model we call the description function
+    example.description()
+

@@ -32,7 +32,6 @@ class OrnsteinUhlenbeck:
     """
 
     def __init__(self):
-
         self.theta = None  # Long-term mean
         self.mu = None  # Speed at which the values will regroup around the long-term mean
         self.sigma_square = None  # The amplitude of randomness in the system

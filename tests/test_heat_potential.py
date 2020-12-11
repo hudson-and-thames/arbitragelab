@@ -9,7 +9,7 @@ import unittest
 import numpy as np
 import pandas as pd
 
-from arbitragelab.heat_potential_approach.heat_potential import HeatPotentials
+from arbitragelab.optimal_mean_reversion.heat_potential import HeatPotentials
 
 
 class TestHeatPotentials(unittest.TestCase):

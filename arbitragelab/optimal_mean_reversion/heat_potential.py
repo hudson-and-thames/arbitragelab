@@ -23,7 +23,9 @@ class HeatPotentials():
     """
 
     def __init__(self):
-
+        """
+        Initializes parameters
+        """
         self.theta = None
         self.optimal_profit = None
         self.optimal_stop_loss = None
@@ -46,8 +48,7 @@ class HeatPotentials():
         theta, self.mu, sigma = ou_params
         self.delta_grid = delta_grid
 
-        if max_trade_duration is not None:
-            self.max_trade_duration = self.mu * max_trade_duration
+        self.max_trade_duration = self.mu * max_trade_duration
 
         self.theta = np.sqrt(self.mu) * theta / sigma
 
@@ -82,7 +83,6 @@ class HeatPotentials():
         (p.5 and p.8)
 
         :param max_trade_duration: (float) Maximum duration of the trade.
-
         :return: (np.array) Grid of v(t).
         """
         # Setting up the grid of (tau = max_trade_duration - t)
@@ -100,7 +100,6 @@ class HeatPotentials():
         (p.5)
 
          :param max_trade_duration: (float) Maximum duration of the trade.
-
          :return: (float) Calculated value of v(0).
         """
         output = (1 - np.exp(-2 * max_trade_duration)) / 2
@@ -113,7 +112,6 @@ class HeatPotentials():
         (p.5)
 
         :param max_trade_duration: (float) Maximum duration of the trade.
-
         :return: (float) The result of function calculation.
         """
         upsilon = self.upsilon(max_trade_duration)
@@ -130,7 +128,6 @@ class HeatPotentials():
 
         :param v: (np.array) Grid of v(t) where t in [0,max_trade_duration] with step delta_grid.
         :param optimal_profit: Optimal profit-taking threshold.
-
         :return: (np.array) Array of values of the helper function with respect to grid elements.
         """
 
@@ -145,7 +142,6 @@ class HeatPotentials():
 
         :param v: (np.array) Grid of v(t) where t in [0,max_trade_duration] with step delta_grid.
         :param optimal_stop_loss: (float) Optimal stop-loss level.
-
         :return: (np.array) Array of values of the helper function with respect to grid elements.
         """
 
@@ -163,7 +159,6 @@ class HeatPotentials():
         :param max_trade_duration: (float) Maximum duration of the trade.
         :param optimal_profit: (float) Optimal profit-taking threshold.
         :param optimal_stop_loss: (float) Optimal stop-loss level.
-
         :return: (np.array) List of calculated values of helper functions for every
         element in grid v(t).
         """
@@ -205,7 +200,6 @@ class HeatPotentials():
         :param max_trade_duration: (float) Maximum duration of the trade.
         :param optimal_profit: (float) Optimal profit-taking threshold.
         :param optimal_stop_loss: (float) Optimal stop-loss level.
-
         :return: (np.array) List of calculated values of lower and upper epsilon and phi functions
         for every element in grid v(t).
         """
@@ -281,7 +275,6 @@ class HeatPotentials():
         :param K_21: (function) Function that calculates the K_2_1(v,s).
         :param K_22: (function) Function that calculates the K_2_2(v,s).
         :param K_22_v: (function) Function that calculates the approximation of K_2_2(v,v).
-
         :return: (tuple) List of calculated solutions for two coupled system of Volterra
         integral equations for every element in grid v(t).
         """
@@ -348,7 +341,6 @@ class HeatPotentials():
         :param max_trade_duration: (float) Maximum duration of the trade.
         :param optimal_profit: (float) Optimal profit-taking threshold.
         :param optimal_stop_loss: (float) Optimal stop-loss level.
-
         :return: (np.array) List of calculated values of E and F functions for every
         element in grid v(t).
         """
@@ -419,7 +411,6 @@ class HeatPotentials():
         :param max_trade_duration: (float) Maximum duration of the trade.
         :param optimal_profit: (float) Optimal profit-taking threshold.
         :param optimal_stop_loss: (float) Optimal stop-loss level.
-
         :return: (float) Sharpe ratio.
         """
         # Setting up the helper values
@@ -445,7 +436,6 @@ class HeatPotentials():
         (p.6)
 
         :param params: (np.array) Optimal profit-taking and stop-loss level.
-
         :return: (float) Negated Sharpe ratio.
         """
 
