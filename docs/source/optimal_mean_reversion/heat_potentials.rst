@@ -181,8 +181,9 @@ Example
 
 .. code-block::
 
-    from arbitragelab.optimal_mean_reversion import HeatPotentials
     from arbitragelab.optimal_mean_reversion.ou_model import OrnsteinUhlenbeck
+    from arbitragelab.optimal_mean_reversion import HeatPotentials
+    import numpy as np
 
     # Create the class object
     example = HeatPotentials()
