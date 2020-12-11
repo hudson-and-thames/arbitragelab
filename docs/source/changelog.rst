@@ -41,3 +41,5 @@ Changelog
 * :feature:`19` Cointegrated time series simulation module added (Lin et al. 2006): Simulate cointegrated series that follows AR(1) dynamics.
 * :support:`19` Minimum profit optimization documentation for cointegrated pairs trading strategy.
 * :support:`19` Cointegrated time series simulation documentation.
+* :feature:`22` XOU-model to the Optimal Mean Reversion module added.
+* :support:`22` XOU-model documentation.
