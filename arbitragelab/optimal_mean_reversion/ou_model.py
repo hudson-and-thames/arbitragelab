@@ -531,6 +531,7 @@ class OrnsteinUhlenbeck:
         # Integrating over positive values
         with warnings.catch_warnings():  # Silencing specific IntegrationWarning
             warnings.filterwarnings('ignore', r'The algorithm does not converge')
+            warnings.filterwarnings('ignore', r'overflow encountered in exp')
             calculated_f = quad(f_func, 0, np.inf)[0]
 
         return calculated_f
