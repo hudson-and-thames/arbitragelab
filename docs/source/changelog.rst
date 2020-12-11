@@ -43,3 +43,5 @@ Changelog
 * :support:`19` Cointegrated time series simulation documentation.
 * :feature:`22` XOU-model to the Optimal Mean Reversion module added.
 * :support:`22` XOU-model documentation.
+* :feature:`27` CIR-model to the Optimal Mean Reversion module added.
+* :support:`27` CIR-model documentation.
