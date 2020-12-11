@@ -9,24 +9,24 @@ import unittest
 import numpy as np
 import pandas as pd
 
-from arbitragelab.optimal_mean_reversion.heat_potential import HeatPotentials
+from arbitragelab.optimal_mean_reversion.heat_potentials import HeatPotentials
 
 
 class TestHeatPotentials(unittest.TestCase):
     """
-    Tests the HeatPotentials module
+    Tests the HeatPotentials module.
     """
 
-    def setUp(self) -> None:
+    def setUp(self):
         """
-        Sets up the universal testing values
+        Sets up the universal testing values.
         """
 
         self.params = (1.8557, 0.00653, 0.15)
 
-    def test_fit(self) -> None:
+    def test_fit(self):
         """
-        Tests the correctness of the fit to a steady-state distribution
+        Tests the correctness of the fit to a steady-state distribution.
         """
 
         # Setting up the model
@@ -39,12 +39,15 @@ class TestHeatPotentials(unittest.TestCase):
 
         self.assertAlmostEqual(test.max_trade_duration, 1.959, delta=1e-3)
 
-        test.description()
+        # Tests calling the description function
+        descr = test.description()
+        self.assertIsInstance(descr, pd.Series)
 
-    def test_helper_functions(self) -> None:
+    def test_helper_functions(self):
         """
-        Tests the helper functions
+        Tests the helper functions.
         """
+
         # Setting up the instance of the class
         test = HeatPotentials()
 
@@ -66,10 +69,11 @@ class TestHeatPotentials(unittest.TestCase):
         # Tests if the description function returns the instance of the correct class
         self.assertIsInstance(test.description(), pd.Series)
 
-    def test_core_functionality(self) -> None:
+    def test_core_functionality(self):
         """
-        Tests the core functionality
+        Tests the core functionality.
         """
+
         # Setting up the instance of the class
         test = HeatPotentials()
 
@@ -81,4 +85,5 @@ class TestHeatPotentials(unittest.TestCase):
         # Testing the optimal levels and sharpe calculation
         np.testing.assert_almost_equal(test.optimal_levels(), expected_output, decimal=4)
 
-        self.assertAlmostEqual(test.sharpe_calculation(test.max_trade_duration, 5.2423, -3.243), expected_output[2], delta=1e-3)
+        self.assertAlmostEqual(test.sharpe_calculation(test.max_trade_duration, 5.2423, -3.243),
+                               expected_output[2], delta=1e-3)

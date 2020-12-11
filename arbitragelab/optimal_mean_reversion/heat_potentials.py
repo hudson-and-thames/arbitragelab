@@ -1,18 +1,17 @@
 # Copyright 2019, Hudson and Thames Quantitative Research
 # All rights reserved
-# Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
+# Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 
-# pylint: disable=missing-module-docstring, invalid-name, too-many-locals, too-many-arguments
-#import warnings
+# pylint: disable=missing-module-docstring, invalid-name, too-many-locals
+
 from typing import Callable
 import numpy as np
-#import matplotlib.pyplot as plt
+
 import scipy.optimize as so
 import pandas as pd
 
 
-
-class HeatPotentials():
+class HeatPotentials:
     """
     This class implements the algorithm for finding
     profit-taking and stop-loss levels for p/l
@@ -26,6 +25,7 @@ class HeatPotentials():
         """
         Initializes parameters
         """
+
         self.theta = None
         self.optimal_profit = None
         self.optimal_stop_loss = None
@@ -34,16 +34,16 @@ class HeatPotentials():
         self.max_trade_duration = None
         self.mu = None
 
-    def fit(self, ou_params: list, delta_grid: float, max_trade_duration=None) -> None:
+    def fit(self, ou_params: list, delta_grid: float, max_trade_duration: float = None):
         """
-        Fits the steady-state distribution to given OU model, assigns the
+        Fits the steady-state distribution to the given OU model, assigns the
         grid density with respect to t, maximum duration of the trade.
         Calculates and assigns values for optimal stop-loss and profit-taking levels.
-        :param ou_params: (list) parameters of the OU model. [theta, mu, sigma]
-        :param delta_grid: Grid density with respect to t.
-        :param max_trade_duration: maximum duration of the trade.
+
+        :param ou_params: (list) Parameters of the OU model. [theta, mu, sigma]
+        :param delta_grid: (float) Grid density with respect to t.
+        :param max_trade_duration: (float) Maximum duration of the trade.
         """
-        # theta, mu, sigma = ou.optimal_coefficients(ou_data)
 
         theta, self.mu, sigma = ou_params
         self.delta_grid = delta_grid
@@ -67,8 +67,10 @@ class HeatPotentials():
 
         :return: (pd.Series) Summary data for model parameters and optimal levels.
         """
+
         # Calculating the default data values
         data = [self.optimal_profit, self.optimal_stop_loss, self.max_trade_duration / self.mu]
+
         # Setting the names for the data indexes
         index = ['profit-taking threshold', 'stop-loss level', 'max duration of the trade']
 
@@ -85,6 +87,7 @@ class HeatPotentials():
         :param max_trade_duration: (float) Maximum duration of the trade.
         :return: (np.array) Grid of v(t).
         """
+
         # Setting up the grid of (tau = max_trade_duration - t)
         tau = max_trade_duration - np.arange(0, max_trade_duration, self.delta_grid)
 
@@ -96,24 +99,26 @@ class HeatPotentials():
     @staticmethod
     def upsilon(max_trade_duration: float) -> float:
         """
-        Calculates the helper function that correspond to v(0).
+        Calculates the helper function that corresponds to v(0).
         (p.5)
 
          :param max_trade_duration: (float) Maximum duration of the trade.
          :return: (float) Calculated value of v(0).
         """
+
         output = (1 - np.exp(-2 * max_trade_duration)) / 2
 
         return output
 
     def omega(self, max_trade_duration: float) -> float:
         """
-        Calculates helper value for method of heat potentials.
+        Calculates helper value for a method of heat potentials.
         (p.5)
 
         :param max_trade_duration: (float) Maximum duration of the trade.
         :return: (float) The result of function calculation.
         """
+
         upsilon = self.upsilon(max_trade_duration)
 
         # Calculating the omega value
@@ -149,8 +154,7 @@ class HeatPotentials():
 
         return output
 
-    def _heat_potential_helper(self, max_trade_duration: float,
-                               optimal_profit: float,
+    def _heat_potential_helper(self, max_trade_duration: float, optimal_profit: float,
                                optimal_stop_loss: float) -> np.ndarray:
         """
         Calculates the values of the helper functions for numerical root calculation.
@@ -188,8 +192,7 @@ class HeatPotentials():
 
         return e_upper, e_lower, f_upper, f_lower
 
-    def _numerical_calculation_helper(self, max_trade_duration: float,
-                                      optimal_profit: float,
+    def _numerical_calculation_helper(self, max_trade_duration: float, optimal_profit: float,
                                       optimal_stop_loss: float) -> np.ndarray:
         """
         Numerically calculates helping integral functions to solve
@@ -255,17 +258,15 @@ class HeatPotentials():
         return eps_lower, eps_upper, phi_lower, phi_upper
 
     @staticmethod
-    def _numerical_calculation_equations(v: np.ndarray,
-                                         K_11: Callable[[float], float],
+    def _numerical_calculation_equations(v: np.ndarray, K_11: Callable[[float], float],
                                          K_11_v: Callable[[float], float],
                                          K_12: Callable[[float], float],
                                          K_21: Callable[[float], float],
                                          K_22: Callable[[float], float],
                                          K_22_v: Callable[[float], float],
-                                         f1: np.ndarray,
-                                         f2: np.ndarray) -> tuple:
+                                         f1: np.ndarray, f2: np.ndarray) -> tuple:
         """
-        Numerically calculates general solution for system of Volterra integral equations.
+        Numerically calculates general solution for a system of Volterra integral equations.
         (p.8)
 
         :param v: (np.array) Grid of v(t) where t in [0,max_trade_duration] with step delta_grid.
@@ -297,7 +298,7 @@ class HeatPotentials():
 
         nu_2[1] = -f2[1] / (1 - K_22_v(v[1]) * np.sqrt(v[1]))
 
-        # Calculating the mavle of mutiplication term for both solutions
+        # Calculating the value of multiplication term for both solutions
         nu_1_mult = (1 + K_11_v(v[2:k]) * np.sqrt(v[2:k] - v[1:k - 1])) ** -1
 
         nu_2_mult = (-1 + K_22_v(v[2:k]) * np.sqrt(v[2:k] - v[1:k - 1])) ** -1
@@ -344,6 +345,7 @@ class HeatPotentials():
         :return: (np.array) List of calculated values of E and F functions for every
         element in grid v(t).
         """
+
         # Calculate the core helper values
         eps_lower, eps_upper,\
         phi_lower, phi_upper = self._numerical_calculation_helper(max_trade_duration,
@@ -403,7 +405,7 @@ class HeatPotentials():
         return E, F
 
     def sharpe_calculation(self, max_trade_duration: float, optimal_profit: float,
-                           optimal_stop_loss: float) -> np.ndarray:
+                           optimal_stop_loss: float) -> float:
         """
         Calculates the Sharpe ratio.
         (p.6 )
@@ -413,6 +415,7 @@ class HeatPotentials():
         :param optimal_stop_loss: (float) Optimal stop-loss level.
         :return: (float) Sharpe ratio.
         """
+
         # Setting up the helper values
         E, F = self._sharpe_helper_functions(max_trade_duration, optimal_profit, optimal_stop_loss)
 
@@ -430,7 +433,7 @@ class HeatPotentials():
 
         return sharpe_ratio
 
-    def _neg_sharpe_calculation(self, params):
+    def _neg_sharpe_calculation(self, params: np.array) -> float:
         """
         Calculates the negative Sharpe ratio for the optimization process
         (p.6)
@@ -462,10 +465,10 @@ class HeatPotentials():
 
     def optimal_levels(self) -> list:
         """
-        Calculates optimal profit-taking and stop-loss levels by maximizing the Sharpe ratio
+        Calculates optimal profit-taking and stop-loss levels by maximizing the Sharpe ratio.
 
         :returns: (list) The list that consists of profit-taking level,
-        stop-loss level, max Sharpe values.
+            stop-loss level, max Sharpe values.
         """
 
         # Set up the the initialization points
