@@ -43,6 +43,8 @@ Changelog
 * :support:`19` Cointegrated time series simulation documentation.
 * :feature:`22` XOU-model to the Optimal Mean Reversion module added.
 * :support:`22` XOU-model documentation.
+* :feature:`23` Heat potential approach module added.
+* :support:`23` Heat potential approach documentation.
 * :feature:`24` Quantile Time Series Strategy (SM Sarmento, N Horta, 2020) and Auto ARIMA model added.
 * :support:`24` Quantile Time Series Strategy and Auto ARIMA model documentation.
 * :feature:`27` CIR-model to the Optimal Mean Reversion module added.

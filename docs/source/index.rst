@@ -109,6 +109,7 @@ This project is licensed under an all rights reserved licence.
     optimal_mean_reversion/ou_model
     optimal_mean_reversion/xou_model
     optimal_mean_reversion/cir_model
+    optimal_mean_reversion/heat_potentials
 
 .. toctree::
     :maxdepth: 2
