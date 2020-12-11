@@ -1,9 +1,10 @@
 # Copyright 2019, Hudson and Thames Quantitative Research
 # All rights reserved
-# Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
+# Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 """
 This module implements the quantile time series approach described in
-Sarmento and Nuno Horta in `"A Machine Learning based Pairs Trading Investment Strategy" <https://www.springer.com/gp/book/9783030472504>`__.
+`"A Machine Learning based Pairs Trading Investment Strategy" <https://www.springer.com/gp/book/9783030472504>`__
+(pages 37-43) by Simão Moraes Sarmento and Nuno Horta.
 """
 
 import pandas as pd
@@ -17,6 +18,9 @@ class QuantileTimeSeriesTradingStrategy:
     top quantile of positive spread (`y`) differences and bottom quantile of negative spread differences.
     Secondly, we use time series spread prediction `y_hat` (it can be user-specified prediction, ARIMA, ANN, RNN, etc.)
     We enter a position if y_hat - y <= bottom quantile or y_hat - y >= top quantile.
+
+    This strategy is described in `"A Machine Learning based Pairs Trading Investment Strategy" <https://www.springer.com/gp/book/9783030472504>`__
+    (pages 37-43) by Simão Moraes Sarmento and Nuno Horta.
     """
 
     def __init__(self, long_quantile: float = 0.9, short_quantile: float = 0.1):

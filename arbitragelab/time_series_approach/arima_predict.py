@@ -1,3 +1,6 @@
+# Copyright 2019, Hudson and Thames Quantitative Research
+# All rights reserved
+# Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 """
 The module implements the ARIMA forecast of any time series using the Auto-ARIMA approach.
 """
