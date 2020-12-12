@@ -352,6 +352,13 @@ class TestCopulaStrategy(unittest.TestCase):
         self.assertAlmostEqual(cop.c(0.5, 0.7), 1.09150554, delta=1e-4)
         self.assertAlmostEqual(cop.c(0.6, 0.7), 1.1416005, delta=1e-4)
 
+        # Check copula joint cumulative density C(U=u,V=v)
+        self.assertAlmostEqual(cop.C(0, 0.2), cop.C(0.2, 0), delta=1e-4)
+        self.assertAlmostEqual(cop.C(0.7, 1), cop.C(1, 0.7), delta=1e-4)
+        self.assertAlmostEqual(cop.C(1, 1), 1, delta=1e-4)
+        self.assertAlmostEqual(cop.C(0, 0), 0, delta=1e-4)
+        self.assertAlmostEqual(cop.C(0.3, 0.7), 0.23534923332657925, delta=1e-4)
+
         # Check copula conditional cdf Prob(U<=u|V=v)
         self.assertAlmostEqual(cop.condi_cdf(0.5, 0.7), 0.4415184293094455, delta=1e-4)
 

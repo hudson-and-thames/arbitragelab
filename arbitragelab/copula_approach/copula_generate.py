@@ -13,7 +13,7 @@ from abc import ABC
 from typing import Callable
 from scipy.optimize import brentq
 from scipy.special import gamma as gm
-from scipy.integrate import quad
+from scipy.integrate import dblquad, quad 
 import scipy.stats as ss
 import numpy as np
 import pandas as pd
@@ -270,7 +270,7 @@ class Frank(Copula):
 
         :param u1: (float) I.I.D. uniform random variable in [0,1].
         :param v2: (float) I.I.D. uniform random variable in [0,1].
-        :param theta: (float) Range in [1, +inf), measurement of copula dependency.
+        :param theta: (float) All reals except for 0, measurement of copula dependency.
         :return: (tuple) The sampled pair in [0, 1]x[0, 1].
         """
 
@@ -1319,6 +1319,35 @@ class Student(Copula):
         pdf = numerator / denominator
 
         return pdf
+    
+    def C(self, u: int, v: int) -> float:
+        """
+        Calculate cumulative density of the bivariate copula: P(U<=u, V<=v).
+
+        Result is numerical. Calculated from definition of elliptical copula:
+            C(u, v) = Phi_nu_cor (inv_t(u, nu), inv_t(v, nu))
+        Where inv_t(u, nu) is the percentile function for a univariate Student-t distribution with DOF = nu.
+        Phi_nu_cor is the bivariate Student-t CDF with covariance matrix = correlation matrix, DOF = nu.
+        Here Phi_nu_cor is calculated numerically by double integration.
+
+        :param u: (float) A real number in [0, 1].
+        :param v: (float) A real number in [0, 1].
+        :return: (float) The culumative density.
+        """
+        # Avoid errors when u, v too close to 0
+        u = max(u, 1e-6)
+        v = max(v, 1e-6)
+        corr = [[1, self.rho], [self.rho, 1]]  # Correlation matrix.
+        # Get raw result from integration on pdf
+        def t_pdf_local(x1, x2):
+            return self._bv_t_dist(x=[x1, x2], mu=[0, 0], cov=corr, df=self.nu)
+
+        inv_t = (ss.t(df=self.nu)).ppf
+        raw_result = dblquad(t_pdf_local, -np.inf, inv_t(u), -np.inf, inv_t(v), epsabs=1e-4, epsrel=1e-4)[0]
+        # Map result back to [0, 1]
+        cdf = max(min(raw_result, 1), 0)
+
+        return cdf
 
     def condi_cdf(self, u: float, v: float) -> float:
         """
