@@ -14,6 +14,7 @@ lxml==4.5.2
 requests_html==0.10.0
 seaborn==0.10.0
 pmdarima==1.7.1
+analytics-python==1.2.9
 
 #Develop
 bump2version==1.0.1
