@@ -71,7 +71,7 @@ class MultivariateCointegration:
         """
 
         total_df = self._missing_impute(pd.concat([self.__asset_df, self.__trade_df]),
-                                       nan_method=nan_method, order=order)
+                                        nan_method=nan_method, order=order)
         self.__asset_df = total_df.loc[self.__asset_df.index]
         self.__trade_df = total_df.loc[self.__trade_df.index]
 
