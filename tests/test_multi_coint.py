@@ -379,7 +379,8 @@ class TestMultivariateCointegration(unittest.TestCase):
         Test in-sample performance of the trading strategy.
         """
 
-        in_sample = MultivariateCointegration(self.train_data, self.trade_data)
+        # Cut the in-sample test length to save build time
+        in_sample = MultivariateCointegration(self.train_data, self.trade_data.iloc[:110])
 
         # Impute NaN values
         in_sample.fillna_inplace(nan_method='ffill')
@@ -396,7 +397,7 @@ class TestMultivariateCointegration(unittest.TestCase):
         # Test returns only plot in here
         fig_returns = in_sample.plot_returns(returns)
         fig_returns_with_xlim = in_sample.plot_returns(returns, start_date=pd.Timestamp(2001, 11, 6),
-                                                       end_date=pd.Timestamp(2007, 1, 2))
+                                                       end_date=pd.Timestamp(2002, 6, 6))
 
         # Check if the plot object returns
         self.assertTrue(issubclass(type(fig_returns), Figure))
@@ -414,8 +415,8 @@ class TestMultivariateCointegration(unittest.TestCase):
         plot1_year = plot_no_spec_xlim_left.year
 
         self.assertEqual(plot1_year, 2001)
-        self.assertEqual(plot1_month, 8)
-        self.assertEqual(plot1_day, 5)
+        self.assertEqual(plot1_month, 10)
+        self.assertEqual(plot1_day, 30)
 
         # Check the xlim of the plot when nothing was specified
         ax1 = fig_returns_with_xlim.get_axes()
