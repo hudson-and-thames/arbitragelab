@@ -147,9 +147,9 @@ introduced and the infinite summation will be replaced by a finite sum :math:`\s
 
 .. math::
 
-    \frac{-b^i C \text{ sgn} \bigg( \sum_{p=1}^{P} Z_{t-p} \bigg)}{P_t^i \sum_{j \in L} b^j}, \: i \in L
+    \Bigg \lfloor \frac{-b^i C \text{ sgn} \bigg( \sum_{p=1}^{P} Z_{t-p} \bigg)}{P_t^i \sum_{j \in L} b^j} \Bigg \rfloor, \: i \in L
 
-    \frac{b^i C \text{ sgn} \bigg( \sum_{p=1}^{P} Z_{t-p} \bigg)}{P_t^i \sum_{j \in L} b^j}, \: i \in S
+    \Bigg \lfloor \frac{b^i C \text{ sgn} \bigg( \sum_{p=1}^{P} Z_{t-p} \bigg)}{P_t^i \sum_{j \in L} b^j} \Bigg \rfloor, \: i \in S
 
 .. note::
 
@@ -195,10 +195,13 @@ Example
     # Initialize the trading signal generator
     multi_coint_signal = MultivariateCointegration(train_data, test_data)
 
-    # Generating the signal, recording the cointegration vector time evolution,
+    # Fill NaN values
+    multi_coint_signal.fillna_inplace(nan_method='ffill')
+
+    # Generating the signal, signal by notional value, recording the cointegration vector time evolution,
     # and calculate portfolio daily percentage returns
-    signal, coint_vec, port_returns = multi_coint_signal.trading_signal(nlags=30,
-                                                                        rolling_window_size=1500)
+    signal, signal_ntn, coint_vec, returns = multi_coint_signal.trading_signal(nlags=30,
+                                                                               rolling_window_size=1500)
 
 Research Notebooks
 ##################
