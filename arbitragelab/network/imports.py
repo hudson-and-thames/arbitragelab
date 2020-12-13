@@ -51,7 +51,7 @@ class Golem:
         import arbitragelab.util as util
         import arbitragelab.optimal_mean_reversion as optimal_mean_reversion
         import arbitragelab.time_series_approach as time_series_approach
-        devadarsh.track('import_libraries')
+        devadarsh.track('Import')
 
     # pylint: disable=missing-function-docstring
     def __validate(self):

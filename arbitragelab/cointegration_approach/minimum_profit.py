@@ -18,6 +18,7 @@ import statsmodels.api as sm
 
 from arbitragelab.cointegration_approach.engle_granger import EngleGrangerPortfolio
 from arbitragelab.cointegration_approach.johansen import JohansenPortfolio
+from arbitragelab.util import devadarsh
 
 
 class MinimumProfit:
@@ -45,6 +46,8 @@ class MinimumProfit:
         # Store the train and trade dataset for future use
         self._train_df = None
         self._trade_df = None
+
+        devadarsh.track('MinimumProfit')
 
     def train_test_split(self, date_cutoff: Optional[pd.Timestamp] = None,
                          num_cutoff: int = None) -> Tuple[pd.DataFrame, pd.DataFrame]:

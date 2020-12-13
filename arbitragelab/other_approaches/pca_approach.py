@@ -16,6 +16,9 @@ from sklearn.linear_model import LinearRegression
 
 
 # pylint: disable=invalid-name
+from arbitragelab.util import devadarsh
+
+
 class PCAStrategy:
     """
     This strategy creates mean reverting portfolios using Principal Components Analysis. The idea of the strategy
@@ -41,6 +44,7 @@ class PCAStrategy:
 
         self.n_components = n_components  # Number of PCA components
         self.pca_model = PCA(n_components)  # Model for PCA calculation
+        devadarsh.track('PCAStrategy')
 
     @staticmethod
     def standardize_data(matrix: pd.DataFrame) -> (pd.DataFrame, pd.Series):

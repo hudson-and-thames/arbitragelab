@@ -10,6 +10,8 @@ import numpy as np
 import scipy.optimize as so
 import pandas as pd
 
+from arbitragelab.util import devadarsh
+
 
 class HeatPotentials:
     """
@@ -33,6 +35,8 @@ class HeatPotentials:
         self.sharpe = None
         self.max_trade_duration = None
         self.mu = None
+
+        devadarsh.track('HeatPotentials')
 
     def fit(self, ou_params: list, delta_grid: float, max_trade_duration: float = None):
         """

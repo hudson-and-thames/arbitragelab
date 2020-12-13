@@ -14,6 +14,7 @@ import pandas as pd
 from matplotlib.figure import Figure
 
 from arbitragelab.optimal_mean_reversion.ou_model import OrnsteinUhlenbeck
+from arbitragelab.util import devadarsh
 
 
 class CoxIngersollRoss(OrnsteinUhlenbeck):
@@ -45,6 +46,7 @@ class CoxIngersollRoss(OrnsteinUhlenbeck):
 
         super().__init__()
         self.B_value = None
+        devadarsh.track('CoxIngersollRoss')
 
     def fit(self, data: pd.DataFrame, data_frequency: str, discount_rate: tuple, transaction_cost: tuple,
             start: str = None, end: str = None, stop_loss: float = None):

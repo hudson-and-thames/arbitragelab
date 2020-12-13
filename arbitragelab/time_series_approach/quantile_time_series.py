@@ -11,6 +11,8 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+from arbitragelab.util import devadarsh
+
 
 class QuantileTimeSeriesTradingStrategy:
     """
@@ -40,6 +42,8 @@ class QuantileTimeSeriesTradingStrategy:
         self.negative_differences = None
 
         self.positions = []  # Positions (-1, 0, 1) logs
+
+        devadarsh.track('QuantileTimeSeriesTradingStrategy')
 
     def fit_thresholds(self, spread_series: pd.Series):
         """

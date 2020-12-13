@@ -12,18 +12,19 @@ from requests import get
 import analytics
 
 # Env Var
-IS_CIRCLECI = False  # Don't run inside CircleCI
 API_KEY_ENV_VAR = "ARBLAB_API_KEY"  # User ID
+SEGMENT = 'r7uCHEvWWUshccLG6CYTOaZ3j3gA9Wpf'
 
-# pylint: disable=bare-except
+
 try:
     IS_CIRCLECI = bool(os.environ['IS_CIRCLECI'])
-except:
-    pass
+except KeyError:
+    IS_CIRCLECI = False
 
 # Set Location and User
 IP = None
 USER = "unknown"
+IS_DEV = IS_CIRCLECI or (os.environ["ARBLAB_API_KEY"][-4:] == '62a0')
 
 # pylint: disable=bare-except
 try:
@@ -35,39 +36,31 @@ except:
 try:
     USER = os.environ[API_KEY_ENV_VAR]
 except KeyError:
-    USER = 'Angier'
+    USER = 'Robert Angier'
 
 # Connect with DB
-analytics.write_key = 'r7uCHEvWWUshccLG6CYTOaZ3j3gA9Wpf'
+analytics.write_key = SEGMENT
 
 
 # Identify
+# pylint: disable=missing-function-docstring
 def identify():
-    """
-    Identify user.
-    """
-    if not IS_CIRCLECI:
+    if not IS_DEV:
         analytics.identify(USER, {"name": USER,
                                   'created_at': dt.now()})
 
 
 # Generic function for pinging the server
+# pylint: disable=missing-function-docstring
 def page(url):
-    """
-    Page opened.
-    :param url: the page url
-    """
-    if not IS_CIRCLECI:
+    if not IS_DEV:
         analytics.page(USER, 'ArbitrageLab', 'Import',
                        {"url": url,
                         'time': dt.now()},
                        context=LOCATION)
 
 
+# pylint: disable=missing-function-docstring
 def track(func):
-    """
-    User action.
-    :param func: action name
-    """
-    if not IS_CIRCLECI:
+    if not IS_DEV:
         analytics.track(USER, func, {'time': dt.now()})
