@@ -269,7 +269,6 @@ class TestMultivariateCointegration(unittest.TestCase):
         # As long as it is close to neutral it should be passing the test
         self.assertTrue(abs(neg_pos_dollar_value + pos_pos_dollar_value) / 1.e7 < 1.e-3)
 
-    # pylint: disable=too-many-locals, too-many-statements
     def test_trade_signal(self):
         """
         Test trading signal generation.
@@ -341,18 +340,14 @@ class TestMultivariateCointegration(unittest.TestCase):
         fig_full_weight = trade_signal_test.plot_all(signals, signals_ntn, coint_vec_time_evo, returns,
                                                      use_weights=True, start_date=pd.Timestamp(2001, 11, 6),
                                                      end_date=pd.Timestamp(2007, 1, 2))
-        # Plot the returns only figure
-        fig_returns = trade_signal_test.plot_returns(returns)
 
         # First check if the plot object has been generated
         self.assertTrue(issubclass(type(fig_full), Figure))
         self.assertTrue(issubclass(type(fig_full_weight), Figure))
-        self.assertTrue(issubclass(type(fig_returns), Figure))
 
         # Check subplots numbers
         self.assertEqual(len(fig_full.get_axes()), 3)
         self.assertEqual(len(fig_full_weight.get_axes()), 3)
-        self.assertEqual(len(fig_returns.get_axes()), 1)
 
         # Check the xlim of the plot when nothing was specified
         ax1, _, ax3 = fig_full.get_axes()
@@ -383,3 +378,57 @@ class TestMultivariateCointegration(unittest.TestCase):
         # Check y-label when raw signals are plotted
         signal_label = ax3.get_ylabel()
         self.assertEqual(signal_label, "Portfolio Weights")
+
+    def test_insample(self):
+        """
+        Test in-sample performance of the trading strategy.
+        """
+
+        in_sample = MultivariateCointegration(self.train_data, self.trade_data)
+
+        # Impute NaN values
+        in_sample.fillna_inplace(nan_method='ffill')
+
+        # Generate trading signals
+        _, _, coint_vec_time_evo, returns = in_sample.trading_signal(30, rolling_window_size=None, insample=True)
+
+        # Cointegration vector should be constant
+        self.assertTrue(np.isclose(coint_vec_time_evo['AEX'], coint_vec_time_evo['AEX'].mean()).all())
+        self.assertTrue(np.isclose(coint_vec_time_evo['FTSE'], coint_vec_time_evo['FTSE'].mean()).all())
+        self.assertTrue(np.isclose(coint_vec_time_evo['CAC'], coint_vec_time_evo['CAC'].mean()).all())
+        self.assertTrue(np.isclose(coint_vec_time_evo['DAX'], coint_vec_time_evo['DAX'].mean()).all())
+
+        # Test returns only plot in here
+        fig_returns = in_sample.plot_returns(returns)
+        fig_returns_with_xlim = in_sample.plot_returns(returns, start_date=pd.Timestamp(2001, 11, 6),
+                                                       end_date=pd.Timestamp(2007, 1, 2))
+
+        # Check if the plot object returns
+        self.assertTrue(issubclass(type(fig_returns), Figure))
+        self.assertTrue(issubclass(type(fig_returns_with_xlim), Figure))
+
+        # Check subplot number
+        self.assertEqual(len(fig_returns.get_axes()), 1)
+        self.assertEqual(len(fig_returns_with_xlim.get_axes()), 1)
+
+        # Check the xlim of the plot when nothing was specified
+        ax1 = fig_returns.get_axes()
+        plot_no_spec_xlim_left = num2date(ax1[0].get_xlim()[0])
+        plot1_day = plot_no_spec_xlim_left.day
+        plot1_month = plot_no_spec_xlim_left.month
+        plot1_year = plot_no_spec_xlim_left.year
+
+        self.assertEqual(plot1_year, 2001)
+        self.assertEqual(plot1_month, 8)
+        self.assertEqual(plot1_day, 5)
+
+        # Check the xlim of the plot when nothing was specified
+        ax1 = fig_returns_with_xlim.get_axes()
+        plot_no_spec_xlim_left = num2date(ax1[0].get_xlim()[0])
+        plot1_day = plot_no_spec_xlim_left.day
+        plot1_month = plot_no_spec_xlim_left.month
+        plot1_year = plot_no_spec_xlim_left.year
+
+        self.assertEqual(plot1_year, 2001)
+        self.assertEqual(plot1_month, 11)
+        self.assertEqual(plot1_day, 6)
