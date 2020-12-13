@@ -302,11 +302,12 @@ class TestMultivariateCointegration(unittest.TestCase):
                                                      np.array([10000205.8, -2885789.45, -6475862.52, -646945.05])))
         self.assertIsNone(np.testing.assert_allclose(signals_ntn.iloc[-1].values,
                                                      np.array([-2221400.24, -7775488.56, 8244294.95, 1748541.76])))
-        target_head = np.array([30.582711178446427, -12.11624038306599, -27.220035836898937, -2.716097980580956])
-        self.assertIsNone(np.testing.assert_allclose(coint_vec_time_evo.iloc[0].values, target_head, rtol=1e-5))
-
-        target_tail = np.array([3.884615498623572, 13.602601047839087, -21.879100926485236, -4.644199584857195])
-        self.assertIsNone(np.testing.assert_allclose(coint_vec_time_evo.iloc[-1].values, target_tail, rtol=1e-5))
+        self.assertIsNone(np.testing.assert_allclose(coint_vec_time_evo.iloc[0].values,
+                                                     np.array([30.582711178446427, -12.11624038306599, -27.220035836898937, -2.716097980580956]),
+                                                     rtol=1e-5))
+        self.assertIsNone(np.testing.assert_allclose(coint_vec_time_evo.iloc[-1].values,
+                                                     np.array([3.884615498623572, 13.602601047839087, -21.879100926485236, -4.644199584857195]),
+                                                     rtol=1e-5))
 
         # If cointegration vector is not updated, then the cointegration vector should be the same for each data point
         self.assertTrue(np.isclose(coint_vec_time_evo_short['AEX'], coint_vec_time_evo_short['AEX'].mean()).all())
