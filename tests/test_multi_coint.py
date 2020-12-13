@@ -356,13 +356,10 @@ class TestMultivariateCointegration(unittest.TestCase):
         plot1_month = plot_no_spec_xlim_left.month
         plot1_year = plot_no_spec_xlim_left.year
 
-        self.assertEqual(plot1_year, 2001)
-        self.assertEqual(plot1_month, 8)
-        self.assertEqual(plot1_day, 4)
+        self.assertListEqual([plot1_year, plot1_month, plot1_day], [2001, 8, 4])
 
         # Check y-label when raw signals are plotted
-        signal_label = ax3.get_ylabel()
-        self.assertEqual(signal_label, "Num. of Shares")
+        self.assertEqual(ax3.get_ylabel(), "Num. of Shares")
 
         # Check the xlim of the plot when nothing was specified
         ax1, _, ax3 = fig_full_weight.get_axes()
@@ -371,13 +368,10 @@ class TestMultivariateCointegration(unittest.TestCase):
         plot1_month = plot_no_spec_xlim_left.month
         plot1_year = plot_no_spec_xlim_left.year
 
-        self.assertEqual(plot1_year, 2001)
-        self.assertEqual(plot1_month, 11)
-        self.assertEqual(plot1_day, 6)
+        self.assertListEqual([plot1_year, plot1_month, plot1_day], [2001, 11, 6])
 
         # Check y-label when raw signals are plotted
-        signal_label = ax3.get_ylabel()
-        self.assertEqual(signal_label, "Portfolio Weights")
+        self.assertEqual(ax3.get_ylabel(), "Portfolio Weights")
 
     def test_insample(self):
         """
