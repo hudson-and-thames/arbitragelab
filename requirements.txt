@@ -13,7 +13,7 @@ mpldatacursor==0.7.1
 lxml==4.5.2
 requests_html==0.10.0
 seaborn==0.10.0
-pmdarima==1.7.1
+pmdarima==1.8.0
 analytics-python==1.2.9
 
 #Develop
