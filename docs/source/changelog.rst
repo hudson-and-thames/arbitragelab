@@ -29,6 +29,10 @@ Changelog
 * :support:`24` Quantile Time Series Strategy and Auto ARIMA model documentation.
 * :feature:`27` CIR-model to the Optimal Mean Reversion module added.
 * :support:`27` CIR-model documentation.
+* :feature:`30` Track user analytics using Segment
+* :support:`30` Analytics documentation.
+
+
 * :release:`0.1.0 <2020-11-18>`
 * :feature:`2` Kalman Filter + Kalman strategy added.
 * :support:`2` Kalman Filter documentation.
