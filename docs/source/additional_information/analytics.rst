@@ -1,17 +1,17 @@
-.. _analytics:
+.. _additional_information-analytics:
 
 =========
 Analytics
 =========
 
-Please note that we have added standard web analytics to ArbitrageLab, using `Segment <https://segment.com/>`__.
+Please note that we have added standard web analytics to ArbitrageLab, using `Segment. <https://segment.com/>`__
 
 We track the following:
 
 * City
 * UserIDs
 * Function calls
-* Time stamps
+* Timestamps
 
 This allows our team to see how the package is being used by you, our client, so that we may improve the functionality and
 build more tools that you will love. An additional purpose is that we need to start tracking growth KPIs such as cohort
@@ -21,6 +21,6 @@ The impact of the analytics is negligible.
 
 .. warning::
 
-   * Please don't alter or change any of the code as this is a violation of our licence agreement.
+   * Please don't alter or change any of the code as this is a violation of our license agreement.
    * We do provide a separate enterprise license for companies that want to white label or alter code.
    * All changes are flagged by the system.
