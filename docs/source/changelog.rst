@@ -12,6 +12,7 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+* :release:`0.2.0 <2020-12-14>`
 * :feature:`5` ML Based Pairs Selection (Horta, 2020) and Data Importer added.
 * :support:`5` ML Based Pairs Selection and Data Importer documentation.
 * :feature:`8` Copula strategy added (Liew et al. 2013): Log price (or equivalently, cumulative log returns) based copula strategy.
