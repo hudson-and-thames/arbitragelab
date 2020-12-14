@@ -148,4 +148,5 @@ This project is licensed under an all rights reserved licence.
     :caption: Additional Information
     :hidden:
 
+    additional_information/analytics
     additional_information/license
