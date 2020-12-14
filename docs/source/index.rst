@@ -54,6 +54,13 @@ This project is licensed under an all rights reserved licence.
 
 .. toctree::
     :maxdepth: 2
+    :caption: Data
+    :hidden:
+
+    data/data_importer
+
+.. toctree::
+    :maxdepth: 2
     :caption: Distance Approach
     :hidden:
 
@@ -81,6 +88,17 @@ This project is licensed under an all rights reserved licence.
     cointegration_approach/cointegration_tests
     cointegration_approach/half_life
     cointegration_approach/trading_strategies
+    cointegration_approach/minimum_profit_simulation
+    cointegration_approach/minimum_profit
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Copula Approach
+    :hidden:
+
+    copula_approach/introduction
+    copula_approach/copula_brief_intro
+    copula_approach/trading_strategy
 
 .. toctree::
     :maxdepth: 2
@@ -89,6 +107,17 @@ This project is licensed under an all rights reserved licence.
 
     optimal_mean_reversion/introduction
     optimal_mean_reversion/ou_model
+    optimal_mean_reversion/xou_model
+    optimal_mean_reversion/cir_model
+    optimal_mean_reversion/heat_potentials
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Time Series Approach
+    :hidden:
+
+    time_series_approach/introduction
+    time_series_approach/quantile_time_series_strategy
 
 .. toctree::
     :maxdepth: 2
@@ -99,15 +128,25 @@ This project is licensed under an all rights reserved licence.
     other_approaches/pca_approach
 
 .. toctree::
+    :maxdepth: 2
+    :caption: ML Approach
+    :hidden:
+
+    ml_approach/introduction
+    ml_approach/ml_based_pairs_selection
+
+.. toctree::
     :maxdepth: 3
     :caption: Developer Guide
     :hidden:
 
     changelog
 
+
 .. toctree::
     :maxdepth: 2
     :caption: Additional Information
     :hidden:
 
+    additional_information/analytics
     additional_information/license

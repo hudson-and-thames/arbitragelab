@@ -11,9 +11,9 @@ import numpy as np
 import pandas as pd
 
 from arbitragelab.codependence.correlation import (squared_angular_distance, angular_distance, absolute_angular_distance,
-                                               distance_correlation, kullback_leibler_distance, norm_distance)
+                                                   distance_correlation, kullback_leibler_distance, norm_distance)
 from arbitragelab.codependence.information import (get_mutual_info, variation_of_information_score,
-                                               get_optimal_number_of_bins)
+                                                   get_optimal_number_of_bins)
 from arbitragelab.codependence.codependence_matrix import (get_dependence_matrix, get_distance_matrix)
 from arbitragelab.codependence.gnpr_distance import (spearmans_rho, gpr_distance, gnpr_distance)
 from arbitragelab.codependence.optimal_transport import optimal_transport_dependence
