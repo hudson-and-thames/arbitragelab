@@ -5,7 +5,9 @@
 This module implements the Feature Expansion class.
 """
 
+import itertools
 import numpy as np
+import pandas as pd
 
 # pylint: disable=W0102
 
@@ -17,7 +19,8 @@ class FeatureExpander:
     def __init__(self, methods=[], n_orders=1):
         """
 
-        :param methods: (list) Possible expansion methods [chebyshev, legendre, laguerre, power].
+        :param methods: (list) Possible expansion methods [chebyshev, legendre,
+            laguerre, power, product].
         :param n_orders: (int) Number of orders.
         """
         self.methods = methods
@@ -64,6 +67,22 @@ class FeatureExpander:
 
         return np.polynomial.polynomial.polyvander(series, degree)
 
+    @staticmethod
+    def _product(series, degree):
+        """
+        
+        :param series: (pd.Series)
+        :param degree: (int)        
+        """
+
+        comb_range = range(len(series[0]))
+
+        combinations = [list(comb) for comb in itertools.combinations(comb_range, degree)]
+
+        vectorized_x = pd.DataFrame(series)
+
+        return [np.prod(vectorized_x.iloc[:, comb], axis=1) for comb in combinations ]
+
     def fit(self, frame):
         """
 
@@ -73,21 +92,28 @@ class FeatureExpander:
         self.dataset = frame
         return self
 
-    def transform(self) -> list:
+    def transform(self) -> pd.DataFrame:
         """
         Transform data to polynomial features
 
-        :return: List of lists of the expanded values.
+        :return: Original DataFrame with the expanded values appended to it.
         """
         new_dataset = []
 
-        for row in self.dataset.values:
+        for row in self.dataset:
             expanded_row = list(row)
-            for degree in range(1, self.n_orders):
-                for meth in self.methods:
-                    expanded_row.extend(
-                        np.ravel(getattr(self, '_' + meth)(row, degree)))
+            for meth in self.methods:
+                if meth != "product":
+                    expanded_row.extend( np.ravel( getattr(self, '_' + meth)(row, self.n_orders) ) )
 
-            new_dataset.append(np.ravel(expanded_row).tolist())
+            new_dataset.append( np.ravel(expanded_row).tolist() )
 
-        return new_dataset
+        new_dataset_df = pd.DataFrame(new_dataset)
+
+        if "product" in self.methods:
+            prod_result = getattr(self, '_product')(self.dataset, self.n_orders)
+            prod_result_df = pd.DataFrame(prod_result).T
+
+            return pd.concat([new_dataset_df, prod_result_df], axis=1)
+
+        return new_dataset_df
