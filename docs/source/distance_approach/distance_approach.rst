@@ -40,14 +40,14 @@ This stage of the DistanceStrategy consists of the following steps:
 
 1. **Normalization of the input data.**
 
-To use the Euclidean square distance, the price time series are being normalized using the following
+To use the Euclidean square distance, the training price time series are being normalized using the following
 formula:
 
 .. math::
 
-    P_{normalized} = \frac{P - max(P)}{max(P) - min(P)}
+    P_{normalized} = \frac{P - min(P)}{max(P) - min(P)}
 
-where :math:`P` is the price series of an asset, :math:`min(P)` and :math:`max(P)` are the minimum
+where :math:`P` is the training price series of an asset, :math:`min(P)` and :math:`max(P)` are the minimum
 and maximum values from the price series.
 
 2. **Finding pairs.**
@@ -106,8 +106,8 @@ This stage of the DistanceStrategy consists of the following steps:
 
 1. **Normalization of the input data.**
 
-Using the same approach as in the pairs formation stage, we normalize the input dataset using
-the same maximum and minimum historical values for price series.
+Using the same approach as in the pairs formation stage, we normalize the input trading dataset using
+the same maximum and minimum historical values from the training price series.
 
 2. **Portfolios creation.**
 
