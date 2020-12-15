@@ -1,8 +1,8 @@
 # Copyright 2019, Hudson and Thames Quantitative Research
 # All rights reserved
-# Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
+# Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 """
-This module implements the TAR model by Ender and Granger (1998).
+This module implements the TAR model by Enders and Granger (1998).
 """
 
 import pandas as pd

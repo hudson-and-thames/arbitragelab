@@ -1,6 +1,7 @@
 # Copyright 2019, Hudson and Thames Quantitative Research
 # All rights reserved
-# Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
+# Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
+
 """
 Implementation of the statistical arbitrage distance approach proposed by
 Gatev, E., Goetzmann, W. N., and Rouwenhorst, K. G. in
@@ -11,6 +12,8 @@ https://papers.ssrn.com/sol3/papers.cfm?abstract_id=141615.
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+
+from arbitragelab.util import devadarsh
 
 
 class DistanceStrategy:
@@ -32,6 +35,8 @@ class DistanceStrategy:
         self.normalized_data = None  # Normalized test dataset
         self.portfolios = None  # Pair portfolios composed from test dataset
         self.trading_signals = None  # Final trading signals
+
+        devadarsh.track('DistanceStrategy')
 
     def form_pairs(self, train_data, num_top=5, skip_top=0, list_names=None):
         """

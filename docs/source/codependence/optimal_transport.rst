@@ -251,3 +251,9 @@ The following research notebook can be used to better understand the optimal cop
 * `Optimal Transport`_
 
 .. _`Optimal Transport`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Codependence%20Module/Optimal%20Transport/optimal_transport.ipynb
+
+References
+##########
+
+* `Marti, G., Andler, S., Nielsen, F. and Donnat, P., 2017, February. Exploring and measuring non-linear correlations: Copulas, Lightspeed Transportation and Clustering. In NIPS 2016 Time Series Workshop (pp. 59-69). <https://arxiv.org/pdf/1610.09659.pdf>`__
+* `Marti Gautier, 2020. Measuring non-linear dependence with Optimal Transport. Available at personal blog. <https://gmarti.gitlab.io/qfin/2020/06/25/copula-optimal-transport-dependence.html>`__

@@ -1,6 +1,6 @@
 # Copyright 2019, Hudson and Thames Quantitative Research
 # All rights reserved
-# Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
+# Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 
 # pylint: disable=missing-module-docstring, invalid-name, too-many-instance-attributes
 import warnings
@@ -10,6 +10,8 @@ import scipy.optimize as so
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+
+from arbitragelab.util import devadarsh
 
 
 class OrnsteinUhlenbeck:
@@ -32,7 +34,6 @@ class OrnsteinUhlenbeck:
     """
 
     def __init__(self):
-
         self.theta = None  # Long-term mean
         self.mu = None  # Speed at which the values will regroup around the long-term mean
         self.sigma_square = None  # The amplitude of randomness in the system
@@ -46,6 +47,8 @@ class OrnsteinUhlenbeck:
         self.data = None  # Training data provided by the user
         self.training_period = None  # Current training period
         self.mll = None  # Maximum log likelihood
+
+        devadarsh.track('OrnsteinUhlenbeck')
 
     def fit(self, data, data_frequency, discount_rate, transaction_cost, start=None, end=None,
             stop_loss=None):
@@ -531,6 +534,7 @@ class OrnsteinUhlenbeck:
         # Integrating over positive values
         with warnings.catch_warnings():  # Silencing specific IntegrationWarning
             warnings.filterwarnings('ignore', r'The algorithm does not converge')
+            warnings.filterwarnings('ignore', r'overflow encountered in exp')
             calculated_f = quad(f_func, 0, np.inf)[0]
 
         return calculated_f

@@ -1,6 +1,6 @@
 # Copyright 2019, Hudson and Thames Quantitative Research
 # All rights reserved
-# Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
+# Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 
 """
 This module implements Kalman filter logic in statistical arbitrage trading. Kalman trading
@@ -22,6 +22,9 @@ import pandas as pd
 
 
 # pylint: disable=invalid-name
+from arbitragelab.util import devadarsh
+
+
 class KalmanFilterStrategy:
     """
     KalmanFilterStrategy implements a dynamic hedge ratio estimation between two assets using
@@ -64,6 +67,7 @@ class KalmanFilterStrategy:
         # Helper variables from Kalman filter
         self.R = None  # Prediction variance-covariance
         self.beta = np.array([0, 0])  # Starting state prediction
+        devadarsh.track('KalmanFilterStrategy')
 
     def update(self, x: float, y: float):
         """

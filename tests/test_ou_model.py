@@ -1,6 +1,6 @@
 # Copyright 2019, Hudson and Thames Quantitative Research
 # All rights reserved
-# Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
+# Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 
 """
 Test functions from the OU-model of the Optimal Mean Reversion module.
@@ -10,6 +10,7 @@ import unittest
 import os
 import numpy as np
 import pandas as pd
+import matplotlib
 
 from arbitragelab.optimal_mean_reversion.ou_model import OrnsteinUhlenbeck
 
@@ -241,9 +242,9 @@ class TestOrnsteinUhlenbeck(unittest.TestCase):
         np.testing.assert_almost_equal(optimal_levels_assets, expected_optimal_levels_assets, decimal=4)
 
         # Testing the fitness check function
-        assets.check_fit()
+        self.assertIsInstance(assets.check_fit(), pd.DataFrame)
         # Testing the description function
-        assets.description()
+        self.assertIsInstance(assets.description(), pd.core.series.Series)
         # Testing the description function without stop-loss value
         assets.L = None
         assets.description()
@@ -283,9 +284,9 @@ class TestOrnsteinUhlenbeck(unittest.TestCase):
         assets.ou_model_simulation(100, 0.6, 12, 0.1, 0.00396)
 
         # Tests plotting method
-        assets.plot_levels(self.dataframe, stop_loss=True)
-        assets.plot_levels(self.assetprices, stop_loss=True)
-        assets.plot_levels(self.portfolioprices)
+        self.assertIsInstance(assets.plot_levels(self.dataframe, stop_loss=True), matplotlib.figure.Figure)
+        self.assertIsInstance(assets.plot_levels(self.assetprices, stop_loss=True), matplotlib.figure.Figure)
+        self.assertIsInstance(assets.plot_levels(self.portfolioprices), matplotlib.figure.Figure)
 
 
     def test_functions_exceptions(self):

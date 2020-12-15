@@ -13,7 +13,7 @@ jobs:
       - run:
           name: Run Pylint Check
           command: |
-            pylint arbitragelab --rcfile=.pylintrc -f text
+            pylint arbitragelab tests --rcfile=.pylintrc -f text
       - run:
           name: Run Unit Tests
           command: |
