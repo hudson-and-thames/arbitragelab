@@ -176,7 +176,7 @@ within the i-th bin.
 So, the discretized estimator of entropy is:
 
 .. math::
-    \hat{H}[X]=-\sum\limits_{i=1}^{B_{X}}\frac{N_{i}}{N}log[\frac{N_{i}}{N}]log[\Delta_{X}]
+    \hat{H}[X]=-\sum\limits_{i=1}^{B_{X}}\frac{N_{i}}{N}log[\frac{N_{i}}{N}]+log[\Delta_{X}]
 
 where :math:`N_{i}` is the number of observations within the i-th bin, :math:`N = \sum_{i=1}^{B_{X}}N_{i}` .
 

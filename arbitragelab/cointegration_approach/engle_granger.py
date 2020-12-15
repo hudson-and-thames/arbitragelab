@@ -12,6 +12,7 @@ from statsmodels.tsa.stattools import adfuller
 from sklearn.linear_model import LinearRegression
 
 from arbitragelab.cointegration_approach.base import CointegratedPortfolio
+from arbitragelab.util import devadarsh
 
 
 class EngleGrangerPortfolio(CointegratedPortfolio):
@@ -31,6 +32,8 @@ class EngleGrangerPortfolio(CointegratedPortfolio):
         self.dependent_variable = None  # Column name for dependent variable used in OLS estimation.
         self.cointegration_vectors = None  # Regression coefficients used as hedge-ratios.
         self.adf_statistics = None  # ADF statistics.
+
+        devadarsh.track('EngleGrangerPortfolio')
 
     def fit(self, price_data: pd.DataFrame, add_constant: bool = False):
         """

@@ -13,6 +13,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
+from arbitragelab.util import devadarsh
+
 
 class DistanceStrategy:
     """
@@ -33,6 +35,8 @@ class DistanceStrategy:
         self.normalized_data = None  # Normalized test dataset
         self.portfolios = None  # Pair portfolios composed from test dataset
         self.trading_signals = None  # Final trading signals
+
+        devadarsh.track('DistanceStrategy')
 
     def form_pairs(self, train_data, num_top=5, skip_top=0, list_names=None):
         """
