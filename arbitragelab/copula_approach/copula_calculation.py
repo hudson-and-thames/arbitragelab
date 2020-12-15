@@ -221,3 +221,56 @@ def fit_nu_for_t_copula(x: np.array, y: np.array, nu_tol: float = None) -> float
                    options={'disp': False}, tol=nu_tol)
 
     return res['x'][0]
+
+def scad_penalty(x: float, gamma: float, a: float) -> float:
+    """
+    SCAD (smoothly clipped absolute deviation) penalty function.
+
+    It encourages sparse solutions for fitting data to models. As a piecewise function, this implementation is
+    branchless.
+
+    :param x: (float) The variable.
+    :param gamma: (float) One of the parameters in SCAD.
+    :param a: (float) One of the parameters in SCAD.
+    :return: (float) Evaluated result.
+    """
+
+    # Bool variables for branchless construction.
+    is_linear = (np.abs(x) <= gamma)
+    is_quadratic = np.logical_and(gamma < np.abs(x), np.abs(x) <= a * gamma)
+    is_constant = (a * gamma) < np.abs(x)
+
+    # Assembling parts.
+    linear_part = gamma * np.abs(x) * is_linear
+    quadratic_part = (2 * a * gamma * np.abs(x) - x**2 - gamma**2) / (2 * (a - 1)) * is_quadratic
+    constant_part = (gamma**2 * (a + 1)) / 2 * is_constant
+
+    return linear_part + quadratic_part + constant_part
+
+def scad_derivative(x: float, gamma: float, a: float) -> float:
+    """
+    The derivative of SCAD (smoothly clipped absolute deviation) penalty function w.r.t x.
+
+    It encourages sparse solutions for fitting data to models.
+
+    :param x: (float) The variable.
+    :param gamma: (float) One of the parameters in SCAD.
+    :param a: (float) One of the parameters in SCAD.
+    :return: (float) Evaluated result.
+    """
+
+    part_1 = gamma * (x <= gamma)
+    part_2 = gamma * (a * gamma - x)*((a * gamma - x) > 0) / ((a - 1) * gamma) * (x > gamma)
+
+    return part_1 + part_2
+
+def adjust_weights(weights: np.array, threshold: float) -> np.array:
+    raw_weights = np.copy(weights)
+    # Filter out components that have low weights. Low weights will be 0.
+    filtered_weights = raw_weights * (raw_weights > threshold)
+    # Normalize the filtered weights. Make the total weight a partition of [0, 1]
+    scaler = np.sum(filtered_weights)
+    adjusted_weights = filtered_weights / scaler
+    
+    return adjusted_weights
+    
