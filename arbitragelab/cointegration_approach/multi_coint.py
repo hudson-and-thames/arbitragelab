@@ -33,12 +33,13 @@ class MultivariateCointegration:
         :param trade_df: (pd.Dataframe) Raw out-of-sample price dataframe of the assets. Use None if only in-sample
             properties are desired.
         """
+
         self.__asset_df = asset_df
         self.__trade_df = trade_df
         self.__coint_vec = None
 
     @staticmethod
-    def _missing_impute(price_df: pd.DataFrame, nan_method: str = 'ffill', order: int = 3):
+    def _missing_impute(price_df: pd.DataFrame, nan_method: str = 'ffill', order: int = 3) -> pd.DataFrame:
         """
         Fill the missing values of the asset prices with two options: front-fill or cubic spline.
 
@@ -48,12 +49,13 @@ class MultivariateCointegration:
         :param order: (int) Polynomial order for spline function.
         :return: (pd.DataFrame) Imputed dataframe.
         """
+
         if nan_method == "ffill":
-            # Use front-fill to impute.
+            # Use front-fill to impute
             price_df = price_df.fillna(method='ffill')
 
         elif nan_method == "spline":
-            # Use cubic spline to impute.
+            # Use cubic spline to impute
             price_df = price_df.interpolate(method='spline', order=order)
 
         else:
@@ -84,7 +86,7 @@ class MultivariateCointegration:
         :return: (pd.DataFrame) Log prices of the assets.
         """
 
-        # Return log price.
+        # Return log price
         return price_df.apply(np.log)
 
     @staticmethod
@@ -96,7 +98,7 @@ class MultivariateCointegration:
         :return: (pd.DataFrame) Log prices of the assets.
         """
 
-        # Drop first row of NA and return the price difference.
+        # Drop first row of NA and return the price difference
         return price_df.diff().dropna()
 
     @property
@@ -106,6 +108,7 @@ class MultivariateCointegration:
 
         :return: (pd.DataFrame) Dataframe of asset prices.
         """
+
         return self.__asset_df
 
     @property
@@ -115,6 +118,7 @@ class MultivariateCointegration:
 
         :return: (pd.DataFrame) Dataframe of log asset prices.
         """
+
         return self.__trade_df
 
     def fit(self, log_price: pd.DataFrame, sig_level: str = "95%", rolling_window_size: Optional[int] = 1500,
@@ -129,32 +133,33 @@ class MultivariateCointegration:
         :param suppress_warnings: (bool) Boolean flag to suppress the cointegration warning message.
         :return: (np.array) The cointegration vector, b.
         """
-        # Checking the significance of a test.
+
+        # Checking the significance of a test
         if sig_level not in ['90%', '95%', '99%']:
             raise ValueError("Significance level can only be the following:\n "
                              "90%, 95%, or 99%.\n Please check the input.")
 
-        # Calculate the cointegration vector with Johansen test.
+        # Calculate the cointegration vector with Johansen test
         jo_portfolio = JohansenPortfolio()
 
-        # Select if applying rolling window.
+        # Select if applying rolling window
         if rolling_window_size is None:
             jo_portfolio.fit(log_price, det_order=0)
         else:
             jo_portfolio.fit(log_price.iloc[-rolling_window_size:], det_order=0)
 
-        # Check statistics to see if the pairs are cointegrated at the specified significance level.
+        # Check statistics to see if the pairs are cointegrated at the specified significance level
         eigen_stats = jo_portfolio.johansen_eigen_statistic
         trace_stats = jo_portfolio.johansen_trace_statistic
         eigen_not_coint = (eigen_stats.loc['eigen_value'] < eigen_stats.loc[sig_level]).all()
         trace_not_coint = (trace_stats.loc['trace_statistic'] < trace_stats.loc[sig_level]).all()
 
-        # If not cointegrated then warn the users that the performance might be affected.
+        # If not cointegrated then warn the users that the performance might be affected
         if not suppress_warnings and (eigen_not_coint or trace_not_coint):
             warnings.warn("The asset pair is not cointegrated at "
                           "{} level based on eigenvalue or trace statistics.".format(sig_level))
 
-        # Retrieve the cointegration vector and store it.
+        # Retrieve the cointegration vector and store it
         coint_vec = jo_portfolio.cointegration_vectors.loc[0]
         self.__coint_vec = coint_vec
 
@@ -200,7 +205,7 @@ class MultivariateCointegration:
         pos_notional = np.floor(pos_shares) * last_price[pos_coef_asset.index]
         neg_notional = np.floor(neg_shares) * last_price[neg_coef_asset.index]
 
-        # Assign the correct sign to the number of shares according to the sign of CC.
+        # Assign the correct sign to the number of shares according to the sign of CC
         return -1. * np.floor(pos_shares), np.floor(neg_shares), -1. * pos_notional, neg_notional
 
     @staticmethod
@@ -219,7 +224,7 @@ class MultivariateCointegration:
         :return: (float, float) Long P&L; Short P&L.
         """
 
-        # Join the trading signal and price difference by asset names.
+        # Join the trading signal and price difference by asset names
         day_pnl_df = pd.concat([signal, price_diff], axis=1)
 
         # Rename the columns
@@ -257,7 +262,7 @@ class MultivariateCointegration:
         signals, signals_notional, coint_vec_evo, returns_df = [], [], [], []
 
         # Create a copy of the original training DF so we can preserve the data because we will update the original
-        # training data with incoming trading data.
+        # training data with incoming trading data
         train_df = deepcopy(self.__asset_df)
 
         # Get trading period and daily price difference
