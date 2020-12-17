@@ -265,12 +265,22 @@ def scad_derivative(x: float, gamma: float, a: float) -> float:
     return part_1 + part_2
 
 def adjust_weights(weights: np.array, threshold: float) -> np.array:
+    """
+    Adjust the weights of mixed copula components.
+
+    Dropping weights smaller or equal to a given threshold, and redistribute the weight. For example, if we set the
+    threshold to 0.02 and the original weight is [0.49, 0.02, 0.49], then it will be re-adjusted to [0.5, 0, 0.5].
+
+    :param weights: (np.array) The original weights to be adjusted.
+    :param threshold: (float) The threshold that a weight will be considered 0.
+    :return: (np.array) The readjusted weight.
+    """
+
     raw_weights = np.copy(weights)
     # Filter out components that have low weights. Low weights will be 0.
     filtered_weights = raw_weights * (raw_weights > threshold)
     # Normalize the filtered weights. Make the total weight a partition of [0, 1]
     scaler = np.sum(filtered_weights)
     adjusted_weights = filtered_weights / scaler
-    
+
     return adjusted_weights
-    

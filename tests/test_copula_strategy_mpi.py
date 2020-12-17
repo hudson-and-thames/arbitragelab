@@ -2,9 +2,9 @@
 # All rights reserved
 # Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 """
-Unit tests for basic copula strategy.
+Unit tests for copula strategy using mispricing index (MPI).
 """
-# pylint: disable = invalid-name,  protected-access
+# pylint: disable = invalid-name, protected-access
 import os
 import unittest
 import datetime as dt
@@ -19,6 +19,7 @@ class TestCopulaStrategyMPI(unittest.TestCase):
     """
 
     def setUp(self):
+
         project_path = os.path.dirname(__file__)
         self.data_path = project_path + r'/test_data'
 
