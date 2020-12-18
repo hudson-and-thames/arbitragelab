@@ -105,6 +105,59 @@ class CopulaStrategyMPI(CopulaStrategy):
         mpis = pd.DataFrame(data=condi_probs_data, index=returns.index, columns=returns.columns)
 
         return mpis
+    
+    @staticmethod
+    def positions_to_units(prices_df: pd.DataFrame, positions: pd.Series, multiplier: float = 1) -> pd.DataFrame:
+        """
+        Change the positions series into units held for each security for a dollar neutral strategy.
+
+        Originally the positions calculated by this strategy is given with values in {0, 1, -1}. To be able to actually
+        trade using the dollar neutral strategy as given by the authors in the paper, one needs to know at any given
+        time how much units to hold for each stock. The result will be returned in a pd.DataFrame. The user can also
+        multiply the final result by changing the multiplier input. It means by default it uses 1 dollar for
+        calculation unless changed. It also means there is no reinvestment on gains.
+
+        Note: This method assumes the 0th column in prices_df is the long unit (suppose it is called stock 1), 1st
+        column the shrot unit (suppose it is called stock 2). For example, 1 in positions means buy stock 1 with 0.5
+        dollar and sell stock 2 to gain 0.5 dollar.
+
+        Note2: The short units will be given in its actual value. i.e., short 0.54 units is given as -0.54 in the
+        output.
+
+        :param prices_df: (pd.DataFrame) Prices data frames for the two securities.
+        :param positions: (pd.Series) The suggested positions with values in {0, 1, -1}. Need to have the same length
+            as prices_df.
+        :param multiplier: (float) Optional. Multiply the calculated result by this amount. Defalts to 1.
+        :return: (pd.DataFrame) The calculated positions for each security. The row and column index will be taken
+            from prices_df.
+        """
+
+        units_df = pd.DataFrame(data=0, index=prices_df.index, columns=prices_df.columns)
+        units_df.iloc[0, 0] = 0.5 / prices_df.iloc[0, 0] * positions[0]
+        units_df.iloc[0, 1] = - 0.5 / prices_df.iloc[1, 0] * positions[0]
+        nums = len(positions)
+        for i in range(1, nums):
+            # By default the new amount of units to be held is the same as the previous step.
+            units_df.iloc[i, :] = units_df.iloc[i-1, :]
+            # Updating if there are position changes.
+            # From not short to short.
+            if positions[i-1] != -1 and positions[i] == -1:  # Short 1, long 2
+                long_units = 0.5 / prices_df.iloc[i, 1]
+                short_units = 0.5 / prices_df.iloc[i, 0]
+                units_df.iloc[i, 0] = - short_units
+                units_df.iloc[i, 1] = long_units
+            # From not long to long.
+            if positions[i-1] != 1 and positions[i] == 1:  # Short 2, long 1
+                long_units = 0.5 / prices_df.iloc[i, 0]
+                short_units = 0.5 / prices_df.iloc[i, 1]
+                units_df.iloc[i, 0] = long_units
+                units_df.iloc[i, 1] = - short_units
+            # From long/short to none.
+            if positions[i-1] != 0 and positions[i] == 0:  # Exiting
+                units_df.iloc[i, 0] = 0
+                units_df.iloc[i, 1] = 0
+
+        return units_df.multiply(multiplier)
 
     def get_positions_and_flags(self, returns: pd.DataFrame,
                                 cdf1: Callable[[float], float], cdf2: Callable[[float], float],
@@ -133,7 +186,7 @@ class CopulaStrategyMPI(CopulaStrategy):
         feature built-in to calculate ratios for forming positions and we still use -1, 1, 0 to indicate short, long
         and no position, as we think it offers better flexibility for the user to choose.
 
-        Note 2: The positions calculated on a certain day are corresponds to information given on that day. Thus for
+        Note 2: The positions calculated on a certain day are corresponds to information given on *THAT DAY*. Thus for
         forming an equity curve, backtesting or actual trading, one should forward-roll the position by at least 1.
 
         :param returns: (pd.DataFrame) Return series for the stock pair.
