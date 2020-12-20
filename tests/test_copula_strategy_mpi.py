@@ -162,6 +162,32 @@ class TestCopulaStrategyMPI(unittest.TestCase):
         np.testing.assert_array_almost_equal(result[0], pd.Series([2.1, -0.1]), decimal=6)
         self.assertEqual(result[1:], (0, [0, 0]))
 
+    @staticmethod
+    def test_positions_to_units_dollar_neutral():
+        """
+        Testing positions_to_units_dollar_neutral method.
+        """
+
+        CSMPI = copula_strategy_mpi.CopulaStrategyMPI()
+
+        # Getting some arbitrary positions
+        positions = pd.Series([0, 0, 1, 0, 0, -1, 0, 0, 1, -1, 0, 0, -1, 1, 0, 0], dtype=int)
+        # Getting prices and put them in a DataFrame
+        prices_x = pd.Series(np.ones(shape=len(positions)))  # Always 1
+        prices_y = prices_x.multiply(2)  # Always 2
+        frame = {'stock x': prices_x, 'stock y': prices_y}
+        prices_df = pd.DataFrame(frame)
+        units = CSMPI.positions_to_units_dollar_neutral(prices_df, positions, multiplier=2)
+
+        # Generate the expected results
+        expected_x_units = pd.Series([0, 0, 1, 0, 0, -1, 0, 0, 1, -1, 0, 0, -1, 1, 0, 0])
+        expected_y_units = pd.Series([0, 0, 1, 0, 0, -1, 0, 0, 1, -1, 0, 0, -1, 1, 0, 0]).multiply(-0.5)
+        expected_units_frame = {'stock x': expected_x_units, 'stock y': expected_y_units}
+        expected_units = pd.DataFrame(expected_units_frame)
+
+        # Check the result
+        pd.testing.assert_frame_equal(units, expected_units, check_dtype=False)
+
     def test_get_position_and_flags(self):
         """
         Testing positions and flags generation from get_position_and_flags method.
@@ -170,9 +196,7 @@ class TestCopulaStrategyMPI(unittest.TestCase):
         CSMPI = copula_strategy_mpi.CopulaStrategyMPI(opening_triggers=(-0.6, 0.6), stop_loss_positions=(-2, 2))
         returns = CSMPI.to_returns(pair_prices=self.pair_prices)
         # Fit an N14 copula.
-        s1_series = returns.iloc[:, 0]
-        s2_series = returns.iloc[:, 1]
-        _, copula, cdf1, cdf2 = CSMPI.fit_copula(s1_series, s2_series, copula_name='N14')
+        _, copula, cdf1, cdf2 = CSMPI.fit_copula(returns, copula_name='N14')
         # Forming positions and flags.
         _, _ = CSMPI.get_positions_and_flags(returns, cdf1, cdf2, enable_reset_flag=True)
         # Check goodness of copula fit by its coefficient.

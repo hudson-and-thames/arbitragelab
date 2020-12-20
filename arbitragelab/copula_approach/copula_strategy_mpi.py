@@ -65,14 +65,14 @@ class CopulaStrategyMPI(CopulaStrategy):
     @staticmethod
     def to_returns(pair_prices: pd.DataFrame) -> pd.DataFrame:
         r"""
-        Convert a pair's price series DataFrame to its return series DataFrame.
+        Convert a pair's prices DataFrame to its returns DataFrame.
 
-        Returns defined as: r(t) = P(t) / P(t-1).
+        Returns defined as: r(t) = P(t) / P(t-1) - 1.
 
         Note that the 0th row will be NaN value.
 
-        :param pair_prices: (pd.DataFrame) 2 price series of the stock pair.
-        :return: (pd.DataFrame) 2 return series of the stock pair.
+        :param pair_prices: (pd.DataFrame) Prices data frame of the stock pair.
+        :return: (pd.DataFrame) Returns data frame for the stock pair.
         """
 
         returns = pair_prices.pct_change()
@@ -88,7 +88,7 @@ class CopulaStrategyMPI(CopulaStrategy):
         returns data. i.e., MPI_1(r1, r2) = P(R1 <= r1 | R2 = r2), where r1, r2 are the value of returns for two stocks.
         Similarly MPI_2(r1, r2) = P(R2 <= r2 | R1 = r1).
 
-        :param returns: (pd.DataFrame) Return series for the stock pair.
+        :param returns: (pd.DataFrame) Return data frame for the stock pair.
         :param cdf1: (func) Cumulative density function for stock 1's returns series.
         :param cdf2: (func) Cumulative density function for stock 1's returns series.
         :return: (pd.DataFrame) Mispricing indices for the pair of stocks.
@@ -106,8 +106,45 @@ class CopulaStrategyMPI(CopulaStrategy):
 
         return mpis
     
+    def fit_copula(self, returns: pd.DataFrame, copula_name: str, if_renew: bool = True,
+                           nu_tol: float = 0.05) -> tuple:
+        """
+        Conduct a pseudo max likelihood estimation and information criterion.
+
+        If fitting a Student-t copula, it also includes a max likelihood fit for nu using COBYLA method from
+        scipy.optimize.minimize. nu's fit range is [1, 15]. When the user wishes to use nu > 15, please delegate to
+        Gaussian copula instead. This step is relatively slow.
+
+        The output returns:
+            - result_dict: (dict) The name of the copula and its SIC, AIC, HQIC values;
+            - copula: (Copula) The fitted copula with parameters satisfying maximum likelihood;
+            - s1_cdf: (func) The cumulative density function for stock 1, using training data;
+            - s2_cdf: (func) The cumulative density function for stock 2, using training data.
+
+        :param returns: (pd.DataFrame) Returns data frame for the stock pair.
+        :param copula_name: (str) Type of copula to fit. Support 'Gumbel', 'Frank', 'Clayton', 'Joe', 'N13', 'N14',
+            'Gaussian', 'Student'.
+        :param if_renew: (bool) Whether use the fitted copula to replace the copula in CopulaStrategyMPI.
+        :param nu_tol: (float) Optional. The final accuracy for finding nu for Student-t copula. Defaults to 0.05.
+        :return: (dict, Copula, func, func)
+            The name of the copula and its SIC, AIC, HQIC values;
+            The fitted copula;
+            The cumulative density function for stock 1, using training data;
+            The cumulative density function for stock 2, using training data.
+        """
+        
+        # Convert DataFrame to numpy arrays.
+        s1_series = returns.iloc[:, 0].to_numpy()
+        s2_series = returns.iloc[:, 1].to_numpy()
+        # Call the fit_copula in the parent class.
+        result_dict, copula, s1_cdf, s2_cdf = super().fit_copula(s1_series, s2_series, copula_name, if_renew, nu_tol)
+
+        return result_dict, copula, s1_cdf, s2_cdf
+        
+    
     @staticmethod
-    def positions_to_units(prices_df: pd.DataFrame, positions: pd.Series, multiplier: float = 1) -> pd.DataFrame:
+    def positions_to_units_dollar_neutral(prices_df: pd.DataFrame, positions: pd.Series,
+                                          multiplier: float = 1) -> pd.DataFrame:
         """
         Change the positions series into units held for each security for a dollar neutral strategy.
 
@@ -124,7 +161,7 @@ class CopulaStrategyMPI(CopulaStrategy):
         Note2: The short units will be given in its actual value. i.e., short 0.54 units is given as -0.54 in the
         output.
 
-        :param prices_df: (pd.DataFrame) Prices data frames for the two securities.
+        :param prices_df: (pd.DataFrame) Prices data frame for the two securities.
         :param positions: (pd.Series) The suggested positions with values in {0, 1, -1}. Need to have the same length
             as prices_df.
         :param multiplier: (float) Optional. Multiply the calculated result by this amount. Defalts to 1.
@@ -189,7 +226,7 @@ class CopulaStrategyMPI(CopulaStrategy):
         Note 2: The positions calculated on a certain day are corresponds to information given on *THAT DAY*. Thus for
         forming an equity curve, backtesting or actual trading, one should forward-roll the position by at least 1.
 
-        :param returns: (pd.DataFrame) Return series for the stock pair.
+        :param returns: (pd.DataFrame) Returns data frame for the stock pair.
         :param cdf1: (func) Cumulative density function for stock 1's returns series.
         :param cdf2: (func) Cumulative density function for stock 1's returns series.
         :param init_pos: (int) Optional. Initial position. Takes value 0, 1, -1, corresponding to no
@@ -289,10 +326,11 @@ class CopulaStrategyMPI(CopulaStrategy):
         upper_open_threshold = self.opening_triggers[1]
 
         # Check if positions should be open. If so, based on which stock.
-        long_based_on_1 = (flag_1 <= lower_open_threshold)
-        long_based_on_2 = (flag_2 >= upper_open_threshold)
-        short_based_on_1 = (flag_1 >= upper_open_threshold)
-        short_based_on_2 = (flag_2 <= lower_open_threshold)
+        # Uncomment for the next four lines to allow for openinig positions only when there's no position currently.
+        long_based_on_1 = (flag_1 <= lower_open_threshold) # and (pre_position == 0)
+        long_based_on_2 = (flag_2 >= upper_open_threshold) # and (pre_position == 0)
+        short_based_on_1 = (flag_1 >= upper_open_threshold) # and (pre_position == 0)
+        short_based_on_2 = (flag_2 <= lower_open_threshold) # and (pre_position == 0)
 
         # Forming triggers.
         long_trigger = (long_based_on_1 or long_based_on_2)

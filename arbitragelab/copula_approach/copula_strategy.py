@@ -71,7 +71,7 @@ class CopulaStrategy:
     def fit_copula(self, s1_series: np.array, s2_series: np.ndarray, copula_name: str,
                    if_empirical_cdf: bool = True, if_renew: bool = True, nu_tol: float = 0.05) -> tuple:
         """
-        Conduct a max likelihood estimation and information criterion.
+        Conduct a pseudo max likelihood estimation and information criterion.
 
         Note: s1_series and s2_series need to be pre-processed. In general, raw price data is depreciated.
             One may use log return or cumulative log return. CopulaStrategy class provides a method to

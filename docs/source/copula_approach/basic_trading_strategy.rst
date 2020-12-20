@@ -1,8 +1,8 @@
-.. _copula_approach-trading_strategy:
+.. _copula_approach-basic_trading_strategy:
 
-================
-Trading Strategy
-================
+======================
+Basic Trading Strategy
+======================
 
 .. Note::
     The following strategy closely follow the implementations:

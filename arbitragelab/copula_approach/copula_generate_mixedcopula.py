@@ -43,7 +43,7 @@ class MixedCopula(ABC):
         """
         Describe the components and coefficients of the mixed copula.
 
-        The description include descriptive name, class name, the copula dependency parameter for each mixed copula
+        The description includes descriptive name, class name, the copula dependency parameter for each mixed copula
         component and their weights.
 
         :return: (pd.Series) The description of the specific mixed copula.
