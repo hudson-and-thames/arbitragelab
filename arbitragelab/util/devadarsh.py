@@ -54,7 +54,7 @@ def identify():
 
 
 # Generic function for pinging the server
-# pylint: disable=missing-function-docstringpip
+# pylint: disable=missing-function-docstring
 def page(url):
     if not IS_DEV:
         analytics.page(USER, 'ArbitrageLab', 'Import',
