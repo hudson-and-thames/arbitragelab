@@ -7,11 +7,7 @@ The module implements the ARIMA forecast of any time series using the Auto-ARIMA
 
 import warnings
 import sys
-try:
-    from contextlib import nullcontext
-except ImportError:
-    from contextlib import ExitStack as nullcontext  # Py 3.6.
-
+from contextlib import nullcontext
 import numpy as np
 import pandas as pd
 
