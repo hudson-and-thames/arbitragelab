@@ -24,7 +24,14 @@ class TestFeatureExpander(unittest.TestCase):
         # Set the input data, which in this case is the standard XOR.
         data = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
 
-        expanded_data = FeatureExpander(methods=['laguerre', 'power', 'chebyshev', 'legendre'], n_orders=2).fit(pd.DataFrame(data)).transform()
+        expanded_data = FeatureExpander(methods=['laguerre', 'power', 'chebyshev', 'legendre'],
+                                        n_orders=2).fit(data).transform()
 
         # Check that it returned the right amount of terms.
-        self.assertEqual(len(expanded_data[0]), 18)
+        self.assertEqual(len(expanded_data.columns), 26)
+
+        expanded_data = FeatureExpander(methods=['product'],
+                                        n_orders=2).fit(data).transform()
+
+        # Check that it returned the right amount of terms.
+        self.assertEqual(len(expanded_data.columns), 3)

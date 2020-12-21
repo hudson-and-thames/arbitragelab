@@ -70,9 +70,9 @@ class FeatureExpander:
     @staticmethod
     def _product(series, degree):
         """
-        
+
         :param series: (pd.Series)
-        :param degree: (int)        
+        :param degree: (int)
         """
 
         comb_range = range(len(series[0]))
@@ -81,7 +81,7 @@ class FeatureExpander:
 
         vectorized_x = pd.DataFrame(series)
 
-        return [np.prod(vectorized_x.iloc[:, comb], axis=1) for comb in combinations ]
+        return [np.prod(vectorized_x.iloc[:, comb], axis=1) for comb in combinations]
 
     def fit(self, frame):
         """
@@ -104,9 +104,9 @@ class FeatureExpander:
             expanded_row = list(row)
             for meth in self.methods:
                 if meth != "product":
-                    expanded_row.extend( np.ravel( getattr(self, '_' + meth)(row, self.n_orders) ) )
+                    expanded_row.extend(np.ravel(getattr(self, '_' + meth)(row, self.n_orders)))
 
-            new_dataset.append( np.ravel(expanded_row).tolist() )
+            new_dataset.append(np.ravel(expanded_row).tolist())
 
         new_dataset_df = pd.DataFrame(new_dataset)
 

@@ -8,6 +8,7 @@ import os
 import unittest
 
 import pandas as pd
+import matplotlib.pyplot as plt
 from statsmodels.regression.linear_model import RegressionResults
 from statsmodels.iolib.summary import Summary
 
@@ -81,7 +82,7 @@ class TestTAR(unittest.TestCase):
         # Check that it returned valid regression results.
         self.assertTrue(type(tar_results), RegressionResults)
 
-        tar_results.fittedvalues.plot()
+        plt.plot(tar_results.fittedvalues.values)
 
         self.assertTrue(type(tar_results.summary()), Summary)
 

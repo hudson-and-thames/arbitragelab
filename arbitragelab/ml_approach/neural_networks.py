@@ -6,8 +6,8 @@ This module implements the Multi Layer Perceptron, RNN model and the Pi Sigma Mo
 """
 
 from keras.models import Model
-from keras.layers.core import Dense, Activation, Lambda
-from keras.layers import  Input, LSTM, Dense
+# from keras.layers.core import Dense, Activation, Lambda
+from keras.layers import  Input, LSTM, Dense, Activation, Lambda
 from keras.callbacks.callbacks import History
 
 import tensorflow as tf

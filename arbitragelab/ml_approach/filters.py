@@ -31,6 +31,8 @@ class CorrelationFilter:
         self.buy_threshold = buy_threshold
         self.sell_threshold = sell_threshold
         self.corr_series = None
+        self.frame = None
+        self.transformed = None
 
     def fit(self, frame: pd.DataFrame):
         """
@@ -40,7 +42,7 @@ class CorrelationFilter:
         """
 
         frame = frame.copy()
-        
+
         self.frame = frame
 
         two_legged_df = frame.iloc[:, 0:2]
@@ -88,7 +90,7 @@ class CorrelationFilter:
 
         corr_events = self.transformed['side']
 
-        plt.figure(figsize=(15,10))
+        plt.figure(figsize=(15, 10))
         plt.subplot(311)
         ax1 = plt.plot(corr_series.diff())
         plt.axhline(y=self.buy_threshold, color='g', linestyle='--')
@@ -158,13 +160,14 @@ class ThresholdFilter:
         self.buy_threshold = buy_threshold
         self.sell_threshold = sell_threshold
         self.frame = None
+        self.transformed = None
 
     def plot(self):
         """
         :return: (Axes)
         """
 
-        plt.figure(figsize=(15,10))
+        plt.figure(figsize=(15, 10))
 
         plt.subplot(211)
         ax1 = plt.plot(self.transformed.iloc[:, 0].cumsum())
@@ -210,7 +213,7 @@ class ThresholdFilter:
         init_frame.loc[buy_signal, 'side'] = 1
         init_frame.loc[sell_signal, 'side'] = -1
         init_frame['side'] = init_frame['side'].shift(1)
-        
+
         self.transformed = init_frame
 
         return init_frame
@@ -238,7 +241,13 @@ class VolatilityFilter:
         """
 
         self.lookback = lookback
+        self.sigma = None
         self.frame = None
+        self.mu_avg = None
+        self.spread = None
+        self.vol_series = None
+        self.rolling_mean_vol = None
+        self.vol_forcast_series = None
 
     def plot(self):
         """
@@ -269,21 +278,21 @@ class VolatilityFilter:
         """
 
         self.spread = spread
-        self.frame = spread.pct_change().copy().to_frame()
-        
+        self.frame = spread.diff().copy().to_frame()
+
         # Exponentially Weighted Moving Average Variance, known as RiskMetrics
-        rm = EWMAVariance(0.94)
+        risk_metrics_vol = EWMAVariance(0.94)
 
         # (ZeroMean) - useful if using residuals from a model estimated separately
-        zm = ZeroMean(self.frame, volatility=rm)
-        zm.fit()
+        zero_mean = ZeroMean(self.frame, volatility=risk_metrics_vol)
+        zero_mean.fit()
 
-        vol_forcast_series = pd.Series(zm.resids(self.frame), index=self.frame.index)
+        vol_forcast_series = pd.Series(zero_mean.resids(self.frame), index=self.frame.index)
 
-        rolling_mean_vol = vol_forcast_series.rolling(window=80).mean()
+        rolling_mean_vol = vol_forcast_series.rolling(window=self.lookback).mean()
 
-        mu_avg = rolling_mean_vol.rolling(window=80).mean().mean()
-        sigma = rolling_mean_vol.rolling(window=80).std().mean()
+        mu_avg = rolling_mean_vol.rolling(window=self.lookback).mean().mean()
+        sigma = rolling_mean_vol.rolling(window=self.lookback).std().mean()
 
         self.vol_forcast_series = vol_forcast_series
         self.rolling_mean_vol = rolling_mean_vol
@@ -303,6 +312,7 @@ class VolatilityFilter:
 
         vol_series = self.vol_forcast_series.copy().to_frame()
         vol_series["regime"] = np.nan
+        vol_series["leverage_multiplier"] = np.nan
 
         avg_minus_two_std_dev = self.mu_avg - 2*self.sigma
         avg_minus_four_std_dev = self.mu_avg - 4*self.sigma
@@ -310,14 +320,17 @@ class VolatilityFilter:
         # Extremely Low Regime
         extrm_low_mask = (self.rolling_mean_vol <= avg_minus_four_std_dev)
         vol_series.loc[extrm_low_mask, "regime"] = -3
+        vol_series.loc[extrm_low_mask, "leverage_multiplier"] = 2.5
 
         # Medium Low Regime
         medium_low_mask = (self.rolling_mean_vol <= avg_minus_two_std_dev) & (self.rolling_mean_vol >= avg_minus_four_std_dev)
         vol_series.loc[medium_low_mask, "regime"] = -2
+        vol_series.loc[medium_low_mask, "leverage_multiplier"] = 2
 
         # Higher Low Regime
         higher_low_mask = (self.rolling_mean_vol <= self.mu_avg) & (self.rolling_mean_vol >= avg_minus_two_std_dev)
         vol_series.loc[higher_low_mask, 'regime'] = -1
+        vol_series.loc[higher_low_mask, "leverage_multiplier"] = 1.5
 
         avg_plus_two_std_dev = self.mu_avg + 2*self.sigma
         avg_plus_four_std_dev = self.mu_avg + 4*self.sigma
@@ -325,17 +338,20 @@ class VolatilityFilter:
         # Lower High Regime
         low_high_mask = (self.rolling_mean_vol >= self.mu_avg) & (self.rolling_mean_vol <= avg_plus_two_std_dev)
         vol_series.loc[low_high_mask, 'regime'] = 1
+        vol_series.loc[low_high_mask, "leverage_multiplier"] = 1
 
         # Medium High Regime
         medium_high_mask = (self.rolling_mean_vol >= avg_plus_two_std_dev) & (self.rolling_mean_vol <= avg_plus_four_std_dev)
         vol_series.loc[medium_high_mask, "regime"] = 2
+        vol_series.loc[medium_high_mask, "leverage_multiplier"] = 0.5
 
         # Extremely High Regime
         extrm_high_mask = (self.rolling_mean_vol >= avg_plus_four_std_dev)
         vol_series.loc[extrm_high_mask, "regime"] = 3
+        vol_series.loc[extrm_high_mask, "leverage_multiplier"] = 0
 
         self.vol_series = vol_series
-        
+
         return vol_series
 
     def fit_transform(self, frame) -> pd.DataFrame:

@@ -11,9 +11,7 @@ from keras.callbacks.callbacks import History
 from sklearn.model_selection import train_test_split
 from sklearn.datasets import make_regression
 
-from arbitragelab.ml_approach.mlp import MultiLayerPerceptron
-from arbitragelab.ml_approach.rnn import RecurrentNeuralNetwork
-from arbitragelab.ml_approach.pi_sigma import PiSigmaNeuralNetwork
+from arbitragelab.ml_approach.neural_networks import MultiLayerPerceptron, RecurrentNeuralNetwork, PiSigmaNeuralNetwork
 
 # pylint: disable=unbalanced-tuple-unpacking
 

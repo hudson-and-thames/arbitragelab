@@ -9,9 +9,7 @@ import unittest
 
 import pandas as pd
 
-from arbitragelab.ml_approach.threshold_filter import ThresholdFilter
-from arbitragelab.ml_approach.correlation_filter import CorrelationFilter
-
+from arbitragelab.ml_approach.filters import ThresholdFilter, CorrelationFilter, VolatilityFilter
 
 class TestFilters(unittest.TestCase):
     """
@@ -49,13 +47,16 @@ class TestFilters(unittest.TestCase):
         """
 
         # Initialize ThresholdFilter with 2 std dev band for buying and selling triggers.
-        thres_filter = ThresholdFilter(
-            buy_threshold=-self.spread_diff_std*2, sell_threshold=self.spread_diff_std*2)
+        thres_filter = ThresholdFilter(buy_threshold=-self.spread_diff_std*2,
+                                       sell_threshold=self.spread_diff_std*2)
+
         std_events = thres_filter.fit_transform(self.spread_diff_series)
 
         # Check that the correct amount of triggers have been set.
-        self.assertEqual(
-            std_events['side'].value_counts().values.tolist(), [3817, 76, 58])
+        self.assertEqual(std_events['side'].value_counts().values.tolist(),
+                         [3817, 76, 58])
+
+        thres_filter.plot()
 
     def test_correlation_filter(self):
         """
@@ -63,12 +64,27 @@ class TestFilters(unittest.TestCase):
         """
 
         # Initialize CorrelationFilter with +-0.05 correlation change to trigger buy/sell.
-        corr_filter = CorrelationFilter(
-            buy_threshold=0.05, sell_threshold=-0.05, lookback=30)
+        corr_filter = CorrelationFilter(buy_threshold=0.05, sell_threshold=-0.05,
+                                        lookback=30)
         corr_filter.fit(self.working_df[['wti', 'gasoline']])
-        corr_events = corr_filter.transform(
-            self.working_df[['wti', 'gasoline']])
+        corr_events = corr_filter.transform(self.working_df[['wti', 'gasoline']])
 
         # Check that the correct amount of triggers have been set.
-        self.assertEqual(corr_events['side'].value_counts(
-        ).values.tolist(), [3693, 130, 128])
+        self.assertEqual(corr_events['side'].value_counts().values.tolist(),
+                         [3693, 130, 128])
+
+        corr_filter.plot()
+
+    def test_volatility_filter(self):
+        """
+        Tests the Volatility filter.
+        """
+
+        vol_filter = VolatilityFilter(lookback=80)
+
+        vol_events = vol_filter.fit_transform(self.spread_diff_series)
+
+        self.assertEqual(vol_events['regime'].value_counts().values.tolist(),
+                         [1846, 1840, 80, 79, 13, 13])
+
+        vol_filter.plot()
