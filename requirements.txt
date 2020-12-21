@@ -17,6 +17,7 @@ pmdarima==1.8.0
 analytics-python==1.2.9
 keras==2.3.1
 tensorflow==2.2.1
+arch==4.15
 
 # Develop
 bump2version==1.0.1

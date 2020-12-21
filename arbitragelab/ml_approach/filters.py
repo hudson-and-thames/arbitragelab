@@ -9,8 +9,8 @@ This module implements the Correlation Filter described in Dunis et al. (2005).
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from arch.univariate import ZeroMean, EWMAVariance
 from sklearn.preprocessing import MinMaxScaler
+from arch.univariate import ZeroMean, EWMAVariance
 
 class CorrelationFilter:
     """

@@ -6,12 +6,8 @@ Tests Regressor Committee Class.
 """
 
 import unittest
-from keras.engine.training import Model
-from keras.callbacks.callbacks import History
-from sklearn.model_selection import train_test_split
 from sklearn.datasets import make_regression
-
-from arbitragelab.ml_approach.neural_networks import MultiLayerPerceptron, RecurrentNeuralNetwork, PiSigmaNeuralNetwork
+from sklearn.model_selection import train_test_split
 from arbitragelab.ml_approach.regressor_committee import RegressorCommittee
 
 # pylint: disable=unbalanced-tuple-unpacking
@@ -31,9 +27,9 @@ class TestRegressorCommittee(unittest.TestCase):
 
         _, frame_size = features.shape
 
-        mlp_params = {'frame_size': frame_size, 'hidden_size': 8, 'num_outputs': 1, 'loss_fn': "mean_squared_error", 
-                            'optmz': "adam", 'metrics': [], 'hidden_layer_activation_function': "sigmoid",
-                            'output_layer_act_func': "linear"}
+        mlp_params = {'frame_size': frame_size, 'hidden_size': 8, 'num_outputs': 1, 'loss_fn': "mean_squared_error",
+                      'optmz': "adam", 'metrics': [], 'hidden_layer_activation_function': "sigmoid",
+                      'output_layer_act_func': "linear"}
 
         # Initialize mlp committee.
         committee = RegressorCommittee(mlp_params, num_committee=2, epochs=100, verbose=False)

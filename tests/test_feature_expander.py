@@ -7,7 +7,6 @@ Tests Spread Modeling Feature Expander Implementation.
 
 import unittest
 import numpy as np
-import pandas as pd
 
 from arbitragelab.ml_approach.feature_expander import FeatureExpander
 
