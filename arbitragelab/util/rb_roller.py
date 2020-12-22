@@ -49,7 +49,6 @@ class RBFutureRoller(BaseFuturesRoller):
 
         target_dates = super().get_available_date_per_month_from(dataset)#, 'first')
 
-        rb_roll_dates = target_dates['target_date'].drop_duplicates(
-        ).dropna().values[1:]
+        rb_roll_dates = target_dates['target_date'].drop_duplicates()
 
-        return rb_roll_dates
+        return rb_roll_dates.dropna().values[1:]

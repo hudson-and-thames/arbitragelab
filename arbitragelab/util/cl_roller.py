@@ -39,8 +39,7 @@ class CrudeOilFutureRoller(BaseFuturesRoller):
         twnty_fives = cl_final_df['target_date'].drop_duplicates()
 
         working_frame = pd.DataFrame(twnty_fives)
-        working_frame['is_in_original_index'] = pd.Series(
-            twnty_fives.isin(cl_final_df['original_index']))
+        working_frame['is_in_original_index'] = pd.Series(twnty_fives.isin(cl_final_df['original_index']))
 
         # Diagnostic check; How many 25ths actually occur in the dataset?
         # working_frame['is_in_original_index'].value_counts()

@@ -10,17 +10,18 @@ import pandas as pd
 
 # pylint: disable=R0201
 
-
 class BaseFuturesRoller:
     """
     Basic Futures Roller implementation.
     """
 
-    def __init__(self):
+    def __init__(self, open_col: str = "PX_OPEN", close_col: str = "PX_LAST"):
         """
         Initialization of variables.
         """
 
+        self.open_col = open_col
+        self.close_col = close_col
         self.dataset = None
         self.diagnostic_frame = None
 
@@ -57,38 +58,39 @@ class BaseFuturesRoller:
 
         roll_dates = self._get_rolldates(self.dataset)
 
-        gaps_series, diagnostic_frame = self.roll(
-            self.dataset, roll_dates, roll_forward)
+        gaps_series, diagnostic_frame = self.roll(self.dataset, roll_dates, roll_forward)
 
         self.diagnostic_frame = diagnostic_frame
 
         if handle_negative_roll:
-            rolled_series = self.dataset['PX_LAST'] - gaps_series
+            rolled_series = self.dataset[self.close_col] - gaps_series
 
-            return self.non_negativeize(rolled_series, self.dataset['PX_LAST'])
+            return self.non_negativeize(rolled_series, self.dataset[self.close_col])
 
         return gaps_series
 
-    @staticmethod
-    def generate_diagnostic_frame(dataset: pd.DataFrame, termination_date_indexes: np.array,
+    def generate_diagnostic_frame(self, dataset: pd.DataFrame, termination_date_indexes: np.array,
                                   following_dates: pd.DatetimeIndex) -> pd.DataFrame:
         """
         Returns dataframe full of every roll operation and its gap size.
 
-        :param dataset: (pd.DataFrame) Price data. Must have columns [PX_OPEN, PX_LAST].
+        :param dataset: (pd.DataFrame) Price data.
         :param termination_date_indexes: (np.array) Indexes of termination dates.
         :param following_dates: (pd.DateTimeIndex) Dates following the termination dates.
         :return: (pd.DataFrame) List of dates and their gap's size.
         """
 
         diag_df = pd.DataFrame({})
-        diag_df['last_on_termination_date'] = dataset['PX_LAST'].iloc[termination_date_indexes].index
-        diag_df['last_prices'] = dataset['PX_LAST'].iloc[termination_date_indexes].values
+        diag_df['last_on_termination_date'] = dataset[self.close_col].iloc[termination_date_indexes].index
+        diag_df['last_prices'] = dataset[self.close_col].iloc[termination_date_indexes].values
         diag_df['open_day_after_termination_date'] = following_dates
-        diag_df['open_prices'] = dataset['PX_OPEN'].loc[following_dates].values
+        diag_df['open_prices'] = dataset[self.open_col].loc[following_dates].values
 
-        diag_df['gap'] = dataset['PX_OPEN'].loc[following_dates].values \
-            - dataset['PX_LAST'].iloc[termination_date_indexes].values
+        day_before_exp_vals = dataset[self.open_col].loc[following_dates].values
+
+        day_after_exp_vals = dataset[self.close_col].iloc[termination_date_indexes].values
+
+        diag_df['gap'] = day_before_exp_vals - day_after_exp_vals
 
         return diag_df
 
@@ -107,8 +109,7 @@ class BaseFuturesRoller:
 
         price_series = pd.DataFrame()
         indexed_list = list(dataset_datetime_index)
-        indexed_list = [indexed_list.index(
-            i)-n_days for i in target_dates.dropna()]
+        indexed_list = [indexed_list.index(i)-n_days for i in target_dates.dropna()]
         price_series['expiry'] = dataset_datetime_index.iloc[indexed_list]
 
         return price_series
@@ -130,8 +131,8 @@ class BaseFuturesRoller:
         price_series['day'] = price_df.index.to_period('D').day
 
 #         if mode == "first":
-        price_series['target_day'] = price_series.groupby(by=['expiry_month'])[
-            'day'].transform(min)
+        price_by_exp_month = price_series.groupby(by=['expiry_month'])
+        price_series['target_day'] = price_by_exp_month['day'].transform(min)
 #         elif mode == "last":
 #             price_series['target_day'] = price_series.groupby(by=['expiry_month'])['day'].transform(max)
 #         elif mode == "specifc":
@@ -139,11 +140,12 @@ class BaseFuturesRoller:
 #         else:
 #             print("Please select a valid mode!")
 
-        price_series['target_date'] = price_series['expiry_month'].astype(str) \
-            + "-" + price_series['target_day'].astype(str)
+        exp_month = price_series['expiry_month'].astype(str)
+        exp_day = price_series['target_day'].astype(str)
+        price_series['target_date'] = exp_month + "-" + exp_day
 
-        price_series['target_date'] = pd.to_datetime(
-            price_series['target_date'], errors='coerce')
+        price_series['target_date'] = pd.to_datetime(price_series['target_date'],
+                                                     errors='coerce')
 
         return price_series
 
@@ -164,11 +166,13 @@ class BaseFuturesRoller:
         price_series['original_index'] = dataset_datetime_index
         price_series['expiry_month'] = dataset_datetime_index.to_period('M')
         price_series['day'] = day_of_month
-        price_series['target_date'] = price_series['expiry_month'].astype(str) \
-            + "-" + price_series['day'].astype(str)
 
-        price_series['target_date'] = pd.to_datetime(
-            price_series['target_date'], errors='coerce')
+        exp_month = price_series['expiry_month'].astype(str)
+        exp_day = price_series['day'].astype(str)
+        price_series['target_date'] = exp_month + "-" + exp_day
+
+        price_series['target_date'] = pd.to_datetime(price_series['target_date'],
+                                                     errors='coerce')
 
         return price_series[['original_index', 'target_date']]
 
@@ -186,9 +190,10 @@ class BaseFuturesRoller:
         :return: (Date)
         """
 
+        index_to_monthly = pd.to_datetime(dataset.index).to_period('M')
+
         # Use delta to get all days in that month from the original series.
-        full_working_month = dataset.loc[pd.to_datetime(
-            dataset.index).to_period('M') == working_month_delta]
+        full_working_month = dataset.loc[index_to_monthly == working_month_delta]
 
         # Remove all days including and after target_date
         full_working_month = full_working_month[full_working_month.index.day < target_day]
@@ -204,14 +209,17 @@ class BaseFuturesRoller:
         :param match_end: (bool)
         :return: (pd.Series) (pd.DataFrame)
         """
-        gaps = dataset['PX_LAST']*0
+        gaps = dataset[self.close_col]*0
 
         iloc = list(dataset.index)
 
         iloc = [iloc.index(i)-1 for i in roll_dates]
 
-        gaps.loc[roll_dates] = dataset['PX_OPEN'].loc[roll_dates] - \
-            dataset['PX_LAST'].iloc[iloc].values
+        day_before_exp_vals = dataset[self.open_col].loc[roll_dates]
+
+        day_after_exp_vals = dataset[self.close_col].iloc[iloc].values
+
+        gaps.loc[roll_dates] = day_before_exp_vals - day_after_exp_vals            
 
         gaps = gaps.cumsum().dropna()
 
