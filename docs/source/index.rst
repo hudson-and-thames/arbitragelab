@@ -79,4 +79,35 @@ This project is licensed under an all rights reserved licence.
     codependence/codependence_matrix
     codependence/optimal_transport
 
+.. toctree::
+    :maxdepth: 2
+    :caption: Cointegration Approach
+    :hidden:
+
+    cointegration_approach/introduction
+    cointegration_approach/cointegration_tests
+    cointegration_approach/half_life
+    cointegration_approach/trading_strategies
+    cointegration_approach/minimum_profit_simulation
+    cointegration_approach/minimum_profit
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Copula Approach
+    :hidden:
+
+    copula_approach/introduction
+    copula_approach/copula_brief_intro
+    copula_approach/trading_strategy
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Optimal Mean Reversion
+    :hidden:
+
+    optimal_mean_reversion/introduction
+    optimal_mean_reversion/ou_model
+    optimal_mean_reversion/xou_model
+    optimal_mean_reversion/cir_model
+    optimal_mean_reversion/heat_potentials
 
