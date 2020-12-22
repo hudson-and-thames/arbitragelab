@@ -12,6 +12,9 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+* :release:`0.2.1 <2020-12-22>`
+* :bug:`Hot` Error with environment variables in analytics module.
+
 * :release:`0.2.0 <2020-12-14>`
 * :feature:`5` ML Based Pairs Selection (Horta, 2020) and Data Importer added.
 * :support:`5` ML Based Pairs Selection and Data Importer documentation.
