@@ -111,3 +111,42 @@ This project is licensed under an all rights reserved licence.
     optimal_mean_reversion/cir_model
     optimal_mean_reversion/heat_potentials
 
+.. toctree::
+    :maxdepth: 2
+    :caption: Time Series Approach
+    :hidden:
+
+    time_series_approach/introduction
+    time_series_approach/quantile_time_series_strategy
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Other Approaches
+    :hidden:
+
+    other_approaches/kalman_filter
+    other_approaches/pca_approach
+
+.. toctree::
+    :maxdepth: 2
+    :caption: ML Approach
+    :hidden:
+
+    ml_approach/introduction
+    ml_approach/ml_based_pairs_selection
+
+.. toctree::
+    :maxdepth: 3
+    :caption: Developer Guide
+    :hidden:
+
+    changelog
+
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Additional Information
+    :hidden:
+
+    additional_information/analytics
+    additional_information/license
