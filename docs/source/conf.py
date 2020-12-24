@@ -22,7 +22,7 @@ copyright = '2019, Hudson & Thames Quantitative Research.'
 author = 'Hudson & Thames Quantitative Research'
 
 # The full version, including alpha/beta/rc tags
-release = '0.2.1'
+release = '0.2.2'
 
 
 # -- General configuration ---------------------------------------------------
