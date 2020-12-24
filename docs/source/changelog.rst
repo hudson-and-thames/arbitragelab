@@ -12,6 +12,9 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+* :release:`0.2.2 <2020-12-24>`
+* :bug:`32` Copulas module imports were not exposed.
+
 * :release:`0.2.1 <2020-12-22>`
 * :bug:`Hot` Error with environment variables in analytics module.
 
