@@ -5,19 +5,21 @@
 This module implements the Multi Layer Perceptron, RNN model and the Pi Sigma Model.
 """
 
-from keras.models import Model
-# from keras.layers.core import Dense, Activation, Lambda
-from keras.layers import  Input, LSTM, Dense, Activation, Lambda
-from keras.callbacks.callbacks import History
+#pylint: disable=wrong-import-position
+import os
+import logging
+logging.getLogger('tensorflow').setLevel(logging.ERROR)
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 import tensorflow as tf
-
+from keras.models import Model
+from keras.callbacks.callbacks import History
+from keras.layers import  Input, LSTM, Dense, Activation, Lambda
 import matplotlib.pyplot as plt
 
 class BaseNeuralNetwork:
     """
-    Skeleton Class to be inherited by child
-    neural network implementations.
+    Skeleton Class to be inherited by child neural network implementations.
     """
 
     def __init__(self):
@@ -46,7 +48,8 @@ class BaseNeuralNetwork:
 
     def plot_loss(self) -> list:
         """
-        Method that returns visual plot of the loss trajectory.
+        Method that returns visual plot of the loss trajectory in
+        terms of epochs spent training.
         """
 
         result = plt.plot(self.fitted_model.history['loss'])
@@ -56,20 +59,23 @@ class BaseNeuralNetwork:
 
 class MultiLayerPerceptron(BaseNeuralNetwork):
     """
-    Multi Layer Perceptron implementation.
-
-    Regression: loss_fn="mean_squared_error", optmz="adam", metrics=["r2_score"]
-    num_outputs=1
-
-    Classification: loss_fn="categorical_crossentropy", optmz="adam", metrics=["accuracy"]
-    num_outputs=num_classes?
+    Vanilla Multi Layer Perceptron implementation.
     """
 
-    def __init__(self, frame_size, hidden_size=2, num_outputs=1, loss_fn="mean_squared_error",
-                 optmz="adam", metrics="accuracy",
-                 hidden_layer_activation_function="relu", output_layer_act_func="linear"):
+    def __init__(self, frame_size: int, hidden_size: int = 2, num_outputs: int = 1,
+                 loss_fn: str = "mean_squared_error", optmz: str = "adam", metrics: str = "accuracy",
+                 hidden_layer_activation_function: str = "relu", output_layer_act_func: str = "linear"):
         """
         Initialization of variables.
+
+        :param frame_size: (int)
+        :param hidden_size: (int)
+        :param num_outputs: (int)
+        :param loss_fn: (str)
+        :param optmz: (str)
+        :param metrics: (str)
+        :param hidden_layer_activation_function: (str)
+        :param output_layer_act_func: (str)
         """
 
         super().__init__()
@@ -84,8 +90,9 @@ class MultiLayerPerceptron(BaseNeuralNetwork):
         self.hidden_layer_activation_function = hidden_layer_activation_function
         self.output_layer_activation_function = output_layer_act_func
 
-    def build(self):
+    def build(self) -> Model:
         """
+        Builds and compiles model architecture.
 
         :return: (Model)
         """
@@ -112,11 +119,20 @@ class RecurrentNeuralNetwork(BaseNeuralNetwork):
     Recurrent Neural Network implementation.
     """
 
-    def __init__(self, input_shape, hidden_size=50, num_outputs=1, loss_fn="mean_squared_error",
-                 optmz="adam", metrics="accuracy",
-                 hidden_layer_activation_function="relu", output_layer_act_func="linear"):
+    def __init__(self, input_shape: tuple, hidden_size: int = 10, num_outputs: int = 1,
+                 loss_fn: str = "mean_squared_error", optmz: str = "adam", metrics: str = "accuracy",
+                 hidden_layer_activation_function: str = "relu", output_layer_act_func: str = "linear"):
         """
         Initialization of Variables.
+
+        :param input_shape: (tuple)
+        :param hidden_size: (int)
+        :param num_outputs: (int)
+        :param loss_fn: (str)
+        :param optmz: (str)
+        :param metrics: (str)
+        :param hidden_layer_activation_function: (str)
+        :param output_layer_act_func: (str)
         """
 
         super().__init__()
@@ -131,9 +147,11 @@ class RecurrentNeuralNetwork(BaseNeuralNetwork):
         self.hidden_layer_activation_function = hidden_layer_activation_function
         self.output_layer_activation_function = output_layer_act_func
 
-    def build(self):
+    def build(self) -> Model:
         """
         Builds and compiles model architecture.
+
+        :return: (Model)
         """
 
         input_layer = Input(self.input_shape)
@@ -158,11 +176,20 @@ class PiSigmaNeuralNetwork(BaseNeuralNetwork):
     Pi Sigma Neural Network implementation.
     """
 
-    def __init__(self, frame_size, hidden_size=2, num_outputs=1, loss_fn="mean_squared_error",
-                 optmz="sgd", metrics="accuracy",
-                 hidden_layer_activation_function="linear", output_layer_act_func="sigmoid"):
+    def __init__(self, frame_size: int, hidden_size: int = 2, num_outputs: int = 1,
+                 loss_fn: str = "mean_squared_error", optmz: str = "sgd", metrics: str = "accuracy",
+                 hidden_layer_activation_function: str = "linear", output_layer_act_func: str = "sigmoid"):
         """
         Inialization of variables.
+
+        :param frame_size: (int)
+        :param hidden_size: (int)
+        :param num_outputs: (int)
+        :param loss_fn: (str)
+        :param optmz: (str)
+        :param metrics: (str)
+        :param hidden_layer_activation_function: (str)
+        :param output_layer_act_func: (str)
         """
 
         super().__init__()
@@ -177,8 +204,9 @@ class PiSigmaNeuralNetwork(BaseNeuralNetwork):
         self.hidden_layer_activation_function = hidden_layer_activation_function
         self.output_layer_activation_function = output_layer_act_func
 
-    def build(self):
+    def build(self) -> Model:
         """
+        Builds and compiles model architecture.
 
         :return: (Model)
         """
@@ -202,9 +230,13 @@ class PiSigmaNeuralNetwork(BaseNeuralNetwork):
         return model
 
     @staticmethod
-    def _pi_this(tensor):
+    def _pi_this(tensor: tf.Tensor) -> tf.Tensor:
         """
-        :return: (tf.Tensor)
+        Computes the product of elements across 'axis=1' of the input tensor and 
+        will return the reduced version of the tensor.
+
+        :param tensor: (tf.Tensor) Weights from the hidden layer.
+        :return: (tf.Tensor) Product of input tensor.
         """
 
         prod = tf.math.reduce_prod(tensor, keepdims=True, axis=1)

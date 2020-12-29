@@ -8,8 +8,6 @@ This module implements the base Futures Roller.
 import numpy as np
 import pandas as pd
 
-# pylint: disable=R0201
-
 class BaseFuturesRoller:
     """
     Basic Futures Roller implementation.
@@ -115,13 +113,11 @@ class BaseFuturesRoller:
         return price_series
 
     @staticmethod
-    # , mode: str, nth_day: int = 0
     def get_available_date_per_month_from(price_df: pd.DataFrame) -> pd.DataFrame:
         """
+        Gets first available day per month from the dataset.
 
         :param price_df: (pd.DataFrame)
-        :param mode: (str) Available modes; ["first", "last", "specific"]
-        :param nth_day: (int)
         :return: (pd.DataFrame)
         """
 
@@ -130,15 +126,8 @@ class BaseFuturesRoller:
         price_series['expiry_month'] = price_df.index.to_period('M')
         price_series['day'] = price_df.index.to_period('D').day
 
-#         if mode == "first":
         price_by_exp_month = price_series.groupby(by=['expiry_month'])
         price_series['target_day'] = price_by_exp_month['day'].transform(min)
-#         elif mode == "last":
-#             price_series['target_day'] = price_series.groupby(by=['expiry_month'])['day'].transform(max)
-#         elif mode == "specifc":
-#             price_series['target_day'] = price_series.groupby(by=['expiry_month'])['day'].nth(nth_day)
-#         else:
-#             print("Please select a valid mode!")
 
         exp_month = price_series['expiry_month'].astype(str)
         exp_day = price_series['target_day'].astype(str)
@@ -203,6 +192,9 @@ class BaseFuturesRoller:
 
     def roll(self, dataset: pd.DataFrame, roll_dates: pd.Series, match_end: bool = True):
         """
+        Deals with single futures contracts. Forms a series of cumulative
+        roll gaps and returns a diagnostic dataframe with dates of rolls for
+        further analysis.
 
         :param dataset: (pd.DataFrame)
         :param roll_dates: (pd.Series)
@@ -230,6 +222,13 @@ class BaseFuturesRoller:
 
     def non_negativeize(self, rolled_series: pd.Series, raw_series: pd.Series) -> pd.Series:
         """
+        In general, non negative series are preferred over negative series, which could
+        easily occur particularly if the contract sold off while in contango. The method
+        employed here works as follows; the return as rolled price change is divided by
+        the raw price and then a series is formed using those returns, ex (1+r).cumprod().
+
+        This method has been described originally in De Prado, M.L., 2018. Advances in
+        financial machine learning. John Wiley & Sons.
 
         :param rolled_series: (pd.Series)
         :param raw_series: (pd.Series)

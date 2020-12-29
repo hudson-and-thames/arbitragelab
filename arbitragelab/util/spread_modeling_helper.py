@@ -25,15 +25,18 @@ class SpreadModelingHelper:
 
     def __init__(self, sprd: pd.Series, feat_expansion: bool = True, unique_sampling: bool = True):
         """
-        The dataset returned in this module will consists of two major periods
+        This method will break the spread in two major periods:
+        
         Insample Period - that will be broken down in two; the training period
-        and the testing period. Out of Sample Period - the final stretch embragoed
-        by a year from the insample period.
+        and the testing period. 
+        Out of Sample Period - the final stretch embargoed by a year from the
+        insample period.
 
-        :param sprd: (pd.Series)
-        :param feat_expansion: (bool)
-        :param unique_sampling: (bool)
-        :return: (pd.DataFrame)
+        :param sprd: (pd.Series) A series consisting of the spread.
+        :param feat_expansion: (bool) If enabled will deploy the feature expansion
+            procedure based on what is documented in (Dunis et al. 2006)
+        :param unique_sampling: (bool) If enabled will remove all the rows
+            at every N lag.
         """
 
         # Change spread to returns.
@@ -94,9 +97,13 @@ class SpreadModelingHelper:
         self.oos_pred = None
 
     @staticmethod
-    def _onedim_scaler_wrapper(scaler_obj, original_data):
+    def _onedim_scaler_wrapper(scaler_obj: MinMaxScaler, original_data: pd.DataFrame) -> pd.Series:
         """
         Converts data object to a proper scaled object.
+        
+        :param scaler_obj: (MinMaxScaler) Object to use to scale the data.
+        :param original_data: (pd.DataFrame) The data that needs to be scaled.
+        :return: (pd.Series)
         """
 
         reshaped_data = original_data.values.reshape(-1, 1)
@@ -105,9 +112,14 @@ class SpreadModelingHelper:
         return pd.Series(scaled_data, index=original_data.index)
 
     @staticmethod
-    def _wrap_threshold_filter(ytrue, ypred, std_dev_sample):
+    def _wrap_threshold_filter(ytrue: pd.DataFrame, ypred: pd.DataFrame, std_dev_sample: float) -> pd.DataFrame:
         """
         Wraps Threshold filter class.
+
+        :param ytrue: (pd.DataFrame) The ground truth data.
+        :param ypred: (pd.DataFrame) The predicted data.
+        :param std_dev_sample: (float) The range for the buy/sell threshold.
+        :return: (pd.DataFrame)
         """
 
         thresh_filter = ThresholdFilter(-std_dev_sample, std_dev_sample)
@@ -119,9 +131,13 @@ class SpreadModelingHelper:
         return std_events
 
     @staticmethod
-    def _wrap_correlation_filter(ytrue, working_df):
+    def _wrap_correlation_filter(ytrue: pd.DataFrame, working_df: pd.DataFrame) -> pd.DataFrame:
         """
         Wraps Correlation filter class.
+
+        :param ytrue: (pd.DataFrame) The ground truth data.
+        :param working_df: (pd.DataFrame) DataFrame with both legs of the spread.
+        :return: (pd.DataFrame)
         """
 
         corr_filter = CorrelationFilter(buy_threshold=0.05,
@@ -136,9 +152,14 @@ class SpreadModelingHelper:
         return corr_events
 
     @staticmethod
-    def _wrap_vol_filter(ytrue, ypred, base_events):
+    def _wrap_vol_filter(ytrue: pd.DataFrame, ypred: pd.DataFrame, base_events: pd.DataFrame) -> pd.DataFrame:
         """
         Wraps Volatility filter class.
+
+        :param ytrue: (pd.DataFrame) The ground truth data.
+        :param ypred: (pd.DataFrame) The predicted data.
+        :param base_events: (pd.DataFrame) A DataFrame full of events to be filtered.
+        :return: (pd.DataFrame)
         """
 
         vol_filter = VolatilityFilter(lookback=80)
@@ -152,10 +173,19 @@ class SpreadModelingHelper:
 
         return vol_events
 
-    def get_filtering_results(self, ytrain, ypred, std_dev_sample, working_df, plot=True):
+    def get_filtering_results(self, ytrain: pd.DataFrame, ypred: pd.DataFrame,
+                              std_dev_sample: float, working_df: pd.DataFrame,
+                              plot: bool = True):
         """
         Executes and if needed plots the results from all the filter combinations
         included in the library.
+
+        :param ytrue: (pd.DataFrame) The ground truth data.
+        :param ypred: (pd.DataFrame) The predicted data.
+        :param std_dev_sample: (float) The range for the buy/sell threshold.
+        :param working_df: (pd.DataFrame) DataFrame with both legs of the spread.
+        :param plot: (bool) Plot the trades of each filter.
+        :return: (tuple) 
         """
 
         unfiltered_events = self._wrap_threshold_filter(ytrain, ypred,
@@ -194,10 +224,13 @@ class SpreadModelingHelper:
 
         return unfiltered_events, std_events, corr_events, std_vol_events, corr_vol_events
 
-    def get_metrics(self, working_df):
+    def get_metrics(self, working_df: pd.DataFrame) -> pd.DataFrame:
         """
         Main handler for gathering all the financial metrics relating
         to each dataset slice.
+
+        :param working_df: (pd.DataFrame) DataFrame with both legs of the spread.
+        :return: (pd.DataFrame)
         """
 
         train_filter_results = self.get_filtering_results(self.train_set, self.train_pred, self.train_pred, working_df, False)
@@ -216,27 +249,53 @@ class SpreadModelingHelper:
         return pd.concat([train_filter_metrics, test_filter_metrics, oos_filter_metrics])
 
     @staticmethod
-    def convert_filter_events_to_metrics(filter_events):
+    def convert_filter_events_to_metrics(filter_events: pd.DataFrame):
         """
-        Convert a set of returns to financial metrics.
+        Convert a set of returns to financial metrics. The metrics
+        include annual returns, annual volatility, max drawdown and
+        sharpe ratio.
+
+        :param filter_events: (pd.DataFrame) Trade events tagged with a
+            'side' column with 1/0/-1 referring to long, no trade, short.
+        :return: (pd.DataFrame)
         """
 
         metrics = []
 
         for fresult in filter_events:
-            rets = fresult[fresult['side'] != 0]['rets']
+            processed_freturns = fresult[fresult['side'] != 0]
+            processed_freturns[processed_freturns['side'] == -1] = -processed_freturns[processed_freturns['side'] == -1]
+            rets = processed_freturns['rets']
             possible_days = len(pd.date_range(rets.index[0], rets.index[-1]))
 
-            # THIS ANNUAL RETURN CALCULATION NEEDS TO BE REVISED.
-            annual_ret = rets.add(1).prod() ** (252 / possible_days) - 1
-            std_dev = fresult[fresult['side'] != 0]['rets'].std()
-            metrics.append([fresult.name, annual_ret, std_dev])
+            annual_ret = rets.add(1).prod() ** (356 / possible_days) - 1
+            annual_ret = np.round(annual_ret*100, 2)
 
-        return pd.DataFrame(metrics, columns=['Filtering Method', 'Annual Returns', 'Std Dev'])
+            std_dev = fresult[fresult['side'] != 0]['rets'].std()
+            annual_vol = std_dev ** (1.0 / 2)
+            annual_vol = np.round(annual_vol*100, 2)
+            
+            sharpe_ratio = np.round(rets.mean() / std_dev, 2)
+            
+            cum_returns = (np.cumprod(1 + rets.values))*100
+            max_return = np.fmax.accumulate(cum_returns, axis=0)
+            max_drawdown = np.min((cum_returns - max_return) / max_return, axis=0)
+            max_drawdown = np.round(max_drawdown*100, 2)
+            
+            metrics.append([fresult.name, annual_ret,
+                            annual_vol, max_drawdown,
+                            sharpe_ratio])
+
+        return pd.DataFrame(metrics, columns=['Filtering Method', 'Annual Returns',
+                                              'Annual Volatility', 'Max Drawdown',
+                                              'Sharpe Ratio'])
 
     def plot_model_results(self, model):
         """
         Inverts the scaling of the dataset and plots the regression results.
+
+        :param model: (Object) ML model that has the method 'predict' implemented.
+        :return: (tuple)
         """
 
         predicted_train_y = model.predict(self.input_train)
@@ -279,9 +338,12 @@ class SpreadModelingHelper:
         return y_train_inverted, predicted_train_inverted, y_test_inverted, predicted_test_inverted, y_oos_inverted, predicted_oos_inverted
 
     @staticmethod
-    def plot_trades(events, title):
+    def plot_trades(events: pd.DataFrame, title: str):
         """
         Plots long/short/all trades given a set of labeled returns.
+
+        :param events: (pd.DataFrame) Trade DataFrame with returns and side as columns.
+        :param title: (str)
         """
 
         long_trades = events[(events['side'] == 1)].iloc[:, 0]
@@ -289,9 +351,7 @@ class SpreadModelingHelper:
         all_trades = pd.concat([long_trades, short_trades]).sort_index()
 
         plt.plot(np.cumprod(1 + long_trades.values) - 1)
-
         plt.plot(np.cumprod(1 + short_trades.values) - 1)
-
         plt.plot(np.cumprod(1 + all_trades.values) - 1)
 
         plt.legend(['long trades', 'short trades', 'all trades'])
@@ -299,9 +359,13 @@ class SpreadModelingHelper:
         plt.title(title)
 
     @staticmethod
-    def plot_regression_results(y_true, y_pred, title):
+    def plot_regression_results(y_true: pd.Series, y_pred: pd.Series, title: str):
         """
         Plots Regression results for visual comparison.
+
+        :param ytrue: (pd.DataFrame) The ground truth data.
+        :param ypred: (pd.DataFrame) The predicted data.
+        :param title: (str)
         """
 
         print(r2_score(y_true, y_pred))

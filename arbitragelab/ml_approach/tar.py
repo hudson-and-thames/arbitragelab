@@ -14,10 +14,12 @@ from arbitragelab.cointegration_approach.johansen import JohansenPortfolio
 
 class TAR():
     """
-    Threshold AutoRegressive Model.
+    The Threshold AutoRegressive Model is an extension provided by Enders and
+    Granger to the standard Dicker-Fuller Test. It considers the upside and
+    downside moves separately, thus allowing for the possibility of asymmetric adjustment.
     """
 
-    def __init__(self, price_data: pd.DataFrame, calculate_spread: bool = True):
+    def __init__(self, price_data: pd.DataFrame):
         """
         Init function.
 
@@ -25,13 +27,7 @@ class TAR():
             construct to spread from.
         """
 
-        if calculate_spread:
-            johansen_portfolio = JohansenPortfolio()
-            johansen_portfolio.fit(price_data)
-            self.spread = johansen_portfolio.construct_mean_reverting_portfolio(
-                price_data)
-        else:
-            self.spread = price_data
+        self.spread = price_data
 
     @staticmethod
     def _tag_regime(series: pd.Series) -> pd.DataFrame:
@@ -59,6 +55,7 @@ class TAR():
         :return: (RegressionResults)
         """
 
+        # Convert price spread into returns and lag by 1 period.
         jspread = pd.DataFrame(self.spread.values)
         jspread.columns = ['spread']
         jspread['rets'] = jspread['spread']
@@ -70,8 +67,10 @@ class TAR():
 
         lagged_spread = jspread['spread_lag1']
 
+        # Get up/down swings tagged as boolean masks.
         tagged_spread = self._tag_regime(lagged_spread)
 
+        # Multiply the lagged returns with the corresponding masks.
         regime_one = tagged_spread['y_{t-1}'] * tagged_spread['I_{1}']
         regime_two = tagged_spread['y_{t-1}'] * tagged_spread['I_{0}']
 
@@ -87,7 +86,11 @@ class TAR():
 
     def summary(self) -> pd.DataFrame:
         """
-        Returns summary as in paper.
+        Returns summary as in paper. Uses the Wald Test to check for
+        significance of the following hypotheses;
+        - p_1 = 0
+        - p_2 = 0
+        - p_1 = p_2
 
         :return: (pd.DataFrame) Summary of results.
         """

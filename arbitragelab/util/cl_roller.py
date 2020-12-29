@@ -27,6 +27,7 @@ class CrudeOilFutureRoller(BaseFuturesRoller):
 
     def _get_rolldates(self, dataset: pd.DataFrame) -> pd.Series:
         """
+        The implementation method for the rolling procedure for the CL future.
 
         :param dataset: (pd.DataFrame)
         :return: (pd.Series)
@@ -41,22 +42,12 @@ class CrudeOilFutureRoller(BaseFuturesRoller):
         working_frame = pd.DataFrame(twnty_fives)
         working_frame['is_in_original_index'] = pd.Series(twnty_fives.isin(cl_final_df['original_index']))
 
-        # Diagnostic check; How many 25ths actually occur in the dataset?
-        # working_frame['is_in_original_index'].value_counts()
-        # (True: 230, False: 92, Name: is_in_original_index, dtype: int64)
-
-        # CRITICAL ASSUMPTION HERE :
-        # ALL HOLIDAYS SHOULD HAVE NO PRICING DATA BECAUSE IT'S A HOLIDAY
-
         futures_df_index = list(dataset.index)
 
         # Get all 25ths that have occured (ie. have price data), and get 2 days prior to them.
         dates_that_occurred_mask = np.equal(working_frame['is_in_original_index'], True)
         dates_that_occurred = working_frame[dates_that_occurred_mask]
         roll_over_dates_for_business_days = [futures_df_index.index(i)-2 for i in dates_that_occurred['target_date'].values]
-
-        # DIAGNOSIS PRINT:
-        # futures_prices_df.iloc[roll_over_dates_for_business_days].index.values
 
         # Get all 25ths that did not occur (ie. they were holidays so no price data for that day).
         dates_not_occurred_mask = np.equal(working_frame['is_in_original_index'], False)
@@ -72,14 +63,7 @@ class CrudeOilFutureRoller(BaseFuturesRoller):
 
         roll_over_dates_for_holidays = np.ravel(roll_over_dates_for_holidays)
 
-        # DIAGNOSIS PRINT:
-        # roll_over_dates_for_holidays
-
         all_roll_overs = pd.concat([pd.Series(roll_over_dates_for_holidays),
                                     pd.Series(dataset.iloc[roll_over_dates_for_business_days].index.values)])
-
-        # DIAGNOSIS PRINT:
-        # is_expiry_busines_day(pd.DataFrame(all_roll_overs,
-        #            columns=['roll_over_dates']), 'roll_over_dates')['is_in_original_index'].value_counts()
 
         return all_roll_overs.sort_values().values

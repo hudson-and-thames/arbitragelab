@@ -44,6 +44,33 @@ Implementation
 .. autoclass:: ThresholdFilter
     :noindex:
     :members: __init__, fit, transform, fit_transform
+    
+
+Example
+*******
+
+.. code-block::
+
+    # Importing packages
+    import pandas as pd
+    import numpy as np
+    from arbitragelab.ml_approach.filters import ThresholdFilter
+
+    # Getting the dataframe with time series of asset returns
+    data = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])
+
+    # Calculate spread returns and std dev.
+    spread_series = data['spread']
+    spread_diff_series = spread_series.diff()
+    spread_diff_std = self.spread_diff_series.std()
+    
+    # Initialize ThresholdFilter with 2 std dev band for buying and selling triggers.
+    thres_filter = ThresholdFilter(buy_threshold=-spread_diff_std*2,
+                                   sell_threshold=spread_diff_std*2)
+
+    std_events = thres_filter.fit_transform(spread_diff_series)
+    
+    thres_filter.plot()
 
 Asymmetric Threshold Filter
 ###########################
@@ -59,6 +86,39 @@ The asymmetric threshold filter :math:`X` is as follows;
 where :math:`\Delta S_t` is the change in spread, :math:`X` is the level of the filter and :math:`(p_1, p_2)`
 being coefficients estimated from the TAR model.
 
+Example
+*******
+
+.. code-block::
+
+    # Importing packages
+    import pandas as pd
+    import numpy as np
+    from arbitragelab.ml_approach.filters import ThresholdFilter
+
+    # Getting the dataframe with time series of asset returns
+    data = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])
+
+    # Calculate spread returns and std dev.
+    spread_series = data['spread']
+    spread_diff_series = spread_series.diff()
+    spread_diff_std = self.spread_diff_series.std()
+    
+    # Initialize the TAR asymmetry coefficients.
+    p_1 = -0.012957
+    p_2 = -0.038508
+
+    buy_thresh = abs(p_1) * spread_diff_std*2
+    sell_thresh = - abs(p_2) * spread_diff_std*2
+    
+    # Initialize ThresholdFilter with 2 std dev band for buying and selling triggers.
+    asym_thres_filter = ThresholdFilter(buy_threshold=buy_thresh,
+                                   sell_threshold=sell_thresh)
+
+    std_events = asym_thres_filter.fit_transform(spread_diff_series)
+    
+    asym_thres_filter.plot()
+
 Correlation Filter
 ##################
 
@@ -67,7 +127,7 @@ Correlation Filter
     
     Side by side comparison of the legs correlation and the spread.
 
-As well as the application of a standard filter, trades have been filtered in terms of correlation. This is
+As well as the application of a standard filter, trades can also be filtered in terms of correlation. This is
 presented as a new methodology to filter trading rule returns on spread markets. The idea is to enable the
 trader to filter out periods of static spread movement (when the correlation between the underlying legs is
 increasing) and retain periods of dynamic spread movement (when the correlation of the underlying
@@ -97,23 +157,43 @@ Implementation
     :noindex:
     :members: __init__, fit, transform
 
+
+Example
+*******
+
+.. code-block::
+
+    # Importing packages
+    import pandas as pd
+    import numpy as np
+    from arbitragelab.ml_approach.filters import CorrelationFilter
+
+    # Getting the dataframe with time series of asset returns
+    data = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])
+
+    corr_filter = CorrelationFilter(buy_threshold=0.05, sell_threshold=-0.05, lookback=30)
+    corr_filter.fit(data[['leg_1', 'leg_2']])
+    corr_events = corr_filter.transform(data[['leg_1', 'leg_2']])
+    
+    corr_filter.plot()
+
 Volatility Filter
 #################
 
-In contribution to `(Dunis, Laws, and Middleton 2011) <https://www.tandfonline.com/doi/abs/10.1080/1351847X.2013.830140>`_, this paper develops a more refined
-volatility filter in order to offer a more sophisticated insight into market timing. 
+`(Dunis, Laws, and Middleton 2011) <https://www.tandfonline.com/doi/abs/10.1080/1351847X.2013.830140>`_, develop 
+a refined volatility filter in order to offer a more sophisticated insight into market timing. 
 
-The intuition of the strategy is to avoid trading when volatility is very high while at
+The intuition of the method is to avoid trading when volatility is very high while at
 the same time exploiting days when the volatility is relatively low. The significant
 difference between market timing techniques as used in `(Dunis, Laws, and Middleton 2011) <https://www.tandfonline.com/doi/abs/10.1080/1351847X.2013.830140>`_
-and time-varying leverage as used here is that leverage can be easily achieved by scaling
+and time-varying leverage as implemented here is that leverage can be easily achieved by scaling
 position sizes inversely to computed risk measures.
 
 There are a number of different measurement techniques available to analysts when calculating
 time-varying volatility. The most common method is the calculation of a moving average as used
-by `(Dunis and Miao 2006) <https://link.springer.com/article/10.1057/palgrave.jam.2240212>`_ who estimate volatilities using a fixed window of time (number of days,
-weeks, months). The same volatility regime classification technique was employed for the purpose
-of this research. 
+by `(Dunis and Miao 2006) <https://link.springer.com/article/10.1057/palgrave.jam.2240212>`_ 
+who estimate volatilities using a fixed window of time (number of days, weeks, months).
+The same volatility regime classification technique was employed for the purpose of this research. 
 
 The RiskMetrics volatility can be seen as a special case of the `(Bollerslev 1986)  <https://www.tandfonline.com/doi/abs/10.1080/07474938608800095>`_ GARCH model with pre-determined
 decay parameters, and it is calculated using the following formula
@@ -125,10 +205,11 @@ decay parameters, and it is calculated using the following formula
 where :math:`\sigma^2` is the volatility forecast of a specific asset, :math:`r^2` is the squared return of
 that asset, and :math:`\mu = 0.94` for daily data and :math:`0.97` for monthly data, as computed in `(Morgan 1994) <https://www.msci.com/documents/10199/5915b101-4206-4ba0-aee2-3449d5c7e95a>`_.
 
-Following `(Morgan 1994) <https://www.msci.com/documents/10199/5915b101-4206-4ba0-aee2-3449d5c7e95a>`_, the estimation of volatility regimes is therefore based
-on a rolling historical average of RiskMetrics volatility (:math:`\mu_{AVG}`) as well as the standard deviation
-of this volatility (:math:`\sigma`). The latter is in essence ‘the volatility of the volatility’. For the purpose of
-this investigation, both historical parameters :math:`\mu_{AVG}` and :math:`\sigma` are calculated on a three-month rolling
+Following `(Morgan 1994) <https://www.msci.com/documents/10199/5915b101-4206-4ba0-aee2-3449d5c7e95a>`_, 
+the estimation of volatility regimes is therefore based on a rolling historical average of RiskMetrics
+volatility (:math:`\mu_{AVG}`) as well as the standard deviation of this volatility (:math:`\sigma`).
+The latter is in essence ‘the volatility of the volatility’. For the purpose of this investigation,
+both historical parameters :math:`\mu_{AVG}` and :math:`\sigma` are calculated on a three-month rolling
 window. The average of both :math:`\mu_{AVG}` and :math:`\sigma` are then calculated based on these three-month historic
 periods. 
 
@@ -162,6 +243,25 @@ Similarly, periods of lower volatility are categorised as
     :noindex:
     :members: __init__, fit, transform, fit_transform
 
+Example
+*******
+
+.. code-block::
+
+    # Importing packages
+    import pandas as pd
+    import numpy as np
+    from arbitragelab.ml_approach.filters import VolatilityFilter
+
+    # Getting the dataframe with time series of asset returns
+    data = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])
+    spread_series = data['spread']
+
+    vol_filter = VolatilityFilter(lookback=30)
+    vol_events = vol_filter.fit_transform(spread_series)
+    
+    vol_filter.plot()
+    
 References
 ##########
 

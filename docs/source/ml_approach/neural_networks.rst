@@ -50,6 +50,40 @@ using a variety of algorithms such as gradient descent and conjugant descent.
     :noindex:
     :members: __init__, build
     
+Example
+*******
+
+.. code-block::
+
+    # Importing packages
+    import pandas as pd
+    from sklearn.model_selection import train_test_split
+    from sklearn.datasets import make_regression
+    from sklearn.metrics import r2_score
+    from arbitragelab.ml_approach.neural_networks import MultiLayerPerceptron
+    
+    X, y = make_regression(500)
+    
+    n_frames, frame_size = X.shape
+
+    regressor = MultiLayerPerceptron(frame_size, num_outputs=1, loss_fn="mean_squared_error", 
+                                      optmz="adam", metrics=[], hidden_layer_activation_function="relu",
+                                      output_layer_act_func="linear")
+
+    regressor.build()
+
+    regressor.summary()
+    
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, shuffle=False)
+
+    regressor.fit(X_train, y_train,
+                    batch_size=20, epochs=400,
+                    verbose=1)
+
+    regressor.plot_loss()
+                    
+    predictions = r2_score(y_test, regressor.predict(X_test))
+    
 Recurrent Neural Network (LSTM)
 ###############################
 Recurrent neural networks (RNNs) are a type of neural networks which leverage
@@ -75,6 +109,43 @@ hidden state, and gating mechanism.
     :noindex:
     :members: __init__, build
 
+.. code-block::
+
+    # Importing packages
+    import pandas as pd
+    from sklearn.model_selection import train_test_split
+    from sklearn.datasets import make_regression
+    from sklearn.metrics import r2_score
+    from arbitragelab.ml_approach.neural_networks import RecurrentNeuralNetwork
+    
+    X, y = make_regression(500)
+    
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, shuffle=False)
+    
+    n_features = 1
+    
+    # Reshape from [samples, timesteps] into [samples, timesteps, features]
+    X_train = X_train.reshape((X_train.shape[0], X_train.shape[1], n_features))
+    X_test = X_test.reshape((X_test.shape[0], X_test.shape[1], n_features))
+
+    _, frame_size, no_features = X_train.shape
+  
+    regressor = RecurrentNeuralNetwork((frame_size, no_features), num_outputs=1, loss_fn="mean_squared_error", 
+                                      optmz="adam", metrics=[], hidden_layer_activation_function="relu",
+                                      output_layer_act_func="linear")
+
+    regressor.build()
+
+    regressor.summary()
+
+    regressor.fit(X_train, y_train,
+                    batch_size=20, epochs=400,
+                    verbose=1)
+
+    regressor.plot_loss()
+                    
+    predictions = r2_score(y_test, regressor.predict(X_test))
+    
 Higher Order Neural Network
 ###########################
 
@@ -150,6 +221,44 @@ orders of 4 and over are rarely used.
     :noindex:
     :members: __init__, fit, transform
 
+    
+Example
+*******
+
+.. code-block::
+
+    # Importing packages
+    import pandas as pd
+    from sklearn.model_selection import train_test_split
+    from sklearn.datasets import make_regression
+    from sklearn.metrics import r2_score
+    from arbitragelab.ml_approach.feature_expander import FeatureExpander
+    from arbitragelab.ml_approach.neural_networks import MultiLayerPerceptron
+    
+    X, y = make_regression(500)
+    
+    expanded_X = FeatureExpander(methods=['product', 'power'], n_orders=2).fit(X).transform()
+    
+    n_frames, frame_size = expanded_X.shape
+
+    regressor = MultiLayerPerceptron(frame_size, num_outputs=1, loss_fn="mean_squared_error", 
+                                      optmz="adam", metrics=[], hidden_layer_activation_function="relu",
+                                      output_layer_act_func="linear")
+
+    regressor.build()
+
+    regressor.summary()
+    
+    X_train, X_test, y_train, y_test = train_test_split(expanded_X, y, test_size=0.3, shuffle=False)
+
+    regressor.fit(X_train, y_train,
+                    batch_size=20, epochs=100,
+                    verbose=1)
+
+    regressor.plot_loss()
+                    
+    predictions = r2_score(y_test, regressor.predict(X_test))
+    
 Multiple Layer NNs `(Ghazali et al. 2009) <https://www.igi-global.com/chapter/artificial-higher-order-neural-networks/5286>`_
 *****************************************************************************************************************************
 
@@ -168,9 +277,7 @@ disadvantage, `(Shin & Ghosh 1991) <https://ieeexplore.ieee.org/abstract/documen
 proposed an extension to the pi-sigma network, the so-called ridge polynomial neural network
 (RPN), which consists of a number of increasing order pi-sigma units. Most of the above 
 networks have one layer of trainable weights, and hence simple weights updating procedures
-can be used for their training. A multi-layered architecture which uses a different
-approach is the product units network, where the weights correspond to the exponents
-of the higher-order terms.
+can be used for their training.
 
 .. math:: 
     
@@ -188,6 +295,38 @@ of the higher-order terms.
 .. autoclass:: PiSigmaNeuralNetwork
     :noindex:
     :members: __init__, build
+    
+
+.. code-block::
+
+    # Importing packages
+    import pandas as pd
+    from sklearn.model_selection import train_test_split
+    from sklearn.datasets import make_regression
+    from sklearn.metrics import r2_score
+    from arbitragelab.ml_approach.neural_networks import PiSigmaNeuralNetwork
+    
+    X, y = make_regression(500)
+    
+    n_frames, frame_size = X.shape
+
+    regressor = PiSigmaNeuralNetwork(frame_size, num_outputs=1, loss_fn="mean_squared_error", 
+                                      optmz="adam", metrics=[], hidden_layer_activation_function="relu",
+                                      output_layer_act_func="linear")
+
+    regressor.build()
+
+    regressor.summary()
+    
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, shuffle=False)
+
+    regressor.fit(X_train, y_train,
+                    batch_size=20, epochs=100,
+                    verbose=1)
+
+    regressor.plot_loss()
+                    
+    predictions = r2_score(y_test, regressor.predict(X_test))
 
 References
 ##########

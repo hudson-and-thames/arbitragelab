@@ -90,6 +90,34 @@ Implementation
     :noindex:
     :members: __init__, fit, summary
 
+Example
+*******
+
+.. code-block::
+
+    # Importing packages
+    import pandas as pd
+    from arbitragelab.ml_approach.tar import TAR
+    
+    # Getting the dataframe with time series of asset returns
+    data = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])
+
+    # Calculate spread returns and std dev.
+    spread_series = data['spread']
+    
+    # The TAR model expects a Zero mean series.
+    demeaned_spread = (spread_series - spread_series.mean())
+
+    # Initialize and fit TAR model.
+    model = TAR(demeaned_spread)
+    tar_results = model.fit()
+    tar_results.summary()
+    
+    tar_results.fittedvalues.plot()
+    
+    model.summary()
+    
+
 References
 ##########
 

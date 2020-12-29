@@ -17,17 +17,17 @@ class NBPFutureRoller(BaseFuturesRoller):
 
     def _get_rolldates(self, dataset: pd.DataFrame) -> pd.Series:
         """
+        The implementation method for the rolling procedure for the NBP future.
 
         :param dataset: (pd.DataFrame)
         :return: (pd.Series)
         """
 
-        target_dates = super().get_available_date_per_month_from(dataset)#, 'first')
+        target_dates = super().get_available_date_per_month_from(dataset)
 
-        final_df = super().get_x_days_prior_available_target_date(1,
-                                                                  dataset.index.to_series(), target_dates['target_date'])
+        final_df = super().get_x_days_prior_available_target_date(1, dataset.index.to_series(),
+                                                                  target_dates['target_date'])
 
-        nbp_roll_dates = final_df['expiry'].drop_duplicates(
-        ).dropna().values[:-1]
+        nbp_roll_dates = final_df['expiry'].drop_duplicates().dropna().values[:-1]
 
         return nbp_roll_dates

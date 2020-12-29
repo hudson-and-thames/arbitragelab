@@ -42,12 +42,13 @@ class RBFutureRoller(BaseFuturesRoller):
 
     def _get_rolldates(self, dataset: pd.DataFrame) -> pd.Series:
         """
+        The implementation method for the rolling procedure for the RB future.
 
         :param dataset: (pd.DataFrame)
         :return: (pd.Series)
         """
 
-        target_dates = super().get_available_date_per_month_from(dataset)#, 'first')
+        target_dates = super().get_available_date_per_month_from(dataset)
 
         rb_roll_dates = target_dates['target_date'].drop_duplicates()
 

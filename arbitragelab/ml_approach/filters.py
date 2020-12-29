@@ -65,6 +65,9 @@ class CorrelationFilter:
 
         working_frame = frame.copy()
 
+        # Get all the events at the specified threshold range as a list. Then
+        # use isin to convert those individual dates into a boolean mask to be
+        # used on the working_frame variable to set each side.
         buy_signal = working_frame.index.isin(self.corr_series[self.corr_series > self.buy_threshold].index)
         sell_signal = working_frame.index.isin(self.corr_series[self.corr_series < self.sell_threshold].index)
 
@@ -77,32 +80,41 @@ class CorrelationFilter:
 
         return working_frame
 
-    def plot(self):
+    def plot(self) -> list:
         """
 
-        :return: (Axes)
+        :return: (list) List of Axes objects.
         """
 
         two_legged_df = self.frame.iloc[:, 0:2]
+
+        # Calculate naive spread.
         spread = two_legged_df.iloc[:, 0] - two_legged_df.iloc[:, 1]
 
+        # Calculate correlation series.
         corr_series = self.corr_series
 
+        # Get all buy/sell/nothing events.
         corr_events = self.transformed['side']
 
         plt.figure(figsize=(15, 10))
+        
+        # Plot correlation change through time and set the
+        # given buy/sell threshold as horizontal lines.
         plt.subplot(311)
         ax1 = plt.plot(corr_series.diff())
         plt.axhline(y=self.buy_threshold, color='g', linestyle='--')
         plt.axhline(y=self.sell_threshold, color='r', linestyle='--')
         plt.title("Correlation change over time")
 
+        # Plot buy events triggered by the change in correlation.
         plt.subplot(312)
         ax2 = plt.plot(spread)
         for trade_evnt in spread[corr_events == 1].index:
             plt.axvline(trade_evnt, color="tab:green", alpha=0.2)
         plt.title("Buy Events")
 
+        # Plot sell events triggered by the change in correlation.
         plt.subplot(313)
         ax3 = plt.plot(spread)
         for trade_evnt in spread[corr_events == -1].index:
@@ -127,15 +139,22 @@ class CorrelationFilter:
         two_legged_df = frame.iloc[:, 0:2]
         two_legged_df.index.name = '_index_'
 
+        # Get rolling correlation vector for the legs.
         daily_corr = two_legged_df.rolling(lookback,
                                            min_periods=lookback).corr()
+        # The DataFrame index is reset to make the MultiIndex more
+        # workable.
         daily_corr = daily_corr.iloc[:, 0].reset_index().dropna()
 
+        # We select a level from the previously reset correlation index, and specify a 
+        # column to be selected from the matrix.
         final_corr = daily_corr[daily_corr['level_1'] == two_legged_df.columns[1]]
         final_corr.set_index('_index_', inplace=True)
+        # Cleanup of some of the duplicate correlation data.
         final_corr.drop(['level_1'], axis=1, inplace=True)
         final_corr.dropna(inplace=True)
 
+        # Here we scale the correlation data to [0, 1]
         scaler = MinMaxScaler()
         scaled_corr = scaler.fit_transform(final_corr.iloc[:, 0].values.reshape(-1, 1))
         corr_series = pd.Series(data=scaled_corr.reshape(1, -1)[0],
@@ -162,9 +181,9 @@ class ThresholdFilter:
         self.frame = None
         self.transformed = None
 
-    def plot(self):
+    def plot(self) -> list:
         """
-        :return: (Axes)
+        :return: (list) List of Axes objects.
         """
 
         plt.figure(figsize=(15, 10))
@@ -218,7 +237,7 @@ class ThresholdFilter:
 
         return init_frame
 
-    def fit_transform(self, frame) -> pd.DataFrame:
+    def fit_transform(self, frame: pd.DataFrame) -> pd.DataFrame:
         """
         Convenience method that executes the fit and transform method
         in sequence.
@@ -238,6 +257,8 @@ class VolatilityFilter:
     def __init__(self, lookback: int = 80):
         """
         Initialization of trade parameters.
+        
+        :param lookback: (int)
         """
 
         self.lookback = lookback
@@ -249,9 +270,9 @@ class VolatilityFilter:
         self.rolling_mean_vol = None
         self.vol_forcast_series = None
 
-    def plot(self):
+    def plot(self) -> list:
         """
-        :return: (Axes)
+        :return: (list) List of Axes objects
         """
 
         plt.figure(figsize=(15, 10))
@@ -274,24 +295,30 @@ class VolatilityFilter:
         """
         Sets the time series to be analyzed inside of the class object.
 
-        :param frame: (pd.DataFrame) Time series to be analyzed.
+        :param spread: (pd.DataFrame) Time series to be analyzed.
         """
 
         self.spread = spread
         self.frame = spread.diff().copy().to_frame()
 
-        # Exponentially Weighted Moving Average Variance, known as RiskMetrics
+        # Initialize an Exponentially Weighted Moving Average Variance Object,
+        # also known as RiskMetrics.
         risk_metrics_vol = EWMAVariance(0.94)
 
-        # (ZeroMean) - useful if using residuals from a model estimated separately
+        # Initialize a ZeroMean object to let us use the residuals estimated from the
+        # volatility model separately.
         zero_mean = ZeroMean(self.frame, volatility=risk_metrics_vol)
         zero_mean.fit()
 
+        # Store the residuals as a DateIndex Series.
         vol_forcast_series = pd.Series(zero_mean.resids(self.frame), index=self.frame.index)
 
+        # Calculate rolling estimated mean of estimated volatility.
         rolling_mean_vol = vol_forcast_series.rolling(window=self.lookback).mean()
 
+        # Calculate the mean of the rolling mean volatility estimate. 
         mu_avg = rolling_mean_vol.rolling(window=self.lookback).mean().mean()
+        # Calculate the mean of the rolling std dev of the volatility estimate.
         sigma = rolling_mean_vol.rolling(window=self.lookback).std().mean()
 
         self.vol_forcast_series = vol_forcast_series
@@ -303,8 +330,10 @@ class VolatilityFilter:
 
     def transform(self) -> pd.DataFrame:
         """
-        Adds a side column to describe the signal that was detected at
-        that point, based on the parameters given in the constructor.
+        Adds a regime column to describe the volatility level that was detected at
+        that point, based on the parameters given in the constructor. And also
+        a 'leverage_multiplier' column describing the leverage factor use
+        in Dunis et al.
 
         :return: (pd.DataFrame) Time series augmented with the regime
             information.
@@ -317,17 +346,19 @@ class VolatilityFilter:
         avg_minus_two_std_dev = self.mu_avg - 2*self.sigma
         avg_minus_four_std_dev = self.mu_avg - 4*self.sigma
 
-        # Extremely Low Regime
+        # Extremely Low Regime - smaller or equal than mean average volatility - 4 std devs
         extrm_low_mask = (self.rolling_mean_vol <= avg_minus_four_std_dev)
         vol_series.loc[extrm_low_mask, "regime"] = -3
         vol_series.loc[extrm_low_mask, "leverage_multiplier"] = 2.5
 
-        # Medium Low Regime
+        # Medium Low Regime - smaller or equal than mean average volatility - 2 std devs and greater or equal
+        # than mean average volatility - 4 std devs
         medium_low_mask = (self.rolling_mean_vol <= avg_minus_two_std_dev) & (self.rolling_mean_vol >= avg_minus_four_std_dev)
         vol_series.loc[medium_low_mask, "regime"] = -2
         vol_series.loc[medium_low_mask, "leverage_multiplier"] = 2
 
-        # Higher Low Regime
+        # Higher Low Regime - smaller or equal than mean average volatility and greater or equal
+        # than mean average volatility - 2 std devs
         higher_low_mask = (self.rolling_mean_vol <= self.mu_avg) & (self.rolling_mean_vol >= avg_minus_two_std_dev)
         vol_series.loc[higher_low_mask, 'regime'] = -1
         vol_series.loc[higher_low_mask, "leverage_multiplier"] = 1.5
@@ -335,17 +366,19 @@ class VolatilityFilter:
         avg_plus_two_std_dev = self.mu_avg + 2*self.sigma
         avg_plus_four_std_dev = self.mu_avg + 4*self.sigma
 
-        # Lower High Regime
+        # Lower High Regime - greater or equal than mean average volatility + 2 std devs and smaller or equal
+        # than mean average volatility + 4 std devs
         low_high_mask = (self.rolling_mean_vol >= self.mu_avg) & (self.rolling_mean_vol <= avg_plus_two_std_dev)
         vol_series.loc[low_high_mask, 'regime'] = 1
         vol_series.loc[low_high_mask, "leverage_multiplier"] = 1
 
-        # Medium High Regime
+        # Medium High Regime - greater or equal than mean average volatility + 2 std devs and smaller or equal
+        # than mean average volatility + 4 std devs
         medium_high_mask = (self.rolling_mean_vol >= avg_plus_two_std_dev) & (self.rolling_mean_vol <= avg_plus_four_std_dev)
         vol_series.loc[medium_high_mask, "regime"] = 2
         vol_series.loc[medium_high_mask, "leverage_multiplier"] = 0.5
 
-        # Extremely High Regime
+        # Extremely High Regime - greater or equal than mean average volatility + 4 std devs
         extrm_high_mask = (self.rolling_mean_vol >= avg_plus_four_std_dev)
         vol_series.loc[extrm_high_mask, "regime"] = 3
         vol_series.loc[extrm_high_mask, "leverage_multiplier"] = 0
@@ -354,7 +387,7 @@ class VolatilityFilter:
 
         return vol_series
 
-    def fit_transform(self, frame) -> pd.DataFrame:
+    def fit_transform(self, frame: pd.DataFrame) -> pd.DataFrame:
         """
         Convenience method that executes the fit and transform method
         in sequence.

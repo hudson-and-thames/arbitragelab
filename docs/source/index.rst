@@ -58,6 +58,7 @@ This project is licensed under an all rights reserved licence.
     :hidden:
 
     data/data_importer
+    data/futures_rollover
 
 .. toctree::
     :maxdepth: 2
@@ -135,7 +136,6 @@ This project is licensed under an all rights reserved licence.
     ml_approach/introduction
     ml_approach/ml_based_pairs_selection
     ml_approach/spread_modeling
-    ml_approach/futures_rollover
     ml_approach/threshold_ar
     ml_approach/neural_networks
     ml_approach/filters
