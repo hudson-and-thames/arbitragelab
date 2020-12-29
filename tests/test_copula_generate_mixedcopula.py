@@ -271,7 +271,7 @@ class TestCopulaGenerateMixedCopula(unittest.TestCase):
         theta = 5
         weights = (0.3, 0.4, 0.3)
         ctg = cgmix.CTGMixCop(cop_params=(theta, rho, nu, theta), weights=weights)
-        cfg = cgmix.CTGMixCop(cop_params=(theta, theta, theta), weights=weights)
+        cfg = cgmix.CFGMixCop(cop_params=(theta, theta, theta), weights=weights)
 
         # Initiate without an axes
         axs = dict()
