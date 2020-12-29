@@ -19,7 +19,7 @@ Statistical Association, 109(506), pp.788-801.
 
 # pylint: disable = invalid-name, too-many-locals
 from abc import ABC, abstractmethod
-from scipy.optimize import minimize, OptimizeResult
+from scipy.optimize import minimize
 import numpy as np
 import pandas as pd
 import arbitragelab.copula_approach.copula_generate as cg
@@ -319,7 +319,6 @@ class CTGMixCop(MixedCopula):
             # Otherwise use the usual maximization step
             else:  # pragma: no cover
                 cop_params = self._maximization_step(quantile_data, gamma_scad, a_scad, cop_params, weights)
-                print('else flag')
             # Update for the new parameters
             new_full_params = np.concatenate([weights, cop_params], axis=None)
             # Update the l1 difference norm and also the counter
