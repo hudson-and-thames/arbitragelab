@@ -316,8 +316,10 @@ class CTGMixCop(MixedCopula):
             if weights[1] < 1e-2:
                 weights = ccalc.adjust_weights(weights, threshold=1e-2)
                 cop_params = self._maximization_step_no_t(quantile_data, gamma_scad, a_scad, cop_params, weights)
-            else:  # Otherwise use the usual maximization step.
+            # Otherwise use the usual maximization step
+            else:  # pragma: no cover
                 cop_params = self._maximization_step(quantile_data, gamma_scad, a_scad, cop_params, weights)
+                print('else flag')
             # Update for the new parameters
             new_full_params = np.concatenate([weights, cop_params], axis=None)
             # Update the l1 difference norm and also the counter
@@ -555,64 +557,6 @@ class CTGMixCop(MixedCopula):
         penalty = num * np.sum([ccalc.scad_penalty(weights[k], gamma=gamma_scad, a=a_scad) for k in range(3)])
 
         return (log_likelihood_sum - penalty * int(if_penalty)) * multiplier
-
-    def _fit_quantile(self, quantile_data: pd.DataFrame, tol: float, method: str) -> OptimizeResult:
-        """
-        Fitting cop_params and weights by max likelihood from data. (Depreciated)
-
-        Note: This method was used by the author (da Silva et al. 2017). However, it is really unstable, and does not
-        necessarily find a good solution. Also it does not penalize small components in copula mixtures. For all the
-        above reasons it is depreciated for practical use. We still implement it here as a choice if one wishes to use
-        for whatever reason. It is just a wrapper of a bounded scipy optimization algorithm over weights and cop_params.
-
-        Recommended default param: tol = 0.01, method = 'TNC'. Quantile data needs to be in [0, 1].
-        :param quantile_data: (pd.DataFrame) The quantile data to be used for fitting.
-        :param tol: (float) Tolerance for termination for the numerical optimizer. The user is expected to
-            tune this parameter for potentially better fit on different data. Defaults to 0.01 in the class.
-        :param method: (str) Numerical algorithm used for optimization. By default it uses TNC (Truncated
-            Newton) for better performance in the class. Also the user can use 'L-BFGS-B' for faster calculation, but
-            the fit is generally not as good as 'TNC'. Please DO NOT use other methods as they are tested as invalid
-            for this framework.
-        :return (OptimizeResult): The optimized result from the numerical algorithm.
-        """
-
-        u1 = quantile_data.iloc[:, 0].to_numpy()
-        u2 = quantile_data.iloc[:, 1].to_numpy()
-
-        # Define the objective function.
-        def neg_log_likelihood_mixcop(my_params):
-            theta_c, rho_t, nu_t, theta_g, weight_c, weight_t = my_params
-            # Edge case for Student and Clayton. Turn them away from 0 but retain the sign.
-            theta_c = self._away_from_0(theta_c)
-            rho_t = self._away_from_0(rho_t)
-            # Initiate 3 copulas with their own copula parameter respectively.
-            clayton_cop = cg.Clayton(theta=theta_c)
-            corr = [[1, rho_t], [rho_t, 1]]
-            t_cop = cg.Student(cov=corr, nu=nu_t)
-            gumbel_cop = cg.Gumbel(theta=theta_g)
-            # Calculate log-likelihood respectively for each copula.
-            likelihood_list_clayton = np.array([clayton_cop.get_cop_density(u1_i, u2_i)
-                                                for (u1_i, u2_i) in zip(u1, u2)])
-            likelihood_list_t = np.array([t_cop.get_cop_density(u1_i, u2_i) for (u1_i, u2_i) in zip(u1, u2)])
-            likelihood_list_gumbel = np.array([gumbel_cop.get_cop_density(u1_i, u2_i) for (u1_i, u2_i) in zip(u1, u2)])
-            # Mix according to weights.
-            likelihood_list_mix = (weight_c * likelihood_list_clayton + weight_t * likelihood_list_t
-                                   + (1 - weight_c - weight_t) * likelihood_list_gumbel)
-            # Calculate sum of log likelihood respectively.
-            log_likelihood_sum = np.sum(np.log(likelihood_list_mix))
-
-            return -log_likelihood_sum  # Minimizing the negative of log likelihood.
-
-        # ML fit for obj func neg_log_likelihood_mixcop(theta_c, theta_f, theta_g, weight_c, weight_f)
-        params = np.array([3, 3, 0.8, 3, 0.33, 0.33])  # Initial guess
-        # Constraint: theta_c in [-1, 100]. rho_t in [0.01, 0.99]. nu_t in [2, 15]. theta_g in [1, 100]
-        # weight_c in [0, 1]. weight_f in [0, 1]
-        bnds = ((-1, 100), (0.01, 0.99), (2, 10), (1, 100), (0, 1), (0, 1))
-
-        res = minimize(neg_log_likelihood_mixcop, params, method=method, bounds=bnds,
-                       options={'disp': False}, tol=tol)
-
-        return res
 
     def _get_param(self) -> dict:
         """
@@ -920,64 +864,6 @@ class CFGMixCop(MixedCopula):
         penalty = num * np.sum([ccalc.scad_penalty(weights[k], gamma=gamma_scad, a=a_scad) for k in range(3)])
 
         return (log_likelihood_sum - penalty * int(if_penalty)) * multiplier
-
-    def _fit_quantile(self, quantile_data: pd.DataFrame, tol: float, method: str) -> OptimizeResult:
-        """
-        Fitting cop_params and weights by max likelihood from data. (Depreciated)
-
-        Note: This method was used by the author (da Silva et al. 2017). However, it is really unstable, and does not
-        necessarily find a good solution. Also it does not penalize small components in copula mixtures. For all the
-        above reasons it is depreciated for practical use. We still implement it here as a choice if one wishes to use
-        for whatever reason. It is just a wrapper of a bounded scipy optimization algorithm over weights and cop_params.
-
-        Recommended default param: tol = 0.01, method = 'TNC'. Quantile data needs to be in [0, 1].
-        :param quantile_data: (pd.DataFrame) The quantile data to be used for fitting.
-        :param tol: (float) Tolerance for termination for the numerical optimizer. The user is expected to
-            tune this parameter for potentially better fit on different data. Defaults to 0.01 in the class.
-        :param method: (str) Numerical algorithm used for optimization. By default it uses TNC (Truncated
-            Newton) for better performance in the class. Also the user can use 'L-BFGS-B' for faster calculation, but
-            the fit is generally not as good as 'TNC'. Please DO NOT use other methods as they are tested as invalid
-            for this framework.
-        :return (OptimizeResult): The optimized result from the numerical algorithm.
-        """
-
-        # Lower level calculations were done on numpy arrays.
-        u1 = quantile_data.iloc[:, 0].to_numpy()
-        u2 = quantile_data.iloc[:, 1].to_numpy()
-
-        # Define the objective function.
-        def neg_log_likelihood_mixcop(my_params):
-            theta_c, theta_f, theta_g, weight_c, weight_f = my_params
-            # Edge case for frank and clayton. Turn them away from 0 but retain the sign.
-            theta_c = self._away_from_0(theta_c)
-            theta_f = self._away_from_0(theta_f)
-            # Initiate 3 copulas with their own copula parameter respectively.
-            clayton_cop = cg.Clayton(theta=theta_c)
-            frank_cop = cg.Frank(theta=theta_f)
-            gumbel_cop = cg.Gumbel(theta=theta_g)
-            # Calculate log-likelihood respectively for each copula.
-            likelihood_list_clayton = np.array([clayton_cop.get_cop_density(u1_i, u2_i)
-                                                for (u1_i, u2_i) in zip(u1, u2)])
-            likelihood_list_frank = np.array([frank_cop.get_cop_density(u1_i, u2_i) for (u1_i, u2_i) in zip(u1, u2)])
-            likelihood_list_gumbel = np.array([gumbel_cop.get_cop_density(u1_i, u2_i) for (u1_i, u2_i) in zip(u1, u2)])
-            # Mix according to weights.
-            likelihood_list_mix = (weight_c * likelihood_list_clayton + weight_f * likelihood_list_frank
-                                   + (1 - weight_c - weight_f) * likelihood_list_gumbel)
-            # Calculate sum of log likelihood respectively.
-            log_likelihood_sum = np.sum(np.log(likelihood_list_mix))
-
-            return -log_likelihood_sum  # Minimizing the negative of log likelihood.
-
-        # ML fit for obj func neg_log_likelihood_mixcop(theta_c, theta_f, theta_g, weight_c, weight_f)
-        params = np.array([3, 3, 3, 0.33, 0.33])  # Initial guess
-        # Constraint: theta_c in [-1, 100]. theta_f in [-50, 50]. theta_g in [1, 100]
-        # weight_c in [0, 1]. weight_f in [0, 1]
-        bnds = ((-1, 100), (-50, 50), (1, 100), (0, 1), (0, 1))
-
-        res = minimize(neg_log_likelihood_mixcop, params, method=method, bounds=bnds,
-                       options={'disp': False}, tol=tol)
-
-        return res
 
     def _get_param(self) -> dict:
         """

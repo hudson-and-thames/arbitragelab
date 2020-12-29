@@ -783,9 +783,6 @@ class TestBasicCopulaStrategy(unittest.TestCase):
 
         # Fit CTGMixCop to data using BCS
         result_dict, fitted_copula, _, _ = BCS.fit_copula(data_df, copula_name='CTGMixCop', gamma_scad=0.6)
-        print(result_dict)
-        print(fitted_copula.cop_params)
-        print(fitted_copula.weights)
         self.assertEqual(result_dict['Copula Name'], 'CTGMixCop')
         self.assertAlmostEqual(result_dict['SIC'], -2209.358326366888, delta=1e-3)
         self.assertAlmostEqual(result_dict['AIC'], -2238.7506149531737, delta=1e-3)
