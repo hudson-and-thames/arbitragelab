@@ -521,8 +521,8 @@ class BasicCopulaStrategy:
         return cur_pos, who_exits
 
     @staticmethod
-    def _exit_trigger_mpi(condi_probs: pd.Series, pre_condi_probs: pd.Series, exit_rule: str,
-                          who_exits: np.array, exit_thresholds: tuple) -> Tuple[int, np.array]:
+    def _exit_trigger(condi_probs: pd.Series, pre_condi_probs: pd.Series, exit_rule: str,
+                      who_exits: np.array, exit_thresholds: tuple) -> Tuple[int, np.array]:
         """
         Check if the exiting signal is triggered.
 
