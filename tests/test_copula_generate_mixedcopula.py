@@ -11,6 +11,7 @@ import datetime as dt
 import numpy as np
 import pandas as pd
 import scipy.stats as ss
+import matplotlib.pyplot as plt
 from arbitragelab.copula_approach import copula_generate_mixedcopula as cgmix
 from arbitragelab.copula_approach import copula_generate as cg
 from arbitragelab.copula_approach import copula_calculation as ccalc
@@ -259,3 +260,32 @@ class TestCopulaGenerateMixedCopula(unittest.TestCase):
         kendalls_taus_sample = ss.kendalltau(sample_pairs[:, 0], sample_pairs[:, 1])[0]
         self.assertAlmostEqual(kendalls_taus_sample, 0.8, delta=0.05)
         np.random.seed(None)  # Reset random seed.
+
+    def test_plot_abs_class_method(self):
+        """
+        Testing the plot method in the Copula abstract class.
+        """
+
+        rho = 0.5
+        nu = 4
+        theta = 5
+        weights = (0.3, 0.4, 0.3)
+        ctg = cgmix.CTGMixCop(cop_params=(theta, rho, nu, theta), weights=weights)
+        cfg = cgmix.CTGMixCop(cop_params=(theta, theta, theta), weights=weights)
+
+        # Initiate without an axes
+        axs = dict()
+        axs['CTG'] = ctg.plot(200)
+        axs['CFG'] = cfg.plot(200)
+        for key in axs:
+            self.assertEqual(str(type(axs[key])), "<class 'matplotlib.axes._subplots.AxesSubplot'>")
+
+        # Initiate with an axes
+        _, ax = plt.subplots()
+        axs = dict()
+        axs['CTG'] = ctg.plot(200, ax)
+        axs['CFG'] = cfg.plot(200, ax)
+        plt.close()
+
+        for key in axs:
+            self.assertEqual(str(type(axs[key])), "<class 'matplotlib.axes._subplots.AxesSubplot'>")

@@ -22,6 +22,7 @@ from abc import ABC, abstractmethod
 from scipy.optimize import minimize
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 import arbitragelab.copula_approach.copula_generate as cg
 import arbitragelab.copula_approach.copula_calculation as ccalc
 
@@ -57,6 +58,32 @@ class MixedCopula(ABC):
         """
         Get the parameters of the mixed copula.
         """
+
+    def plot(self, num: int, ax: plt.axes = None, **ax_kwargs) -> plt.axes:
+        """
+        Plot a given number sampling of the mixed copula.
+
+        :param num: (int) The number of points to sample for plotting.
+        :param ax: (plt.axes) Optional. The plotting axes. If not provided it will generate its own. Defaults to None.
+        :param ax_kwargs: (dict) Additional axes keyword arguments for plotting.
+        :return: (plt.axes) The plot axes.
+        """
+
+        samples = self.generate_pairs(num)  # Sample from each copula for plotting
+
+        # Plot the samples on an axes
+        ax = ax or plt.gca()
+        ax.scatter(samples[:, 0], samples[:, 1], **ax_kwargs)
+        ax.set_xlim(-0.02, 1.02)
+        ax.set_ylim(-0.02, 1.02)
+        ax.set_aspect('equal', adjustable='box')  # Equal scale in x and y.
+
+        # Modify the title.
+        copula_name = self.__class__.__name__  # Each specific copula's name
+        ax.set_title(r'{}, weights=({:.2f}, {:.2f}, {:.2f})'.format(
+            copula_name, self.weights[0], self.weights[1], self.weights[2]))
+
+        return ax
 
     def get_cop_density(self, u: float, v: float, eps: float = 1e-5) -> float:
         """

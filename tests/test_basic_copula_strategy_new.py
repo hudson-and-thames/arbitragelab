@@ -538,21 +538,21 @@ class TestBasicCopulaStrategy(unittest.TestCase):
         # Previously long
         pre_pos = 1
         expected_pos = 1  # Expecting long
-        expected_who_exits = pd.Series([0, 1])
+        expected_who_exits = pd.Series([0, 0])
         cur_pos, who_exits = BCS.get_cur_position(condi_probs, pre_condi_probs, pre_pos, exit_rule, who_exits)
         self.assertEqual(cur_pos, expected_pos)
         pd.testing.assert_series_equal(who_exits, expected_who_exits, check_dtype=False, check_less_precise=3)
         # Previously short
         pre_pos = -1
         expected_pos = -1  # Expecting long
-        expected_who_exits = pd.Series([0, 1])
+        expected_who_exits = pd.Series([0, 0])
         cur_pos, who_exits = BCS.get_cur_position(condi_probs, pre_condi_probs, pre_pos, exit_rule, who_exits)
         self.assertEqual(cur_pos, expected_pos)
         pd.testing.assert_series_equal(who_exits, expected_who_exits, check_dtype=False, check_less_precise=3)
         # Previously no position
         pre_pos = 0
         expected_pos = 0  # Expecting long
-        expected_who_exits = pd.Series([0, 1])
+        expected_who_exits = pd.Series([0, 0])
         cur_pos, who_exits = BCS.get_cur_position(condi_probs, pre_condi_probs, pre_pos, exit_rule, who_exits)
         self.assertEqual(cur_pos, expected_pos)
         pd.testing.assert_series_equal(who_exits, expected_who_exits, check_dtype=False, check_less_precise=3)
@@ -883,7 +883,7 @@ class TestBasicCopulaStrategy(unittest.TestCase):
         gaussian = cg.Gaussian(cov=cov)
         student = cg.Student(cov=cov, nu=nu)
 
-        # Expect None type
+        # Initiate without an axes
         axs = dict()
         axs['Gumbel'] = gumbel.plot(200)
         axs['Frank'] = frank.plot(200)
@@ -898,7 +898,7 @@ class TestBasicCopulaStrategy(unittest.TestCase):
         for key in axs:
             self.assertEqual(str(type(axs[key])), "<class 'matplotlib.axes._subplots.AxesSubplot'>")
 
-        # Expect plt.axes type
+        # Initiate with axes
         _, ax = plt.subplots()
         axs = dict()
         axs['Gumbel'] = gumbel.plot(200, ax)

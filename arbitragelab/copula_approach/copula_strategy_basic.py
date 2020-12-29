@@ -518,6 +518,9 @@ class BasicCopulaStrategy:
             # Change here for precedence of open and exit signals.
             cur_pos = open_signal * int((not bool(exit_signal)))
 
+        if open_signal != 0:  # Reset who_exits when there is an open signal.
+            who_exits = pd.Series(np.zeros(2))
+
         return cur_pos, who_exits
 
     @staticmethod

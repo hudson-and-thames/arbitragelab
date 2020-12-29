@@ -125,7 +125,7 @@ class Copula(ABC):
 
         :param num: (int) The number of points to sample for plotting.
         :param ax: (plt.axes) Optional. The plotting axes. If not provided it will generate its own. Defaults to None.
-        :param **ax_kwargs: (dict) Additional axes keyword arguments for plotting.
+        :param ax_kwargs: (dict) Additional axes keyword arguments for plotting.
         :return: (plt.axes) The plot axes.
         """
 
