@@ -7,7 +7,6 @@ Unit tests for copula strategy using mispricing index (MPI).
 # pylint: disable = invalid-name, protected-access
 import os
 import unittest
-import datetime as dt
 import numpy as np
 import pandas as pd
 from arbitragelab.copula_approach import copula_strategy_mpi
@@ -23,9 +22,7 @@ class TestCopulaStrategyMPI(unittest.TestCase):
         project_path = os.path.dirname(__file__)
         self.data_path = project_path + r'/test_data'
 
-        self.pair_prices = pd.read_csv(self.data_path + r'/BKD_ESC_2009_2011.csv', index_col=0)
-        formatted_dates = [dt.datetime.strptime(d, '%m/%d/%Y').date() for d in self.pair_prices.index]
-        self.pair_prices.index = formatted_dates
+        self.pair_prices = pd.read_csv(self.data_path + r'/BKD_ESC_2009_2011.csv', parse_dates=True, index_col="Date")
 
     def test_exit_trigger(self):
         """
@@ -41,33 +38,33 @@ class TestCopulaStrategyMPI(unittest.TestCase):
         flag_3_0 = pd.Series([3, 0])
         flag_n2_n2 = pd.Series([-2, -2])
 
-        self.assertTrue(CS._exit_trigger(pre_flag=flag_0_0, raw_cur_flag=flag_3_0, open_based_on=[-1, 1]))
-        self.assertTrue(CS._exit_trigger(pre_flag=flag_0_0, raw_cur_flag=flag_n2_n2, open_based_on=[-1, 1]))
-        self.assertTrue(CS._exit_trigger(pre_flag=flag_05_05, raw_cur_flag=flag_0_0, open_based_on=[-1, 1]))
-        self.assertFalse(CS._exit_trigger(pre_flag=flag_02_05, raw_cur_flag=flag_05_05, open_based_on=[-1, 1]))
-        self.assertFalse(CS._exit_trigger(pre_flag=flag_02_05, raw_cur_flag=flag_01_3, open_based_on=[-1, 1]))
-        self.assertFalse(CS._exit_trigger(pre_flag=flag_0_0, raw_cur_flag=flag_0_0, open_based_on=[-1, 1]))
+        self.assertTrue(CS._exit_trigger_mpi(pre_flag=flag_0_0, raw_cur_flag=flag_3_0, open_based_on=[-1, 1]))
+        self.assertTrue(CS._exit_trigger_mpi(pre_flag=flag_0_0, raw_cur_flag=flag_n2_n2, open_based_on=[-1, 1]))
+        self.assertTrue(CS._exit_trigger_mpi(pre_flag=flag_05_05, raw_cur_flag=flag_0_0, open_based_on=[-1, 1]))
+        self.assertFalse(CS._exit_trigger_mpi(pre_flag=flag_02_05, raw_cur_flag=flag_05_05, open_based_on=[-1, 1]))
+        self.assertFalse(CS._exit_trigger_mpi(pre_flag=flag_02_05, raw_cur_flag=flag_01_3, open_based_on=[-1, 1]))
+        self.assertFalse(CS._exit_trigger_mpi(pre_flag=flag_0_0, raw_cur_flag=flag_0_0, open_based_on=[-1, 1]))
 
-        self.assertTrue(CS._exit_trigger(pre_flag=flag_0_0, raw_cur_flag=flag_3_0, open_based_on=[1, 1]))
-        self.assertTrue(CS._exit_trigger(pre_flag=flag_0_0, raw_cur_flag=flag_n2_n2, open_based_on=[1, 1]))
-        self.assertTrue(CS._exit_trigger(pre_flag=flag_n05_n05, raw_cur_flag=flag_05_05, open_based_on=[1, 1]))
-        self.assertFalse(CS._exit_trigger(pre_flag=flag_02_05, raw_cur_flag=flag_05_05, open_based_on=[1, 1]))
-        self.assertFalse(CS._exit_trigger(pre_flag=flag_02_05, raw_cur_flag=flag_01_3, open_based_on=[1, 1]))
-        self.assertFalse(CS._exit_trigger(pre_flag=flag_0_0, raw_cur_flag=flag_0_0, open_based_on=[1, 1]))
+        self.assertTrue(CS._exit_trigger_mpi(pre_flag=flag_0_0, raw_cur_flag=flag_3_0, open_based_on=[1, 1]))
+        self.assertTrue(CS._exit_trigger_mpi(pre_flag=flag_0_0, raw_cur_flag=flag_n2_n2, open_based_on=[1, 1]))
+        self.assertTrue(CS._exit_trigger_mpi(pre_flag=flag_n05_n05, raw_cur_flag=flag_05_05, open_based_on=[1, 1]))
+        self.assertFalse(CS._exit_trigger_mpi(pre_flag=flag_02_05, raw_cur_flag=flag_05_05, open_based_on=[1, 1]))
+        self.assertFalse(CS._exit_trigger_mpi(pre_flag=flag_02_05, raw_cur_flag=flag_01_3, open_based_on=[1, 1]))
+        self.assertFalse(CS._exit_trigger_mpi(pre_flag=flag_0_0, raw_cur_flag=flag_0_0, open_based_on=[1, 1]))
 
-        self.assertFalse(CS._exit_trigger(pre_flag=flag_0_0, raw_cur_flag=flag_3_0, open_based_on=[-1, 2]))
-        self.assertTrue(CS._exit_trigger(pre_flag=flag_0_0, raw_cur_flag=flag_n2_n2, open_based_on=[-1, 2]))
-        self.assertFalse(CS._exit_trigger(pre_flag=flag_05_05, raw_cur_flag=flag_0_0, open_based_on=[-1, 2]))
-        self.assertFalse(CS._exit_trigger(pre_flag=flag_02_05, raw_cur_flag=flag_05_05, open_based_on=[-1, 2]))
-        self.assertTrue(CS._exit_trigger(pre_flag=flag_02_05, raw_cur_flag=flag_01_3, open_based_on=[-1, 2]))
-        self.assertFalse(CS._exit_trigger(pre_flag=flag_0_0, raw_cur_flag=flag_0_0, open_based_on=[-1, 2]))
+        self.assertFalse(CS._exit_trigger_mpi(pre_flag=flag_0_0, raw_cur_flag=flag_3_0, open_based_on=[-1, 2]))
+        self.assertTrue(CS._exit_trigger_mpi(pre_flag=flag_0_0, raw_cur_flag=flag_n2_n2, open_based_on=[-1, 2]))
+        self.assertFalse(CS._exit_trigger_mpi(pre_flag=flag_05_05, raw_cur_flag=flag_0_0, open_based_on=[-1, 2]))
+        self.assertFalse(CS._exit_trigger_mpi(pre_flag=flag_02_05, raw_cur_flag=flag_05_05, open_based_on=[-1, 2]))
+        self.assertTrue(CS._exit_trigger_mpi(pre_flag=flag_02_05, raw_cur_flag=flag_01_3, open_based_on=[-1, 2]))
+        self.assertFalse(CS._exit_trigger_mpi(pre_flag=flag_0_0, raw_cur_flag=flag_0_0, open_based_on=[-1, 2]))
 
-        self.assertFalse(CS._exit_trigger(pre_flag=flag_0_0, raw_cur_flag=flag_3_0, open_based_on=[1, 2]))
-        self.assertTrue(CS._exit_trigger(pre_flag=flag_0_0, raw_cur_flag=flag_n2_n2, open_based_on=[1, 2]))
-        self.assertFalse(CS._exit_trigger(pre_flag=flag_n05_n05, raw_cur_flag=flag_05_05, open_based_on=[1, 2]))
-        self.assertFalse(CS._exit_trigger(pre_flag=flag_02_05, raw_cur_flag=flag_05_05, open_based_on=[1, 2]))
-        self.assertTrue(CS._exit_trigger(pre_flag=flag_02_05, raw_cur_flag=flag_01_3, open_based_on=[1, 2]))
-        self.assertFalse(CS._exit_trigger(pre_flag=flag_0_0, raw_cur_flag=flag_0_0, open_based_on=[1, 2]))
+        self.assertFalse(CS._exit_trigger_mpi(pre_flag=flag_0_0, raw_cur_flag=flag_3_0, open_based_on=[1, 2]))
+        self.assertTrue(CS._exit_trigger_mpi(pre_flag=flag_0_0, raw_cur_flag=flag_n2_n2, open_based_on=[1, 2]))
+        self.assertFalse(CS._exit_trigger_mpi(pre_flag=flag_n05_n05, raw_cur_flag=flag_05_05, open_based_on=[1, 2]))
+        self.assertFalse(CS._exit_trigger_mpi(pre_flag=flag_02_05, raw_cur_flag=flag_05_05, open_based_on=[1, 2]))
+        self.assertTrue(CS._exit_trigger_mpi(pre_flag=flag_02_05, raw_cur_flag=flag_01_3, open_based_on=[1, 2]))
+        self.assertFalse(CS._exit_trigger_mpi(pre_flag=flag_0_0, raw_cur_flag=flag_0_0, open_based_on=[1, 2]))
 
     def test_get_position_and_reset_flag(self):
         """
@@ -200,8 +197,8 @@ class TestCopulaStrategyMPI(unittest.TestCase):
         # Forming positions and flags.
         _, _ = CSMPI.get_positions_and_flags(returns, cdf1, cdf2, enable_reset_flag=True)
         # Check goodness of copula fit by its coefficient.
-        self.assertAlmostEqual(copula.theta, 1.3989032623979707)
+        self.assertAlmostEqual(copula.theta, 1.3951538673040886)
         # Check numbers of triggers.
-        self.assertEqual(CSMPI._long_count, 338)
-        self.assertEqual(CSMPI._exit_count, 31)
-        self.assertEqual(CSMPI._short_count, 478)
+        self.assertEqual(CSMPI._long_count, 339)
+        self.assertEqual(CSMPI._exit_count, 32)
+        self.assertEqual(CSMPI._short_count, 476)

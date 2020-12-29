@@ -8,36 +8,36 @@ Xie, W., Liew, R.Q., Wu, Y. and Zou, X., 2014. Pairs Trading with Copulas.
 https://efmaefm.org/0efmameetings/EFMA%20ANNUAL%20MEETINGS/2014-Rome/papers/EFMA2014_0222_FullPaper.pdf
 """
 # pylint: disable = invalid-name, too-many-locals
-from typing import Callable
+from typing import Callable, Sequence, Union
 import numpy as np
 import pandas as pd
-from arbitragelab.copula_approach.copula_strategy import CopulaStrategy
+from arbitragelab.copula_approach.copula_strategy_basic import BasicCopulaStrategy
 import arbitragelab.copula_approach.copula_generate as cg
+import arbitragelab.copula_approach.copula_generate_mixedcopula as cgmix
 # import arbitragelab.copula_approach.copula_calculation as ccalc
 
 
-class CopulaStrategyMPI(CopulaStrategy):
+class CopulaStrategyMPI(BasicCopulaStrategy):
     """
     Copula trading strategy based on mispricing index(MPI).
 
     This strategy uses mispricing indices from a pair of stocks to form positions.
-    It is more specific than the original CopulaStrategy as its logic is built upon the usage of return series, not
-    price series from stocks. Indeed, it uses flag series, defined as the cumulative centered mispricing index, with
-    certain reset conditions to form positions. A very important note is that, flag series are not uniquely defined
-    based on the authors' description. In some cases the reset conditions depends on whether the reset priority is
-    higher or opening a position priority is higher. In this implementation as CopulaStrategyMPI, the reset priority
+    It is more specific than the original BacicCopulaStrategy as its logic is built upon the usage of return series,
+    not price series from stocks. Indeed, it uses flag series, defined as the cumulative centered mispricing index,
+    with certain reset conditions to form positions. A very important note is that, flag series are not uniquely
+    defined based on the authors' description. In some cases the reset conditions depends on whether the reset priority
+    is higher or opening a position priority is higher. In this implementation as CopulaStrategyMPI, the reset priority
     is the highest. If one wishes to change the precedence, it is in method _get_position_and_reset_flag.
 
-    Compared to the original CopulaStrategy class, it includes the following fundamental functionalities:
+    Compared to the original BasicCopulaStrategy class, it includes the following fundamental functionalities:
 
         1. Convert price series to return series.
-        2. Fit a copula using maximum likelihood.
-        3. Calculate MPI and flags (essentially cumulative mispricing index).
-        4. Use flags to form positions.
+        2. Calculate MPI and flags (essentially cumulative mispricing index).
+        3. Use flags to form positions.
 
     """
 
-    def __init__(self, copula: cg.Copula = None,
+    def __init__(self, copula: Union[cg.Copula, cgmix.MixedCopula] = None,
                  opening_triggers: tuple = (-0.6, 0.6), stop_loss_positions: tuple = (-2, 2)):
         """
         Initiate a CopulaStrategyMPI class.
@@ -45,8 +45,8 @@ class CopulaStrategyMPI(CopulaStrategy):
         One can choose to initiate with no arguments, or to initiate with a given copula as the system's
         Copula.
 
-        :param copula: (Copula) Optional. A copula object that the class will use for all analysis. If there
-            is no input then fit_copula method will create one when called.
+        :param copula: (Copula, MixedCopula) Optional. A copula object that the class will use for all analysis. If
+            there is no input then fit_copula method will create one when called.
         :param opening_triggers: (tuple) Optional. The thresholds for MPI to trigger a long/short position for the
             pair's trading framework. Format is (long trigger, short trigger). Defaults to (-0.6, 0.6).
         :param stop_loss_positions: (tuple) Optional. One of the conditions for MPI to trigger an exiting
@@ -63,24 +63,28 @@ class CopulaStrategyMPI(CopulaStrategy):
         self._exit_count = 0
 
     @staticmethod
-    def to_returns(pair_prices: pd.DataFrame) -> pd.DataFrame:
+    def to_returns(pair_prices: pd.DataFrame, fill_init_nan: Sequence[float] = (0, 0)) -> pd.DataFrame:
         r"""
         Convert a pair's prices DataFrame to its returns DataFrame.
 
         Returns defined as: r(t) = P(t) / P(t-1) - 1.
 
-        Note that the 0th row will be NaN value.
+        Note that the 0th row will be NaN value, and needs to be filled.
 
         :param pair_prices: (pd.DataFrame) Prices data frame of the stock pair.
+        :param fill_init_nan: (Sequence[float]) Optional. What to fill the NaN value at the initial row. Defaults
+            to (0, 0).
         :return: (pd.DataFrame) Returns data frame for the stock pair.
         """
 
         returns = pair_prices.pct_change()
+        returns.iloc[0, 0] = fill_init_nan[0]
+        returns.iloc[0, 1] = fill_init_nan[1]
 
         return returns
 
-    def calc_mpi(self, returns: pd.DataFrame,
-                 cdf1: Callable[[float], float], cdf2: Callable[[float], float]) -> pd.DataFrame:
+    def calc_mpi(self, returns: pd.DataFrame, cdf1: Callable[[float], float],
+                 cdf2: Callable[[float], float]) -> pd.DataFrame:
         r"""
         Calculate mispricing indices from returns.
 
@@ -90,58 +94,19 @@ class CopulaStrategyMPI(CopulaStrategy):
 
         :param returns: (pd.DataFrame) Return data frame for the stock pair.
         :param cdf1: (func) Cumulative density function for stock 1's returns series.
-        :param cdf2: (func) Cumulative density function for stock 1's returns series.
+        :param cdf2: (func) Cumulative density function for stock 2's returns series.
         :return: (pd.DataFrame) Mispricing indices for the pair of stocks.
         """
-        # Translate to numpy array to use methods in CopulaStrategy
-        s1 = returns.iloc[:, 0].to_numpy()  # Returns series from stock 1
-        s2 = returns.iloc[:, 1].to_numpy()  # Returns series from stock 2
 
+        # Convert to quantile data
+        quantile_c1 = returns.iloc[:, 0].map(cdf1)
+        quantile_c2 = returns.iloc[:, 1].map(cdf2)
+        quantile_data = pd.concat([quantile_c1, quantile_c2], axis=1)
         # Calculate conditional probabilities using returns and cdfs. This is the definition of MPI.
-        condi_probs_data = self.series_condi_prob(s1_series=s1, s2_series=s2,
-                                                  cdf1=cdf1, cdf2=cdf2)
-
-        # Reform to a data frame.
-        mpis = pd.DataFrame(data=condi_probs_data, index=returns.index, columns=returns.columns)
+        mpis = super().get_condi_probs(quantile_data)
 
         return mpis
-    
-    def fit_copula(self, returns: pd.DataFrame, copula_name: str, if_renew: bool = True,
-                           nu_tol: float = 0.05) -> tuple:
-        """
-        Conduct a pseudo max likelihood estimation and information criterion.
 
-        If fitting a Student-t copula, it also includes a max likelihood fit for nu using COBYLA method from
-        scipy.optimize.minimize. nu's fit range is [1, 15]. When the user wishes to use nu > 15, please delegate to
-        Gaussian copula instead. This step is relatively slow.
-
-        The output returns:
-            - result_dict: (dict) The name of the copula and its SIC, AIC, HQIC values;
-            - copula: (Copula) The fitted copula with parameters satisfying maximum likelihood;
-            - s1_cdf: (func) The cumulative density function for stock 1, using training data;
-            - s2_cdf: (func) The cumulative density function for stock 2, using training data.
-
-        :param returns: (pd.DataFrame) Returns data frame for the stock pair.
-        :param copula_name: (str) Type of copula to fit. Support 'Gumbel', 'Frank', 'Clayton', 'Joe', 'N13', 'N14',
-            'Gaussian', 'Student'.
-        :param if_renew: (bool) Whether use the fitted copula to replace the copula in CopulaStrategyMPI.
-        :param nu_tol: (float) Optional. The final accuracy for finding nu for Student-t copula. Defaults to 0.05.
-        :return: (dict, Copula, func, func)
-            The name of the copula and its SIC, AIC, HQIC values;
-            The fitted copula;
-            The cumulative density function for stock 1, using training data;
-            The cumulative density function for stock 2, using training data.
-        """
-        
-        # Convert DataFrame to numpy arrays.
-        s1_series = returns.iloc[:, 0].to_numpy()
-        s2_series = returns.iloc[:, 1].to_numpy()
-        # Call the fit_copula in the parent class.
-        result_dict, copula, s1_cdf, s2_cdf = super().fit_copula(s1_series, s2_series, copula_name, if_renew, nu_tol)
-
-        return result_dict, copula, s1_cdf, s2_cdf
-        
-    
     @staticmethod
     def positions_to_units_dollar_neutral(prices_df: pd.DataFrame, positions: pd.Series,
                                           multiplier: float = 1) -> pd.DataFrame:
@@ -228,7 +193,7 @@ class CopulaStrategyMPI(CopulaStrategy):
 
         :param returns: (pd.DataFrame) Returns data frame for the stock pair.
         :param cdf1: (func) Cumulative density function for stock 1's returns series.
-        :param cdf2: (func) Cumulative density function for stock 1's returns series.
+        :param cdf2: (func) Cumulative density function for stock 2's returns series.
         :param init_pos: (int) Optional. Initial position. Takes value 0, 1, -1, corresponding to no
             position, long or short. Defaults to 0.
         :param enable_reset_flag: (bool) Optional. Whether allowing the flag series to be reset by
@@ -243,6 +208,9 @@ class CopulaStrategyMPI(CopulaStrategy):
         flags = pd.DataFrame(data=0, index=returns.index, columns=returns.columns)  # Initialize flag values.
         positions = pd.Series(data=[np.nan]*len(returns), index=returns.index)
         positions[0] = init_pos
+        # Reset the counters
+        self._long_count, self._short_count, self._exit_count = 0, 0, 0
+
         # Calculate positions and flags
         for i in range(1, len(returns)):
             mpi = mpis.iloc[i, :]
@@ -327,15 +295,15 @@ class CopulaStrategyMPI(CopulaStrategy):
 
         # Check if positions should be open. If so, based on which stock.
         # Uncomment for the next four lines to allow for openinig positions only when there's no position currently.
-        long_based_on_1 = (flag_1 <= lower_open_threshold) # and (pre_position == 0)
-        long_based_on_2 = (flag_2 >= upper_open_threshold) # and (pre_position == 0)
-        short_based_on_1 = (flag_1 >= upper_open_threshold) # and (pre_position == 0)
-        short_based_on_2 = (flag_2 <= lower_open_threshold) # and (pre_position == 0)
+        long_based_on_1 = (flag_1 <= lower_open_threshold)  # and (pre_position == 0)
+        long_based_on_2 = (flag_2 >= upper_open_threshold)  # and (pre_position == 0)
+        short_based_on_1 = (flag_1 >= upper_open_threshold)  # and (pre_position == 0)
+        short_based_on_2 = (flag_2 <= lower_open_threshold)  # and (pre_position == 0)
 
         # Forming triggers.
         long_trigger = (long_based_on_1 or long_based_on_2)
         short_trigger = (short_based_on_1 or short_based_on_2)
-        exit_trigger = self._exit_trigger(pre_flag, raw_cur_flag, open_based_on)
+        exit_trigger = self._exit_trigger_mpi(pre_flag, raw_cur_flag, open_based_on)
         any_trigger = any([long_trigger, short_trigger, exit_trigger])
         # Updating trigger counts.
         self._long_count += int(long_trigger)
@@ -374,7 +342,7 @@ class CopulaStrategyMPI(CopulaStrategy):
 
         return cur_position, if_reset_flag, open_based_on
 
-    def _exit_trigger(self, pre_flag: pd.Series, raw_cur_flag: pd.Series, open_based_on: list) -> bool:
+    def _exit_trigger_mpi(self, pre_flag: pd.Series, raw_cur_flag: pd.Series, open_based_on: list) -> bool:
         """
         Check if the exit signal is triggered.
 

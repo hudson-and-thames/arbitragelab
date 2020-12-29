@@ -168,7 +168,7 @@ The hedge may need to be adjusted often to stay close to being truly dollar-neut
 
 .. Note::
     Dollar neutral is not the same as market neutral.
-    To achieve market neutrality, one needs to know hedge away the ex-ante beta exposure.
+    To achieve market neutrality, one needs to know how to hedge away the ex-ante beta exposure.
 
 Calculating Equity Curve
 ########################

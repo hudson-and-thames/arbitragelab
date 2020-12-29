@@ -9,19 +9,20 @@ to emulate a switch functionality.
 """
 
 # pylint: disable = invalid-name, too-many-lines
-from abc import ABC
+from abc import ABC, abstractmethod
 from typing import Callable
 from scipy.optimize import brentq
 from scipy.special import gamma as gm
-from scipy.integrate import dblquad, quad 
+from scipy.integrate import dblquad, quad
 import scipy.stats as ss
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
 
 class Copula(ABC):
     """
-    Copula class houses common functions for each coplula subtype.
+    Copula class houses common functions for each copula subtype.
     """
 
     def __init__(self):
@@ -30,6 +31,13 @@ class Copula(ABC):
 
         This is a helper superclass for all named copulas in this module. There is no need to directly initiate.
         """
+
+        # Name of each types of copula.
+        self.archimedean_names = ('Gumbel', 'Clayton', 'Frank', 'Joe', 'N13', 'N14')
+        self.elliptic_names = ('Gaussian', 'Student')
+        self.theta = None
+        self.rho = None
+        self.nu = None
 
     def describe(self) -> pd.Series:
         """
@@ -45,6 +53,125 @@ class Copula(ABC):
         description = pd.Series(self._get_param())
 
         return description
+
+    def get_cop_density(self, u: float, v: float, eps: float = 1e-5) -> float:
+        """
+        Get the copula density c(u, v).
+
+        Result is analytical. Also at the u and v will be remapped into [eps, 1-eps] to avoid edge values that may
+        result in infinity or NaN.
+
+        :param u: (float) A real number in [0, 1].
+        :param v: (float) A real number in [0, 1].
+        :param eps: (float) Optional. The distance to the boundary 0 or 1, such that the value u, v will be mapped
+            back. Defaults to 1e-5.
+        :return: (float) The probability density (aka copula density).
+        """
+
+        # Mapping u, v back to the valid computational interval.
+        u = min(max(eps, u), 1 - eps)
+        v = min(max(eps, v), 1 - eps)
+
+        # Wrapper around individual copula's c method.
+        return self.c(u, v)
+
+    def get_cop_eval(self, u: float, v: float, eps: float = 1e-5) -> float:
+        """
+        Get the evaluation of copula, equivalently the cumulative joint distribution C(u, v).
+
+        Result is analytical. Also at the u and v will be remapped into [eps, 1-eps] to avoid edge values that may
+        result in infinity or NaN.
+
+        :param u: (float) A real number in [0, 1].
+        :param v: (float) A real number in [0, 1].
+        :param eps: (float) Optional. The distance to the boundary 0 or 1, such that the value u, v will be mapped
+            back. Defaults to 1e-5.
+        :return: (float) The evaluation of copula (aka cumulative joint distribution).
+        """
+
+        # Mapping u, v back to the valid computational interval.
+        u = min(max(eps, u), 1 - eps)
+        v = min(max(eps, v), 1 - eps)
+
+        # Wrapper around individual copula's C method.
+        return self.C(u, v)
+
+    def get_condi_prob(self, u: float, v: float, eps: float = 1e-5) -> float:
+        """
+        Calculate conditional probability function: P(U<=u | V=v).
+
+        Result is analytical. Also at the u and v will be remapped into [eps, 1-eps] to avoid edge values that may
+        result in infinity or NaN.
+
+        Note: This probability is symmetric about (u, v).
+
+        :param u: (float) A real number in [0, 1].
+        :param v: (float) A real number in [0, 1].
+        :param eps: (float) Optional. The distance to the boundary 0 or 1, such that the value u, v will be mapped
+            back. Defaults to 1e-5.
+        :return: (float) The conditional probability.
+        """
+
+        # Mapping u, v back to the valid computational interval.
+        u = min(max(eps, u), 1 - eps)
+        v = min(max(eps, v), 1 - eps)
+
+        # Wrapper around individual copula's condi_cdf method.
+        return self.condi_cdf(u, v)
+
+    def plot(self, num: int, ax: plt.axes = None, **ax_kwargs) -> plt.axes:
+        """
+        Plot a given number sampling of the copula.
+
+        :param num: (int) The number of points to sample for plotting.
+        :param ax: (plt.axes) Optional. The plotting axes. If not provided it will generate its own. Defaults to None.
+        :param **ax_kwargs: (dict) Additional axes keyword arguments for plotting.
+        :return: (plt.axes) The plot axes.
+        """
+
+        samples = self.generate_pairs(num)  # Sample from each copula for plotting
+
+        # Plot the samples on an axes
+        ax = ax or plt.gca()
+        ax.scatter(samples[:, 0], samples[:, 1], **ax_kwargs)
+        ax.set_xlim(-0.02, 1.02)
+        ax.set_ylim(-0.02, 1.02)
+        ax.set_aspect('equal', adjustable='box')  # Equal scale in x and y.
+
+        # Modify the title.
+        copula_name = self.__class__.__name__  # Each specific copula's name
+        if copula_name in self.archimedean_names:
+            ax.set_title(r'{} Copula, $\theta={:.3f}$'.format(copula_name, self.theta))
+        if copula_name == "Gaussian":
+            ax.set_title(r'{} Copula, $\rho={:.3f}$'.format(copula_name, self.rho))
+        if copula_name == "Student":
+            ax.set_title(r'Student-t Copula, $\rho={:.3f}$, $\nu={:.3f}$'.format(self.rho, self.nu))
+
+        return ax
+
+    @abstractmethod
+    def c(self, u: float, v: float) -> float:
+        """
+        Place holder for calculating copula density.
+        """
+
+    @abstractmethod
+    def C(self, u: float, v: float) -> float:
+        """
+        Place holder for calculating copula evaluation.
+        """
+
+    @abstractmethod
+    def condi_cdf(self, u: float, v: float) -> float:
+        """
+        Place holder for calculating copula conditional probability.
+        """
+
+    @abstractmethod
+    def _get_param(self):
+        """
+        Place holder for getting the parameter(s) of the specific copula.
+        """
 
 
 class Gumbel(Copula):
@@ -172,7 +299,7 @@ class Gumbel(Copula):
 
         :param u: (float) A real number in [0, 1].
         :param v: (float) A real number in [0, 1].
-        :return: (float) The culumative density.
+        :return: (float) The cumulative density.
         """
 
         theta = self.theta
@@ -324,7 +451,7 @@ class Frank(Copula):
 
         :param u: (float) A real number in [0, 1].
         :param v: (float) A real number in [0, 1].
-        :return: (float) The culumative density.
+        :return: (float) The cumulative density.
         """
 
         theta = self.theta
@@ -496,7 +623,7 @@ class Clayton(Copula):
 
         :param u: (float) A real number in [0, 1].
         :param v: (float) A real number in [0, 1].
-        :return: (float) The culumative density.
+        :return: (float) The cumulative density.
         """
 
         theta = self.theta
@@ -655,7 +782,7 @@ class Joe(Copula):
 
         :param u: (float) A real number in [0, 1].
         :param v: (float) A real number in [0, 1].
-        :return: (float) The culumative density.
+        :return: (float) The cumulative density.
         """
 
         theta = self.theta
@@ -835,7 +962,7 @@ class N13(Copula):
 
         :param u: (float) A real number in [0, 1].
         :param v: (float) A real number in [0, 1].
-        :return: (float) The culumative density.
+        :return: (float) The cumulative density.
         """
 
         theta = self.theta
@@ -997,8 +1124,8 @@ class N14(Copula):
         v_part = (-1 + np.power(v, -1/theta))**theta
         cdf_ker = 1 + (u_part + v_part)**(1/theta)
 
-        numerator = (u_part * v_part * (cdf_ker -1)
-                     * (-1 + theta + 2 * theta * (cdf_ker -1)))
+        numerator = (u_part * v_part * (cdf_ker - 1)
+                     * (-1 + theta + 2 * theta * (cdf_ker - 1)))
 
         denominator = ((u_part + v_part)**2 * cdf_ker**(2 + theta)
                        * u * v * u_ker * v_ker * theta)
@@ -1015,7 +1142,7 @@ class N14(Copula):
 
         :param u: (float) A real number in [0, 1].
         :param v: (float) A real number in [0, 1].
-        :return: (float) The culumative density.
+        :return: (float) The cumulative density.
         """
 
         theta = self.theta
@@ -1074,7 +1201,7 @@ class Gaussian(Copula):
         r"""
         Initiate a Gaussian copula object.
 
-        :param cov: (np.array) Covariance matrix (NOT correlation matrix), measurement of covariation. The class will
+        :param cov: (np.array) Covariance matrix (NOT correlation matrix), measurement of covariance. The class will
         calculate correlation internally once the covariance matrix is given.
         """
 
@@ -1164,13 +1291,13 @@ class Gaussian(Copula):
 
         :param u: (float) A real number in [0, 1].
         :param v: (float) A real number in [0, 1].
-        :return: (float) The culumative density.
+        :return: (float) The cumulative density.
         """
 
         corr = [[1, self.rho], [self.rho, 1]]  # Correlation matrix.
         inv_cdf_u = ss.norm.ppf(u)  # Inverse cdf of standard normal.
         inv_cdf_v = ss.norm.ppf(v)
-        mvn_dist = ss.multivariate_normal(mean=[0, 0], cov=corr)  # Joint cdf of multivar normal.
+        mvn_dist = ss.multivariate_normal(mean=[0, 0], cov=corr)  # Joint cdf of multivariate normal.
         cdf = mvn_dist.cdf((inv_cdf_u, inv_cdf_v))
 
         return cdf
@@ -1219,7 +1346,7 @@ class Student(Copula):
         Initiate a Student copula object.
 
         :param nu: (float) Degrees of freedom.
-        :param cov: (np.array) Covariance matrix (NOT correlation matrix), measurement of covariation. The class will
+        :param cov: (np.array) Covariance matrix (NOT correlation matrix), measurement of covariance. The class will
         calculate correlation internally once the covariance matrix is given.
         """
 
@@ -1319,20 +1446,20 @@ class Student(Copula):
         pdf = numerator / denominator
 
         return pdf
-    
+
     def C(self, u: int, v: int) -> float:
         """
         Calculate cumulative density of the bivariate copula: P(U<=u, V<=v).
 
         Result is numerical. Calculated from definition of elliptical copula:
             C(u, v) = Phi_nu_cor (inv_t(u, nu), inv_t(v, nu))
-        Where inv_t(u, nu) is the percentile function for a univariate Student-t distribution with DOF = nu.
+        Where inv_t(u, nu) is the percentile function for a uni-variate Student-t distribution with DOF = nu.
         Phi_nu_cor is the bivariate Student-t CDF with covariance matrix = correlation matrix, DOF = nu.
         Here Phi_nu_cor is calculated numerically by double integration.
 
         :param u: (float) A real number in [0, 1].
         :param v: (float) A real number in [0, 1].
-        :return: (float) The culumative density.
+        :return: (float) The cumulative density.
         """
         # Avoid errors when u, v too close to 0
         u = max(u, 1e-6)
@@ -1468,7 +1595,7 @@ class Switcher:
 
         return my_copula
 
-    def _create_frank(self)-> Frank:
+    def _create_frank(self) -> Frank:
         """
         Create Frank copula.
         """

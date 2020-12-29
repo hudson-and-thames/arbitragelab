@@ -3,6 +3,8 @@
 # Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 """
 Master module that uses copula for trading strategy.
+
+This is a legacy module.
 """
 
 # pylint: disable = invalid-name

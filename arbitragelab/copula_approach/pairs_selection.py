@@ -5,17 +5,17 @@
 Module for implementing some quick pairs selection algorithms for copula-based strategies.
 """
 # pylint: disable = invalid-name
+from typing import Union, List, Tuple
+from itertools import combinations
 import numpy as np
 import scipy.stats as ss
 import pandas as pd
-from typing import Union, List, Tuple
-from itertools import combinations
 
 
 class PairsSelector:
     r"""
     The class that quickly select pairs for copula-based trading strategies.
-    
+
     This class selects potential pairs for copula-based trading strategies. Methods include Spearman's rho, Kendall's
     tau and Euclidean distance on normalized prices. Those methods are relatively quick to perform and is generally
     used in literature for copula-based pairs trading framework. For more sophisticated ML based pairs selection
@@ -26,7 +26,7 @@ class PairsSelector:
         """
         Class initiation.
         """
-    
+
     def rank_pairs(self, stocks_universe: pd.DataFrame, method: str = 'kendall tau',
                    nan_option: Union[str, None] = 'forward fill',
                    keep_num_pairs: Union[int, None] = None) -> pd.Series:
@@ -47,7 +47,7 @@ class PairsSelector:
         'forward fill' to avoid look-ahead bias. User should be aware that 'linear interp' will linearly interpolate
         the NaN value and will thus introduce look-ahead bias. This method will internally fill the NaN values. Also
         the very first row of data cannot have NaN values.
-        
+
         :param stocks_universe: (pd.DataFrame) The stocks universe to be analyzed. Require no multi-indexing for
             columns.
         :param method: (pd.DataFrame) Optional. The method to pick pairs. One can choose from ['spearman rho',
@@ -57,7 +57,7 @@ class PairsSelector:
             ['forward fill', 'linear interp', None]. Defaults to 'forward fill'.
         :param keep_num_pairs: (Union[int, None]) Optional. The number of top ranking pairs to keep. Defaults to None,
             which means all pairs will be returned.
-        :return: (pd.Series) The selected pairs descendingly ranked in their score (top 'correlated' pairs on the top).
+        :return: (pd.Series) The selected pairs ranked descending in their scores (top 'correlated' pairs on the top).
         """
 
         # 0. Preprocessing for NaN value
@@ -84,12 +84,12 @@ class PairsSelector:
     def _pre_processing_nan(stocks_universe: pd.DataFrame, nan_option: str) -> pd.DataFrame:
         """
         Pre-processing data for NaN values.
-        
+
         Available options are 'forward fill', 'linear interp', None.
         ALL NaN values need to be filled, otherwise you will likely get the scores all in NaN value. We suggest
         'forward fill' to avoid look-ahead bias. User should be aware that 'linear interp' will linearly interpolate
         the NaN value and will thus introduce look-ahead bias.
-        
+
         :param stocks_universe: (pd.DataFrame) The stocks universe to be analyzed. Require no multi-indexing for
             columns.
         :param nan_option: (Union[str, None]) Optional. The method to fill NaN value. one can choose from
@@ -109,7 +109,7 @@ class PairsSelector:
     def _select_all_pairs(all_names: pd.Series) -> List[Tuple[str, str]]:
         """
         Select all possible pairs by from the given names.
-        
+
         :param all_names: (pd.Series) All the available names in the stocks universe.
         :return: (List[Tuple[str, str]]) All the possible pairs to be analyzed in list of tuples of their names.
         """
@@ -118,14 +118,14 @@ class PairsSelector:
         result = list(comb_iter)
 
         return result
-    
+
     def _calculate_scores(self, stocks_universe: pd.DataFrame, pairs_names: list, method: str) -> pd.Series:
         """
         Calculate scores based on different methods.
-        
+
         The scores is recorded in a series with row index multi-indexed in the form of ('ABC', 'XYZ') for stocks pair
         'ABC' and 'XYZ'.
-        
+
         :param stocks_universe: (pd.DataFrame) The stocks universe to be analyzed. Require no multi-indexing for
             columns.
         :param pairs_names: (list) All the possible pairs to be analyzed in list of tuples of their names.
@@ -135,7 +135,7 @@ class PairsSelector:
         """
 
         # Initialize the scores dictionary for each available pairs.
-        scores = {pair_names : None for pair_names in pairs_names}
+        scores = {pair_names: None for pair_names in pairs_names}
 
         # Calculate the scores for each pair for each method.
         if method == 'spearman rho':
@@ -162,7 +162,7 @@ class PairsSelector:
     @staticmethod
     def spearman_rho(s1: pd.Series, s2: pd.Series) -> float:
         """
-        Calculating Spearman's rho for a pair of stocks. 
+        Calculating Spearman's rho for a pair of stocks.
 
         Complexity is O(N logN).
 
@@ -179,16 +179,16 @@ class PairsSelector:
     def kendall_tau(s1: pd.Series, s2: pd.Series) -> float:
         """
         Calculating Kendall's tau for a pair of stocks.
-        
+
         Complexity is O(N^2).
-        
+
         :param s1: (pd.Series) Prices series for a stock.
         :param s2: (pd.Series) Prices series for a stock.
         :return: (float) Kendall's tau value.
         """
-        
+
         result = ss.kendalltau(s1, s2)[0]
-        
+
         return result
 
     @staticmethod
@@ -204,7 +204,7 @@ class PairsSelector:
         :return: (float) Negative sum of Euclidean distance value.
         """
 
-        # Conver to normalized prices.
+        # Convert to normalized prices.
         s1_normalized = s1 / s1[0]
         s2_normalized = s2 / s2[0]
 

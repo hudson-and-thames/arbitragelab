@@ -16,6 +16,7 @@ Functions include:
 from typing import Callable
 import numpy as np
 import scipy.stats as ss
+from scipy.interpolate import interp1d
 from scipy.optimize import minimize
 from statsmodels.distributions.empirical_distribution import ECDF
 from sklearn.covariance import EmpiricalCovariance
@@ -52,6 +53,44 @@ def find_marginal_cdf(x: np.array, empirical: bool = True, **kwargs) -> Callable
 
     return None
 
+def construct_ecdf_lin(train_data: np.array, upper_bound: float = 1-1e-5, lower_bound: float = 1e-5) -> Callable:
+    """
+    Construct an empirical cumulative density function with linear interpolation between data points.
+
+    The function it returns agrees with the ECDF function from statsmodels in values, but also applies linear
+    interpolation to fill the gap.
+    Features include: Allowing training data to have nan values; Allowing the cumulative density output to have an
+    upper and lower bound, to avoid singularities in some applications with probability 0 or 1.
+
+    :param train_data: (np.array) The data to train the output ecdf function.
+    :param upper_bound: (float) The upper bound value for the returned ecdf function.
+    :param lower_bound: (float) The lower bound value for the returned ecdf function.
+    :return: (Callable) The constructed ecdf function.
+    """
+
+    train_data_np = np.array(train_data)  # Convert to numpy array for the next step in case the input is not.
+    train_data_np = train_data_np[~np.isnan(train_data_np)]  # Remove nan value from the array.
+
+    step_ecdf = ECDF(train_data_np)  # train an ecdf on all training data.
+    # Sorted unique elements. They are the places where slope changes for the cumulative density.
+    slope_changes = np.unique(np.sort(train_data_np))
+    # Calculate the ecdf at the points of slope change.
+    sample_ecdf_at_slope_changes = np.array([step_ecdf(unique_value) for unique_value in slope_changes])
+    # Linearly interpolate. Allowing extrapolation to catch data out of range.
+    # x: unique elements in training data; y: the ecdf value for those training data.
+    interp_ecdf = interp1d(slope_changes, sample_ecdf_at_slope_changes, assume_sorted=True, fill_value='extrapolate')
+
+    # Implement the upper and lower bound the ecdf.
+    def bounded_ecdf(x):
+        if np.isnan(x):  # Map nan input to nan.
+            result = np.NaN
+        else:  # Apply the upper and lower bound.
+            result = max(min(interp_ecdf(x), upper_bound), lower_bound)
+
+        return result
+
+    # Vectorize it to work with arrays.
+    return np.vectorize(bounded_ecdf)
 
 def ml_theta_hat(x: np.array, y: np.array, copula_name: str) -> float:
     """

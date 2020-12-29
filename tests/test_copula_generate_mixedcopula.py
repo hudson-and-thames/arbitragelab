@@ -19,6 +19,8 @@ from arbitragelab.copula_approach import copula_calculation as ccalc
 class TestCopulaGenerateMixedCopula(unittest.TestCase):
     """
     Testing module copula_generate_mixedcopula.py and also methods in copula_calculation related to mixed copulas.
+
+    Does not include fitting methods since those are tested under BasicCopulaStrategy.
     """
 
     def setUp(self):
@@ -127,19 +129,19 @@ class TestCopulaGenerateMixedCopula(unittest.TestCase):
         # Check c(u, v), i.e., prob densities of the mixed cop.
         expected_densities = [42856.22880307941, 18356.037799997655, 97.54259654567115, 97.54259654567115,
                               0.48723388612506763, 0.48723388612506763, 1.7946192932939031]
-        densities = [ctg.c(u, v) for (u, v) in zip(us, vs)]
+        densities = [ctg.get_cop_density(u, v) for (u, v) in zip(us, vs)]
         np.testing.assert_array_almost_equal(expected_densities, densities, decimal=6)
 
         # Check C(u, v), i.e., cumulative densities of the mixed cop.
         expected_cumdensities = [4.837929924689697e-05, 0.9998164208438649, 9.922442017680219e-05,
                                  9.927550024586962e-05, 0.2870850302069872, 0.28708499518336156, 0.3904651911354585]
-        cumdensities = [ctg.C(u, v) for (u, v) in zip(us, vs)]
+        cumdensities = [ctg.get_cop_eval(u, v) for (u, v) in zip(us, vs)]
         np.testing.assert_array_almost_equal(expected_cumdensities, cumdensities, decimal=6)
 
         # Check condi_cdf(u, v), i.e., conditional probs of the mixed cop.
         expected_cumdensities = [0.23816113067906816, 0.875634105685517, 0.9985132417816676,
                                  0.001486758218343033, 0.067166026946893, 0.9184718285315775, 0.47278137437820367]
-        cumdensities = [ctg.condi_cdf(u, v) for (u, v) in zip(us, vs)]
+        cumdensities = [ctg.get_condi_prob(u, v) for (u, v) in zip(us, vs)]
         np.testing.assert_array_almost_equal(expected_cumdensities, cumdensities, decimal=6)
 
         # Test _away_from_0 method in MixedCopula parent class
@@ -215,22 +217,22 @@ class TestCopulaGenerateMixedCopula(unittest.TestCase):
         us = [0, 1, 1, 0, 0.3, 0.7, 0.5]
         vs = [0, 1, 0, 1, 0.7, 0.3, 0.5]
 
-        # Check c(u, v), i.e., prob densities of the mixed cop.
+        # Check get_cop_density(u, v), i.e., prob densities of the mixed cop.
         expected_densities = [41624.98642234784, 28720.660686591415, 0.01865885301119625, 0.018658853011196245,
                               0.3816145685458273, 0.3816145685458273, 2.1471963217627814]
-        densities = [cfg.c(u, v) for (u, v) in zip(us, vs)]
+        densities = [cfg.get_cop_density(u, v) for (u, v) in zip(us, vs)]
         np.testing.assert_array_almost_equal(expected_densities, densities, decimal=6)
 
-        # Check C(u, v), i.e., cumulative densities of the mixed cop.
+        # Check get_cop_eval(u, v), i.e., cumulative densities of the mixed cop.
         expected_cumdensities = [4.6050662931472644e-05, 0.9998213129311458, 9.999981335175073e-05,
                                  9.999981335175073e-05, 0.2914772991528678, 0.2914772991528678, 0.40510936419358706]
-        cumdensities = [cfg.C(u, v) for (u, v) in zip(us, vs)]
+        cumdensities = [cfg.get_cop_eval(u, v) for (u, v) in zip(us, vs)]
         np.testing.assert_array_almost_equal(expected_cumdensities, cumdensities, decimal=6)
 
-        # Check condi_cdf(u, v), i.e., conditional probs of the mixed cop.
+        # Check get_condi_prob(u, v), i.e., conditional probs of the mixed cop.
         expected_cumdensities = [0.22435467527472625, 0.8935568957992956, 0.9999998134152023,
                                  1.8658479839651037e-07, 0.049245024408386615, 0.9342460479433407, 0.4707809952066607]
-        cumdensities = [cfg.condi_cdf(u, v) for (u, v) in zip(us, vs)]
+        cumdensities = [cfg.get_condi_prob(u, v) for (u, v) in zip(us, vs)]
         np.testing.assert_array_almost_equal(expected_cumdensities, cumdensities, decimal=6)
 
         # Test _away_from_0 method in MixedCopula parent class

@@ -19,7 +19,6 @@ Statistical Association, 109(506), pp.788-801.
 
 # pylint: disable = invalid-name, too-many-locals
 from abc import ABC, abstractmethod
-from typing import Callable
 from scipy.optimize import minimize, OptimizeResult
 import numpy as np
 import pandas as pd
@@ -59,7 +58,7 @@ class MixedCopula(ABC):
         Get the parameters of the mixed copula.
         """
 
-    def c(self, u: float, v: float, eps: float = 1e-5) -> float:
+    def get_cop_density(self, u: float, v: float, eps: float = 1e-5) -> float:
         """
         Calculate probability density of the bivariate copula: P(U=u, V=v).
 
@@ -82,7 +81,7 @@ class MixedCopula(ABC):
 
         return pdf
 
-    def C(self, u: float, v: float, eps: float = 1e-4) -> float:
+    def get_cop_eval(self, u: float, v: float, eps: float = 1e-4) -> float:
         """
         Calculate cumulative density of the bivariate copula: P(U<=u, V<=v).
 
@@ -105,7 +104,7 @@ class MixedCopula(ABC):
 
         return cdf
 
-    def condi_cdf(self, u: float, v: float, eps: float = 1e-5) -> float:
+    def get_condi_prob(self, u: float, v: float, eps: float = 1e-5) -> float:
         """
         Calculate conditional probability function: P(U<=u | V=v).
 
@@ -201,13 +200,13 @@ class CTGMixCop(MixedCopula):
 
         self.copulas = [self.clayton_cop, self.t_cop, self.gumbel_cop]
 
-    def fit(self, data: pd.DataFrame, cdf1: Callable[[float], float], cdf2: Callable[[float], float],
-            max_iter: int = 25, gamma_scad: float = 0.7, a_scad: float = 6, weight_margin: float = 1e-2) -> float:
+    def fit(self, data: pd.DataFrame, max_iter: int = 25, gamma_scad: float = 0.6, a_scad: float = 6,
+            weight_margin: float = 1e-2) -> float:
         """
         Fitting cop_params and weights by expectation maximization (EM) from real data.
 
         Changes the mix copulas weights and copula parameters internally. Also returns the sum of log likelihood. The
-        data will be converted to quantile by cdf1, cdf2 provided by the user.
+        data will be converted to quantile by empirical cumulative distribution function.
 
         Implementation of EM method based on a non-parametric adaptation of the article:
         <Cai, Z. and Wang, X., 2014. Selection of mixed copula model via penalized likelihood. Journal of the American
@@ -226,11 +225,9 @@ class CTGMixCop(MixedCopula):
         check.
 
         :param data: (pd.DataFrame) Data in (n, 2) pd.DataFrame used to fit the mixed copula.
-        :param cdf1: (func) Cumulative density function trained, for the 0th column in data.
-        :param cdf2: (func) Cumulative density function trained, for the 1st column in data.
         :param max_iter: (int) Optional. Maximum iteration for the EM method. The class default value 25 is just an
             empirical estimation and the user is expected to change it when needed.
-        :param gamma_scad: (float) Optional. Tuning parameter for the SCAD penalty term. Defaults to 0.7.
+        :param gamma_scad: (float) Optional. Tuning parameter for the SCAD penalty term. Defaults to 0.6.
         :param a_scad: (float) Optional. Tuning parameter for the SCAD penalty term. Defaults to 6.
         :param weight_margin: (float) Optional. A small number such that if below this threshold, the weight will be
             considered 0. Defaults to 1e-2.
@@ -239,8 +236,10 @@ class CTGMixCop(MixedCopula):
 
         # Make a quantile_data DataFrame by mapping original data with marginal cdfs.
         quantile_data = data.multiply(0)
-        quantile_data.iloc[:, 0] = cdf1(data.iloc[:, 0])
-        quantile_data.iloc[:, 1] = cdf2(data.iloc[:, 1])
+        cdf1 = ccalc.construct_ecdf_lin(data.iloc[:, 0])
+        cdf2 = ccalc.construct_ecdf_lin(data.iloc[:, 1])
+        quantile_data.iloc[:, 0] = data.iloc[:, 0].map(cdf1)
+        quantile_data.iloc[:, 1] = data.iloc[:, 1].map(cdf2)
         # Fit the quantile data.
         weights, cop_params = self._fit_quantile_em(quantile_data, max_iter, gamma_scad, a_scad)
         # Post processing weights. Abandon weights that are too small.
@@ -370,8 +369,9 @@ class CTGMixCop(MixedCopula):
                 # The rest of the for loop are just calculating components of the formula in (Cai et al. 2014)
                 sum_ml_lst = u1 * 0
                 for t in range(num):  # For each data point.
-                    sum_ml_lst[t] = (weights[i] * local_copulas[i].c(u=u1[t], v=u2[t]) /
-                                     np.sum([weights[j] * local_copulas[j].c(u=u1[t], v=u2[t]) for j in range(3)]))
+                    sum_ml_lst[t] = (weights[i] * local_copulas[i].get_cop_density(u=u1[t], v=u2[t]) /
+                                     np.sum([weights[j] * local_copulas[j].get_cop_density(u=u1[t], v=u2[t])
+                                             for j in range(3)]))
 
                 sum_ml = np.sum(sum_ml_lst)
                 numerator = weights[i] * ccalc.scad_derivative(weights[i], gamma_scad, a_scad) - sum_ml / num
@@ -460,9 +460,9 @@ class CTGMixCop(MixedCopula):
         gumbel_cop = cg.Gumbel(theta=theta_g)
 
         # Calculate mixed copula's log-likelihood over data.
-        likelihood_list_clayton = np.array([clayton_cop.c(u1_i, u2_i) for (u1_i, u2_i) in zip(u1, u2)])
-        likelihood_list_student = np.array([student_cop.c(u1_i, u2_i) for (u1_i, u2_i) in zip(u1, u2)])
-        likelihood_list_gumbel = np.array([gumbel_cop.c(u1_i, u2_i) for (u1_i, u2_i) in zip(u1, u2)])
+        likelihood_list_clayton = np.array([clayton_cop.get_cop_density(u1_i, u2_i) for (u1_i, u2_i) in zip(u1, u2)])
+        likelihood_list_student = np.array([student_cop.get_cop_density(u1_i, u2_i) for (u1_i, u2_i) in zip(u1, u2)])
+        likelihood_list_gumbel = np.array([gumbel_cop.get_cop_density(u1_i, u2_i) for (u1_i, u2_i) in zip(u1, u2)])
         likelihood_list_mix = (weight_c * likelihood_list_clayton + weight_t * likelihood_list_student
                                + (1 - weight_c - weight_t) * likelihood_list_gumbel)
         log_likelihood_sum = np.sum(np.log(likelihood_list_mix))
@@ -546,8 +546,8 @@ class CTGMixCop(MixedCopula):
         gumbel_cop = cg.Gumbel(theta=theta_g)
 
         # Calculate mixed copula's log-likelihood over data.
-        likelihood_list_clayton = np.array([clayton_cop.c(u1_i, u2_i) for (u1_i, u2_i) in zip(u1, u2)])
-        likelihood_list_gumbel = np.array([gumbel_cop.c(u1_i, u2_i) for (u1_i, u2_i) in zip(u1, u2)])
+        likelihood_list_clayton = np.array([clayton_cop.get_cop_density(u1_i, u2_i) for (u1_i, u2_i) in zip(u1, u2)])
+        likelihood_list_gumbel = np.array([gumbel_cop.get_cop_density(u1_i, u2_i) for (u1_i, u2_i) in zip(u1, u2)])
         likelihood_list_mix = weight_c * likelihood_list_clayton + (1 - weight_c) * likelihood_list_gumbel
         log_likelihood_sum = np.sum(np.log(likelihood_list_mix))
 
@@ -591,9 +591,10 @@ class CTGMixCop(MixedCopula):
             t_cop = cg.Student(cov=corr, nu=nu_t)
             gumbel_cop = cg.Gumbel(theta=theta_g)
             # Calculate log-likelihood respectively for each copula.
-            likelihood_list_clayton = np.array([clayton_cop.c(u1_i, u2_i) for (u1_i, u2_i) in zip(u1, u2)])
-            likelihood_list_t = np.array([t_cop.c(u1_i, u2_i) for (u1_i, u2_i) in zip(u1, u2)])
-            likelihood_list_gumbel = np.array([gumbel_cop.c(u1_i, u2_i) for (u1_i, u2_i) in zip(u1, u2)])
+            likelihood_list_clayton = np.array([clayton_cop.get_cop_density(u1_i, u2_i)
+                                                for (u1_i, u2_i) in zip(u1, u2)])
+            likelihood_list_t = np.array([t_cop.get_cop_density(u1_i, u2_i) for (u1_i, u2_i) in zip(u1, u2)])
+            likelihood_list_gumbel = np.array([gumbel_cop.get_cop_density(u1_i, u2_i) for (u1_i, u2_i) in zip(u1, u2)])
             # Mix according to weights.
             likelihood_list_mix = (weight_c * likelihood_list_clayton + weight_t * likelihood_list_t
                                    + (1 - weight_c - weight_t) * likelihood_list_gumbel)
@@ -658,13 +659,13 @@ class CFGMixCop(MixedCopula):
 
         self.copulas = [self.clayton_cop, self.frank_cop, self.gumbel_cop]
 
-    def fit(self, data: pd.DataFrame, cdf1: Callable[[float], float], cdf2: Callable[[float], float],
-            max_iter: int = 25, gamma_scad: float = 0.7, a_scad: float = 6, weight_margin: float = 1e-2) -> float:
+    def fit(self, data: pd.DataFrame, max_iter: int = 25, gamma_scad: float = 0.6, a_scad: float = 6,
+            weight_margin: float = 1e-2) -> float:
         """
         Fitting cop_params and weights by expectation maximization (EM) from real data.
 
         Changes the mix copulas weights and copula parameters internally. Also returns the sum of log likelihood. The
-        data will be converted to quantile by cdf1, cdf2 provided by the user.
+        data will be converted to quantile by empirical cumulative distribution function.
 
         Implementation of EM method based on a non-parametric adaptation of the article:
         <Cai, Z. and Wang, X., 2014. Selection of mixed copula model via penalized likelihood. Journal of the American
@@ -683,11 +684,9 @@ class CFGMixCop(MixedCopula):
         check.
 
         :param data: (pd.DataFrame) Data in (n, 2) pd.DataFrame used to fit the mixed copula.
-        :param cdf1: (func) Cumulative density function trained, for the 0th column in data.
-        :param cdf2: (func) Cumulative density function trained, for the 1st column in data.
         :param max_iter: (int) Optional. Maximum iteration for the EM method. The class default value 25 is just an
             empirical estimation and the user is expected to change it when needed.
-        :param gamma_scad: (float) Optional. Tuning parameter for the SCAD penalty term. Defaults to 0.7.
+        :param gamma_scad: (float) Optional. Tuning parameter for the SCAD penalty term. Defaults to 0.6.
         :param a_scad: (float) Optional. Tuning parameter for the SCAD penalty term. Defaults to 6.
         :param weight_margin: (float) Optional. A small number such that if below this threshold, the weight will be
             considered 0. Defaults to 1e-2.
@@ -696,8 +695,10 @@ class CFGMixCop(MixedCopula):
 
         # Make a quantile_data DataFrame by mapping original data with marginal cdfs.
         quantile_data = data.multiply(0)
-        quantile_data.iloc[:, 0] = cdf1(data.iloc[:, 0])
-        quantile_data.iloc[:, 1] = cdf2(data.iloc[:, 1])
+        cdf1 = ccalc.construct_ecdf_lin(data.iloc[:, 0])
+        cdf2 = ccalc.construct_ecdf_lin(data.iloc[:, 1])
+        quantile_data.iloc[:, 0] = data.iloc[:, 0].map(cdf1)
+        quantile_data.iloc[:, 1] = data.iloc[:, 1].map(cdf2)
         # Fit the quantile data.
         weights, cop_params = self._fit_quantile_em(quantile_data, max_iter, gamma_scad, a_scad)
         # Post processing weights. Abandon weights that are too small.
@@ -817,10 +818,11 @@ class CFGMixCop(MixedCopula):
             iteration += 1
             for i in range(3):  # For each component of the mixed copula.
                 # The rest of the for loop are just calculating components of the formula in (Cai et al. 2014)
-                sum_ml_lst = u1 * 0
+                sum_ml_lst = np.zeros_like(u1)
                 for t in range(num):  # For each data point.
-                    sum_ml_lst[t] = (weights[i] * local_copulas[i].c(u=u1[t], v=u2[t]) /
-                                     np.sum([weights[j] * local_copulas[j].c(u=u1[t], v=u2[t]) for j in range(3)]))
+                    sum_ml_lst[t] = (weights[i] * local_copulas[i].get_cop_density(u=u1[t], v=u2[t]) /
+                                     np.sum([weights[j] * local_copulas[j].get_cop_density(u=u1[t], v=u2[t])
+                                             for j in range(3)]))
 
                 sum_ml = np.sum(sum_ml_lst)
                 numerator = weights[i] * ccalc.scad_derivative(weights[i], gamma_scad, a_scad) - sum_ml / num
@@ -907,9 +909,9 @@ class CFGMixCop(MixedCopula):
         gumbel_cop = cg.Gumbel(theta=theta_g)
 
         # Calculate mixed copula's log-likelihood over data.
-        likelihood_list_clayton = np.array([clayton_cop.c(u1_i, u2_i) for (u1_i, u2_i) in zip(u1, u2)])
-        likelihood_list_frank = np.array([frank_cop.c(u1_i, u2_i) for (u1_i, u2_i) in zip(u1, u2)])
-        likelihood_list_gumbel = np.array([gumbel_cop.c(u1_i, u2_i) for (u1_i, u2_i) in zip(u1, u2)])
+        likelihood_list_clayton = np.array([clayton_cop.get_cop_density(u1_i, u2_i) for (u1_i, u2_i) in zip(u1, u2)])
+        likelihood_list_frank = np.array([frank_cop.get_cop_density(u1_i, u2_i) for (u1_i, u2_i) in zip(u1, u2)])
+        likelihood_list_gumbel = np.array([gumbel_cop.get_cop_density(u1_i, u2_i) for (u1_i, u2_i) in zip(u1, u2)])
         likelihood_list_mix = (weight_c * likelihood_list_clayton + weight_f * likelihood_list_frank
                                + (1 - weight_c - weight_f) * likelihood_list_gumbel)
         log_likelihood_sum = np.sum(np.log(likelihood_list_mix))
@@ -954,9 +956,10 @@ class CFGMixCop(MixedCopula):
             frank_cop = cg.Frank(theta=theta_f)
             gumbel_cop = cg.Gumbel(theta=theta_g)
             # Calculate log-likelihood respectively for each copula.
-            likelihood_list_clayton = np.array([clayton_cop.c(u1_i, u2_i) for (u1_i, u2_i) in zip(u1, u2)])
-            likelihood_list_frank = np.array([frank_cop.c(u1_i, u2_i) for (u1_i, u2_i) in zip(u1, u2)])
-            likelihood_list_gumbel = np.array([gumbel_cop.c(u1_i, u2_i) for (u1_i, u2_i) in zip(u1, u2)])
+            likelihood_list_clayton = np.array([clayton_cop.get_cop_density(u1_i, u2_i)
+                                                for (u1_i, u2_i) in zip(u1, u2)])
+            likelihood_list_frank = np.array([frank_cop.get_cop_density(u1_i, u2_i) for (u1_i, u2_i) in zip(u1, u2)])
+            likelihood_list_gumbel = np.array([gumbel_cop.get_cop_density(u1_i, u2_i) for (u1_i, u2_i) in zip(u1, u2)])
             # Mix according to weights.
             likelihood_list_mix = (weight_c * likelihood_list_clayton + weight_f * likelihood_list_frank
                                    + (1 - weight_c - weight_f) * likelihood_list_gumbel)
