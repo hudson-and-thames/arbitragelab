@@ -538,21 +538,21 @@ class TestBasicCopulaStrategy(unittest.TestCase):
         # Previously long
         pre_pos = 1
         expected_pos = 1  # Expecting long
-        expected_who_exits = pd.Series([0, 0])
+        expected_who_exits = pd.Series([0, 1])
         cur_pos, who_exits = BCS.get_cur_position(condi_probs, pre_condi_probs, pre_pos, exit_rule, who_exits)
         self.assertEqual(cur_pos, expected_pos)
         pd.testing.assert_series_equal(who_exits, expected_who_exits, check_dtype=False, check_less_precise=3)
         # Previously short
         pre_pos = -1
-        expected_pos = -1  # Expecting long
-        expected_who_exits = pd.Series([0, 0])
+        expected_pos = -1  # Expecting short
+        expected_who_exits = pd.Series([0, 1])
         cur_pos, who_exits = BCS.get_cur_position(condi_probs, pre_condi_probs, pre_pos, exit_rule, who_exits)
         self.assertEqual(cur_pos, expected_pos)
         pd.testing.assert_series_equal(who_exits, expected_who_exits, check_dtype=False, check_less_precise=3)
         # Previously no position
         pre_pos = 0
-        expected_pos = 0  # Expecting long
-        expected_who_exits = pd.Series([0, 0])
+        expected_pos = 0  # Expecting no position
+        expected_who_exits = pd.Series([0, 1])
         cur_pos, who_exits = BCS.get_cur_position(condi_probs, pre_condi_probs, pre_pos, exit_rule, who_exits)
         self.assertEqual(cur_pos, expected_pos)
         pd.testing.assert_series_equal(who_exits, expected_who_exits, check_dtype=False, check_less_precise=3)
