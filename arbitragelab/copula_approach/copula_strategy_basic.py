@@ -392,7 +392,7 @@ class BasicCopulaStrategy:
             trading signal generation. Defaults to (0.5, 0.5).
         :param exit_rule: (str) Optional. The logic for triggering an exit signal. Available choices are 'and', 'or'.
             They indicate whether both conditional probabilities need to cross 0.5. Defaults to 'and'.
-        :return: (np.array) The suggested positions for the given price data.
+        :return: (pd.Series) The suggested positions for the given price data.
         """
 
         # Map to quantile data using the trained marginal cdfs.

@@ -21,15 +21,15 @@ long-short pairs trading framework.
     (Figure and Caption from Botha et al. 2013.) An illustration of the areas where the values of U and V respectively 
     are considered extreme when using a 99% confidence level and the N14 copula dependence structure.
 
-Probability Threshold Strategy
-##############################
+Conditional Probabilities
+#########################
 
 We start with a pair of stocks of interest :math:`S_1` and :math:`S_2`, which can be selected by various methods.
 For example, using the Engle-Granger test for cointegration.
 By consensus, we define the spread as :math:`S_1` in relation to :math:`S_2`.
 e.g. Short the spread means buying :math:`S_1` and/or selling :math:`S_2`.
 
-Use **cumulative log return** data of the stocks during the training/formation period, we proceed with a pseudo-MLE
+Use **prices** data of the stocks during the training/formation period, we proceed with a pseudo-MLE
 fit to establish a copula that reflects the relation of the two stocks during the training/formation period.
 
 Then we can calculate the **conditional probabilities** using trading/testing period data:
@@ -46,21 +46,46 @@ Then we can calculate the **conditional probabilities** using trading/testing pe
 
 - When :math:`P(U_1\le u_1 | U_2 = u_2) > 0.5`, then stock 1 is considered over-valued.
 
+Trading Logic
+#############
+
 Now we define an upper threshold :math:`b_{up}` (e.g. 0.95) and a lower threshold :math:`b_{lo}` (e.g. 0.05),
 then the logic is as follows:
 
 - If :math:`P(U_1\le u_1 | U_2 = u_2) \le b_{lo}` and :math:`P(U_2\le u_2 | U_1 = u_1) \ge b_{up}`, then stock 1 is
-  undervalued, and stock 2 is overvalued. Hence we long the spread.
+  undervalued, and stock 2 is overvalued. Hence we long the spread. ( :math:`1` in position)
 
 - If :math:`P(U_2\le u_2 | U_1 = u_1) \le b_{lo}` and :math:`P(U_1\le u_1 | U_2 = u_2) \ge b_{up}`, then stock 2 is
-  undervalued, and stock 1 is overvalued. Hence we short the spread.
+  undervalued, and stock 1 is overvalued. Hence we short the spread. ( :math:`-1` in position)
 
-- If one of the conditional probabilities cross the boundary of :math:`0.5` in relation to its previous time step,
-  then we exit the position, as we consider the position is no longer valid.
+- If both/either conditional probabilities cross the boundary of :math:`0.5`, then we exit the position, as we consider
+  the position no longer valid. ( :math:`0` in position)
 
-With an input of portfolio price series, a backward-looking window for a simple moving average, and a
-window for rolling st. deviation, the function will output a dataframe with portfolio price series
-alongside with the Z-Scores and target quantities of the unit portfolio to hold.
+Ambiguities and Comments
+************************
+
+The authors did not specify what will happen if the followings occur:
+
+1. When there is an open signal and a exit signal.
+    
+2. When there is an open signal and currently there is a position.
+    
+3. When there is a long and short signal together.
+
+Here is our take:
+
+1. Exit signal overrides open signal.
+
+2. Flip the position to the signal's suggestion. For example, originally have a short position, and receives a long
+   signal, then the position becomes long.
+   
+3. Technically this should never happen with the default trading logic. However if it did happen for whatever
+   reason, long + short signal will lead to no opening signal and the positions will not change, unless there is
+   an exit signal and that resets the position to 0.
+
+For exiting a position, the authors proposed using **'and'** logic: Both conditional probabilities need to cross :math:`0.5`.
+However we found this too strict and sometimes fails to exit a position when it should. Therefore we also provide the
+**'or'** logic: At least one of the conditional probabilities cross :math:`0.5`.
 
 .. figure:: images/positions_log_prices.png
     :scale: 50 %
@@ -77,12 +102,17 @@ alongside with the Z-Scores and target quantities of the unit portfolio to hold.
     from BKD and ESC.
 
 Implementation
-**************
+##############
 
-.. automodule:: arbitragelab.copula_approach.copula_strategy
+.. Warning::
+    The original :code:`CopulaStrategy` class is still available in Arbitrage Lab but is considered a legacy module.
+    One can keep using it if it is already in use, but we highly recommend new users to use :code:`BasicCopulaStrategy`
+    exclusively for more flexibility, better consistency with other copula modules, and full support of :code:`pandas`. 
+
+.. automodule:: arbitragelab.copula_approach.copula_strategy_basic
         
-    .. autoclass:: CopulaStrategy
-	:members: __init__, cum_log_return, fit_copula, analyze_time_series, graph_copula
+    .. autoclass:: BasicCopulaStrategy
+	:members: __init__, fit_copula, get_positions, to_quantile, get_info_criterion, get_condi_probs, get_cur_position
 
 Example
 *******
@@ -90,51 +120,40 @@ Example
 .. code-block::
 
    # Importing the module and other libraries
-   from arbitragelab.copula_approach.copula_strategy import CopulaStrategy
+   from arbitragelab.copula_approach.copula_strategy_basic import BasicCopulaStrategy
    import matplotlib.pyplot as plt
-   import numpy as np
+   import pandas as pd
 
    # Instantiating the module
-   CS = CopulaStrategy()
+   BCS = BasicCopulaStrategy()
 
    # Loading the data
-   s1_price = pd.read_csv('X_FILE_PATH.csv').set_index('Date').dropna()
-   s2_price = pd.read_csv('Y_FILE_PATH.csv').set_index('Date').dropna()
+   pair_prices = pd.read_csv('PRICE_DATA.csv', index_col='Dates', parse_dates=True)
 
    # Split data into train and test sets
-   s1_price_train = s1_price[:int(len(s1_price)*0.7)]
-   s1_price_test = s1_price[int(len(s1_price)*0.7):]
-
-   s2_price_train = s2_price[:int(len(s2_price)*0.7)]
-   s2_price_test = s2_price[int(len(s2_price)*0.7):]
-
-   # Converting price data to cumulative log returns
-   s1_clr_train = CS.cum_log_return(s1_price_train)
-   s2_clr_train = CS.cum_log_return(s2_price_train)
-   s1_clr_test = CS.cum_log_return(s1_price_test, start=s1_price_train[0])
-   s2_clr_test = CS.cum_log_return(s2_price_test, start=s2_price_train[0])
+   prices_train = pair_prices.iloc[:int(len(s1_price)*0.7)]
+   prices_test = pair_prices.iloc[int(len(s1_price)*0.7):]
 
    # Fitting to a Student-t copula
-   result_dict, copula, s1_cdf, s2_cdf = CS.fit_copula(s1_series=s1_clr_train,
-                                                       s2_series=s2_clr_train,
-                                                       copula_name='Student')
+   result_dict, copula, s1_cdf, s2_cdf = BCS.fit_copula(data=prices_train,
+                                                        copula_name='Student')
 													   
-   # Printing fit scores (AIC, SIC, HQIC)
+   # Printing fit scores (AIC, SIC, HQIC, log-likelihood)
    print(result_dict)
 
    # Forming position series using trading period data, assuming holding no position initially.
-   # Also changing upper and lower bound to 0.9 and 0.1 respectively.
-   positions = CS.analyze_time_series(s1_series=s1_clr_test,
-                                      s2_series=s2_clr_test,
-                                      cdf1=s1_cdf,
-                                      cdf2=s2_cdf,
-                                      start_position=0,
-                                      lower_threshold=0.10,
-                                      upper_threshold=0.90)
+   # Also changing lower and upper bound to 0.1 and 0.9 respectively.
+   # 'AND' exit logic:
+   positions_and = BCS.get_positions(data=prices_test, cdf1=s1_cdf, cdf2=s2_cdf,
+                                     init_pos=0, open_thresholds=(0.1, 0.9))
+
+   # 'OR' exit logic:
+   positions_or = BCS.get_positions(data=prices_test, cdf1=s1_cdf, cdf2=s2_cdf,
+                                    init_pos=0, open_thresholds=(0.1, 0.9), exit_rule='or')
    
    # Graph from the fitted copula
    ax = plt.subplot()
-   CS.graph_copula(copula_name='Student', ax=ax, cov=copula.cov, nu=copula.nu)
+   copula.plot(num=1000, ax=ax)
    plt.show()
    
    # Sample 2000 times from the fitted copula

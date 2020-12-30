@@ -12,7 +12,7 @@ Mispricing Index Trading Strategy
 .. Warning::
     The authors claimed a relatively robust 8-10% returns from this strategy in the formation period (6 mo).
     We are pretty positive that the rules proposed in the paper were implemented correctly in the :code:`CopulaStrategyMPI`
-    module with thorough unit testing on every possible case, and thus there is very unlikely to have mistakes.
+    module with thorough unit testing on every possible case, and thus it is very unlikely to have logical mistakes.
     However the P&L is very sensitive to the opening and exiting parameters value, input data and copula choice,
     and it cannot lead to the claimed returns, after trying all the possible interpretations of ambiguities.
     
@@ -229,7 +229,7 @@ Example
    result_dict, copula, s1_cdf, s2_cdf = CSMPI.fit_copula(returns=returns_train,
                                                           copula_name='N14')
 													   
-   # Printing fit scores in AIC, SIC, HQIC
+   # Printing fit scores in AIC, SIC, HQIC and log-likelihood
    print(result_dict)
 
    # Forming positions and flags using trading period data, assuming holding no position initially.

@@ -49,12 +49,14 @@ Tools presented in this module enable the user to:
 
     - Feed in a single pair's data point (i.e., EOD data from just today) and thus generate a single position.
 
-There are 8 commonly used ones that are now available: :code:`Gumbel`, :code:`Frank`, :code:`Clayton`, :code:`Joe`,
-:code:`N13`, :code:`N14`, :code:`Gaussian` and :code:`Student` (Student-t).
-They are all subclasses of the class :code:`Copula`, and they share some common repertoire of methods and attributes.
-However, most of the time, the user is not expected to directly use the copulas.
-All trading related functionalities are stated above, and included in the :code:`CopulaStrategy` class.
+There are 8 commonly used pure copulas that are now available: :code:`Gumbel`, :code:`Frank`, :code:`Clayton`, :code:`Joe`,
+:code:`N13`, :code:`N14`, :code:`Gaussian` and :code:`Student` (Student-t) under :code:`Copula`.
+Also there are 2 mixed copulas :code:`CTGMixCop` (Clayton-Student-Gumbel) and :code:`CFGMixCop` (Clayton-Frank-Gumbel) under
+:code:`MixedCopula`.
+They share some common repertoire of methods and attributes.
+However, most of the time for trading purposes, the user is not expected to directly use the copulas.
+All trading related functionalities are included in the :code:`BasicCopulaStrategy` and :code:`CopulaStrategyMPI` class.
 
 The user may choose to fit the pair's data to all provided copulas, then compare the information criterion scores (AIC,
-SIC, HQIC) to decide the best copula. One can further use the fitted copula to generate trading positions by giving
-thresholds from data.
+SIC, HQIC, Log-likelihood) to decide the best copula. One can further use the fitted copula to generate trading positions
+by giving thresholds from data.
