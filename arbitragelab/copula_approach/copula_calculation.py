@@ -6,11 +6,15 @@ Back end module that handles maximum likelihood related copula calculations.
 
 Functions include:
     Finding (marginal) cumulative distribution function from data.
+    Findind empirical cumulative distribution function from data with linear interpolation.
     Maximum likelihood estimation of theta_hat (empirical theta) from data.
     Calculating the sum log-likelihood given a copula and data.
     Calculating SIC (Schwarz information criterion).
     Calculating AIC (Akaike information criterion).
     Calculating HQIC (Hannan-Quinn information criterion).
+    Fitting Student-t Copula.
+    SCAD penalty functions.
+    Adjust weights for mixed copulas for normality.
 """
 # pylint: disable = invalid-name
 from typing import Callable

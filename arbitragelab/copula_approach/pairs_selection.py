@@ -19,7 +19,7 @@ class PairsSelector:
     This class selects potential pairs for copula-based trading strategies. Methods include Spearman's rho, Kendall's
     tau and Euclidean distance on normalized prices. Those methods are relatively quick to perform and is generally
     used in literature for copula-based pairs trading framework. For more sophisticated ML based pairs selection
-    methods, please refer to `arbitragelab.ml_approach`.
+    methods, please refer to :code:`arbitragelab.ml_approach`.
     """
 
     def __init__(self):

@@ -102,6 +102,7 @@ This project is licensed under an all rights reserved licence.
     copula_approach/copula_deeper_intro
     copula_approach/basic_trading_strategy
     copula_approach/mispricing_index_strategy
+    copula_approach/utility_functions
 
 .. toctree::
     :maxdepth: 2
