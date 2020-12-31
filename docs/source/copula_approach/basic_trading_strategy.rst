@@ -107,7 +107,7 @@ Implementation
 .. Warning::
     The original :code:`CopulaStrategy` class is still available in Arbitrage Lab but is considered a legacy module.
     One can keep using it if it is already in use, but we highly recommend new users to use :code:`BasicCopulaStrategy`
-    exclusively for more flexibility, better consistency with other copula modules, and full support of :code:`pandas`. 
+    exclusively for more flecibility, better consistency with other copula modules, and full support of :code:`pandas`. 
 
 .. automodule:: arbitragelab.copula_approach.copula_strategy_basic
         
