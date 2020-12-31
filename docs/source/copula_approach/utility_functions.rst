@@ -104,13 +104,64 @@ Comments
 Kendall's tau and Spearman's rho are rank based values.
 Thus they are non-parametric.
 Kendall's tau's computation complexity is :math:`O(N^2)` and Spearman's rho is :math:`O(N \log N)`.
+The pairs selected by :math:`\tau` and :math:`\rho` generally do not differ much.
 However Kendall's tau is more stable, and suffers less from outliers.
 
 Euclidean distance is also used commonly in literatures.
-However we found it not coping with copula-based strategies very well based on our back tests on Dow stocks for 2010-2020.
+The pairs selected in general do not coincide with the pairs selected by :math:`\tau` and :math:`\rho`.
+However we found it not coping with copula-based strategies very well based on our back tests.
 
 Pearson's correlation is not included here due to its parametric approach, and assumption on normality of the underlyings.
 
+To illustrate their differences further, here we conduct a quick run on adjusted closing prices on Dow stocks from beginning of 
+2011 to end of 2019:
+
+.. figure:: images/individual_ranked_rho_tau.png
+    :scale: 30 %
+    :align: center
+    
+    The plots are :math:`\tau` and :math:`\rho` scores individually for all available pairs.
+    Value-wise, :math:`\tau` is smaller than :math:`\rho` in terms of absolute value.
+    
+.. figure:: images/rho_ranked_rho_tau.png
+    :scale: 30 %
+    :align: center
+    
+    We plot :math:`\tau` and :math:`\rho` for all pairs, but the sequence is based on :math:`\rho`.
+
+.. figure:: images/tau_ranked_rho_tau.png
+    :scale: 30 %
+    :align: center
+    
+    We plot :math:`\tau` and :math:`\rho` for all pairs, but the sequence is based on :math:`\tau`.
+    We can see that :math:`\rho` is a bit less stable, with slightly larger jumps.
+
+.. figure:: images/eucdis_ranked_rho_tau.png.png
+    :scale: 30 %
+    :align: center
+    
+    Now we plot :math:`\tau` and :math:`\rho` for all pairs, but the sequence is based on Euclidean distance.
+    We can see that the Euclidean distance result do not agree with :math:`\tau` and :math:`\rho`,
+    also :math:`\tau` is a bit more stable than :math:`\rho`.
+
+Below are the top pairs normalized prices plot (cumulative return) selected by Euclidean distance and Kendall's tau respectively.
+They clearly demonstrate what each method aims to capture.
+
+.. figure:: images/top_euc.png
+    :scale: 25 %
+    :align: center
+
+.. figure:: images/top_tau.png
+    :scale: 25 %
+    :align: center
+
+It might make more sense to look at the quantile plot for the HD-V pair selected by Kendall's tau.
+
+.. figure:: images/top_tau_quantile.png
+    :scale: 25 %
+    :align: center
+    
+    
 Implementation
 **************
 
