@@ -10,7 +10,7 @@
        Proceedings of the first brazilian conference on statistical modeling in insurance and finance.
        University Press USP Sao Paulo, 2003.
     3. Chang, Bo. `Copula: A Very Short Introduction <https://bochang.me/blog/posts/copula/>`__.
-    4. Wiecki, Thomas. `An intuitive, visual guide to copulas <https://twiecki.io/blog/2018/05/03/copulas/>`__.
+    4. Andy Jones. `SCAD penalty <https://andrewcharlesjones.github.io/posts/2020/03/scad/>`__.
 
 =========================
 A Deeper Intro to Copulas
@@ -140,7 +140,8 @@ Once we have enough observations from :math:`X_1` and :math:`X_2`, we define the
     \tilde{C}_n(\frac{i}{n}, \frac{j}{n}) = \frac{1}{n}
     ||\{ (X_1, X_2) \mid X_1 \le X_1(i), X_2 \le X_2(j) \}||,
     
-where :math:`X_1(i)` is the :math:`i`-th largest element for :math:`X_1`. Same applies for :math:`X_2(j)`.
+where :math:`X_1(i)` is the :math:`i`-th largest element for :math:`X_1`; same applies for :math:`X_2(j)`;
+:math:`|| \cdot ||` is the cardinality, or the number of elements in the set for a finite set.
 The definition may look more complicated than what it is.
 To calculate :math:`\tilde{C}_n(\frac{i}{n}, \frac{j}{n})`, one just need to count the number of cases in the whole observation
 that are not greater than the :math:`i`-th and :math:`j`-th rank for their own marginal r.v. respectively.
@@ -180,6 +181,13 @@ If one uses empirical CDFs, then it is identical to our first definition.
     "Pure" copula is not an official name.
     It is used here for convenience, in contrast to mixed copulas, to represent Archimedean and elliptical copulas.
 
+.. figure:: images/densityGaussian.png
+    :scale: 71 %
+    :align: center
+    
+    Plot of :math:`c(u,v)` for the infamous Gaussian copula. It is often not obvious to decide from the plot that whether 
+    a copula has tail dependencies.
+
 For practical purposes, at least for the implemented trading strategies in this module, it is enough to understand
 tail dependency for each copula and what structure are they generally modeling, because sometimes the nuances only
 come into play for a (math) analyst.
@@ -200,13 +208,15 @@ Here are a few key results:
    
 5. For Value-at-Risk calculations, Gaussian copula is overly optimistic and Gumbel is too pessimistic.
 
-6. Copulas with upper tail dependency: Gumbel, Joe, N13, N14, Student-t
+6. Copulas with upper tail dependency: Gumbel, Joe, N13, N14, Student-t.
 
-7. Copulas with lower tail dependency: Clayton, N14 (weaker), Student-t
+7. Copulas with lower tail dependency: Clayton, N14 (weaker), Student-t.
+
+8. Copulas with no tail dependency: Gaussian, Frank.
 
 Since a Student-t copula will converge to a Gaussian copula as the degrees of freedom increases, it makes sense to quantify
 the change of tail dependence (the upper and lower tail dependency is the same value thanks to symmetry for Student-t copula).
-It is tabled below:
+It is tabled below from [Demarta, McNeil, The t Copula and Related Copulas, 2005]:
 
 .. list-table:: Tail Dependency for Bivariate Student-t Copula
    :widths: 20 20 20 20 20 20
@@ -244,7 +254,6 @@ It is tabled below:
      - 0
      - 1
 
-
 Implementation
 **************
 
@@ -267,18 +276,33 @@ In this `copula_approach` module, we support two mixed copula classes: :code:`CF
 :code:`CTGMixCop` for Clayton-Student-Gumbel mix, inspired by [da Silva et al. 2017].
 
 It is pretty intuitive to understand, for example, for a CFG mixde copula, one needs to specify the :math:`\theta`'s,
-the dependency parameter for each copula component, and their **weights**.
+the dependency parameter for each copula component, and their **weights** that sums to :math:`1`.
 In total there are :math:`5` parameters for CFG.
-The weights should be understood in the sense of Markov, i.e., it describes the probability of an observation coming from
+The weights should be understood in the sense of **Markov**, i.e., it describes the probability of an observation coming from
 each component.
+
+For example, we present the Clayton-Frank-Gumbel mixed copula as below:
+
+.. math::
+    
+    C_{mix}(u_1, u_2; \boldsymbol{\theta}, \mathbf{w}) := 
+    w_C C_C(u_1, u_2; \theta_C) + w_F C_F(u_1, u_2; \theta_F) + w_G C_G(u_1, u_2; \theta_G)
 
 Why Mixed Copulas
 *****************
 
 Archimedean copulas and elliptical copulas, though powerful by themselves to capture nonlinear relations for two random
 variables, may suffer from the degree to which they can be calibrated to data.
-While using a pure empirical copula may subject to overfit, a mixed copula that can adjust the upper and lower tail dependency
+While using a pure empirical copula may subject to overfit, a mixed copula that can calibrate the upper and lower tail dependency
 usually describes the dependency structure really well for its flexibility.
+
+.. figure:: images/AMGN_HD_MixCop.png
+    :scale: 22 %
+    :align: center
+    
+    Plot of quantiles for prices of Amgen and Home Depot in 2011-2019, and sample plots from a fitted CFG copula.
+    Mixed copulas calibrate the tail dependencies better than "pure" copulas. 
+    
 
 But this flexibility comes at a price: fitting it to data is not trivial.
 Although one can wrap an optimization function for finding the individual weights and copula parameters using max likelihood,
@@ -352,6 +376,27 @@ It is tested that the EM algorithm is *oracle* and *sparse*.
 Loosely speaking, the former means it has good asymptotic properties, and the latter says it will trim small
 weights off.
 
+.. Note::
+
+    The EM algorithm is still not mathematically perfect, and has the following issues:
+    
+    1. It is slow for some data sets.
+       Also the CTG is slow due to the bottleneck from Student-t copula.
+    
+    2. If the copula mixture have simular components, for instance, Gaussian and Frank, then it cannot pick the correct
+       component weights well.
+       Luckily for fitting data, usually the differences are minimal.
+       
+    3. The SCAD parameters :math:`\gamma` and :math:`a` may require some tuning, depending on the data set it fits.
+       Some authors suggest using cross validation to find a good pair of values.
+       We did not implement this in the package because it takes really long for the calculation to a point it becomes
+       unrealistic to run it (about 1 hour in some cases).
+       We did run some CV while coding it, so that the default values of :math:`\gamma` and :math:`a` are good choices.
+    
+    4. Sometimes the algorithm throws warnings, because the optimization algorithm underneath does not strictly following
+       the prescribed bounds.
+       Usually this is not an issue that will compromise the result.
+       And some minor tuning on SCAD parameters can solve this issue.
 
 Implementation
 **************
@@ -383,9 +428,20 @@ Interesting Open Problems
 
 5. Adjust copulas so it can model when dependency structure changes with time.
 
+6. All current copulas, "pure" or mixed, assumes symmetry. It would be nice to see analysis on asymmetric pairs modeled
+   by copula.
+
 References
 ##########
 
 * `Liew, R.Q. and Wu, Y., 2013. Pairs trading: A copula approach. Journal of Derivatives & Hedge Funds, 19(1), pp.12-30. <https://link.springer.com/article/10.1057/jdhf.2013.1>`__
 * `Stander, Y., Marais, D. and Botha, I., 2013. Trading strategies with copulas. Journal of Economic and Financial Sciences, 6(1), pp.83-107. <https://www.researchgate.net/publication/318054326_Trading_strategies_with_copulas>`__
 * `Schmid, F., Schmidt, R., Blumentritt, T., Gaißer, S. and Ruppert, M., 2010. Copula-based measures of multivariate association. In Copula theory and its applications (pp. 209-236). Springer, Berlin, Heidelberg. <https://www.researchgate.net/publication/225898324_Copula-Based_Measures_of_Multivariate_Association>`__
+* `Huard, D., Évin, G. and Favre, A.C., 2006. Bayesian copula selection. Computational Statistics & Data Analysis, 51(2), pp.809-822. <http://www.academia.edu/download/43927781/Bayesian_copula_selection20160320-19907-11r1q20.pdf>`__
+* `Kole, E., Koedijk, K. and Verbeek, M., 2007. Selecting copulas for risk management. Journal of Banking & Finance, 31(8), pp.2405-2423. <https://repub.eur.nl/pub/12668/SelectingCopulas_2005.pdf>`__
+* `Nelsen, R.B., 2003, September. Properties and applications of copulas: A brief survey. In Proceedings of the first brazilian conference on statistical modeling in insurance and finance (pp. 10-28). University Press USP Sao Paulo. <http://w4.stern.nyu.edu/ioms/docs/sg/seminars/nelsen.pdf>`__
+* `Cai, Z. and Wang, X., 2014. Selection of mixed copula model via penalized likelihood. Journal of the American Statistical Association, 109(506), pp.788-801. <https://www.tandfonline.com/doi/pdf/10.1080/01621459.2013.873366?casa_token=e4kOD3APdtUAAAAA:DnBnxkvcOtfPw3gDYoO66db8GzJiGS5M2G5rMK3ERfAvejk5022dhjAe2X26dk7eTf9kWmYfMg6Mkg>`__
+* `Liu, B.Y., Ji, Q. and Fan, Y., 2017. A new time-varying optimal copula model identifying the dependence across markets. Quantitative Finance, 17(3), pp.437-453. <https://www.tandfonline.com/doi/pdf/10.1080/14697688.2016.1205208?casa_token=Chu53l2q9SAAAAAA:MBAM-Zr3EL04IA0fcTJut0AQj5hPOvJjwVJUnxY9ZoB9wBRhGlfLjotX8aaITasXGWXXTr4wh9Td7A>`__
+* `Demarta, S. and McNeil, A.J., 2005. The t copula and related copulas. International statistical review, 73(1), pp.111-129. <https://www.risknet.de/fileadmin/eLibrary/t-Copula-Demarta-ETH.pdf>`__
+
+
