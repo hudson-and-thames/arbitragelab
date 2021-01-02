@@ -38,7 +38,7 @@ variable pairs under the copula framework, instead of spending efforts in idiosy
 distributions.
 
 The process of sampling:
-    1. For two random variables with foxed distributions, find their own marginal CDFs. (The CDFs need to be continuous.)
+    1. For two random variables with fixed distributions, find their own marginal CDFs. (The CDFs need to be continuous.)
     2. Pick a specific realization :math:`\omega \in \Omega`, and from it sample the two random variables.
     3. Sample multiple times and map the random samples into their quantile domain by their CDFs.
     4. Plot the pair's quantile data.
@@ -206,7 +206,7 @@ For Archimedean copulas, the general methodology for sampling or simulation come
 
 For some copulas, the above method can greatly be simplified due to having closed-form solutions for step :math:`2`.
 Otherwise, one will have to use appropriate numerical methods to find :math:`w`.
-Interested reader can check `Procedure to Generate Uniform Random Variates from Each Copula
+Interested readers can check `Procedure to Generate Uniform Random Variates from Each Copula
 <https://www.caee.utexas.edu/prof/bhat/ABSTRACTS/Supp_material.pdf>`_
 for all the simplified forms.
 

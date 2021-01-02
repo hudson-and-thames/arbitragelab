@@ -90,7 +90,7 @@ And those can be derived from the copula:
 where :math:`\hat{C}(u_1, u_2) = u_1 + u_2 - 1 + C(1 - u_1, 1 - u_2)` is the **reflected copula**. 
 If :math:`\lambda_l > 0` then there is lower tail dependence.
 If :math:`\lambda_u > 0` then there is upper tail dependence.
-Note that one should to actually calculate the limit for each copula, and it is not obvious from the plot usually.
+Note that one should actually calculate the limit for each copula, and it is not obvious from the plot usually.
 
 For example, as plotted below, it is not difficult to show that for a Gumbel copula, :math:`\lambda_l=0` and
 :math:`\lambda_u=1`.
@@ -275,7 +275,7 @@ Mixed Copulas
 In this `copula_approach` module, we support two mixed copula classes: :code:`CFGMixCop` for Clayton-Frank-Gumbel mix and
 :code:`CTGMixCop` for Clayton-Student-Gumbel mix, inspired by [da Silva et al. 2017].
 
-It is pretty intuitive to understand, for example, for a CFG mixde copula, one needs to specify the :math:`\theta`'s,
+It is pretty intuitive to understand, for example, for a CFG mixed copula, one needs to specify the :math:`\theta`'s,
 the dependency parameter for each copula component, and their **weights** that sums to :math:`1`.
 In total there are :math:`5` parameters for CFG.
 The weights should be understood in the sense of **Markov**, i.e., it describes the probability of an observation coming from
@@ -417,10 +417,10 @@ Interesting Open Problems
 
 1. Parametrically fit a Student-t and mixed copula.
 
-2. Existence of statistical properties that justify two random varables to have an Archimedean copula (like one
+2. Existence of statistical properties that justify two random variables to have an Archimedean copula (like one
    can justify a random variable is normal).
 
-3. Take advantage of copula's ability to capture non-linear dependencies but also adjust it for time series, so that
+3. Take advantage of copula's ability to capture nonlinear dependencies but also adjust it for time series, so that
    the sequence of data coming in makes a difference.
 
 4. Analysis on copulas when it is used on time series instead of independent draws. (For example, how different it is
@@ -428,7 +428,7 @@ Interesting Open Problems
 
 5. Adjust copulas so it can model when dependency structure changes with time.
 
-6. All current copulas, "pure" or mixed, assumes symmetry. It would be nice to see analysis on asymmetric pairs modeled
+6. All copulas we mentioned so far, "pure" or mixed, assume symmetry. It would be nice to see analysis on asymmetric pairs modeled
    by copula.
 
 References
