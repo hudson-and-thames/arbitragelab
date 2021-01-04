@@ -2,8 +2,11 @@
 # All rights reserved
 # Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 """
-This module identifies a small mean-reverting portfolio out of multiple assets by sparse estimation of covariance
-matrix.
+This module identifies small mean-reverting portfolios out of multiple assets. The price dynamics of all assets are
+assumed to follow a VAR(1) process. The portfolio selection is then realized by estimating a sparse VAR(1) coefficient
+matrix and a sparse covariance matrix from which the weight of each asset in the prospective mean-reverting portfolio is
+determined. Consequently, the mean-reverting properties of the portfolio will be quantified with an Ornstein-Uhlenbeck
+model.
 """
 
 from typing import Tuple
@@ -21,13 +24,28 @@ from sklearn.preprocessing import normalize
 from arbitragelab.optimal_mean_reversion import OrnsteinUhlenbeck
 
 
+# pylint: disable=invalid-name
 class SmallMeanRevPortfolio:
     """
+    This class implements small mean-reverting portfolio selection from a group of assets and provides the following
+    functionality:
 
+    1. Least square estimate of VAR(1) coefficient matrix;
+    2. Box-Tiao canonical decomposition;
+    3. LASSO regression estimate of a sparse VAR(1) coefficient matrix;
+    4. Graphical LASSO regression estimate of a sparse covariance matrix;
+    5. Graph representation of the sparse VAR(1) coefficient matrix and the inverse of the sparse covariance matrix;
+    6. Greedy search algorithm for sparse decomposition;
+    7. Semidefinite relaxation algorithm for sparse decomposition;
+    8. Ornstein-Uhlenbeck mean reversion coefficient and half-life calculation;
+    9. Visualization of the sparse covariance matrix estimation, the sparse VAR(1) coefficient matrix estimation, and
+    the price of the selected portfolio.
     """
+
     def __init__(self, assets):
         """
-        Constructor of the small mean-reverting portfolio identification module.
+        Constructor of the small mean-reverting portfolio identification module. The constructor will subtract the mean
+        price of each asset from the original price such that the price processes have zero mean.
 
         :param assets: (pd.DataFrame) The price history of each asset.
         """
@@ -71,13 +89,13 @@ class SmallMeanRevPortfolio:
         portfolio = assets @ weights
 
         # Fit the OU model
-        ou_model = OrnsteinUhlenbeck
-        ou_model.fit(portfolio, interval, discount_rate=0., transaction_cost=0.)
+        ou_model = OrnsteinUhlenbeck()
+        ou_model.fit(data=portfolio, data_frequency=interval, discount_rate=0., transaction_cost=0.)
 
         # Return the mean reversion coefficient and the half-life
         return ou_model.mu, ou_model.half_life()
 
-    def least_square_VAR_fit(self):
+    def least_square_VAR_fit(self) -> np.array:
         """
         Calculate the least square estimate of the VAR(1) matrix.
 
@@ -92,10 +110,12 @@ class SmallMeanRevPortfolio:
 
         return least_sq_est
 
-    def box_tiao(self) -> np.array:
+    def box_tiao(self, threshold: int = 7) -> np.array:
         """
         Perform Box-Tiao canonical decomposition on the assets dataframe.
 
+        :param threshold: (int) Round precision cutoff threshold. For example, a threshold of n means that a number less
+            than :math:`10^{-n}` will be treated as zero.
         :return: (np.array) The weighting of each asset in the portfolio. There will be N decompositions for N assets,
             where each column vector corresponds to one portfolio. The
         """
@@ -117,14 +137,17 @@ class SmallMeanRevPortfolio:
         return bt_eigvecs
 
     @staticmethod
-    def greedy_search(cardinality: int, matrix_A: np.array, matrix_B: np.array) -> np.array:
+    def greedy_search(cardinality: int, matrix_A: np.array, matrix_B: np.array, threshold: int = 7) -> np.array:
         """
+        Greedy search algorithm for sparse decomposition.
 
-        :param cardinality: (int) Number of assets to form the portfolio.
-        :param matrix_A: (np.array) Matrix A.T @ Gamma @ A, where A is the estimated VAR(1) coefficient matrix, and
-            Gamma is the estimated covariance matrix.
-        :param matrix_B: (np.array) Matrix Gamma, where Gamma is the estimated covariance matrix.
-        :return: (np.array) Weight of each selected assets
+        :param cardinality: (int) Number of assets to include in the portfolio.
+        :param matrix_A: (np.array) Matrix :math:`A^T \\Gamma A`, where A is the estimated VAR(1) coefficient matrix,
+            where :math:`\\Gamma` is the estimated covariance matrix.
+        :param matrix_B: (np.array) Matrix :math:`\\Gamma`, the estimated covariance matrix.
+        :param threshold: (int) Round precision cutoff threshold. For example, a threshold of n means that a number less
+            than :math:`10^{-n}` will be treated as zero.
+        :return: (np.array) Weight of each selected assets.
         """
 
         # Use a list to store all selected assets
@@ -173,17 +196,20 @@ class SmallMeanRevPortfolio:
             selected.append(cur_support)
             candidates.remove(cur_support)
 
-        return selected_weights
+        return np.around(selected_weights, threshold)
 
     @staticmethod
-    def sdp_relax(cardinality: int, matrix_A: np.array, matrix_B: np.array) -> np.array:
+    def sdp_relax(cardinality: int, matrix_A: np.array, matrix_B: np.array, threshold: int = 7) -> np.array:
         """
+        Semidefinite relaxation algorithm for sparse decomposition.
 
         :param cardinality: (int) Number of assets to form the portfolio.
-        :param matrix_A: (np.array) Matrix A.T @ Gamma @ A, where A is the estimated VAR(1) coefficient matrix, and
-            Gamma is the estimated covariance matrix.
-        :param matrix_B: (np.array) Matrix Gamma, where Gamma is the estimated covariance matrix.
-        :return:
+        :param matrix_A: (np.array) Matrix :math:`A^T \\Gamma A`, where A is the estimated VAR(1) coefficient matrix,
+            where :math:`\\Gamma` is the estimated covariance matrix.
+        :param matrix_B: (np.array) Matrix :math:`\\Gamma`, the estimated covariance matrix.
+        :param threshold: (int) Round precision cutoff threshold. For example, a threshold of n means that a number less
+            than :math:`10^{-n}` will be treated as zero.
+        :return: (np.array) Weight of each selected assets.
         """
 
         # Declare a symmetric matrix variable
@@ -207,7 +233,7 @@ class SmallMeanRevPortfolio:
         # Get the eigenvector that corresponds to the largest eigvalue
         weights = eigvectors[:, np.argmax(eigvals)]
 
-        return weights
+        return np.around(weights, threshold)
 
     def LASSO_VAR_tuning(self, sparsity: float, multi_task_lasso: bool = False, alpha_min: float = -5.,
                          alpha_max: float = 0., n_alphas: int = 100, max_iter: int = 1000) -> float:
@@ -226,6 +252,7 @@ class SmallMeanRevPortfolio:
 
         # The number of elements in the VAR(1) matrix is asset number squared
         coefs_nums = self.demeaned.shape[1] ** 2
+        print(coefs_nums)
 
         # Construct the current data and lag-1 data such that they have the same shape
         data_now = self.demeaned.iloc[1:]
@@ -273,14 +300,17 @@ class SmallMeanRevPortfolio:
                              "sparsity requirements. Please try larger alphas for a sparser estimate.")
         return best_alpha
 
-    def LASSO_VAR_fit(self, alpha: float, multi_task_lasso: bool = True, max_iter: int = 1000) -> np.array:
+    def LASSO_VAR_fit(self, alpha: float, multi_task_lasso: bool = True, max_iter: int = 1000,
+                      threshold: int = 10) -> np.array:
         """
-        Fit the LASSO model using the optimized alpha for a specific sparsity.
+        Fit the LASSO model using the optimized alpha to yield a sparse VAR(1) coefficient matrix estimate.
 
         :param alpha: (float) Optimized l1-regularization coefficient.
         :param multi_task_lasso: (bool) If True, use multi-task LASSO for sparse estimate, where the LASSO will yield
             full columns of zeros; otherwise, do LASSO column-wise.
         :param max_iter: (int) Maximum number of iterations of LASSO regression.
+        :param threshold: (int) Round precision cutoff threshold. For example, a threshold of n means that a number less
+            than :math:`10^{-n}` will be treated as zero.
         :return: (np.array) Sparse estimate of VAR(1) matrix.
         """
 
@@ -293,23 +323,29 @@ class SmallMeanRevPortfolio:
             lasso_model = MultiTaskLasso(alpha=alpha, max_iter=max_iter)
         else:
             lasso_model = Lasso(alpha=alpha, max_iter=max_iter)
-        VAR_estimate = lasso_model.fit(data_lag, data_now).coef
+        VAR_estimate = lasso_model.fit(data_lag, data_now).coef_
 
         # Return the best fit for sparse estimate
-        return VAR_estimate
+        return np.around(VAR_estimate, threshold)
 
     def covar_sparse_tuning(self, max_iter: int = 1000, alpha_min: float = -5., alpha_max: float = 0.,
                             n_alphas: int = 100, clusters: int = 3) -> float:
         """
+        Tune the regularization parameter (alpha) of the graphical LASSO model for a sparse estimate of the covariance
+        matrix.
 
-        :param max_iter:
-        :param alpha_min:
-        :param alpha_max:
-        :param n_alphas:
+        :param max_iter: (int) Maximum number of iterations for graphical LASSO fit.
+        :param alpha_min: (float) Minimum regularization parameter.
+        :param alpha_max: (float) Maximum regularization parameter.
+        :param n_alphas: (int) Number of regularization parameter for parameter search.
         :param clusters: (int) Number of smaller clusters desired from the precision matrix.
             The higher the number, the larger the best alpha will be. This parameter cannot exceed the number of assets.
-        :return: (float)
+        :return: (float) Optimal alpha to split the graph representation of the inverse covariance matrix into
+            designated number of clusters.
         """
+        # Check parameter validity
+        if clusters > self.assets.shape[1]:
+            raise ValueError("The number of clusters cannot exceed the number of assets.")
 
         # Set up the parameter space for the regularization parameter
         alphas = np.logspace(alpha_min, alpha_max, n_alphas)
@@ -319,7 +355,7 @@ class SmallMeanRevPortfolio:
             edge_model = GraphicalLasso(alpha=alpha, max_iter=max_iter)
             edge_model.fit(self.demeaned)
 
-            # Retrieve the precision matrix (inverse of sparse covariance matrix) as the graph adjacency matrix representation
+            # Retrieve the precision matrix (inverse of sparse covariance matrix) as the graph adjacency matrix
             adj_matrix = np.copy(edge_model.precision_)
 
             # Graph should have no self loop, so we need to replace the diagonal with zeros for adjacency matrix
@@ -328,34 +364,74 @@ class SmallMeanRevPortfolio:
             # Assign one to non-zero elements
             adj_matrix[adj_matrix != 0] = 1
 
-            # Check if the graph formed by the sparse covariance estimate is chordal and has the desired amount of clusters
+            # Check if the graph formed by the sparse covariance estimate has the desired amount of clusters
             graph = nx.from_numpy_array(adj_matrix)
-            if nx.number_connected_components(graph) == clusters and nx.is_chordal(graph):
+            if nx.number_connected_components(graph) == clusters:
                 return alpha
 
         # The procedure failed to find an optimal alpha, raise exception
         raise ValueError("The regularization coefficient (alpha) range selected cannot meet the "
                          "chordal graph requirement. Please try larger alphas for a sparser estimate.")
 
-    def covar_sparse_fit(self, alpha: float, max_iter: int = 1000) -> np.array:
+    def covar_sparse_fit(self, alpha: float, max_iter: int = 1000, threshold: int = 10) -> Tuple[np.array, np.array]:
         """
+        Fit the graphical LASSO model using the optimized alpha to yield a sparse covariance matrix estimate.
 
-        :param alpha:
-        :param max_iter:
-        :return:
+        :param alpha: (float) Optimized regularization coefficient of graphical LASSO.
+        :param max_iter: (int) Maximum number of iterations for graphical LASSO fit.
+        :param threshold: (int) Round precision cutoff threshold. For example, a threshold of n means that a number less
+            than :math:`10^{-n}` will be treated as zero.
+        :return: (np.array, np.array) Sparse estimate of covariance matrix; inverse of the sparse covariance matrix,
+            i.e. precision matrix as graph representation.
         """
 
         # Fit graphical LASSO model
         edge_model = GraphicalLasso(alpha=alpha, max_iter=max_iter)
         edge_model.fit(self.demeaned)
 
-        # Return the sparse estimate of the covariance matrix
-        return edge_model.covariance_
+        # Return the sparse estimate of the covariance matrix and its inverse
+        return np.around(edge_model.covariance_, threshold), np.around(edge_model.precision_, threshold)
 
-    def plot_box_tiao_portfolio(self):
+    def find_clusters(self, precision_matrix: np.array, var_estimate: np.array) -> nx.Graph:
         """
-        Plot the portfolio value
+        Use the intersection of the graph :math:`\\Gamma^{-1}` and the graph :math:`A^T A` to pinpoint the clusters of
+        assets to perform greedy search or semidefinite relaxation on.
 
-        :return:
+        :param precision_matrix: (np.array) The inverse of the estimated sparse covariance matrix.
+        :param var_estimate: (np.array) The sparse estimate of VAR(1) coefficient matrix.
+        :return: (networkx.Graph) A graph representation of the clusters.
         """
-        pass
+
+        # Construct the graph based on covariance matrix estimate
+        covar_graph = nx.from_numpy_array(precision_matrix)
+        VAR_graph = nx.from_numpy_array(var_estimate)
+
+        # Relabel the graph nodes with asset names
+        mapping = {x: y.split()[0] for x, y in enumerate(list(self.assets.columns))}
+        covar_graph = nx.relabel_nodes(covar_graph, mapping)
+        VAR_graph = nx.relabel_nodes(VAR_graph, mapping)
+
+        # Return the intersection of the two graph
+        return nx.intersection(covar_graph, VAR_graph)
+
+    @staticmethod
+    def check_symmetric(matrix: np.array, rtol: float = 1e-05, atol: float = 1e-08) -> bool:
+        """
+        Check if a matrix is symmetric.
+
+        :param matrix: (np.array) The matrix under inspection.
+        :param rtol: (float) Relative tolerance for np.allclose.
+        :param atol: (float) Absolute tolerance for np.allclose.
+        :return: (bool) True if the matrix symmetric, False otherwise.
+        """
+        return np.allclose(matrix, matrix.T, rtol=rtol, atol=atol)
+
+    @staticmethod
+    def is_pos_def(matrix: np.array) -> bool:
+        """
+        Check if a matrix is positive definite.
+
+        :param matrix: (np.array) The matrix under inspection.
+        :return: (bool) True if the matrix is positive definite, False otherwise.
+        """
+        return np.all(np.linalg.eigvals(matrix + matrix.T) > 0)
