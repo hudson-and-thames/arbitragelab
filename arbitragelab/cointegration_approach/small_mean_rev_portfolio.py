@@ -134,7 +134,7 @@ class SmallMeanRevPortfolio:
         bt_eigvecs = eigvecs[:, np.argsort(eigvals)[::-1]]
 
         # Return the weights
-        return bt_eigvecs
+        return np.around(bt_eigvecs, threshold)
 
     @staticmethod
     def greedy_search(cardinality: int, matrix_A: np.array, matrix_B: np.array, threshold: int = 7) -> np.array:
@@ -158,7 +158,7 @@ class SmallMeanRevPortfolio:
         candidates = set(range(matrix_B.shape[0]))
 
         # Start greedy search
-        for k in range(cardinality):
+        for _ in range(cardinality):
             # Record the maximum value of the target function of the generalized eigenvalue problem
             max_gen_eig_ratio = np.NINF
 
@@ -176,7 +176,7 @@ class SmallMeanRevPortfolio:
                     cur_matrix_B = cur_matrix_B.reshape(-1, 1)
 
                 # Solve the generalized eigenvalue problem
-                eigval, eigvec = scipy.linalg.eigh(cur_matrix_A, cur_matrix_B)
+                _, eigvec = scipy.linalg.eigh(cur_matrix_A, cur_matrix_B)
 
                 # Construct the weighting of the portfolio based on the current support
                 weight = np.zeros((matrix_B.shape[0], 1))
