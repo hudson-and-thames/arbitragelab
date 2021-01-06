@@ -248,9 +248,12 @@ should consist of a log-price of an already created mean-reverting portfolio.
 Implementation
 ==============
 
-.. py:currentmodule:: arbitragelab.optimal_mean_reversion.cir_model.CoxIngersollRoss
+.. automodule:: arbitragelab.optimal_mean_reversion.cir_model
 
-.. autofunction:: fit
+.. autoclass:: CoxIngersollRoss
+   :members: __init__
+
+.. automethod:: CoxIngersollRoss.fit
 
 .. tip::
 
@@ -258,9 +261,9 @@ Implementation
     You have a choice either to use the new dataset or to change the training time interval of your currently
     used dataset.
 
-    .. autofunction:: fit_to_portfolio
+    .. automethod:: CoxIngersollRoss.fit_to_portfolio
 
-    .. autofunction:: fit_to_assets
+    .. automethod:: CoxIngersollRoss.fit_to_assets
 
 Step 2: Determining the optimal entry and exit values
 *****************************************************
@@ -274,12 +277,12 @@ Implementation
 
 :math:`b^{\chi*}`: - optimal level of liquidation:
 
-.. autofunction:: optimal_liquidation_level
+.. automethod:: CoxIngersollRoss.optimal_liquidation_level
 
 
 :math:`d^{\chi*}` - optimal level of entry, accounting for preferred stop-loss level:
 
-.. autofunction:: optimal_entry_level
+.. automethod:: CoxIngersollRoss.optimal_entry_level
 
 .. tip::
 
@@ -299,7 +302,7 @@ the interval of optimal switching prices or an optimal liquidation level if it i
 Implementation
 ==============
 
-.. autofunction:: optimal_switching_levels
+.. automethod:: CoxIngersollRoss.optimal_switching_levels
 
 Step 4: (Optional) Plot the optimal levels on your data
 *******************************************************
@@ -316,12 +319,12 @@ You have a choice whether you want the optimal switching levels displayed or not
 Implementation
 ==============
 
-.. autofunction:: cir_plot_levels
+.. automethod:: CoxIngersollRoss.cir_plot_levels
 
 .. tip::
     To view all the model stats, including the optimal levels call the :code:`cir_description` function.
 
-    .. autofunction:: cir_description
+    .. automethod:: CoxIngersollRoss.cir_description
 
     .. figure:: images/cir_description.png
        :scale: 70 %

@@ -304,9 +304,12 @@ function itself, or use your own portfolio values as an input data.
 Implementation
 ==============
 
-.. py:currentmodule:: arbitragelab.optimal_mean_reversion.ou_model.OrnsteinUhlenbeck
+.. automodule:: arbitragelab.optimal_mean_reversion.ou_model
 
-.. autofunction:: fit
+.. autoclass:: OrnsteinUhlenbeck
+   :members: __init__
+
+.. automethod:: OrnsteinUhlenbeck.fit
 
 .. tip::
 
@@ -314,15 +317,15 @@ Implementation
     You have a choice either to use the new dataset or to change the training time interval of your currently
     used dataset.
 
-    .. autofunction:: fit_to_portfolio
+    .. automethod:: OrnsteinUhlenbeck.fit_to_portfolio
 
-    .. autofunction:: fit_to_assets
+    .. automethod:: OrnsteinUhlenbeck.fit_to_assets
 
 It is important to understand how good of a fit your data is compared to a simulated process with the
 same parameters. To check we can use :code:`check_fit` function that shows the optimal parameter values obtained
 by fitting the OU model to our data and from the OU model simulated using our fitted parameters.
 
-.. autofunction:: check_fit
+.. automethod:: OrnsteinUhlenbeck.check_fit
 
 .. figure:: images/fit_check_function.png
        :scale: 100 %
@@ -336,12 +339,12 @@ by fitting the OU model to our data and from the OU model simulated using our fi
     model can be either the fitted parameters to your data or you can set all of them
     for yourself.
 
-    .. autofunction:: ou_model_simulation
+    .. automethod:: OrnsteinUhlenbeck.ou_model_simulation
 
 Since the half-life of the OU process parameter is widely used in various researches,
 the module has a function for calculating its value.
 
-.. autofunction:: half_life
+.. automethod:: OrnsteinUhlenbeck.half_life
 
 
 Step 2: Determining the optimal entry and exit values
@@ -356,19 +359,19 @@ Implementation
 
 :math:`b^*`: - optimal level of liquidation:
 
-.. autofunction:: optimal_liquidation_level
+.. automethod:: OrnsteinUhlenbeck.optimal_liquidation_level
 
 :math:`d^*` - optimal level of entry:
 
-.. autofunction:: optimal_entry_level
+.. automethod:: OrnsteinUhlenbeck.optimal_entry_level
 
 :math:`b_L^*` - optimal level of liquidation, accounting for preferred stop-loss level:
 
-.. autofunction:: optimal_liquidation_level_stop_loss
+.. automethod:: OrnsteinUhlenbeck.optimal_liquidation_level_stop_loss
 
 :math:`[a_L^*,d_L^*]` - optimal level of entry, accounting for preferred stop-loss level:
 
-.. autofunction:: optimal_entry_interval_stop_loss
+.. automethod:: OrnsteinUhlenbeck.optimal_entry_interval_stop_loss
 
 .. tip::
 
@@ -394,12 +397,12 @@ the latter optimal coefficient found during the fit stage will be used to create
 Implementation
 ==============
 
-.. autofunction:: plot_levels
+.. automethod:: OrnsteinUhlenbeck.plot_levels
 
 .. tip::
     To view al the model stats, including the optimal levels call the ``description`` function
 
-    .. autofunction:: description
+    .. automethod:: OrnsteinUhlenbeck.description
 
     .. figure:: images/description_function.png
        :scale: 70 %

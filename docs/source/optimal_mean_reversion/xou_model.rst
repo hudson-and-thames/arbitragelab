@@ -237,9 +237,12 @@ should consist of a log-price of an already created mean-reverting portfolio.
 Implementation
 ==============
 
-.. py:currentmodule:: arbitragelab.optimal_mean_reversion.xou_model.ExponentialOrnsteinUhlenbeck
+.. automodule:: arbitragelab.optimal_mean_reversion.xou_model
 
-.. autofunction:: fit
+.. autoclass:: ExponentialOrnsteinUhlenbeck
+   :members: __init__
+
+.. automethod:: ExponentialOrnsteinUhlenbeck.fit
 
 .. tip::
 
@@ -247,9 +250,9 @@ Implementation
     You have a choice either to use the new dataset or to change the training time interval of your currently
     used dataset.
 
-    .. autofunction:: fit_to_portfolio
+    .. automethod:: ExponentialOrnsteinUhlenbeck.fit_to_portfolio
 
-    .. autofunction:: fit_to_assets
+    .. automethod:: ExponentialOrnsteinUhlenbeck.fit_to_assets
 
 Step 2: Determining the optimal entry and exit values
 *****************************************************
@@ -263,12 +266,12 @@ Implementation
 
 :math:`b^{\xi*}`: - optimal level of liquidation:
 
-.. autofunction:: xou_optimal_liquidation_level
+.. automethod:: ExponentialOrnsteinUhlenbeck.xou_optimal_liquidation_level
 
 
 :math:`[a^{\xi*}, d^{\xi*}]` - optimal level of entry, accounting for preferred stop-loss level:
 
-.. autofunction:: xou_optimal_entry_interval
+.. automethod:: ExponentialOrnsteinUhlenbeck.xou_optimal_entry_interval
 
 .. tip::
 
@@ -288,7 +291,7 @@ the interval of optimal switching prices or an optimal liquidation level if it i
 Implementation
 ==============
 
-.. autofunction:: optimal_switching_levels
+.. automethod:: ExponentialOrnsteinUhlenbeck.optimal_switching_levels
 
 Step 4: (Optional) Plot the optimal levels on your data
 *******************************************************
@@ -307,12 +310,12 @@ the latter optimal coefficient found during the fit stage will be used to create
 Implementation
 ==============
 
-.. autofunction:: xou_plot_levels
+.. automethod:: ExponentialOrnsteinUhlenbeck.xou_plot_levels
 
 .. tip::
     To view all the model stats, including the optimal levels call the ``xou_description`` function.
 
-    .. autofunction:: xou_description
+    .. automethod:: ExponentialOrnsteinUhlenbeck.xou_description
 
 Example
 #######
