@@ -212,7 +212,7 @@ for all the simplified forms.
 
 For Gaussian and Student-t copulas, one can follow the procedures below:
 
-	1. Generate two i.i.d.'s :math:`(v_1, v_2)` using a bivariate Gaussian/Student-t distribution with desired 
+	1. Generate two a pair :math:`(v_1, v_2)` using a bivariate Gaussian/Student-t distribution with desired 
 	   correlation (and degrees of freedom).
 
 	2. Transform those into quantiles using CDF :math:`\Phi` from standard Gaussian or Student-t distribution (with
@@ -278,27 +278,27 @@ For all Archimedean copulas in this module, we follow a two-step pseudo-MLE appr
 	.. math::
 		\tau(\theta) = 1 + 4 \int_0^1 \frac{\phi(t;\theta)}{\phi'(t;\theta)} dt
 	
-	Then one inversely solve :math:`\hat\theta(\hat\tau)`. For some copulas, the inversion has a closed-form solution. For
+	Then one inversely solves :math:`\hat\theta(\hat\tau)`. For some copulas, the inversion has a closed-form solution. For
 	others, one has to use numerical methods.
 
-For elliptic copulas, we calculate the Kendall's :math:`\hat{\tau}` and then find :math:`\hat{\rho}` via
+For elliptical copulas, we calculate the Kendall's :math:`\hat{\tau}` and then find :math:`\hat{\rho}` via
 
 .. math::
 		\hat{\rho} = \sin \left( \frac{\hat{\tau} \pi}{2} \right)
 
 for the covariance matrix :math:`\mathbf{\sigma}_{2 \times 2}` (though technically speaking, for bivariate
-copulas, only correlation :math:`\rho` is needed, and thus it is uniquelly determined) from the quantile data,
+copulas, only correlation :math:`\rho` is needed, and thus it is uniquely determined) from the quantile data,
 then use :math:`\mathbf{\sigma}_{2 \times 2}` for a Gaussian or Student-t copula.
-Fitting by Spearman's :math:`\rho` is the variance-covariance matrix from data for elliptic copulas is also practiced
+Fitting by Spearman's :math:`\rho` for the variance-covariance matrix from data for elliptic copulas is also practiced
 by some.
 But Spearman's :math:`\rho` is in general less stable than Kendall's :math:`\tau` (though with faster calculation speed).
 And using var-covar implicitly assumes a multi-variate Gaussian model, and it is sensitive to outliers because it is a
 parametric fit.
 See `An Introduction to Copulas <http://www.columbia.edu/~mh2078/QRM/Copulas.pdf>`__ for more detail.
 
-Also note that, theoretically speaking, for Student-t copula, Determing :math:`\nu` (degrees of freedom) analytically from
-arbitrary time series is still an open problem.
-Therefore we opted to use a maximum likelihood fit for :math:`\nu` for the family of Student-t copulas initated by
+Also note that, theoretically speaking, for Student-t copula, Determining :math:`\nu` (degrees of freedom) analytically from
+an arbitrary time series is still an open problem.
+Therefore we opted to use a maximum likelihood fit for :math:`\nu` for the family of Student-t copulas initiated by
 :math:`\mathbf{\sigma}_{2 \times 2}`.
 This calculation is relatively slow.
 

@@ -316,7 +316,7 @@ realistically this is a bad practice for the following reasons:
    
 3. Sometimes there is no result for the fit, since the algorithm does not converge.
 
-4. Some maximization algorithm uses Jacobian or Hessian matrix, and for some copulas the derivative computation does not
+4. Some maximization algorithms use Jacobian or Hessian matrix, and for some copulas the derivative computation does not
    numerically stay stable.
    
 5. Often the weight of a copula component is way too small to be reasonable.
@@ -383,7 +383,7 @@ weights off.
     1. It is slow for some data sets.
        Also the CTG is slow due to the bottleneck from Student-t copula.
     
-    2. If the copula mixture have simular components, for instance, Gaussian and Frank, then it cannot pick the correct
+    2. If the copulas mixture have similar components, for instance, Gaussian and Frank, then it cannot pick the correct
        component weights well.
        Luckily for fitting data, usually the differences are minimal.
        
@@ -393,7 +393,7 @@ weights off.
        unrealistic to run it (about 1 hour in some cases).
        We did run some CV while coding it, so that the default values of :math:`\gamma` and :math:`a` are good choices.
     
-    4. Sometimes the algorithm throws warnings, because the optimization algorithm underneath does not strictly following
+    4. Sometimes the algorithm throws warnings, because the optimization algorithm underneath does not strictly follow
        the prescribed bounds.
        Usually this is not an issue that will compromise the result.
        And some minor tuning on SCAD parameters can solve this issue.
