@@ -80,7 +80,7 @@ Mispricing Index
 
 for stocks :math:`(X, Y)` with returns random variable at day :math:`t`: :math:`(R_t^X, R_t^Y)` and returns value at
 day :math:`t`: :math:`(r_t^X, r_t^Y)`.
-Those two values determines how mispriced each stock is, based on that day's return.
+Those two values determine how mispriced each stock is, based on that day's return.
 Note that so far only one day's return information contributes, and we want to add it up to cumulatively use
 returns to gauge how mispriced the stocks are.
 Therefore we introduce the **flag** series:
@@ -157,7 +157,7 @@ The authors did not specify what will happen if the following occurs:
 
 1. When :math:`FlagX`reaches :math:`D` (or :math:`-D`) and :math:`FlagY` reaches :math:`D` (or :math:`-D`) together.
 2. When in a long(or short) position, receives a short(or long) trigger.
-3. When receiving a opening and exiting signal together.
+3. When receiving an opening and exiting signal together.
 4. When the position was open based on :math:`FlagX` (or :math:`FlagY`), :math:`FlagY` (or :math:`FlagX`) reaches
    :math:`S` or :math:`-S`.
 
@@ -258,13 +258,13 @@ Possible Issues
 
 2. The trading signal is generated from the flags series, and the flags series will be calculated from the
    copula that we use to model.
-   Therefore the explanability suffers.
+   Therefore the explainability suffers.
    Also it is based on the model in second order, and therefore the flag series and the suggested positions
    will be quite different across different copulas, making it not stable and not directly comparable mutually.
 
 3. The way the flags series are defined does not handle well when both stocks are underpriced/overpriced concurrently.
 
-4. Because of flags will be reset to 0 once there is an exiting signal, it implicitly models the returns as
+4. Because flags will be reset to 0 once there is an exiting signal, it implicitly models the returns as
    martingales that do not depend on the current price level of the stock itself and the other stock.
    Such an assumption may be situational, and the user should be aware. (White noise returns do not imply that
    the prices are well cointegrated.)

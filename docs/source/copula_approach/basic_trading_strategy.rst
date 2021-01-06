@@ -66,7 +66,7 @@ Ambiguities and Comments
 
 The authors did not specify what will happen if the followings occur:
 
-1. When there is an open signal and a exit signal.
+1. When there is an open signal and an exit signal.
     
 2. When there is an open signal and currently there is a position.
     
