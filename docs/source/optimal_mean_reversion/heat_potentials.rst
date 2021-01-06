@@ -159,22 +159,25 @@ First of all the user has to use ``fit`` for the parameters to be scaled to remo
 and set up the delta for the grid calculation and maximum duration of the trade.
 
 
-.. py:currentmodule:: arbitragelab.optimal_mean_reversion.heat_potentials.HeatPotentials
+.. automodule:: arbitragelab.optimal_mean_reversion.heat_potentials
 
-.. autofunction:: fit
+.. autoclass:: HeatPotentials
+   :members: __init__
+
+.. automethod:: HeatPotentials.fit
 
 To separately perform the optimization process we use the ``optimal_levels`` function.
 
-.. autofunction:: optimal_levels
+.. automethod:: HeatPotentials.optimal_levels
 
 There is also a possibility to calculate the Sharpe ratio for chosen optimal levels and the maximum duration of the
 trade of choice.
 
-.. autofunction:: sharpe_calculation
+.. automethod:: HeatPotentials.sharpe_calculation
 
 To view the optimal levels scaled back to initial parameters the ``description`` function is used.
 
-.. autofunction:: description
+.. automethod:: HeatPotentials.description
 
 Example
 #######
