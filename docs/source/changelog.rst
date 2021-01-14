@@ -12,6 +12,8 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+* :bug:`34` Data Importer, Distance Approach, ML Approach modules imports were not exposed.
+
 * :release:`0.2.2 <2020-12-24>`
 * :bug:`32` Copulas module imports were not exposed.
 
