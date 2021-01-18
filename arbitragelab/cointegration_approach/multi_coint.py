@@ -29,8 +29,8 @@ class MultivariateCointegration:
 
         The log price dataframe and the cointegration vectors are stored for repeating use.
 
-        :param asset_df: (pd.Dataframe) Raw in-sample price dataframe of the assets.
-        :param trade_df: (pd.Dataframe) Raw out-of-sample price dataframe of the assets. Use None if only in-sample
+        :param asset_df: (pd.DataFrame) Raw in-sample price dataframe of the assets.
+        :param trade_df: (pd.DataFrame) Raw out-of-sample price dataframe of the assets. Use None if only in-sample
             properties are desired.
         """
 
@@ -253,7 +253,7 @@ class MultivariateCointegration:
         :param update_freq: (int) Frequency to update the cointegration vector for out-of-sample test. Default is
             monthly (22 trading days).
         :param insample: (bool) If True, run an in-sample test where the cointegration vector will be estimated using
-            all available data and will not be
+            all available data and will not be recalculated monthly.
         :return: (pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame) Trading signal dataframe;
             trading signal notional dataframe;  cointegration vector time evolution dataframe; daily returns dataframe.
         """
