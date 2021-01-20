@@ -244,7 +244,7 @@ Therefore, we calculate **the cumulative P&L for 1 unit of spread**, to account 
         \mathcal{E}(t) = \sum_{\tau=0}^t R_s(\tau)
 
 This approach does not directly lead to returns,
-because we are trading one unit of the portfolio, and its it is in a sense self-financing by the long-short behavior.
+because we are trading one unit of the portfolio, and it is in a sense self-financing by the long-short behavior.
 
 In some sense, the result can be converted to returns indeed.
 
@@ -263,10 +263,10 @@ But those approaches are rather case dependent, hence we leave the choices to th
 
 ROCC and Fully-Invested Return
 ******************************
-Now we consider traiding with multiple pairs.
+Now we consider trading with multiple pairs.
 
 ROCC (Return on Committed Capital) is considered a conservative approach to calculate returns for multiple pairs.
-It is easy to calculate: Simply scale each portfolio's payoff by the amount of units used for trading, even if some pairs
+It is easy to calculate: Simply scale each portfolio's payoff by the number of units used for trading, even if some pairs
 did not open positions during the trading period, the cost of such a unit by whatever measure is still considered.
 ROCC can be considered taking account of opportunity costs for this reason.
 

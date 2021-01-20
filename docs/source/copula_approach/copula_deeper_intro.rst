@@ -92,7 +92,7 @@ If :math:`\lambda_l > 0` then there is lower tail dependence.
 If :math:`\lambda_u > 0` then there is upper tail dependence.
 Note that one should actually calculate the limit for each copula, and it is not obvious from the plot usually.
 
-For example, as plotted below, it is not difficult to show that for a Gumbel copula, :math:`\lambda_l=0` and
+For example, as plotted below, it can be calculated easily that for a Gumbel copula, :math:`\lambda_l=0` and
 :math:`\lambda_u=1`.
 
 .. figure:: images/densityGumbel.png
@@ -133,7 +133,7 @@ Empirical Copula
 
 At first, a copula always exists for two continuous random variables (to avoid ties in percentile) :math:`X_1`, :math:`X_2`,
 guaranteed by Sklar's theorem.
-Once we have enough observations from :math:`X_1` and :math:`X_2`, we define the implied bivaraite empirical copula as follows:
+Once we have enough observations from :math:`X_1` and :math:`X_2`, we define the implied bivariate empirical copula as follows:
 
 .. math::
     
@@ -146,7 +146,7 @@ The definition may look more complicated than what it is.
 To calculate :math:`\tilde{C}_n(\frac{i}{n}, \frac{j}{n})`, one just need to count the number of cases in the whole observation
 that are not greater than the :math:`i`-th and :math:`j`-th rank for their own marginal r.v. respectively.
 
-The empirical can also be defined parametrically by finding each margincal CDF :math:`F_1`, :math:`F_2`.
+The empirical copula can also be defined parametrically by finding each margincal CDF :math:`F_1`, :math:`F_2`.
 In that case, the empirical copula becomes:
 
 .. math::
@@ -160,7 +160,7 @@ If one uses empirical CDFs, then it is identical to our first definition.
 
     Implicitly, copula is used to model independent draws from multiple time-invariant r.v.'s and analyze their dependency
     structure without influence from the specific marginal distributions.
-    When applying copula to time series, obviously each draw is not independent, and the dependency between securities are
+    When applying copula to time series, obviously each draw is not independent, and the dependency between securities is
     likely to change as time progresses.
     Therefore, using an empirical copula may not be a good idea.
     
@@ -199,7 +199,7 @@ Here are a few key results:
 2. Lower tail dependency means the two random variables are likely to have small values together. This is much stronger
    in general compared to upper tail dependency, because stocks are more likely to go down together than going up together.
    
-3. Frank and Gaussian copula do not have tail dependencies at all. And Gaussian copula infamously contributed to the 2008
+3. Frank and Gaussian copulas do not have tail dependencies at all. And Gaussian copula infamously contributed to the 2008
    financial crisis by pricing CDOs exactly for this reason.
    Frank copula has a stronger dependence in the center compared to Gaussian.
    

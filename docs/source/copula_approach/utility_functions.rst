@@ -39,12 +39,12 @@ This might cause issues if the data set is not large enough, and particularly tr
 at certain regions of the distribution.
 When working with copula-based strategies one essentially aims to capture relative mispricings, which is sparse in nature.
 Moreover, the original ECDF may yield 0 and/or 1, which will be considered edge cases for some copula calculations and we 
-generally wants to avoid it by mapping :math:`[0, 1]` back to :math:`[\varepsilon, 1-\varepsilon]` for some small positive
+generally want to avoid it by mapping :math:`[0, 1]` back to :math:`[\varepsilon, 1-\varepsilon]` for some small positive
 number :math:`\varepsilon`.
 
 .. Note::
 
-    No we are not being lazy here.
+    No, we are not being lazy here.
     Yes, we can technically adjust the calculations to allow infinities, but what if the infinity
     shows up when one uses a max likelihood fit?
     With real world data this happens more often than one might expect.
@@ -109,7 +109,7 @@ However Kendall's tau is more stable, and suffers less from outliers.
 
 Euclidean distance is also used commonly in literatures.
 The pairs selected in general do not coincide with the pairs selected by :math:`\tau` and :math:`\rho`.
-However we found it not coping with copula-based strategies very well based on our back tests.
+However we found it not coping with copula-based strategies very well based on our backtests.
 
 Pearson's correlation is not included here due to its parametric approach, and assumption on normality of the underlyings.
 

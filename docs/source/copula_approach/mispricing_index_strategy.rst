@@ -7,22 +7,27 @@ Mispricing Index Trading Strategy
 .. Note::
     The following strategy closely follow the implementations:
 
-    `Pairs trading with copulas. (2016) <https://efmaefm.org/0efmameetings/EFMA%20ANNUAL%20MEETINGS/2014-Rome/papers/EFMA2014_0222_FullPaper.pdf>`__ by Xie, W., Liew, R.Q., Wu, Y. and Zou, X.
+    * `Pairs trading with copulas. (2014) <https://efmaefm.org/0efmameetings/EFMA%20ANNUAL%20MEETINGS/2014-Rome/papers/EFMA2014_0222_FullPaper.pdf>`__ by Xie, W., Liew, R.Q., Wu, Y. and Zou, X.
+    * `The profitability of pairs trading strategies: distance, cointegration and copula methods. (2016) <https://www.tandfonline.com/doi/pdf/10.1080/14697688.2016.1164337?casa_token=X0-FdUqDsv4AAAAA:ZFothfEHF-dO2-uDtFo2ZuFH0uzF6qijsweHD888yfPx3OZGXW6Szon1jvA2BB_AsgC5-kGYreA4fw>`__ by Rad, H., Low, R.K.Y. and Faff, R.
 
-.. Warning::
+.. Note::
     The authors claimed a relatively robust 8-10% returns from this strategy in the formation period (6 mo).
     We are pretty positive that the rules proposed in the paper were implemented correctly in the :code:`CopulaStrategyMPI`
-    module with thorough unit testing on every possible case, and thus it is very unlikely to have logical mistakes.
-    However the P&L is very sensitive to the opening and exiting parameters value, input data and copula choice,
+    module with thorough unit testing on every possible case, and thus it is very unlikely that we made logical mistakes.
+    However the P&L is very sensitive to the opening and exiting logic and parameter values, input data and copula choice,
     and it cannot lead to the claimed returns, after trying all the possible interpretations of ambiguities.
+    
+    We found out that using an AND for opening and OR for exiting lead to a much less sensitive strategy and generally leads to a
+    much better performance, and we provide such an option in the module.
     
     We still implement this module for people who intend to explore possibilities with copula, however the user should be
     aware of the nature of the proposed framework.
-    Interested reader may read through the *Possible Issues* part and see where this strategy can be improved.
+    Interested reader may read through the *Possible Issues* part and see where this strategy can be improved, and is encouraged
+    to make changes in the source code, where we grouped the exit and open logic in one function for ease of alteration.
     
 Introduction to the Strategy Concepts
 #####################################
-For convenience, the **mispricing index** implemented in the strategy will be referred as **MPI** when no ambiguity arises.
+For convenience, the **mispricing index** implemented in the strategy will be referred to **MPI** when no ambiguity arises.
 
 
 A Quick Review of the Basic Copula Strategy
@@ -44,7 +49,7 @@ For example, if one adopt the assumption that stocks move in a lognormal
 (One may also argue that such assumption can be quite situational. We won't get into the details here.) fashion,
 then almost surely the price will reach any given level with enough time.
 
-This implies that, if the basic copula framework was working on two stocks that has an upward(or downward) drift
+This implies that, if the basic copula framework was working on two stocks that have an upward(or downward) drift
 in the trading period, it may go out of range of the training period, and the conditional probabilities calculated
 from which will always be extreme values as :math:`0` and :math:`1`, bringing in nonsense trading signals.
 One possible way to overcome this inconvenience is to keep the training set up to date so it is less likely to
@@ -111,14 +116,14 @@ which is what they were designed to do:
 Accumulate information from daily returns to reflect information on prices.
 Therefore, you may consider it as a fancy way to represent the returns series.
 
-However, the **real flag** series (without a star, :math:`FlagX(t)`, :math:`FlagY(t)`) **will be reset to :math:`0`**
+However, the **real flag** series (without a star, :math:`FlagX(t)`, :math:`FlagY(t)`) **will be reset to 0**
 whenever there is an exiting signal, which brings us to the trading logic.
 
 Trading Logic
 #############
 
-Opening and Exiting Rules
-*************************
+Default Opening and Exiting Rules
+*********************************
 
 The authors proposes a **dollar-neutral** trade scheme worded as follows:
 
@@ -167,6 +172,27 @@ Here is our take on the above issues:
 2. Change to the trigger position. For example, long position with a short trigger will go short.
 3. Go for the exiting signal.
 4. Do nothing.
+
+Choices for Open and Exit Logic
+*******************************
+The above default logic is essentially an OR-OR logic for open and exit: When at least one of the 4 open conditions is satisfied, an
+open signal (long or short) is triggered;
+Similarly for the exit logic, to exit only one of them needs to be satisfied.
+The opening trigger is in general too sensitive and leads to too many trades, and [Rad et al. 2016] suggested using AND-OR logic instead.
+Thus, to achieve more flexibility, we allow the user to choose AND, OR for both open and exit logic and hence there are 4 possible combinations.
+Based on our tests we found AND-OR to be the most reasonable choice in general, but in certain situations other choices may have an edge.
+
+The default is OR-OR, as suggested in [Xie et al. 2014], and you can switch to other logic in the :code:`get_positions_and_flags` method
+by setting :code:`open_rule` and :code:`exit_rule` to your own liking.
+For instance :code:`open_rule='and'`, :code:`exit_rule='or'`.
+
+.. Note::
+    There are some nuiances on how the logic is carried.
+    In the paper [Xie et al. 2014], they tracked which stock led to opening of a position, and it influences the exit.
+    This tracking procedure makes no sense for other 3 trading logics.
+    The variable :code:`open_based_on` is present in lower level functions that are (python) private, and they track which stock triggered the last
+    opening.
+    Thus this variable is not used (although still calculated, but it is likely incorrect) when using other logic.
 
 .. figure:: images/returns_and_samples.png
     :scale: 40 %
@@ -233,9 +259,13 @@ Example
    print(result_dict)
 
    # Forming positions and flags using trading period data, assuming holding no position initially.
+   # Default uses OR-OR logic for open-exit.
    positions, flags = CSMPI.get_positions_and_flags(returns=returns_test,
-                                                    cdf1=s1_cdf,
-                                                    cdf2=s2_cdf)
+                                                    cdf1=s1_cdf, cdf2=s2_cdf)
+   # Use AND-OR logic.                       
+   positions_and_or, flags_and_or = CSMPI.get_positions_and_flags(returns=returns_test,
+                                                                  cdf1=s1_cdf, cdf2=s2_cdf,
+                                                                  open_rule='and', exit_rule='or')
    
    # Changing the positions series to units to hold for a dollar-neutral strategy for $10000 investment
    units = CSMPI.positions_to_units_dollar_neutral(prices_df=prices_test, positions=positions,
@@ -252,9 +282,12 @@ Example
 
 Possible Issues
 ###############
+The following are critiques for the default strategy.
+For a thorough comparison in large amounts of stocks across several decades, read For the AND-OR strategy, read more 
+in [Rad et al. 2016] on comparisons with other common strategies, using the AND-OR logic.
 
-1. The strategy's outcome is quite sensitive to the values of opening and exiting triggers to the point that
-   a well-fitted copula with a not good sets of parameters can actually lose money.
+1. The default strategy's outcome is quite sensitive to the values of opening and exiting triggers to the point that
+   a well-fitted copula with a not-so-good set of parameters can actually lose money.
 
 2. The trading signal is generated from the flags series, and the flags series will be calculated from the
    copula that we use to model.
@@ -289,4 +322,5 @@ References
 
 * `Xie, W., Liew, R.Q., Wu, Y. and Zou, X., 2016. Pairs trading with copulas. The Journal of Trading, 11(3), pp.41-52. <https://efmaefm.org/0efmameetings/EFMA%20ANNUAL%20MEETINGS/2014-Rome/papers/EFMA2014_0222_FullPaper.pdf>`__
 * `Liew, R.Q. and Wu, Y., 2013. Pairs trading: A copula approach. Journal of Derivatives & Hedge Funds, 19(1), pp.12-30. <https://link.springer.com/article/10.1057/jdhf.2013.1>`__
+* `Rad, H., Low, R.K.Y. and Faff, R., 2016. The profitability of pairs trading strategies: distance, cointegration and copula methods. Quantitative Finance, 16(10), pp.1541-1558. <https://www.tandfonline.com/doi/pdf/10.1080/14697688.2016.1164337?casa_token=X0-FdUqDsv4AAAAA:ZFothfEHF-dO2-uDtFo2ZuFH0uzF6qijsweHD888yfPx3OZGXW6Szon1jvA2BB_AsgC5-kGYreA4fw>`__
 

@@ -269,7 +269,9 @@ For all Archimedean copulas in this module, we follow a two-step pseudo-MLE appr
 
 .. Tip::
     The :code:`construct_ecdf_lin` function we provide in the :code:`copula_calculation` module is a wrapper around :code:`ECDF`
-    from `statsmodels.distributions.empirical_distribution` that allows linear interpolations instead of using a step function.
+    from :code:`statsmodels.distributions.empirical_distribution`
+    `[Link] <https://www.statsmodels.org/stable/generated/statsmodels.distributions.empirical_distribution.ECDF.html>`__
+    that allows linear interpolations instead of using a step function.
     Also it will not hit :math:`0` or :math:`1` but stays sufficiently close to avoid numerical issues in calculations.
 
 .. Note::
@@ -302,7 +304,8 @@ Therefore we opted to use a maximum likelihood fit for :math:`\nu` for the famil
 :math:`\mathbf{\sigma}_{2 \times 2}`.
 This calculation is relatively slow.
 
-For fitting mixed copulas, it is a bit more complicated and they are discussed in their own documentation.
+Fitting mixed copula is a process that is a bit more complicated and is discussed in the
+seperate documentation: :ref:`A Deeper Intro to Copulas <copula_approach-copula_deeper_intro>`.
 Here are a few takeaways:
 
 - Generic max likelihood fit is not stable, and does not drive small weights to 0.
@@ -312,7 +315,7 @@ Here are a few takeaways:
   
 - Any mixture with Student-t copula will greatly decrease the speed for fitting.
 
-- Mixed copulas generally gives the best result in terms of max likelihood across all copulas we provide.
+- Mixed copulas generally give the best result in terms of max likelihood across all copulas we provide.
 
 Research Notebooks
 ##################
