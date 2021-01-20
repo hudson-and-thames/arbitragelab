@@ -19,7 +19,7 @@ import scipy
 import statsmodels.api as sm
 from sklearn.covariance import GraphicalLasso
 from sklearn.linear_model import lasso_path, Lasso, MultiTaskLasso
-from sklearn.preprocessing import normalize
+from sklearn.preprocessing import normalize, StandardScaler
 
 from arbitragelab.optimal_mean_reversion import OrnsteinUhlenbeck
 
@@ -50,7 +50,15 @@ class SmallMeanRevPortfolio:
         :param assets: (pd.DataFrame) The price history of each asset.
         """
         self.__assets = assets
+
+        # Demeaned assets
         self.__demeaned = assets - assets.mean(axis=0)
+
+        # Zero mean and unit variance for each column
+        scaler = StandardScaler()
+        standard_data = pd.DataFrame(scaler.fit_transform(assets))
+        standard_data.index = assets.index
+        self.__standardized = standard_data
 
     @property
     def assets(self) -> pd.DataFrame:
@@ -69,6 +77,15 @@ class SmallMeanRevPortfolio:
         :return: (pd.DataFrame) The processed price history of each asset with zero mean.
         """
         return self.__demeaned
+
+    @property
+    def standardized(self) -> pd.DataFrame:
+        """
+        Getter for the class attribute "standardized".
+
+        :return: (pd.DataFrame) The stnadardized price history of each asset with zero mean and unit variance.
+        """
+        return self.__standardized
 
     @staticmethod
     def mean_rev_coeff(weights: np.array, assets: pd.DataFrame, interval: str = 'D') -> Tuple[float, float]:
@@ -95,15 +112,19 @@ class SmallMeanRevPortfolio:
         # Return the mean reversion coefficient and the half-life
         return ou_model.mu, ou_model.half_life()
 
-    def least_square_VAR_fit(self) -> np.array:
+    def least_square_VAR_fit(self, use_standardized=False) -> np.array:
         """
         Calculate the least square estimate of the VAR(1) matrix.
 
+        :param use_standardized: (bool) If true, use standardized data; otherwise, use demeaned data.
         :return: (np.array) Least square estimate of VAR(1) matrix.
         """
 
         # Fit VAR(1) model
-        var_model = sm.tsa.VAR(self.demeaned)
+        if use_standardized:
+            var_model = sm.tsa.VAR(self.standardized)
+        else:
+            var_model = sm.tsa.VAR(self.demeaned)
 
         # The statsmodels package will give the least square estimate
         least_sq_est = np.squeeze(var_model.fit(1).coefs, axis=0)
@@ -186,7 +207,7 @@ class SmallMeanRevPortfolio:
                 weight[cand, :] = normalize(eigvec[:, -1].reshape(-1, 1), axis=0, norm='l2')
 
                 # Store the maximum and the support corresponds to the maximum
-                gen_eig_ratio = np.squeeze((weight.T @ cur_matrix_A @ weight) / (weight.T @ cur_matrix_B @ weight))
+                gen_eig_ratio = np.squeeze((weight.T @ matrix_A @ weight) / (weight.T @ matrix_B @ weight))
                 if gen_eig_ratio > max_gen_eig_ratio:
                     max_gen_eig_ratio = gen_eig_ratio
                     cur_support = support
@@ -225,7 +246,7 @@ class SmallMeanRevPortfolio:
         ]
 
         # Solve the SDP
-        cp.Problem(cp.Maximize(cp.trace(matrix_A @ Y)), constraints).solve()
+        optimized_value = cp.Problem(cp.Maximize(cp.trace(matrix_A @ Y)), constraints).solve()
 
         # Calculate the eigenvectors; np.linalg.eig will ensure that eigenvectors are normalized
         eigvals, eigvectors = np.linalg.eig(Y.value)
@@ -251,33 +272,33 @@ class SmallMeanRevPortfolio:
         """
 
         # The number of elements in the VAR(1) matrix is asset number squared
-        coefs_nums = self.demeaned.shape[1] ** 2
-        print(coefs_nums)
+        coefs_nums = self.standardized.shape[1] ** 2
 
         # Construct the current data and lag-1 data such that they have the same shape
-        data_now = self.demeaned.iloc[1:]
-        data_lag = self.demeaned.iloc[:-1]
+        data_now = self.standardized.iloc[1:]
+        data_lag = self.standardized.iloc[:-1]
 
         # Set up the parameter space for alpha
-        alphas = np.logspace(alpha_max, alpha_min, n_alphas)
+        alphas = np.linspace(alpha_min, alpha_max, n_alphas)
 
         # Set up the LASSO model and do a search on the alpha parameter space
         if multi_task_lasso:
             # Fit the multi-task LASSO model
-            _, coefs_lasso, _, _ = lasso_path(data_lag, data_now, alphas=alphas, max_iter=max_iter)
-
+            _, coefs_lasso, _ = lasso_path(data_lag, data_now, alphas=alphas, max_iter=max_iter)
             # Select the maximum alpha that satisfies the sparsity requirement
             non_zeros = np.count_nonzero(coefs_lasso, axis=(0, 1))
-            good_alphas = alphas[non_zeros <= (1 - sparsity) * coefs_nums]
 
-            # If no alpha satisfies the sparsity requirement, return NaN
-            if good_alphas.shape == (0, ):
+            # Find the index of the best alpha
+            best_alpha_index = np.searchsorted(non_zeros, (1 - sparsity) * coefs_nums)
+
+            # Retrieve the best alpha
+            if best_alpha_index in [0, len(non_zeros)]:
                 best_alpha = np.Inf
             else:
-                best_alpha = np.min(good_alphas)
+                best_alpha = alphas[::-1][best_alpha_index]
+
         else:
             best_alpha = np.Inf
-
             # Fit the normal LASSO model
             for alpha in alphas:
                 lasso_model = Lasso(alpha=alpha, max_iter=max_iter)
@@ -287,17 +308,15 @@ class SmallMeanRevPortfolio:
 
                 # Calculate the number of non-zero elements
                 non_zeros = np.count_nonzero(coefs_lasso)
-                if non_zeros <= (1 - sparsity) * coefs_nums:
-                    # Store the current best alpha if the sparsity requirement is met
-                    best_alpha = np.min([alpha, best_alpha])
-                    continue
 
-                # If the alpha is sufficiently small, stop searching
-                break
+                # Check if the number of non-zeros satisfies the requirements
+                if non_zeros <= (1 - sparsity) * coefs_nums:
+                    best_alpha = np.min([best_alpha, alpha])
+                    break
 
         if np.isinf(best_alpha):
             raise ValueError("The l1-regularization coefficient (alpha) range selected cannot meet the "
-                             "sparsity requirements. Please try larger alphas for a sparser estimate.")
+                             "sparsity requirements. Please try another alpha range for a sparser estimate.")
         return best_alpha
 
     def LASSO_VAR_fit(self, alpha: float, multi_task_lasso: bool = True, max_iter: int = 1000,
@@ -315,8 +334,8 @@ class SmallMeanRevPortfolio:
         """
 
         # Construct the current data and lag-1 data such that they have the same shape
-        data_now = self.demeaned.iloc[1:]
-        data_lag = self.demeaned.iloc[:-1]
+        data_now = self.standardized.iloc[1:]
+        data_lag = self.standardized.iloc[:-1]
 
         # Fit the model with the optimized alpha
         if multi_task_lasso:
@@ -328,7 +347,7 @@ class SmallMeanRevPortfolio:
         # Return the best fit for sparse estimate
         return np.around(VAR_estimate, threshold)
 
-    def covar_sparse_tuning(self, max_iter: int = 1000, alpha_min: float = -5., alpha_max: float = 0.,
+    def covar_sparse_tuning(self, max_iter: int = 1000, alpha_min: float = 0., alpha_max: float = 1.,
                             n_alphas: int = 100, clusters: int = 3) -> float:
         """
         Tune the regularization parameter (alpha) of the graphical LASSO model for a sparse estimate of the covariance
@@ -348,12 +367,12 @@ class SmallMeanRevPortfolio:
             raise ValueError("The number of clusters cannot exceed the number of assets.")
 
         # Set up the parameter space for the regularization parameter
-        alphas = np.logspace(alpha_min, alpha_max, n_alphas)
+        alphas = np.linspace(alpha_min, alpha_max, n_alphas)
 
         # Fit the graphical LASSO model
         for alpha in alphas:
             edge_model = GraphicalLasso(alpha=alpha, max_iter=max_iter)
-            edge_model.fit(self.demeaned)
+            edge_model.fit(self.standardized)
 
             # Retrieve the precision matrix (inverse of sparse covariance matrix) as the graph adjacency matrix
             adj_matrix = np.copy(edge_model.precision_)
@@ -370,8 +389,8 @@ class SmallMeanRevPortfolio:
                 return alpha
 
         # The procedure failed to find an optimal alpha, raise exception
-        raise ValueError("The regularization coefficient (alpha) range selected cannot meet the "
-                         "chordal graph requirement. Please try larger alphas for a sparser estimate.")
+        raise ValueError("The regularization coefficient range selected cannot meet the number of connected components "
+                         "requirements. Please try larger alphas for a sparser estimate.")
 
     def covar_sparse_fit(self, alpha: float, max_iter: int = 1000, threshold: int = 10) -> Tuple[np.array, np.array]:
         """
@@ -387,7 +406,7 @@ class SmallMeanRevPortfolio:
 
         # Fit graphical LASSO model
         edge_model = GraphicalLasso(alpha=alpha, max_iter=max_iter)
-        edge_model.fit(self.demeaned)
+        edge_model.fit(self.standardized)
 
         # Return the sparse estimate of the covariance matrix and its inverse
         return np.around(edge_model.covariance_, threshold), np.around(edge_model.precision_, threshold)
