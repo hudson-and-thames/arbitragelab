@@ -80,6 +80,11 @@ class BasicCopulaStrategy:
 
         Not in place. Also returns the marginal cdfs of each column. This can work with more than just 2 columns.
 
+        The method returns:
+
+            - quantile_data: (pd.DataFrame) The calculated quantile data in a data frame with the original indexing.
+            - cdf_list: (list) The list of marginal cumulative density functions.
+
         :param data: (pd.DataFrame) The original data in DataFrame.
         :return: (tuple)
             quantile_data: (pd.DataFrame) The calculated quantile data in a data frame with the original indexing.
@@ -363,7 +368,7 @@ class BasicCopulaStrategy:
         r"""
         Get positions from the basic copula strategy.
 
-        This is the threshold basic copula trading strategy implemented by [Liew et al. 2013]. One uses at first use
+        This is the threshold basic copula trading strategy implemented by [Liew et al. 2013]. First, one uses
         formation period prices to train a copula, then trade based on conditional probabilities calculated from the
         quantiles of the current price u1 and u2. If we define the spread as stock 1 in relation to stock 2, then the
         logic is as follows (All the thresholds can be customized via open_thresholds, exit_thresholds parameters):

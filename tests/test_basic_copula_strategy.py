@@ -8,7 +8,7 @@ Unit tests for basic copula strategy.
 
 import os
 import unittest
-
+import warnings
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -32,6 +32,7 @@ class TestCopulaStrategy(unittest.TestCase):
         pair_prices = pd.read_csv(self.data_path + r'/BKD_ESC_2009_2011.csv')
         self.BKD_series = pair_prices['BKD'].to_numpy()
         self.ESC_series = pair_prices['ESC'].to_numpy()
+        warnings.simplefilter('ignore')
 
     def test_gumbel(self):
         """

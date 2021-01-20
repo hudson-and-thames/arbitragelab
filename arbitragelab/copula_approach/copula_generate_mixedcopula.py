@@ -89,7 +89,7 @@ class MixedCopula(ABC):
         """
         Calculate probability density of the bivariate copula: P(U=u, V=v).
 
-        Result is analytical. Also at the u and v will be remapped into [eps, 1-eps] to avoid edge values that may
+        Result is analytical. Also the u and v will be remapped into [eps, 1-eps] to avoid edge values that may
         result in infinity or NaN.
 
         :param u: (float) A real number in [0, 1].

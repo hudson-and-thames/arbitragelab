@@ -9,8 +9,10 @@ This is a legacy module.
 
 # pylint: disable = invalid-name
 from typing import Callable
+import warnings
 import matplotlib.pyplot as plt
 import numpy as np
+
 
 import arbitragelab.copula_approach.copula_generate as cg
 import arbitragelab.copula_approach.copula_calculation as ccalc
@@ -47,6 +49,11 @@ class CopulaStrategy:
         :param default_upper_threshold: (float) Optional. The default upper threshold for opening a position for
             trading signal generation. Defaults to 0.95.
         """
+
+        msg = ("CopulaStrategy is deprecated and will be removed in a future version. "
+               "Please switch to the copula_strategy_basic module and use the BasicCopulaStrategy class that contains"
+               "all previous CopulaStrategy functionality.")  # pragma: no cover
+        warnings.warn(msg, DeprecationWarning, stacklevel=2)  # pragma: no cover
 
         # Copulas that uses theta as parameter
         self.theta_copula_names = ['Gumbel', 'Clayton', 'Frank',

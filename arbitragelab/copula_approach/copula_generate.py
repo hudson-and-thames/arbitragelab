@@ -58,7 +58,7 @@ class Copula(ABC):
         """
         Get the copula density c(u, v).
 
-        Result is analytical. Also at the u and v will be remapped into [eps, 1-eps] to avoid edge values that may
+        Result is analytical. Also the u and v will be remapped into [eps, 1-eps] to avoid edge values that may
         result in infinity or NaN.
 
         :param u: (float) A real number in [0, 1].
@@ -79,7 +79,7 @@ class Copula(ABC):
         """
         Get the evaluation of copula, equivalently the cumulative joint distribution C(u, v).
 
-        Result is analytical. Also at the u and v will be remapped into [eps, 1-eps] to avoid edge values that may
+        Result is analytical. Also the u and v will be remapped into [eps, 1-eps] to avoid edge values that may
         result in infinity or NaN.
 
         :param u: (float) A real number in [0, 1].
@@ -100,7 +100,7 @@ class Copula(ABC):
         """
         Calculate conditional probability function: P(U<=u | V=v).
 
-        Result is analytical. Also at the u and v will be remapped into [eps, 1-eps] to avoid edge values that may
+        Result is analytical. Also the u and v will be remapped into [eps, 1-eps] to avoid edge values that may
         result in infinity or NaN.
 
         Note: This probability is symmetric about (u, v).
@@ -1261,7 +1261,7 @@ class Gaussian(Copula):
 
         return info_dict
 
-    def c(self, u: int, v: int) -> float:
+    def c(self, u: float, v: float) -> float:
         """
         Calculate probability density of the bivariate copula: P(U=u, V=v).
 
@@ -1283,7 +1283,7 @@ class Gaussian(Copula):
 
         return pdf
 
-    def C(self, u: int, v: int) -> float:
+    def C(self, u: float, v: float) -> float:
         """
         Calculate cumulative density of the bivariate copula: P(U<=u, V<=v).
 
@@ -1447,7 +1447,7 @@ class Student(Copula):
 
         return pdf
 
-    def C(self, u: int, v: int) -> float:
+    def C(self, u: float, v: float) -> float:
         """
         Calculate cumulative density of the bivariate copula: P(U<=u, V<=v).
 
