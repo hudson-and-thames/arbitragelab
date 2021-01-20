@@ -293,7 +293,7 @@ class CopulaStrategyMPI(BasicCopulaStrategy):
         return cur_flag, cur_position, open_based_on
 
     def _get_position_and_reset_flag(self, pre_flag: pd.Series, raw_cur_flag: pd.Series,
-                                     pre_position: int,  open_rule: str, exit_rule: str,
+                                     pre_position: int, open_rule: str, exit_rule: str,
                                      open_based_on: list = [0, 0],) -> (int, bool, list):
         """
         Get the next position, and check if one should reset the flag. Suppose the upper opening trigger is D_u and the
