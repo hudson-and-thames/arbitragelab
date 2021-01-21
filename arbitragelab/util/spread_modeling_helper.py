@@ -26,9 +26,9 @@ class SpreadModelingHelper:
     def __init__(self, sprd: pd.Series, feat_expansion: bool = True, unique_sampling: bool = True):
         """
         This method will break the spread in two major periods:
-        
+
         Insample Period - that will be broken down in two; the training period
-        and the testing period. 
+        and the testing period.
         Out of Sample Period - the final stretch embargoed by a year from the
         insample period.
 
@@ -100,7 +100,7 @@ class SpreadModelingHelper:
     def _onedim_scaler_wrapper(scaler_obj: MinMaxScaler, original_data: pd.DataFrame) -> pd.Series:
         """
         Converts data object to a proper scaled object.
-        
+
         :param scaler_obj: (MinMaxScaler) Object to use to scale the data.
         :param original_data: (pd.DataFrame) The data that needs to be scaled.
         :return: (pd.Series)
@@ -185,7 +185,7 @@ class SpreadModelingHelper:
         :param std_dev_sample: (float) The range for the buy/sell threshold.
         :param working_df: (pd.DataFrame) DataFrame with both legs of the spread.
         :param plot: (bool) Plot the trades of each filter.
-        :return: (tuple) 
+        :return: (tuple)
         """
 
         unfiltered_events = self._wrap_threshold_filter(ytrain, ypred,
@@ -274,14 +274,14 @@ class SpreadModelingHelper:
             std_dev = fresult[fresult['side'] != 0]['rets'].std()
             annual_vol = std_dev ** (1.0 / 2)
             annual_vol = np.round(annual_vol*100, 2)
-            
+
             sharpe_ratio = np.round(rets.mean() / std_dev, 2)
-            
+
             cum_returns = (np.cumprod(1 + rets.values))*100
             max_return = np.fmax.accumulate(cum_returns, axis=0)
             max_drawdown = np.min((cum_returns - max_return) / max_return, axis=0)
             max_drawdown = np.round(max_drawdown*100, 2)
-            
+
             metrics.append([fresult.name, annual_ret,
                             annual_vol, max_drawdown,
                             sharpe_ratio])

@@ -232,7 +232,7 @@ class PiSigmaNeuralNetwork(BaseNeuralNetwork):
     @staticmethod
     def _pi_this(tensor: tf.Tensor) -> tf.Tensor:
         """
-        Computes the product of elements across 'axis=1' of the input tensor and 
+        Computes the product of elements across 'axis=1' of the input tensor and
         will return the reduced version of the tensor.
 
         :param tensor: (tf.Tensor) Weights from the hidden layer.

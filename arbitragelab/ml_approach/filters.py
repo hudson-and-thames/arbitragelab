@@ -98,7 +98,7 @@ class CorrelationFilter:
         corr_events = self.transformed['side']
 
         plt.figure(figsize=(15, 10))
-        
+
         # Plot correlation change through time and set the
         # given buy/sell threshold as horizontal lines.
         plt.subplot(311)
@@ -146,7 +146,7 @@ class CorrelationFilter:
         # workable.
         daily_corr = daily_corr.iloc[:, 0].reset_index().dropna()
 
-        # We select a level from the previously reset correlation index, and specify a 
+        # We select a level from the previously reset correlation index, and specify a
         # column to be selected from the matrix.
         final_corr = daily_corr[daily_corr['level_1'] == two_legged_df.columns[1]]
         final_corr.set_index('_index_', inplace=True)
@@ -257,7 +257,7 @@ class VolatilityFilter:
     def __init__(self, lookback: int = 80):
         """
         Initialization of trade parameters.
-        
+
         :param lookback: (int)
         """
 
@@ -316,7 +316,7 @@ class VolatilityFilter:
         # Calculate rolling estimated mean of estimated volatility.
         rolling_mean_vol = vol_forcast_series.rolling(window=self.lookback).mean()
 
-        # Calculate the mean of the rolling mean volatility estimate. 
+        # Calculate the mean of the rolling mean volatility estimate.
         mu_avg = rolling_mean_vol.rolling(window=self.lookback).mean().mean()
         # Calculate the mean of the rolling std dev of the volatility estimate.
         sigma = rolling_mean_vol.rolling(window=self.lookback).std().mean()

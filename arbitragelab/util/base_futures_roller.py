@@ -211,7 +211,7 @@ class BaseFuturesRoller:
 
         day_after_exp_vals = dataset[self.close_col].iloc[iloc].values
 
-        gaps.loc[roll_dates] = day_before_exp_vals - day_after_exp_vals            
+        gaps.loc[roll_dates] = day_before_exp_vals - day_after_exp_vals
 
         gaps = gaps.cumsum().dropna()
 
@@ -220,7 +220,8 @@ class BaseFuturesRoller:
 
         return gaps, self.generate_diagnostic_frame(dataset, iloc, roll_dates)
 
-    def non_negativeize(self, rolled_series: pd.Series, raw_series: pd.Series) -> pd.Series:
+    @staticmethod
+    def non_negativeize(rolled_series: pd.Series, raw_series: pd.Series) -> pd.Series:
         """
         In general, non negative series are preferred over negative series, which could
         easily occur particularly if the contract sold off while in contango. The method

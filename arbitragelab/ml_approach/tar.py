@@ -9,7 +9,7 @@ import pandas as pd
 import statsmodels.api as sm
 from statsmodels.regression.linear_model import RegressionResults
 
-from arbitragelab.cointegration_approach.johansen import JohansenPortfolio
+#from arbitragelab.cointegration_approach.johansen import JohansenPortfolio
 
 
 class TAR():
@@ -28,6 +28,7 @@ class TAR():
         """
 
         self.spread = price_data
+        self.results = None
 
     @staticmethod
     def _tag_regime(series: pd.Series) -> pd.DataFrame:

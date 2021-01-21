@@ -22,9 +22,9 @@ class RegressorCommittee:
                  num_committee: int = 10, epochs: int = 20, verbose: bool = True):
         """
         Initializes Variables.
-        
+
         :param regressor_params: (dict) Any acceptable Keras model params.
-        :param regressor_class: (str) Any class from the 'neural_networks' namespace in arbitragelab. 
+        :param regressor_class: (str) Any class from the 'neural_networks' namespace in arbitragelab.
         :param num_committee: (int) Number of members in the voting committee.
         :param epochs: (int) Number of epochs per member.
         :param verbose: (bool) Print debug information.
@@ -40,7 +40,7 @@ class RegressorCommittee:
     def fit(self, xtrain: pd.DataFrame, ytrain: pd.DataFrame):
         """
         Fits the member models, then the voting object.
-        
+
         :param xtrain: (pd.DataFrame)
         :param ytrain: (pd.DataFrame)
         """
@@ -78,7 +78,7 @@ class RegressorCommittee:
         """
         Collects results from all the committee members and returns
         average result.
-        
+
         :param xtest: (pd.DataFrame)
         :return: (pd.DataFrame) Model predictions.
         """

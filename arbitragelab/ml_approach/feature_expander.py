@@ -95,7 +95,7 @@ class FeatureExpander:
         :return: (pd.DataFrame)
         """
 
-        # Get feature count. 
+        # Get feature count.
         comb_range = range(len(series[0]))
 
         # Generate N degree combinations in relation to feature count.
