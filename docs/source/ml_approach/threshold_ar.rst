@@ -26,7 +26,7 @@ crude oil at time :math:`t` (in \$ per barrel).
 
 In `Dunis et al. (2006) <https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.568.7460&rep=rep1&type=pdf>`_ 
 the case is made that the crack spread exhibits asymmetry at the \$5
-dollar mark, with seemingly larger moves occuring on the upside of the
+dollar mark, with seemingly larger moves occurring on the upside of the
 long-term 'fair value' than on the downside.
 
 Cointegration was first introduced by `(Engle and Granger 1987) <https://doi.org/10.2307/1913236>`_. The technique
@@ -102,19 +102,20 @@ Example
     # Getting the dataframe with time series of asset returns
     data = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])
 
-    # Calculate spread returns and std dev.
+    # Calculating spread returns and std dev.
     spread_series = data['spread']
     
     # The TAR model expects a Zero mean series.
     demeaned_spread = (spread_series - spread_series.mean())
 
-    # Initialize and fit TAR model.
+    # Initializing and fit TAR model.
     model = TAR(demeaned_spread)
     tar_results = model.fit()
     tar_results.summary()
     
     tar_results.fittedvalues.plot()
-    
+
+    # Plotting results.
     model.summary()
     
 

@@ -1,4 +1,4 @@
-.. _utils-data_importer:
+.. _data-data_importer:
 
 =============
 Data Importer

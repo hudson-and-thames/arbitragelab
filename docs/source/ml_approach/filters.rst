@@ -9,9 +9,9 @@ Introduction
 
 The point made by `(Butterworth and Holmes 2002) <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2625061>`_ that ‘the overall profitability of the strategy is
 seriously impaired by the difficulty, which traders face, in liquidating their positions’ indicates a definite
-need for more discerning trade selection, this is achieved by using both a standard (threshold) filter
+need for more discerning trade selection. This is achieved by using both a standard (threshold) filter
 and a correlation filter to further refine the various models return/risk characteristics. More encouragingly, 
-in most cases the application of a filter improves the results of the model, in terms of
+in most cases, the application of a filter improves the results of the model, in terms of
 the out-of-sample Sharpe ratio.
 
 Threshold Filter
@@ -25,13 +25,13 @@ Threshold Filter
 The standard filter mainly stays out of the market if the predicted change in the
 spread is smaller in magnitude than X, X being the optimized filter level.
 
-The threshold filter :math:`X` is as follows;
+The threshold filter :math:`X` is as follows:
 
-- if :math:`\Delta S_t > X` then go, or stay, long the spread
+- if :math:`\Delta S_t > X` then go, or stay, long the spread;
 
-- if :math:`\Delta S_t < X` then go, or stay, short the spread
+- if :math:`\Delta S_t < X` then go, or stay, short the spread;
 
-- if :math:`-X < \Delta S_t < X` then stay out of the spread
+- if :math:`-X < \Delta S_t < X` then stay out of the spread.
 
 where :math:`\Delta S_t` is the change in spread and :math:`X` is the level of the filter.
 
@@ -53,35 +53,35 @@ Example
 
     # Importing packages
     import pandas as pd
-    import numpy as np
     from arbitragelab.ml_approach.filters import ThresholdFilter
 
     # Getting the dataframe with time series of asset returns
     data = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])
 
-    # Calculate spread returns and std dev.
+    # Calculating spread returns and std dev.
     spread_series = data['spread']
     spread_diff_series = spread_series.diff()
     spread_diff_std = self.spread_diff_series.std()
     
-    # Initialize ThresholdFilter with 2 std dev band for buying and selling triggers.
+    # Initializing ThresholdFilter with 2 std dev band for buying and selling triggers.
     thres_filter = ThresholdFilter(buy_threshold=-spread_diff_std*2,
                                    sell_threshold=spread_diff_std*2)
 
     std_events = thres_filter.fit_transform(spread_diff_series)
-    
+
+    # Plotting results
     thres_filter.plot()
 
 Asymmetric Threshold Filter
 ###########################
 
-The asymmetric threshold filter :math:`X` is as follows;
+The asymmetric threshold filter :math:`X` is as follows:
 
-- if :math:`\Delta S_t > \vert p_1 \vert * X` then go, or stay, long the spread
+- if :math:`\Delta S_t > \vert p_1 \vert * X` then go, or stay, long the spread;
 
-- if :math:`\Delta S_t < - \vert p_2 \vert * X` then go, or stay, short the spread
+- if :math:`\Delta S_t < - \vert p_2 \vert * X` then go, or stay, short the spread;
 
-- if :math:`- \vert p_2 \vert * X < \Delta S_t < \vert p_1 \vert * X` then stay out of the spread
+- if :math:`- \vert p_2 \vert * X < \Delta S_t < \vert p_1 \vert * X` then stay out of the spread.
 
 where :math:`\Delta S_t` is the change in spread, :math:`X` is the level of the filter and :math:`(p_1, p_2)`
 being coefficients estimated from the TAR model.
@@ -93,7 +93,6 @@ Example
 
     # Importing packages
     import pandas as pd
-    import numpy as np
     from arbitragelab.ml_approach.filters import ThresholdFilter
 
     # Getting the dataframe with time series of asset returns
@@ -113,10 +112,11 @@ Example
     
     # Initialize ThresholdFilter with 2 std dev band for buying and selling triggers.
     asym_thres_filter = ThresholdFilter(buy_threshold=buy_thresh,
-                                   sell_threshold=sell_thresh)
+                                        sell_threshold=sell_thresh)
 
     std_events = asym_thres_filter.fit_transform(spread_diff_series)
-    
+
+    # Plotting results
     asym_thres_filter.plot()
 
 Correlation Filter
@@ -133,15 +133,15 @@ trader to filter out periods of static spread movement (when the correlation bet
 increasing) and retain periods of dynamic spread movement (when the correlation of the underlying
 legs of the spread is decreasing).
 
-By using this filter it should also be possible to filter out initial moves away from fair value which are
+By using this filter, it should also be possible to filter out initial moves away from the fair value, which are
 generally harder to predict than moves back to fair value. Doing this also filters out periods when the
 spread is stagnant.
 
-Formally, the correlation filter :math:`X_c` can be written as;
+Formally, the correlation filter :math:`X_c` can be written as:
 
-- if :math:`\Delta C < X_c` then take the decision of the trading rule
+- if :math:`\Delta C < X_c` then take the decision of the trading rule;
 
-- if :math:`\Delta C > X_c` then stay out of the market
+- if :math:`\Delta C > X_c` then stay out of the market.
 
 where :math:`\Delta C` is the change in correlation and :math:`X_c` being the size of the correlation filter.
 
@@ -165,16 +165,17 @@ Example
 
     # Importing packages
     import pandas as pd
-    import numpy as np
     from arbitragelab.ml_approach.filters import CorrelationFilter
 
     # Getting the dataframe with time series of asset returns
     data = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])
 
+    # Initialize CorrelationFilter with thresholds of -0.05 and 0.05.
     corr_filter = CorrelationFilter(buy_threshold=0.05, sell_threshold=-0.05, lookback=30)
     corr_filter.fit(data[['leg_1', 'leg_2']])
     corr_events = corr_filter.transform(data[['leg_1', 'leg_2']])
-    
+
+    # Plotting results
     corr_filter.plot()
 
 Volatility Filter
@@ -250,16 +251,17 @@ Example
 
     # Importing packages
     import pandas as pd
-    import numpy as np
     from arbitragelab.ml_approach.filters import VolatilityFilter
 
     # Getting the dataframe with time series of asset returns
     data = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])
     spread_series = data['spread']
 
+    # Initialize VolatilityFilter a 30 period lookback parameter.
     vol_filter = VolatilityFilter(lookback=30)
     vol_events = vol_filter.fit_transform(spread_series)
-    
+
+    # Plotting results
     vol_filter.plot()
     
 References

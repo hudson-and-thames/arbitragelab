@@ -1,7 +1,7 @@
 .. _ml_approach-spread_modeling:
 
 .. note::
-   The following documentation closely follows the work of Dunis et al.
+   The following documentation closely follows the work of Dunis et al. (2015)
 
 ===============
 Spread Modeling
@@ -10,43 +10,42 @@ Spread Modeling
 Introduction
 ############
 
-In this module we are following the works of Dr Christian Dunis and co authors relating to
+In this module, we are following the works of Dr Christian Dunis and co-authors relating to
 the efficient modeling of a few major commodity spreads. The main attributes of trading spreads
 are:
 
 Advantages 
 **********
 
-- Less likely to suffer from information shocks
+- **Less likely to suffer from information shocks**
 
 It is important to note that spreads are less likely to suffer from information shocks, 
 as the movements of the two legs  will offset each other.
 
-- Less likely to be subject to speculative bubbles
+- **Less likely to be subject to speculative bubbles**
 
 `(Sweeney 1988) <https://www.jstor.org/stable/2331068>`_ notes that speculative bubbles are a big source of market 
 inefficiency. This effect is less likely to happen in spread markets because any
 bubble effect will be replicated in the opposing leg of the spread (assuming
-the two legs are sufficiently correlated), the effect of the bubble therefore being
-largely offset. 
+the two legs are sufficiently correlated). Therefore, the effect of the bubble is largely offset.
 
 Disadvantages
 *************
 
-- Limited Return Potential
+- **Limited Return Potential**
 
 The spreads are hard to trade since they offer a limited potential return because of the muted
 effect of market inefficiencies. This is also exacerbated by the fact that two sets of transaction costs
 have to be covered in order to trade a spread. 
 
-- Transaction costs for multiple legs
+- **Transaction costs for multiple legs**
 
 A point made by `(Butterworth and Holmes 2002) <https://www.tandfonline.com/doi/abs/10.1080/09603100110044236>`_ that ‘the overall profitability
 of the strategy is seriously impaired by the difficulty, which traders face, in liquidating
 their positions’ indicates a definite need for more discerning trade selection which is 
 solved using an assortment of filters.
 
-In the literature the initial motivation of the works was to model and forecast the spread
+In the literature, the initial motivation of the works was to model and forecast the spread
 as accurately as possible. As time progressed, the literature started focusing more on
 seeking models/methods that discriminated between large/small moves, so that transaction
 costs would be minimized.
@@ -55,7 +54,7 @@ Papers used in this module
 ##########################
 
 Modelling and trading the gasoline crack spread: A non-linear story (Dunis et al. 2005)
-*********************************************************************************************
+***************************************************************************************
 - Spread being modelled : Crack Spread
 - Benchmark Model : Fair Value Non Linear Cointegration Model
 - Novel Models : MLP, RNN, HONN
@@ -63,7 +62,7 @@ Modelling and trading the gasoline crack spread: A non-linear story (Dunis et al
 - Best Results Out of Sample : HONN with standard threshold filter
 
 Volatility filters for asset management: An application to managed futures (Dunis et al. 2005)
-****************************************************************************************************
+**********************************************************************************************
 - Filters : Time Varying RiskMetrics volatility model
 - Strategies : No Trade Strategy, Reverse Strategy
 
