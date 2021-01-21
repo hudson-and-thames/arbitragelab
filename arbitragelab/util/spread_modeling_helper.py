@@ -16,21 +16,21 @@ from sklearn.metrics import r2_score
 from arbitragelab.ml_approach.feature_expander import FeatureExpander
 from arbitragelab.ml_approach.filters import ThresholdFilter, CorrelationFilter, VolatilityFilter
 
-# pylint: disable=R0902
+# pylint: disable=too-many-instance-attributes
 
 class SpreadModelingHelper:
     """
-    Dunis Approach.
+    Spread modelling apporach from Dunis et al. (2005).
     """
 
     def __init__(self, sprd: pd.Series, feat_expansion: bool = True, unique_sampling: bool = True):
         """
         This method will break the spread in two major periods:
 
-        Insample Period - that will be broken down in two; the training period
+        In Sample Period - that will be broken down in two; the training period
         and the testing period.
         Out of Sample Period - the final stretch embargoed by a year from the
-        insample period.
+        in sample period.
 
         :param sprd: (pd.Series) A series consisting of the spread.
         :param feat_expansion: (bool) If enabled will deploy the feature expansion
@@ -103,7 +103,7 @@ class SpreadModelingHelper:
 
         :param scaler_obj: (MinMaxScaler) Object to use to scale the data.
         :param original_data: (pd.DataFrame) The data that needs to be scaled.
-        :return: (pd.Series)
+        :return: (pd.Series) Scaled data.
         """
 
         reshaped_data = original_data.values.reshape(-1, 1)
@@ -119,7 +119,7 @@ class SpreadModelingHelper:
         :param ytrue: (pd.DataFrame) The ground truth data.
         :param ypred: (pd.DataFrame) The predicted data.
         :param std_dev_sample: (float) The range for the buy/sell threshold.
-        :return: (pd.DataFrame)
+        :return: (pd.DataFrame) Threshold filter results.
         """
 
         thresh_filter = ThresholdFilter(-std_dev_sample, std_dev_sample)
@@ -137,7 +137,7 @@ class SpreadModelingHelper:
 
         :param ytrue: (pd.DataFrame) The ground truth data.
         :param working_df: (pd.DataFrame) DataFrame with both legs of the spread.
-        :return: (pd.DataFrame)
+        :return: (pd.DataFrame) Correlation filter results.
         """
 
         corr_filter = CorrelationFilter(buy_threshold=0.05,
@@ -159,7 +159,7 @@ class SpreadModelingHelper:
         :param ytrue: (pd.DataFrame) The ground truth data.
         :param ypred: (pd.DataFrame) The predicted data.
         :param base_events: (pd.DataFrame) A DataFrame full of events to be filtered.
-        :return: (pd.DataFrame)
+        :return: (pd.DataFrame) Volatility filter results.
         """
 
         vol_filter = VolatilityFilter(lookback=80)
@@ -185,7 +185,7 @@ class SpreadModelingHelper:
         :param std_dev_sample: (float) The range for the buy/sell threshold.
         :param working_df: (pd.DataFrame) DataFrame with both legs of the spread.
         :param plot: (bool) Plot the trades of each filter.
-        :return: (tuple)
+        :return: (tuple) All events series: unfiltered, std, corr, std_vol, corr_vol.
         """
 
         unfiltered_events = self._wrap_threshold_filter(ytrain, ypred,
@@ -230,7 +230,7 @@ class SpreadModelingHelper:
         to each dataset slice.
 
         :param working_df: (pd.DataFrame) DataFrame with both legs of the spread.
-        :return: (pd.DataFrame)
+        :return: (pd.DataFrame) DataFrame with all financial metrics.
         """
 
         train_filter_results = self.get_filtering_results(self.train_set, self.train_pred, self.train_pred, working_df, False)
@@ -257,7 +257,8 @@ class SpreadModelingHelper:
 
         :param filter_events: (pd.DataFrame) Trade events tagged with a
             'side' column with 1/0/-1 referring to long, no trade, short.
-        :return: (pd.DataFrame)
+        :return: (pd.DataFrame) DataFrame with metrics: Returns, Volatility,
+            Max Drawdown, Sharpe Ratio.
         """
 
         metrics = []
@@ -295,7 +296,7 @@ class SpreadModelingHelper:
         Inverts the scaling of the dataset and plots the regression results.
 
         :param model: (Object) ML model that has the method 'predict' implemented.
-        :return: (tuple)
+        :return: (tuple) Train, test, and OOS data inverted.
         """
 
         predicted_train_y = model.predict(self.input_train)
@@ -343,7 +344,7 @@ class SpreadModelingHelper:
         Plots long/short/all trades given a set of labeled returns.
 
         :param events: (pd.DataFrame) Trade DataFrame with returns and side as columns.
-        :param title: (str)
+        :param title: (str) Title to use for the plot.
         """
 
         long_trades = events[(events['side'] == 1)].iloc[:, 0]
@@ -365,7 +366,7 @@ class SpreadModelingHelper:
 
         :param ytrue: (pd.DataFrame) The ground truth data.
         :param ypred: (pd.DataFrame) The predicted data.
-        :param title: (str)
+        :param title: (str) Title to use for the plot.
         """
 
         print(r2_score(y_true, y_pred))

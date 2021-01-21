@@ -9,9 +9,6 @@ import pandas as pd
 import statsmodels.api as sm
 from statsmodels.regression.linear_model import RegressionResults
 
-#from arbitragelab.cointegration_approach.johansen import JohansenPortfolio
-
-
 class TAR():
     """
     The Threshold AutoRegressive Model is an extension provided by Enders and

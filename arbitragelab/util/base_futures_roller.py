@@ -16,6 +16,9 @@ class BaseFuturesRoller:
     def __init__(self, open_col: str = "PX_OPEN", close_col: str = "PX_LAST"):
         """
         Initialization of variables.
+
+        :param open_col: (str) Name of the column with the open price.
+        :param close_col: (str) Name of the column with the close price.
         """
 
         self.open_col = open_col
@@ -40,7 +43,7 @@ class BaseFuturesRoller:
         of each roll operation is stored in the class object. This will return
         that dataframe.
 
-        :return: Returns DataFrame with each roll and gap size.
+        :return: (pd.DataFrame) Returns DataFrame with each roll and gap size.
         """
 
         return self.diagnostic_frame
@@ -51,7 +54,7 @@ class BaseFuturesRoller:
 
         :param roll_forward: (bool) The direction which the gaps should sum to.
         :param handle_negative_roll: (bool) Process to remove negative values from series.
-        :return: Series of gaps or Preprocessed rolled series.
+        :return: (pd.Series) Series of gaps or Preprocessed rolled series.
         """
 
         roll_dates = self._get_rolldates(self.dataset)
@@ -100,9 +103,9 @@ class BaseFuturesRoller:
 
         :param n_days: (int) Number of days to be shifted by
         :param dataset_datetime_index: (pd.DateTimeIndex) All dates that occur in the dataset
-        :param target_dates: (pd.DateTimeIndex) Dates used as the start for the shift. Important
+        :param target_dates: (pd.DateTimeIndex) Dates used as the start for the shift. Important(!)
             these dates need to exist in 'dataset_datetime_index'.
-        :return: (pd.Series)
+        :return: (pd.Series) Price series x days prior to target date.
         """
 
         price_series = pd.DataFrame()
@@ -117,8 +120,8 @@ class BaseFuturesRoller:
         """
         Gets first available day per month from the dataset.
 
-        :param price_df: (pd.DataFrame)
-        :return: (pd.DataFrame)
+        :param price_df: (pd.DataFrame) Original prices dataframe.
+        :return: (pd.DataFrame) Frame with first available days per month.
         """
 
         price_series = pd.DataFrame()
@@ -146,9 +149,9 @@ class BaseFuturesRoller:
         by the input 'dataset_datetime_index'. The dates returned from this method do not take
         into consideration the fact of if the specified date happened in the dataset or not.
 
-        :param dataset_datetime_index: (pd.DateTimeIndex) All dates that occur in the dataset
-        :param day_of_month: (int) Day of month
-        :return: (pd.DataFrame) Dates
+        :param dataset_datetime_index: (pd.DateTimeIndex) All dates that occur in the dataset.
+        :param day_of_month: (int) Day of month.
+        :return: (pd.DataFrame) Dates.
         """
 
         price_series = pd.DataFrame()

@@ -11,6 +11,7 @@ from keras.wrappers.scikit_learn import KerasRegressor
 
 from arbitragelab.ml_approach import neural_networks
 
+# This silencer is related to the protected access
 # pylint: disable=W0212
 
 class RegressorCommittee:

@@ -1,14 +1,14 @@
 # Copyright 2019, Hudson and Thames Quantitative Research
 # All rights reserved
-# Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
+# Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 """
-This module Threshold Filter described in Dunis et al. (2005).
-This module implements the Correlation Filter described in Dunis et al. (2005).
+This module implements the Correlation, Threshold, and Volatility Filters described in Dunis et al. (2005).
 """
 
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+
 from sklearn.preprocessing import MinMaxScaler
 from arch.univariate import ZeroMean, EWMAVariance
 
@@ -66,7 +66,7 @@ class CorrelationFilter:
         working_frame = frame.copy()
 
         # Get all the events at the specified threshold range as a list. Then
-        # use isin to convert those individual dates into a boolean mask to be
+        # use it to convert those individual dates into a boolean mask to be
         # used on the working_frame variable to set each side.
         buy_signal = working_frame.index.isin(self.corr_series[self.corr_series > self.buy_threshold].index)
         sell_signal = working_frame.index.isin(self.corr_series[self.corr_series < self.sell_threshold].index)
@@ -82,6 +82,7 @@ class CorrelationFilter:
 
     def plot(self) -> list:
         """
+        Function to plot correlation change, buy and sell events.
 
         :return: (list) List of Axes objects.
         """
@@ -183,6 +184,8 @@ class ThresholdFilter:
 
     def plot(self) -> list:
         """
+        Function to plot buy and sell events.
+
         :return: (list) List of Axes objects.
         """
 
@@ -258,7 +261,7 @@ class VolatilityFilter:
         """
         Initialization of trade parameters.
 
-        :param lookback: (int)
+        :param lookback: (int) Lookback period to use.
         """
 
         self.lookback = lookback
@@ -272,7 +275,9 @@ class VolatilityFilter:
 
     def plot(self) -> list:
         """
-        :return: (list) List of Axes objects
+        Function to plot spread series,  regime states, and forecasted volatility.
+
+        :return: (list) List of Axes objects.
         """
 
         plt.figure(figsize=(15, 10))
@@ -333,7 +338,7 @@ class VolatilityFilter:
         Adds a regime column to describe the volatility level that was detected at
         that point, based on the parameters given in the constructor. And also
         a 'leverage_multiplier' column describing the leverage factor use
-        in Dunis et al.
+        in Dunis et al. (2005).
 
         :return: (pd.DataFrame) Time series augmented with the regime
             information.
