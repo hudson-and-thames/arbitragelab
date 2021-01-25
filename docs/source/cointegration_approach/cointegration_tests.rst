@@ -202,7 +202,7 @@ Examples
 
    # Importing packages
    import pandas as pd
-   from arbitragelab.cointegration_approach.johansen import EngleGrangerPortfolio
+   from arbitragelab.cointegration_approach.engle_granger import EngleGrangerPortfolio
 
    # Getting the dataframe with time series of cointegrating asset prices
    data = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])
