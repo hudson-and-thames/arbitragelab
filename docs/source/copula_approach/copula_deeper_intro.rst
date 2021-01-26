@@ -276,7 +276,7 @@ In this `copula_approach` module, we support two mixed copula classes: :code:`CF
 :code:`CTGMixCop` for Clayton-Student-Gumbel mix, inspired by [da Silva et al. 2017].
 
 It is pretty intuitive to understand, for example, for a CFG mixed copula, one needs to specify the :math:`\theta`'s,
-the dependency parameter for each copula component, and their **weights** that sums to :math:`1`.
+the dependency parameter for each copula component, and their **weights** that sum to :math:`1`.
 In total there are :math:`5` parameters for CFG.
 The weights should be understood in the sense of **Markov**, i.e., it describes the probability of an observation coming from
 each component.
@@ -293,7 +293,7 @@ Why Mixed Copulas
 
 Archimedean copulas and elliptical copulas, though powerful by themselves to capture nonlinear relations for two random
 variables, may suffer from the degree to which they can be calibrated to data.
-While using a pure empirical copula may subject to overfit, a mixed copula that can calibrate the upper and lower tail dependency
+While using a pure empirical copula may subject to overfiting, a mixed copula that can calibrate the upper and lower tail dependency
 usually describes the dependency structure really well for its flexibility.
 
 .. figure:: images/AMGN_HD_MixCop.png
@@ -310,14 +310,14 @@ realistically this is a bad practice for the following reasons:
 
 1. The outcome is highly unstable, and is heavily subject to the choice of the maximization algorithm.
 
-2. An maximization algorithm fitting :math:`5` parameters for CFG or :math:`6` parameters for CTG usually tends to settle to
+2. A maximization algorithm fitting :math:`5` parameters for CFG or :math:`6` parameters for CTG usually tends to settle to
    a bad result that does not yield a comparable advantage to even its component copula.
    For example, sometimes the fit score for CTG is worse than a direct pseudo-max likelihood fit for Student-t copula.
    
 3. Sometimes there is no result for the fit, since the algorithm does not converge.
 
-4. Some maximization algorithms use Jacobian or Hessian matrix, and for some copulas the derivative computation does not
-   numerically stay stable.
+4. Some maximization algorithms use Jacobian or Hessian matrix, and for some copulas the derivative computation is not
+   numerically stable.
    
 5. Often the weight of a copula component is way too small to be reasonable.
    For example, when an algorithm says there is :math:`0.1 \%` Gumbel copula weight in a dataset of :math:`1000`
@@ -443,5 +443,3 @@ References
 * `Cai, Z. and Wang, X., 2014. Selection of mixed copula model via penalized likelihood. Journal of the American Statistical Association, 109(506), pp.788-801. <https://www.tandfonline.com/doi/pdf/10.1080/01621459.2013.873366?casa_token=e4kOD3APdtUAAAAA:DnBnxkvcOtfPw3gDYoO66db8GzJiGS5M2G5rMK3ERfAvejk5022dhjAe2X26dk7eTf9kWmYfMg6Mkg>`__
 * `Liu, B.Y., Ji, Q. and Fan, Y., 2017. A new time-varying optimal copula model identifying the dependence across markets. Quantitative Finance, 17(3), pp.437-453. <https://www.tandfonline.com/doi/pdf/10.1080/14697688.2016.1205208?casa_token=Chu53l2q9SAAAAAA:MBAM-Zr3EL04IA0fcTJut0AQj5hPOvJjwVJUnxY9ZoB9wBRhGlfLjotX8aaITasXGWXXTr4wh9Td7A>`__
 * `Demarta, S. and McNeil, A.J., 2005. The t copula and related copulas. International statistical review, 73(1), pp.111-129. <https://www.risknet.de/fileadmin/eLibrary/t-Copula-Demarta-ETH.pdf>`__
-
-

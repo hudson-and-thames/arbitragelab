@@ -95,21 +95,21 @@ Quick Pairs Selection
 
 We build the class :class:`PairsSelector` that selects potential pairs for copula-based trading strategies. 
 Methods include Spearman's rho, Kendall's tau and Euclidean distance on normalized prices.
-Those methods are relatively quick to perform and is widely used in literature for copula-based pairs trading framework.
-For more sophisticated ML based pairs selection methods, please refer to :code:`arbitragelab.ml_approach`.
+Those methods are relatively quick to perform and are widely used in literature for copula-based pairs trading framework.
+For more sophisticated ML-based pairs selection methods, please refer to :code:`arbitragelab.ml_approach`.
 
 Comments
 ********
 
-Kendall's tau and Spearman's rho are rank based values.
+Kendall's tau and Spearman's rho are rank-based values.
 Thus they are non-parametric.
 Kendall's tau's computation complexity is :math:`O(N^2)` and Spearman's rho is :math:`O(N \log N)`.
 The pairs selected by :math:`\tau` and :math:`\rho` generally do not differ much.
-However Kendall's tau is more stable, and suffers less from outliers.
+However, Kendall's tau is more stable, and suffers less from outliers.
 
 Euclidean distance is also used commonly in literatures.
 The pairs selected in general do not coincide with the pairs selected by :math:`\tau` and :math:`\rho`.
-However we found it not coping with copula-based strategies very well based on our backtests.
+However, we found it not coping with copula-based strategies very well based on our backtests.
 
 Pearson's correlation is not included here due to its parametric approach, and assumption on normality of the underlyings.
 

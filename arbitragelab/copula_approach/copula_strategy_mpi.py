@@ -4,9 +4,10 @@
 """
 Module that uses copula for trading strategy based on (cumulative) mispricing index.
 
-Xie, W., Liew, R.Q., Wu, Y. and Zou, X., 2014. Pairs Trading with Copulas.
-https://efmaefm.org/0efmameetings/EFMA%20ANNUAL%20MEETINGS/2014-Rome/papers/EFMA2014_0222_FullPaper.pdf
+`Xie, W., Liew, R.Q., Wu, Y. and Zou, X., 2014. Pairs Trading with Copulas.
+<https://efmaefm.org/0efmameetings/EFMA%20ANNUAL%20MEETINGS/2014-Rome/papers/EFMA2014_0222_FullPaper.pdf>`__
 """
+
 # pylint: disable = invalid-name, too-many-locals, dangerous-default-value
 from typing import Callable, Sequence, Union
 import numpy as np
@@ -14,7 +15,6 @@ import pandas as pd
 from arbitragelab.copula_approach.copula_strategy_basic import BasicCopulaStrategy
 import arbitragelab.copula_approach.copula_generate as cg
 import arbitragelab.copula_approach.copula_generate_mixedcopula as cgmix
-# import arbitragelab.copula_approach.copula_calculation as ccalc
 
 
 class CopulaStrategyMPI(BasicCopulaStrategy):
@@ -245,7 +245,6 @@ class CopulaStrategyMPI(BasicCopulaStrategy):
             cur_flag, cur_position, open_based_on = \
                 self._cur_flag_and_position(mpi, pre_flag, pre_position, open_based_on, enable_reset_flag,
                                             open_rule, exit_rule)
-            # print(open_based_on)
             flags.iloc[i, :] = cur_flag
             positions[i] = cur_position
 

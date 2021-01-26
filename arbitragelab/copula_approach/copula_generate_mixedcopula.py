@@ -4,17 +4,15 @@
 """
 Module that uses copula for trading strategy based method described in the following article.
 
-B Sabino da Silva, F., Ziegelman, F. and Caldeira, J., 2017. Mixed Copula Pairs Trading Strategy on the S&P 500.
+`B Sabino da Silva, F., Ziegelman, F. and Caldeira, J., 2017. Mixed Copula Pairs Trading Strategy on the S&P 500.
 Flávio and Caldeira, João, Mixed Copula Pairs Trading Strategy on the S&P, 500.
-<https://www.researchgate.net/profile/Fernando_Sabino_Da_Silva/publication/315878098_Mixed_Copula_Pairs_Trading_Strategy
-_on_the_SP_500/links/5c6f080b92851c695036785f/Mixed-Copula-Pairs-Trading-Strategy-on-the-S-P-500.pdf>
+<https://www.researchgate.net/profile/Fernando_Sabino_Da_Silva/publication/315878098_Mixed_Copula_Pairs_Trading_Strategy_on_the_SP_500/links/5c6f080b92851c695036785f/Mixed-Copula-Pairs-Trading-Strategy-on-the-S-P-500.pdf>`__
 
 Note: Algorithm for fitting mixed copula was adapted from
 
-Cai, Z. and Wang, X., 2014. Selection of mixed copula model via penalized likelihood. Journal of the American
+`Cai, Z. and Wang, X., 2014. Selection of mixed copula model via penalized likelihood. Journal of the American
 Statistical Association, 109(506), pp.788-801.
-<https://www.tandfonline.com/doi/pdf/10.1080/01621459.2013.873366?casa_token=sey8HrojSgYAAAAA:TEMBX8wLYdGFGyM78UXSYm6hXl
-1Qp_K6wiLgRJf6kPcqW4dYT8z3oA3I_odrAL48DNr3OSoqkQsEmQ>
+<https://www.tandfonline.com/doi/pdf/10.1080/01621459.2013.873366?casa_token=sey8HrojSgYAAAAA:TEMBX8wLYdGFGyM78UXSYm6hXl1Qp_K6wiLgRJf6kPcqW4dYT8z3oA3I_odrAL48DNr3OSoqkQsEmQ>`__
 """
 
 # pylint: disable = invalid-name, too-many-locals
@@ -236,8 +234,10 @@ class CTGMixCop(MixedCopula):
         data will be converted to quantile by empirical cumulative distribution function.
 
         Implementation of EM method based on a non-parametric adaptation of the article:
-        <Cai, Z. and Wang, X., 2014. Selection of mixed copula model via penalized likelihood. Journal of the American
-        Statistical Association, 109(506), pp.788-801.>
+        `Cai, Z. and Wang, X., 2014. Selection of mixed copula model via penalized likelihood. Journal of the American
+        Statistical Association, 109(506), pp.788-801.
+        <https://www.tandfonline.com/doi/pdf/10.1080/01621459.2013.873366?casa_token=sey8HrojSgYAAAAA:TEMBX8wLYdGFGyM78UXSYm6hXl1Qp_K6wiLgRJf6kPcqW4dYT8z3oA3I_odrAL48DNr3OSoqkQsEmQ>`__
+
         It contains the following procedure:
 
         1. Expectation step computes and updates the weights conditional on the copula parameters, using an iterative
@@ -296,8 +296,10 @@ class CTGMixCop(MixedCopula):
         Fitting cop_params and weights by expectation maximization (EM) from quantile-data.
 
         Implementation of EM method based on a non-parametric adaptation of the article:
-        <Cai, Z. and Wang, X., 2014. Selection of mixed copula model via penalized likelihood. Journal of the American
-        Statistical Association, 109(506), pp.788-801.>
+        `Cai, Z. and Wang, X., 2014. Selection of mixed copula model via penalized likelihood. Journal of the American
+        Statistical Association, 109(506), pp.788-801.
+        <https://www.tandfonline.com/doi/pdf/10.1080/01621459.2013.873366?casa_token=sey8HrojSgYAAAAA:TEMBX8wLYdGFGyM78UXSYm6hXl1Qp_K6wiLgRJf6kPcqW4dYT8z3oA3I_odrAL48DNr3OSoqkQsEmQ>`__
+
         It contains the following procedure:
 
         1. Expectation step computes and updates the weights conditional on the copula parameters, using an iterative
@@ -638,8 +640,10 @@ class CFGMixCop(MixedCopula):
         data will be converted to quantile by empirical cumulative distribution function.
 
         Implementation of EM method based on a non-parametric adaptation of the article:
-        <Cai, Z. and Wang, X., 2014. Selection of mixed copula model via penalized likelihood. Journal of the American
-        Statistical Association, 109(506), pp.788-801.>
+        `Cai, Z. and Wang, X., 2014. Selection of mixed copula model via penalized likelihood. Journal of the American
+        Statistical Association, 109(506), pp.788-801.
+        <https://www.tandfonline.com/doi/pdf/10.1080/01621459.2013.873366?casa_token=sey8HrojSgYAAAAA:TEMBX8wLYdGFGyM78UXSYm6hXl1Qp_K6wiLgRJf6kPcqW4dYT8z3oA3I_odrAL48DNr3OSoqkQsEmQ>`__
+
         It contains the following procedure:
 
         1. Expectation step computes and updates the weights conditional on the copula parameters, using an iterative
@@ -696,8 +700,10 @@ class CFGMixCop(MixedCopula):
         Fitting cop_params and weights by expectation maximization (EM) from quantile-data.
 
         Implementation of EM method based on a non-parametric adaptation of the article:
-        <Cai, Z. and Wang, X., 2014. Selection of mixed copula model via penalized likelihood. Journal of the American
-        Statistical Association, 109(506), pp.788-801.>
+        `Cai, Z. and Wang, X., 2014. Selection of mixed copula model via penalized likelihood. Journal of the American
+        Statistical Association, 109(506), pp.788-801.
+        <https://www.tandfonline.com/doi/pdf/10.1080/01621459.2013.873366?casa_token=sey8HrojSgYAAAAA:TEMBX8wLYdGFGyM78UXSYm6hXl1Qp_K6wiLgRJf6kPcqW4dYT8z3oA3I_odrAL48DNr3OSoqkQsEmQ>`__
+
         It contains the following procedure:
 
         1. Expectation step computes and updates the weights conditional on the copula parameters, using an iterative

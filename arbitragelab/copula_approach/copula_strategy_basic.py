@@ -5,8 +5,8 @@
 Master module that implements the basic copula trading strategy.
 
 This module is a realization of the methodology in the following paper:
-Liew, R.Q. and Wu, Y., 2013. Pairs trading: A copula approach. Journal of Derivatives & Hedge Funds, 19(1), pp.12-30.
-https://dr.ntu.edu.sg/bitstream/10220/17826/1/jdhf20131a.pdf
+`Liew, R.Q. and Wu, Y., 2013. Pairs trading: A copula approach. Journal of Derivatives & Hedge Funds, 19(1), pp.12-30.
+<https://dr.ntu.edu.sg/bitstream/10220/17826/1/jdhf20131a.pdf>`__
 
 This module is almost identical in terms of functionality as copula_strategy. But is designed with better efficiency,
 better structure, native pandas support, and supports mixed copulas. The trading logic is more clearly defined and all
@@ -278,7 +278,7 @@ class BasicCopulaStrategy:
         Fit a bivariate Student-t copula.
 
         Step 1: Using Kendall's tau to calculate rho for the Student-t copula.
-        Step 2: maximizing likelihood to find the nu.
+        Step 2: Maximizing likelihood to find the nu.
 
         :param data: (pd.DataFrame) Data used to fit the copula to.
         :param fit_params_kwargs: (dict) The grid length for searching nu in maximum likelihood. The key is 'nu_tol'.

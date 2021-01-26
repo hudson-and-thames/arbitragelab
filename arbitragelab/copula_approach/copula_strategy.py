@@ -52,8 +52,8 @@ class CopulaStrategy:
 
         msg = ("CopulaStrategy is deprecated and will be removed in a future version. "
                "Please switch to the copula_strategy_basic module and use the BasicCopulaStrategy class that contains"
-               "all previous CopulaStrategy functionality.")  # pragma: no cover
-        warnings.warn(msg, DeprecationWarning, stacklevel=2)  # pragma: no cover
+               "all previous CopulaStrategy functionality.")
+        warnings.warn(msg, DeprecationWarning, stacklevel=2)
 
         # Copulas that uses theta as parameter
         self.theta_copula_names = ['Gumbel', 'Clayton', 'Frank',

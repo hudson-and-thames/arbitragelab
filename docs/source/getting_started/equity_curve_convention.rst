@@ -6,16 +6,16 @@ Equity Curve Convention
 Why We Write This
 #################
 
-For every strategy, in the end we wish to see its performance on portfolios comprised of real world data.
-However, there are very little well-organized resourses that are openly and readily available talking about how
+For every strategy, in the end, we wish to see its performance on portfolios comprised of real-world data.
+However, there are very little well-organized resources that are openly and readily available talking about how
 the performance should be calculated.
 And since essentially it is related to back-testings on a strategy, conventions are known to be scarce, if any.
-Moreover, often it is not clear from the litertuares on their justification on choosing certain methodologies for
+Moreover, often it is not clear from the literatures on their justification on choosing certain methodologies for
 calculating returns.
 For example, if a pair's trading strategy suggests a position like "long the spread", what is the hedging ratio? How many
 units to purchase? How are the returns calculated if the strategy itself is self-financing? (i.e., you can cover the long
 position cost from the short position.)
-Those are fundamental questions for real world applications, and we created this page to address them.
+Those are fundamental questions for real-world applications, and we created this page to address them.
 
 Therefore, after going through well-regarded literatures, we looked carefully through the logic behind calculating the
 equity curve for a portfolio with different common assumptions.
@@ -24,7 +24,7 @@ for the :code:`arbitragelab` package.
 
 There are some commonly sound approaches with regard to, loosely speaking, "calculating performance of the strategy on a
 portfolio".
-Obviously what one calculates depends on what the definition of "performance" is.
+Obviously, what one calculates depends on what the definition of "performance" is.
 Listed below are some generally used methods:
 
 1. The return, or the internal rate of return. Usually used for stocks on simple strategies.
@@ -35,7 +35,7 @@ Listed below are some generally used methods:
 Forming A Portfolio For Pair's Trading
 ######################################
 Before diving into calculating equity curves, we need to discuss how to form a reasonable portfolio for pair's trading.
-A rule of thumb is that, the portfolio denpends on the strategy that one aims to implement, and a good portfolio should
+A rule of thumb is that, the portfolio depends on the strategy that one aims to implement, and a good portfolio should
 hedge away unnecessary exposures to various kinds of risks, while emphasizing the real strength of the strategy.
 Thus, there is no universally best way to form portfolios, as a terrible choice for one strategy may be almost optimal for
 another.
@@ -124,9 +124,9 @@ Thus it is the same as running an OLS on :math:`R_B` against :math:`R_A`, or equ
 TLS
 ===
 
-Another commonly used method is total least squares (TLS).
+Another commonly used method is the total least squares (TLS).
 When compared to OLS, it takes variances from both series into consideration.
-In general the hedge ratios from TLS and OLS will not differ much from each other.
+In general, the hedge ratios from TLS and OLS will not differ much from each other.
 
 TLS finds the line that minimizes the Euclidean distance to all data points, whereas OLS only accounts for the distance
 in the vertical direction.
@@ -161,7 +161,7 @@ Dollar Neutral Portfolio
 
 In some cases one may consider the dollar-neutral approach.
 For example, to hedge offset price movements of the two stocks as much as possible.
-Also some strategies naturally calls for this trading method, due to their strong reliance on short term returns.
+Also, some strategies naturally call for this trading method, due to their strong reliance on short term returns.
 
 For this strategy, as the name suggests, one simply long and short one asset in equal dollar amounts.
 The hedge may need to be adjusted often to stay close to being truly dollar-neutral.
@@ -196,7 +196,7 @@ advantage of it to be able to calculate **the return** as follows:
             r(t) = \frac{S_A(t) - h S_B(t)}{S_A(t-1) - h S_B(t-1)} - 1 \neq r_A(t) - h r_B(t) - 1
 
 3. Get the positions :math:`P(t)` from some strategy.
-4. Calculatethe daily returns :math:`r_s(t)` from our *strategy*. It is the pointwise multiplication
+4. Calculate the daily returns :math:`r_s(t)` from our *strategy*. It is the pointwise multiplication
 
     .. math::
         r_s(t) = r(t)P(t), \ \text{for each} \ t
@@ -213,7 +213,7 @@ dollar initial investment.
 
 Spread for a Stock Pair
 ***********************
-In this case we have to back up and derive everything by definition from daily P&L.
+In this case, we have to back up and derive everything by definition from daily P&L.
 It makes no sense to even use traditional measures like return on capital.
 For example, if a strategy tells you to long the spread when the spread is :math:`0`, and you have :math:`100,000` dollar
 capital to invest, how many units can you buy?
@@ -232,7 +232,7 @@ Therefore, we calculate **the cumulative P&L for 1 unit of spread**, to account 
         R(t) = \Pi(t) - \Pi(t-1)
 
 3. Get the positions :math:`P(t)` from some strategy.
-4. Calculatethe daily returns :math:`R_s(t)` from our *strategy*. It is the pointwise multiplication
+4. Calculate the daily returns :math:`R_s(t)` from our *strategy*. It is the pointwise multiplication
 
     .. math::
         R_s(t) = R(t)P(t), \ \text{for each} \ t

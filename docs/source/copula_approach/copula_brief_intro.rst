@@ -305,7 +305,7 @@ Therefore we opted to use a maximum likelihood fit for :math:`\nu` for the famil
 This calculation is relatively slow.
 
 Fitting mixed copula is a process that is a bit more complicated and is discussed in the
-seperate documentation: :ref:`A Deeper Intro to Copulas <copula_approach-copula_deeper_intro>`.
+separate documentation: :ref:`A Deeper Intro to Copulas <copula_approach-copula_deeper_intro>`.
 Here are a few takeaways:
 
 - Generic max likelihood fit is not stable, and does not drive small weights to 0.
@@ -319,6 +319,8 @@ Here are a few takeaways:
 
 Research Notebooks
 ##################
+
+The following research notebook can be used to better understand the basic copula strategy.
 
 * `Basic Copula Strategy`_
 
