@@ -9,14 +9,23 @@ Built on top of the :code:`pyvinecoplib` package. See https://github.com/vinecop
 
 from abc import ABC, abstractmethod
 from typing import List, Union
-from scipy.optimize import minimize
 from itertools import permutations
+import numba
 import numpy as np
 import pandas as pd
 import pyvinecopulib as pv
 import scipy.integrate as integrate
 
-class CVineCop():
+class RVineCop():
+    """
+    R-Vine copula class, housing C-vine copula and D-vine copula as special subcases.
+    """
+    
+    def __init__(self):
+        pass
+    
+
+class CVineCop(RVineCop):
     """
     Class for C-vine copulas.
     
@@ -39,9 +48,9 @@ class CVineCop():
         # The pv.Vinecop being wrapped
         self.cvine_cop = cvine_cop
 
-    def fit(self, data: pd.DataFrame, pv_target_idx: int = 1, if_renew: bool = True):
+    def fit_auto(self, data: pd.DataFrame, pv_target_idx: int = 1, if_renew: bool = True):
         """
-        Fit data to the C-vine copula by selecting the center stock.
+        Auto fit data to the C-vine copula by selecting the center stock.
 
         The method will loop through all possible C-vine structures and choose the best fit by AIC. The targeted
         stock will never show up in the center of the tree, thus some C-vine structures need not be included. This
@@ -115,9 +124,42 @@ class CVineCop():
         
         return valid_structures
 
-    def get_condi_prob(self, u: pd.Series, pv_target_idx: int = 1, eps: float = 1e-4) -> float:
+    def get_condi_probs(self, u: Union[pd.DataFrame, np.array], pv_target_idx: int = 1,
+                        eps: float = 1e-4) -> Union[pd.Series, float]:
         r"""
-        Get the conditional probability of the C-vine copula.
+        Get the conditional probabilities of the C-vine copula for a target.
+
+        For example, if we have 5 stocks and pv_target_idx = 2, then this method calculates:
+            P(U2 <= u2 | U1=u1, U3=u3, U4=u2, U5=u5)
+
+        The calculation is numerical by integrating along the margin. By default it uses the 0th element of u as the
+        target. Also this function's value is wrapped within [eps, 1-eps] to avoid potential edge values by default.
+
+        :param u: (Union[pd.DataFrame, np.array]) The quantiles data to be used. The input can be a pandas dataframe,
+            or a numpy array vector. The formal case yields the result with in pandas series in matching indices, and
+            the latter yields a single float number.
+        :param pv_target_idx: (int) Optional. The stock to be targeted for trading. This is indexed from 1, hence 1
+            corresponds to the 0th column data in a pandas data frame. In this case it is the only variable not
+            conditioned on. Defaults to 1.
+        :param eps: (float) Optional. The small value that keeps results within [eps, 1-eps]. Defaults to 1e-4.
+        :return: (Union[pd.Series, float]) The calculated pdf. If the input is a dataframe then the result is a series
+            with matching indices. If the input is a 1D np.array then the result is a float.
+        """
+        # When the input is a 1D np.array
+        if isinstance(u, np.ndarray) and u.ndim == 1:
+            u_srs = pd.Series(u)
+            condi_prob = self._get_condi_prob(u_srs, pv_target_idx, eps)
+            # The output is a float
+            return condi_prob
+
+        # When tne input is a pd.Dataframe
+        condi_probs = u.apply(lambda row: self._get_condi_prob(row, pv_target_idx, eps), axis=1)
+        # The result is a pd.Series with matching indices
+        return condi_probs
+    
+    def _get_condi_prob(self, u: pd.Series, pv_target_idx: int = 1, eps: float = 1e-4) -> float:
+        r"""
+        Get the conditional probability of the C-vine copula for a target.
 
         For example, if we have 5 stocks and pv_target_idx = 2, then this method calculates:
             P(U2 <= u2 | U1=u1, U3=u3, U4=u2, U5=u5)
@@ -233,7 +275,7 @@ class CVineCop():
 
         return simulated_samples
     
-    def aic(self, u: pd.Dataframe, num_threads: int = 1) -> float:
+    def aic(self, u: pd.DataFrame, num_threads: int = 1) -> float:
         """
         Evaluates the Akaike information criterion (AIC).
         
@@ -247,7 +289,7 @@ class CVineCop():
 
         return aic_value
 
-    def bic(self, u: pd.Dataframe, num_threads: int = 1) -> float:
+    def bic(self, u: pd.DataFrame, num_threads: int = 1) -> float:
         """
         Evaluates the Bayesian information criterion (BIC).
         
@@ -261,7 +303,7 @@ class CVineCop():
 
         return bic_value
 
-    def loglik(self, u: pd.Dataframe, num_threads: int = 1) -> float:
+    def loglik(self, u: pd.DataFrame, num_threads: int = 1) -> float:
         """
         Evaluates the Sum of log-likelihood.
         
@@ -275,3 +317,27 @@ class CVineCop():
 
         return loglik_value
 
+
+
+# #%%
+# print(cvine_cop.families)
+# #%%
+# test_quantiles = np.array([[0.1, 0.2, 0.3, 0.4],
+#                             [0.5, 0.2, 0.3, 0.4],
+#                             [1, 0.2, 0.3, 0.4]])
+# lower_input = np.array([[0.099, 0.2, 0.3, 0.4],
+#                         [0.499, 0.6, 0.7, 0.8],
+#                         [0.199, 0.3, 0.4, 0.8]])
+# upper_input = np.array([[0.101, 0.2, 0.3, 0.4],
+#                         [0.501, 0.6, 0.7, 0.8],
+#                         [0.201, 0.3, 0.4, 0.8]])
+# print(cvine_cop.pdf(u=test_quantiles))
+#%%
+
+# u = np.array([0, 0.2, 0.3, 0.4])
+# print(cvinecop._get_condi_prob(u, pv_target_idx = 1, eps=1e-4))
+
+#%%
+
+#%%
+#%%
