@@ -20,7 +20,7 @@ analytics-python==1.2.9
 bump2version==1.0.1
 bumpversion==0.6.0
 codecov==2.0.15
-coverage==4.5.2
+coverage==5.3.1
 pylint==2.5.3
 sphinx==2.2.1 # Docs
 sphinx-rtd-theme==0.4.3 # Docs
