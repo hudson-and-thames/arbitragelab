@@ -4,6 +4,7 @@ jobs:
   run_tests:
     machine:
       image: ubuntu-2004:202010-01
+    resource_class: medium
     steps:
       # Step 1: obtain repo from GitHub
       - checkout
