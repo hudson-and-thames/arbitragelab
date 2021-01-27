@@ -12,6 +12,14 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+* :feature:`28` CopulaStrategy replaced with improved BasicCopulaStrategy in the Copula Approach Module.
+* :feature:`28` Support of Clayton-Frank-Gumbel and Clayton-Student-Gumbel mixed copulas added to the Copula Approach Module.
+* :feature:`28` Mispricing Index Trading Strategy added to the Copula Approach Module.
+* :feature:`28` Quick Pairs Selection and ECDF added to the Copula Approach Module.
+* :support:`28` Updated Copula Brief Intro and added Copula Deeper Intro to documentation.
+* :support:`28` Mispricing Index Trading Strategy, Quick Pairs Selection and ECDF documentation.
+* :support:`28` Equity Curve Convention documentation.
+
 * :release:`0.1.0 <2020-11-18>`
 * :feature:`2` Kalman Filter + Kalman strategy added.
 * :support:`2` Kalman Filter documentation.
@@ -31,6 +39,7 @@ Changelog
 * :support:`17` Added Licence, ReadMe, and RoadMap
 * :support:`20` Added API Key Validation.
 * :support:`20` Add install documentation and test on OS/Ubuntu/Windows.
+
 * :release:`0.2.0 <2020-12-11>`
 * :feature:`5` ML Based Pairs Selection (Horta, 2020) and Data Importer added.
 * :support:`5` ML Based Pairs Selection and Data Importer documentation.
