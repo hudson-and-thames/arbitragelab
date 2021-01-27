@@ -11,10 +11,12 @@ import os
 import json
 from urllib.request import urlopen
 
+from arbitragelab.util import devadarsh
+
 API_KEY_ENV_VAR = "ARBLAB_API_KEY"
 
 
-class Security:
+class Golem:
     """
     Class to verify the API Key of the end user. Make sure that you have declared your environment variables. See the
     installation documentation for more details.
@@ -44,10 +46,13 @@ class Security:
         import arbitragelab.ml_approach as ml_approach
         import arbitragelab.codependence as codependence
         import arbitragelab.cointegration_approach as cointegration_approach
+        import arbitragelab.copula_approach as copula_approach
         import arbitragelab.distance_approach as distance_approach
         import arbitragelab.other_approaches as other_approaches
         import arbitragelab.util as util
         import arbitragelab.optimal_mean_reversion as optimal_mean_reversion
+        import arbitragelab.time_series_approach as time_series_approach
+        devadarsh.track('Import')
 
     # pylint: disable=missing-function-docstring
     def __validate(self):

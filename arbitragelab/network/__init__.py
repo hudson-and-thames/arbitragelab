@@ -1,4 +1,4 @@
 """
 The module handles API validation and analytics.
 """
-from arbitragelab.network.validation import Security
+from arbitragelab.network.imports import Golem

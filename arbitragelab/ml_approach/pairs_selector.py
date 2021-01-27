@@ -7,19 +7,21 @@ Sarmento and Nuno Horta in `"A Machine Learning based Pairs Trading Investment S
 """
 
 import itertools
-import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.axes._axes import Axes
-from matplotlib.figure import Figure
+import pandas as pd
 from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA
 from sklearn.cluster import OPTICS, DBSCAN
 from sklearn.neighbors import NearestNeighbors
 from sklearn.preprocessing import StandardScaler
+import matplotlib.pyplot as plt
+from matplotlib.axes._axes import Axes
+from matplotlib.figure import Figure
 
 from arbitragelab.ml_approach.stat_arb_utils import _outer_cointegration_loop, _outer_ou_loop
+from arbitragelab.util import devadarsh
 from arbitragelab.util.indexed_highlight import IndexedHighlight
+
 
 class PairsSelector:
     """
@@ -38,7 +40,6 @@ class PairsSelector:
 
         :param universe: (pd.DataFrame) Asset prices universe.
         """
-
         self.prices_df = universe
         self.feature_vector = None
         self.cluster_pairs_combinations = []
@@ -50,6 +51,8 @@ class PairsSelector:
 
         self.final_pairs = []
         self.clust_labels_ = []
+
+        devadarsh.track('PairsSelector')
 
     def dimensionality_reduction_by_components(self, num_features: int = 10):
         """

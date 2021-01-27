@@ -6,12 +6,12 @@ This module houses utility functions used by the PairsSelector.
 """
 
 import sys
-import pandas as pd
+from scipy.odr import ODR, Model, RealData
 import numpy as np
+import pandas as pd
 import statsmodels.api as sm
 from statsmodels.tsa.adfvalues import mackinnonp
 from statsmodels.tsa.stattools import adfuller
-from scipy.odr import ODR, Model, RealData
 
 
 def _print_progress(iteration, max_iterations, prefix='', suffix='', decimals=1, bar_length=50):
@@ -108,6 +108,7 @@ def _outer_ou_loop(spreads_df: pd.DataFrame, test_period: str,
 
     return pd.DataFrame(ou_results, index=molecule, columns=['hl', 'crossovers'])
 
+
 def _linear_f(beta: np.array, x_variable: np.array) -> np.array:
     """
     This is the helper linear model that is going to be used in the Orthogonal Regression.
@@ -118,6 +119,7 @@ def _linear_f(beta: np.array, x_variable: np.array) -> np.array:
     """
 
     return beta[0]*x_variable + beta[1]
+
 
 def _outer_cointegration_loop(prices_df: pd.DataFrame, molecule: list) -> pd.DataFrame:
     """
