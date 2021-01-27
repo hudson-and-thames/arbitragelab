@@ -15,6 +15,7 @@ import pandas as pd
 import statsmodels.api as sm
 
 from arbitragelab.cointegration_approach.engle_granger import EngleGrangerPortfolio
+from arbitragelab.util import devadarsh
 
 
 class CointegrationSimulation:
@@ -40,6 +41,7 @@ class CointegrationSimulation:
         self.ts_num = ts_num
         self.ts_length = ts_length
         self.__price_params, self.__coint_params = self.initialize_params()
+        devadarsh.track('CointegrationSimulation')
 
     @staticmethod
     def initialize_params() -> Tuple[dict, dict]:

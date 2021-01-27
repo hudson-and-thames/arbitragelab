@@ -12,6 +12,7 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+* :bug:`34` Data Importer, Distance Approach, ML Approach modules imports were not exposed.
 * :feature:`28` CopulaStrategy replaced with improved BasicCopulaStrategy in the Copula Approach Module.
 * :feature:`28` Support of Clayton-Frank-Gumbel and Clayton-Student-Gumbel mixed copulas added to the Copula Approach Module.
 * :feature:`28` Mispricing Index Trading Strategy added to the Copula Approach Module.
@@ -19,6 +20,33 @@ Changelog
 * :support:`28` Updated Copula Brief Intro and added Copula Deeper Intro to documentation.
 * :support:`28` Mispricing Index Trading Strategy, Quick Pairs Selection and ECDF documentation.
 * :support:`28` Equity Curve Convention documentation.
+
+* :release:`0.2.2 <2020-12-24>`
+* :bug:`32` Copulas module imports were not exposed.
+
+* :release:`0.2.1 <2020-12-22>`
+* :bug:`Hot` Error with environment variables in analytics module.
+
+* :release:`0.2.0 <2020-12-14>`
+* :feature:`5` ML Based Pairs Selection (Horta, 2020) and Data Importer added.
+* :support:`5` ML Based Pairs Selection and Data Importer documentation.
+* :feature:`8` Copula strategy added (Liew et al. 2013): Log price (or equivalently, cumulative log returns) based copula strategy.
+* :feature:`8` Copulas supported: Gumbel, Frank, Clayton, Joe, N13, N14, Gaussian, Student(Student-t).
+* :support:`8` Copula strategy documentation (Liew et al. 2013) for log price based copula strategy.
+* :feature:`19` Minimum profit optimization module added (Lin et al. 2006, Puspaningrum et al. 2010): Finding optimal pre-set boundaries for cointegrated pairs trading strategy.
+* :feature:`19` Cointegrated time series simulation module added (Lin et al. 2006): Simulate cointegrated series that follows AR(1) dynamics.
+* :support:`19` Minimum profit optimization documentation for cointegrated pairs trading strategy.
+* :support:`19` Cointegrated time series simulation documentation.
+* :feature:`22` XOU-model to the Optimal Mean Reversion module added.
+* :support:`22` XOU-model documentation.
+* :feature:`23` Heat potential approach module added.
+* :support:`23` Heat potential approach documentation.
+* :feature:`24` Quantile Time Series Strategy (SM Sarmento, N Horta, 2020) and Auto ARIMA model added.
+* :support:`24` Quantile Time Series Strategy and Auto ARIMA model documentation.
+* :feature:`27` CIR-model to the Optimal Mean Reversion module added.
+* :support:`27` CIR-model documentation.
+* :feature:`30` Track user analytics using Segment
+* :support:`30` Analytics documentation.
 
 * :release:`0.1.0 <2020-11-18>`
 * :feature:`2` Kalman Filter + Kalman strategy added.
@@ -39,14 +67,3 @@ Changelog
 * :support:`17` Added Licence, ReadMe, and RoadMap
 * :support:`20` Added API Key Validation.
 * :support:`20` Add install documentation and test on OS/Ubuntu/Windows.
-
-* :release:`0.2.0 <2020-12-11>`
-* :feature:`5` ML Based Pairs Selection (Horta, 2020) and Data Importer added.
-* :support:`5` ML Based Pairs Selection and Data Importer documentation.
-* :feature:`8` Copula strategy added (Liew et al. 2013): Log price (or equivalently, cumulative log returns) based copula strategy.
-* :feature:`8` Copulas supported: Gumbel, Frank, Clayton, Joe, N13, N14, Gaussian, Student(Student-t).
-* :support:`8` Copula strategy documentation (Liew et al. 2013) for log price based copula strategy.
-* :feature:`19` Minimum profit optimization module added (Lin et al. 2006, Puspaningrum et al. 2010): Finding optimal pre-set boundaries for cointegrated pairs trading strategy.
-* :feature:`19` Cointegrated time series simulation module added (Lin et al. 2006): Simulate cointegrated series that follows AR(1) dynamics.
-* :support:`19` Minimum profit optimization documentation for cointegrated pairs trading strategy.
-* :support:`19` Cointegrated time series simulation documentation.

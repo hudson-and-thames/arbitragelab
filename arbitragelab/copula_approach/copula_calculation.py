@@ -240,6 +240,7 @@ def hqic(log_likelihood: float, n: int, k: int = 1) -> float:
 
     return hqic_value
 
+
 def fit_nu_for_t_copula(x: np.array, y: np.array, nu_tol: float = None) -> float:
     r"""
     Find the best fit value nu for Student-t copula.
