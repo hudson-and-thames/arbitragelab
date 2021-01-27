@@ -12,6 +12,9 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+* :feature:`26` Multivariate Cointegration strategy (Galenko et al. 2010) added to the Cointegration Approach Module.
+* :support:`26` Multivariate Cointegration strategy documentation.
+
 * :release:`0.1.0 <2020-11-18>`
 * :feature:`2` Kalman Filter + Kalman strategy added.
 * :support:`2` Kalman Filter documentation.
@@ -31,6 +34,7 @@ Changelog
 * :support:`17` Added Licence, ReadMe, and RoadMap
 * :support:`20` Added API Key Validation.
 * :support:`20` Add install documentation and test on OS/Ubuntu/Windows.
+
 * :release:`0.2.0 <2020-12-11>`
 * :feature:`5` ML Based Pairs Selection (Horta, 2020) and Data Importer added.
 * :support:`5` ML Based Pairs Selection and Data Importer documentation.
