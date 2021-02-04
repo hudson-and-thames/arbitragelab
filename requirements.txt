@@ -15,6 +15,8 @@ requests_html==0.10.0
 seaborn==0.10.0
 pmdarima==1.8.0
 analytics-python==1.2.9
+cvxpy==1.1.8
+networkx==2.4
 
 # Develop
 bump2version==1.0.1
@@ -25,5 +27,3 @@ pylint==2.5.3
 sphinx==2.2.1 # Docs
 sphinx-rtd-theme==0.4.3 # Docs
 releases==1.6.3 # Docs
-cvxpy~=1.1.7
-networkx~=2.4
