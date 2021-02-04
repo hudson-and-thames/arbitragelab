@@ -2,24 +2,31 @@ version: 2.1
 
 jobs:
   run_tests:
-    docker:
-      - image: circleci/python:3.7.4
+    machine:
+      image: ubuntu-2004:202010-01
+    resource_class: medium
     steps:
+      # Step 1: obtain repo from GitHub
       - checkout
+      # Step 2: create virtual env and install dependencies
       - run:
-          name: Install Python Dependencies
+          name: Create Virtualenv
           command: |
-            pip install --user -r requirements.txt
+            virtualenv venv
+      - run:
+          name: Install Dependencies
+          command: |
+            . venv/bin/activate
+            pip3 install -r requirements.txt
+      # Step 3: run pylint styling check
       - run:
           name: Run Pylint Check
           command: |
+            . venv/bin/activate
             pylint arbitragelab tests --rcfile=.pylintrc -f text
+      # Step 4: run coverage check
       - run:
-          name: Run Unit Tests
-          command: |
-            python -m unittest discover
-      - run:
-          name: Test Code Coverage
+          name: Run Unit Tests and Coverage Check
           command: |
             bash coverage
       - store_test_results:
