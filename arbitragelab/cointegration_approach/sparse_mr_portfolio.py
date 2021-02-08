@@ -503,7 +503,7 @@ class SparseMeanReversionPortfolio:
         # Set up the LASSO model and do a search on the alpha parameter space
         if multi_task_lasso:
             # Fit the multi-task LASSO model
-            _, coefs_lasso, _ = lasso_path(data_lag, data_now, alphas=alphas, max_iter=max_iter)
+            _, coefs_lasso, _, _ = lasso_path(data_lag, data_now, alphas=alphas, max_iter=max_iter)
             # Select the maximum alpha that satisfies the sparsity requirement
             non_zeros = np.count_nonzero(coefs_lasso, axis=(0, 1))
 
