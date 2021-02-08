@@ -3,7 +3,7 @@
 # Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 """
 This module selects sparse mean-reverting portfolios out of an asset universe. The methods implemented in this module
-are based on d'Aspremont (2007) and Cuturi (2016) and include the following:
+are based on d'Aspremont (2011) and Cuturi (2016) and include the following:
 
 1. Box-Tiao canonical decomposition.
 2. Greedy search.
@@ -269,7 +269,7 @@ class SparseMeanReversionPortfolio:
 
             \begin{align*}
             \text{minimize } & \mathbf{Tr}(AY) \\
-            \text{subject to} & \mathbf{1}^T \lvert Y \rvert \mathbf{1} \leq k \mathbf{Tr}(Y) \\
+            \text{subject to } & \mathbf{1}^T \lvert Y \rvert \mathbf{1} \leq k \, \mathbf{Tr}(Y) \\
             & \mathbf{Tr}(Y) > 0 \\
             & \mathbf{Tr}(BY) = 1 \\
             & Y \succeq 0
@@ -320,14 +320,14 @@ class SparseMeanReversionPortfolio:
             :nowrap:
 
             \begin{align*}
-            \text{minimize } & \mathbf{Tr}(\Gamma_1 \Gamma_0^{-1} \Gamma_1^T Y) + \rho \lVert Y \rVert_1 \\
-            \text{subject to} & \mathbf{Tr}(\Gamma_0 Y) >= V \\
+            \text{minimize } & \mathbf{Tr}(\gamma_1 \gamma_0^{-1} \gamma_1^T Y) + \rho \lVert Y \rVert_1 \\
+            \text{subject to } & \mathbf{Tr}(\gamma_0 Y) >= V \\
             & \mathbf{Tr}(Y) = 1 \\
             & Y \succeq 0
             \end{align*}
 
-        where :math:`\Gamma_i` is the lag-:math:`k` sample autocovariance (when :math:`k=0`, it is the sample
-        covariance). V is the variance lower bound of the portfolio.
+        where :math:`\gamma_i` is the lag-:math:`k` sample autocovariance (when :math:`k=0`, it is the sample
+        covariance). :math:`V` is the variance lower bound of the portfolio.
 
         :param rho: (float) Regularization parameter of the :math:`l_1`-norm in the objective function.
         :param variance: (float) Variance lower bound for the portfolio.
@@ -371,14 +371,14 @@ class SparseMeanReversionPortfolio:
             :nowrap:
 
             \begin{align*}
-            \text{minimize } & \sum_{i=1}^p \mathbf{Tr}(\Gamma_i Y)^2 + \rho \lVert Y \rVert_1 \\
-            \text{subject to} & \mathbf{Tr}(\Gamma_0 Y) >= V \\
+            \text{minimize } & \sum_{i=1}^p \mathbf{Tr}(\gamma_i Y)^2 + \rho \lVert Y \rVert_1 \\
+            \text{subject to } & \mathbf{Tr}(\gamma_0 Y) >= V \\
             & \mathbf{Tr}(Y) = 1 \\
             & Y \succeq 0
             \end{align*}
 
-        where :math:`\Gamma_i` is the lag-:math:`k` sample autocovariance (when :math:`k=0`, it is the sample
-        covariance). V is the variance lower bound of the portfolio.
+        where :math:`\gamma_i` is the lag-:math:`k` sample autocovariance (when :math:`k=0`, it is the sample
+        covariance). :math:`V` is the variance lower bound of the portfolio.
 
         :param rho: (float) Regularization parameter of the :math:`l_1`-norm in the objective function.
         :param variance: (float) Variance lower bound for the portfolio.
@@ -423,14 +423,14 @@ class SparseMeanReversionPortfolio:
             :nowrap:
 
             \begin{align*}
-            \text{minimize } & \mathbf{Tr}(\Gamma_1 Y) + \mu \sum_{i=2}^p \mathbf{Tr}(\Gamma_i Y)^2 + \rho \lVert Y \rVert_1 \\
-            \text{subject to} & \mathbf{Tr}(\Gamma_0 Y) >= V \\
+            \text{minimize } & \mathbf{Tr}(\gamma_1 Y) + \mu \sum_{i=2}^p \mathbf{Tr}(\gamma_i Y)^2 + \rho \lVert Y \rVert_1 \\
+            \text{subject to } & \mathbf{Tr}(\gamma_0 Y) >= V \\
             & \mathbf{Tr}(Y) = 1 \\
             & Y \succeq 0
             \end{align*}
 
-        where :math:`\Gamma_i` is the lag-:math:`k` sample autocovariance (when :math:`k=0`, it is the sample
-        covariance). V is the variance lower bound of the portfolio.
+        where :math:`\gamma_i` is the lag-:math:`k` sample autocovariance (when :math:`k=0`, it is the sample
+        covariance). :math:`V` is the variance lower bound of the portfolio.
 
         :param rho: (float) Regularization parameter of the :math:`l_1`-norm in the objective function.
         :param mu: (float) Regularization parameter of higher-order autocovariance.
