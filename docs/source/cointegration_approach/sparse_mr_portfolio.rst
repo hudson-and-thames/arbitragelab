@@ -16,7 +16,7 @@ Introduction
 
 Assets that exhibit significant mean-reversion are difficult to find in efficient markets. As a result, investors focus
 on creating long-short asset baskets to form a mean-reverting portfolio whose aggregate value shows mean-reversion.
-Classic solutions including cointegration or canonical correlation analysis can only construct dense mean-reverting
+Classic solutions, including cointegration or canonical correlation analysis, can only construct dense mean-reverting
 portfolios, i.e. they include every asset in the investing universe. These portfolios have shown significant
 disadvantages in transaction costs, P&L interpretability, and capturing meaningful statistical arbitrage opportunities.
 On the other hand, sparse mean-reverting portfolios, which requires trading as few assets as possible, can mitigate
@@ -56,7 +56,7 @@ speed parameter :math:`\lambda` to measure the mean-reversion strength.
 However, it is hard to express the OU mean-reversion speed :math:`\lambda` as a function of the portfolio weight vector
 :math:`\mathbf{x}`. Instead of optimizing :math:`\lambda`, this module will only use :math:`\lambda` to evaluate the
 sparse portfolios generated and employ three other mean-reversion strength proxies to solve the sparse mean-reverting
-portfolio selection problem.
+portfolio selection problem:
 
 1. Predictability based on Box-Tiao canonical decomposition.
 2. Portmanteau statistic.
@@ -125,7 +125,7 @@ The portfolio value is a linear combination of the asset prices, and can be expl
     \mathbf{x}^T S_t = \mathbf{x}^T \hat{S}_{t-1} + \mathbf{x}^T \varepsilon_t
 
 Without loss of generality, the price of each asset can be assumed to have a zero mean, and the predictability can now
-be written as
+be written as:
 
 .. math::
 
@@ -165,7 +165,7 @@ where :math:`\gamma_k` is the sample lag-:math:`k` autocovariance matrix, define
     \tilde{S}_t & \equiv S_t - \frac{1}{T} \sum_{t=1}^T S_t
     \end{align*}
 
-The module follows closely to the d'Aspremont (2011) and Cuturi (2015) paper as to which estimate of :math:`A` is used
+The module follows closely to the d'Aspremont (2011) and Cuturi (2015) papers as to which estimate of :math:`A` is used
 in the portfolio selection optimization.
 
 The predictablity of the time series under the VAR(1) model assumption can be now written as:
