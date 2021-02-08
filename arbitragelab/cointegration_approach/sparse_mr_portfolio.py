@@ -137,8 +137,7 @@ class SparseMeanReversionPortfolio:
             # Symmetrize the autocovariance, i.e. (A + A^T) / 2
             if symmetrize:
                 return (autocov_m + autocov_m.T) / 2
-            else:
-                return autocov_m
+            return autocov_m
 
         # nlags = 0, return covariance matrix (which is always symmetric)
         return (data.values.T @ data.values) / (data.shape[0] - 1)
@@ -261,7 +260,8 @@ class SparseMeanReversionPortfolio:
 
         return np.around(selected_weights, threshold)
 
-    def sdp_eigenvalue(self, cardinality: float, var_est: np.array, cov_est: np.array,
+    @staticmethod
+    def sdp_eigenvalue(cardinality: float, var_est: np.array, cov_est: np.array,
                        verbose: bool = True, max_iter: int = 10000, maximize: bool = False) -> np.array:
         r"""
         Semidefinite relaxation sparse decomposition following the formulation in d'Aspremont (2011).
@@ -712,7 +712,7 @@ class SparseMeanReversionPortfolio:
         f = np.squeeze(x.T @ s)
 
         # Truncate step
-        x = self.truncate(g, cardinality)
+        x = self._truncate(g, cardinality)
         f_old = f
 
         # TPower iteration loop
@@ -724,7 +724,7 @@ class SparseMeanReversionPortfolio:
             g = 2 * s
 
             # Truncate step
-            x = self.truncate(g, cardinality)
+            x = self._truncate(g, cardinality)
             f = np.squeeze(x.T @ s)
 
             if np.abs(f - f_old) < tol:
@@ -737,7 +737,7 @@ class SparseMeanReversionPortfolio:
         return x
 
     @staticmethod
-    def truncate(vector: np.array, cardinality: int) -> np.array:
+    def _truncate(vector: np.array, cardinality: int) -> np.array:
         """
         Helper function of Truncated Power method.
 
