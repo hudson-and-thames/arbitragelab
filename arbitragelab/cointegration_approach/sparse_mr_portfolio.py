@@ -1,6 +1,8 @@
 # Copyright 2019, Hudson and Thames Quantitative Research
 # All rights reserved
 # Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
+
+# pylint: disable=invalid-name
 """
 This module selects sparse mean-reverting portfolios out of an asset universe. The methods implemented in this module
 are based on d'Aspremont (2011) and Cuturi (2016) and include the following:
