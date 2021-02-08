@@ -5,7 +5,12 @@
 # pylint: disable=invalid-name
 """
 This module selects sparse mean-reverting portfolios out of an asset universe. The methods implemented in this module
-are based on d'Aspremont (2011) and Cuturi (2016) and include the following:
+are based on
+
+`d'Aspremont, A., 2011. Identifying small mean-reverting portfolios. Quantitative Finance, 11(3), pp.351-364. <https://arxiv.org/pdf/0708.3048.pdf>`__
+and
+`Cuturi, M. and d'Aspremont, A., 2015. Mean-reverting portfolios: Tradeoffs between sparsity and volatility. arXiv preprint arXiv:1509.05954. <https://arxiv.org/pdf/1509.05954.pdf>`__
+and include the following:
 
 1. Box-Tiao canonical decomposition.
 2. Greedy search.
@@ -38,13 +43,14 @@ class SparseMeanReversionPortfolio:
     Module for sparse mean reversion portfolio selection.
     """
 
-    def __init__(self, assets):
+    def __init__(self, assets: pd.DataFrame):
         """
         Constructor of the small mean-reverting portfolio identification module. The constructor will subtract the mean
         price of each asset from the original price such that the price processes have zero mean.
 
         :param assets: (pd.DataFrame) The price history of each asset.
         """
+
         self._assets = assets
 
         # Demeaned assets
@@ -63,6 +69,7 @@ class SparseMeanReversionPortfolio:
 
         :return: (pd.DataFrame) The price history of each asset.
         """
+
         return self._assets
 
     @property
@@ -72,6 +79,7 @@ class SparseMeanReversionPortfolio:
 
         :return: (pd.DataFrame) The processed price history of each asset with zero mean.
         """
+
         return self._demeaned
 
     @property
@@ -79,8 +87,9 @@ class SparseMeanReversionPortfolio:
         """
         Getter for the standardized price data.
 
-        :return: (pd.DataFrame) The stnadardized price history of each asset with zero mean and unit variance.
+        :return: (pd.DataFrame) The standardized price history of each asset with zero mean and unit variance.
         """
+
         return self._standardized
 
     @staticmethod
@@ -90,8 +99,8 @@ class SparseMeanReversionPortfolio:
 
         :param weights: (np.array) The weightings for each asset.
         :param assets: (pd.DataFrame) The price history of each asset.
-        :param interval: (str) The time interval, or the frequency, of the price data.
-        :return: (float, float) Mean reversion coefficient; half life of the OU process.
+        :param interval: (str) The time interval, or the frequency, of the price data. Options are ['D', 'M', 'Y'].
+        :return: (float, float) Mean reversion coefficient; half-life of the OU process.
         """
 
         # Check if the shape of the weights and the assets match
@@ -101,8 +110,7 @@ class SparseMeanReversionPortfolio:
         half_life_conversion = {
             'D': 252,
             'M': 12,
-            'Y': 1
-        }
+            'Y': 1}
 
         # From the portfolio by the weights
         portfolio = assets @ weights
@@ -119,13 +127,14 @@ class SparseMeanReversionPortfolio:
         Calculate the autocovariance matrix.
 
         :param nlags: Lag of autocovariance. If nlags = 0, return the covariance matrix.
-        :param symmetrize: (bool) If true, symmetrize the autocovariance matrix :math:`\\frac{A^T + A}{2}`;
+        :param symmetrize: (bool) If True, symmetrize the autocovariance matrix :math:`\\frac{A^T + A}{2}`;
             otherwise, return the original autocovariance matrix.
         :param use_standardized: (bool) If True, use standardized data; otherwise, use demeaned data.
         :return: (np.array) Autocovariance or covariance matrix.
         """
 
         data = self.standardized if use_standardized else self.demeaned
+
         # Lag the data, match the shape, and convert dataframe into numpy array
         if nlags > 0:
             data_now = data.iloc[nlags:].values
@@ -142,11 +151,11 @@ class SparseMeanReversionPortfolio:
         # nlags = 0, return covariance matrix (which is always symmetric)
         return (data.values.T @ data.values) / (data.shape[0] - 1)
 
-    def least_square_VAR_fit(self, use_standardized=False) -> np.array:
+    def least_square_VAR_fit(self, use_standardized: bool = False) -> np.array:
         """
         Calculate the least square estimate of the VAR(1) matrix.
 
-        :param use_standardized: (bool) If true, use standardized data; otherwise, use demeaned data.
+        :param use_standardized: (bool) If True, use standardized data; otherwise, use demeaned data.
         :return: (np.array) Least square estimate of VAR(1) matrix.
         """
 
@@ -199,7 +208,7 @@ class SparseMeanReversionPortfolio:
         :param cov_est: (np.array) Estimated covariance matrix.
         :param threshold: (int) Round precision cutoff threshold. For example, a threshold of n means that a number less
             than :math:`10^{-n}` will be treated as zero.
-        :param maximize: (bool) If true, maximize predictability; otherwise, minimize predictability.
+        :param maximize: (bool) If True, maximize predictability; otherwise, minimize predictability.
         :return: (np.array) Weight of each selected assets.
         """
 
@@ -283,7 +292,7 @@ class SparseMeanReversionPortfolio:
         :param verbose: (bool) If True, print the SDP solver iteration details for debugging; otherwise, suppress the
             debug output.
         :param max_iter: (int) Set number of iterations for the SDP solver.
-        :param maximize: (bool) If true, maximize predictability; otherwise, minimize predictability.
+        :param maximize: (bool) If True, maximize predictability; otherwise, minimize predictability.
         :return: (np.array) The optimized matrix :math:`Y`.
         """
 
@@ -315,8 +324,8 @@ class SparseMeanReversionPortfolio:
     def sdp_predictability_vol(self, rho: float, variance: float, use_standardized: bool = True,
                                verbose: bool = True, max_iter: int = 10000) -> np.array:
         r"""
-        Semidefinite relaxation optimization of predictability with a volatility threshold following the formulation of
-        Cuturi (2016).
+        Semidefinite relaxation optimization of predictability with a volatility threshold following the
+        formulation of Cuturi and d'Aspremont (2015).
 
         .. math::
             :nowrap:
@@ -335,10 +344,11 @@ class SparseMeanReversionPortfolio:
         :param variance: (float) Variance lower bound for the portfolio.
         :param verbose: (bool) If True, print the SDP solver iteration details for debugging; otherwise, suppress the
             debug output.
-        :param use_standardized: (bool) If true, use standardized data for optimization; otherwise, use de-meaned data.
+        :param use_standardized: (bool) If True, use standardized data for optimization; otherwise, use de-meaned data.
         :param max_iter: (int) Set number of iterations for the SDP solver.
-        :return: (np.array) The optimized matrix :math:`Y`
+        :return: (np.array) The optimized matrix :math:`Y`.
         """
+
         # Construct the matrix M
         acov1 = self.autocov(1, symmetrize=True, use_standardized=use_standardized)
         cov = self.autocov(0, use_standardized=use_standardized)
@@ -367,7 +377,7 @@ class SparseMeanReversionPortfolio:
                             verbose: bool = True, max_iter: int = 10000) -> np.array:
         r"""
         Semidefinite relaxation optimization of portmanteau statistic with a volatility threshold following the
-        formulation of Cuturi (2016).
+        formulation of Cuturi and d'Aspremont (2015).
 
         .. math::
             :nowrap:
@@ -387,7 +397,7 @@ class SparseMeanReversionPortfolio:
         :param nlags: (int) Order of portmanteau statistic :math:`p`.
         :param verbose: (bool) If True, print the SDP solver iteration details for debugging; otherwise, suppress the
             debug output.
-        :param use_standardized: (bool) If true, use standardized data for optimization; otherwise, use de-meaned data.
+        :param use_standardized: (bool) If True, use standardized data for optimization; otherwise, use de-meaned data.
         :param max_iter: (int) Set number of iterations for the SDP solver.
         :return: (np.array) The optimized matrix :math:`Y`.
         """
@@ -419,7 +429,7 @@ class SparseMeanReversionPortfolio:
                          verbose: bool = True, max_iter: int = 10000) -> np.array:
         r"""
         Semidefinite relaxation optimization of crossing statistic with a volatility threshold following the
-        formulation of Cuturi (2016).
+        formulation of Cuturi and d'Aspremont (2015).
 
         .. math::
             :nowrap:
@@ -440,7 +450,7 @@ class SparseMeanReversionPortfolio:
         :param nlags: (int) Order of portmanteau statistic :math:`p`.
         :param verbose: (bool) If True, print the SDP solver iteration details for debugging; otherwise, suppress the
             debug output.
-        :param use_standardized: (bool) If true, use standardized data for optimization; otherwise, use de-meaned data.
+        :param use_standardized: (bool) If True, use standardized data for optimization; otherwise, use de-meaned data.
         :param max_iter: (int) Set number of iterations for the SDP solver.
         :return: (np.array) The optimized matrix :math:`Y`.
         """
@@ -481,7 +491,7 @@ class SparseMeanReversionPortfolio:
         :param alpha_max: (float) Maximum l1-regularization coefficient.
         :param n_alphas: (int) Number of l1-regularization coefficient for the parameter search.
         :param max_iter: (int) Maximum number of iterations for LASSO regression.
-        :param use_standardized: (bool) If true, use standardized data for optimization; otherwise, use de-meaned data.
+        :param use_standardized: (bool) If True, use standardized data for optimization; otherwise, use de-meaned data.
         :return: (float) Minimum alpha that satisfies the sparsity requirement.
         """
 
@@ -549,7 +559,7 @@ class SparseMeanReversionPortfolio:
         :param max_iter: (int) Maximum number of iterations of LASSO regression.
         :param threshold: (int) Round precision cutoff threshold. For example, a threshold of n means that a number less
             than :math:`10^{-n}` will be treated as zero.
-        :param use_standardized: (bool) If true, use standardized data for optimization; otherwise, use de-meaned data.
+        :param use_standardized: (bool) If True, use standardized data for optimization; otherwise, use de-meaned data.
         :return: (np.array) Sparse estimate of VAR(1) matrix.
         """
 
@@ -583,10 +593,11 @@ class SparseMeanReversionPortfolio:
         :param n_alphas: (int) Number of regularization parameter for parameter search.
         :param clusters: (int) Number of smaller clusters desired from the precision matrix.
             The higher the number, the larger the best alpha will be. This parameter cannot exceed the number of assets.
-        :param use_standardized: (bool) If true, use standardized data for optimization; otherwise, use de-meaned data.
+        :param use_standardized: (bool) If True, use standardized data for optimization; otherwise, use de-meaned data.
         :return: (float) Optimal alpha to split the graph representation of the inverse covariance matrix into
             designated number of clusters.
         """
+
         # Check parameter validity
         if clusters > self.assets.shape[1]:
             raise ValueError("The number of clusters cannot exceed the number of assets.")
@@ -629,7 +640,7 @@ class SparseMeanReversionPortfolio:
         :param max_iter: (int) Maximum number of iterations for graphical LASSO fit.
         :param threshold: (int) Round precision cutoff threshold. For example, a threshold of n means that a number less
             than :math:`10^{-n}` will be treated as zero.
-        :param use_standardized: (bool) If true, use standardized data for optimization; otherwise, use de-meaned data.
+        :param use_standardized: (bool) If True, use standardized data for optimization; otherwise, use de-meaned data.
         :return: (np.array, np.array) Sparse estimate of covariance matrix; inverse of the sparse covariance matrix,
             i.e. precision matrix as graph representation.
         """
@@ -766,6 +777,7 @@ class SparseMeanReversionPortfolio:
         :param atol: (float) Absolute tolerance for np.allclose.
         :return: (bool) True if the matrix symmetric, False otherwise.
         """
+
         return np.allclose(matrix, matrix.T, rtol=rtol, atol=atol)
 
     @staticmethod
@@ -776,4 +788,5 @@ class SparseMeanReversionPortfolio:
         :param matrix: (np.array) The matrix under inspection.
         :return: (bool) True if the matrix is positive definite, False otherwise.
         """
+
         return np.all(np.linalg.eigvals(matrix + matrix.T) >= 0)
