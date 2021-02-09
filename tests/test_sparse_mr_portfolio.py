@@ -31,6 +31,9 @@ class TestSparseMeanReversionPortfolio(unittest.TestCase):
         Data: 45 international equity ETFs starting from Jan 01, 2016 to Jan 27, 2021.
         """
 
+        # Random seed
+        np.random.seed(0)
+
         # Read data
         project_path = os.path.dirname(__file__)
         data_path = project_path + '/test_data/Country_ETF.csv'
