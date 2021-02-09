@@ -227,8 +227,8 @@ class TestSparseMeanReversionPortfolio(unittest.TestCase):
         self.assertIsNone(allclose(sdp_pred_vol_weights_idx[0],
                                    np.array([2, 5, 7, 11, 16, 28, 31, 41])))
         self.assertIsNone(allclose(sdp_pred_vol_weights_val,
-                                   np.array([0.12620314, -0.17946593, -0.7593694, -0.08145871,
-                                             0.10991965, 0.49000707, -0.0949668, 0.32768794])))
+                                   np.array([0.11224112, -0.16136463, -0.74748693, -0.09120843,
+                                             0.10046743, 0.51952607, -0.06539062, 0.33170881])))
 
     def test_sdp_portmanteau_vol(self):
         """
@@ -251,8 +251,9 @@ class TestSparseMeanReversionPortfolio(unittest.TestCase):
         self.assertIsNone(allclose(sdp_port_vol_weights_idx[0],
                                    np.array([7, 9, 11, 16, 27, 28, 31, 38])))
         self.assertIsNone(allclose(sdp_port_vol_weights_val,
-                                   np.array([0.35675505, -0.41894012, 0.47761865, -0.31756771,
-                                             -0.24383587, -0.30195277, 0.29348291, 0.36260524])))
+                                   np.array([0.35675015, -0.41894421, 0.47761845, -0.3175681,
+                                             -0.24383743, -0.3019539, 0.29348114, 0.3626047]),
+                                   rtol=1e-5))
 
     def test_sdp_crossing_vol(self):
         """

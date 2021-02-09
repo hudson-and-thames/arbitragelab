@@ -474,6 +474,7 @@ class SparseMeanReversionPortfolio:
 
         return Y.value
 
+    # pylint: disable=unbalanced-tuple-unpacking
     def LASSO_VAR_tuning(self, sparsity: float, multi_task_lasso: bool = False, alpha_min: float = -5.,
                          alpha_max: float = 0., n_alphas: int = 100, max_iter: int = 1000,
                          use_standardized: bool = True) -> float:
@@ -491,10 +492,7 @@ class SparseMeanReversionPortfolio:
         :return: (float) Minimum alpha that satisfies the sparsity requirement.
         """
 
-        if use_standardized:
-            data = self.standardized
-        else:
-            data = self.demeaned
+        data = self.standardized if use_standardized else self.demeaned
 
         # The number of elements in the VAR(1) matrix is asset number squared
         coefs_nums = data.shape[1] ** 2
@@ -509,7 +507,7 @@ class SparseMeanReversionPortfolio:
         # Set up the LASSO model and do a search on the alpha parameter space
         if multi_task_lasso:
             # Fit the multi-task LASSO model
-            _, coefs_lasso, _, _ = lasso_path(data_lag, data_now, alphas=alphas, max_iter=max_iter)
+            _, coefs_lasso, _ = lasso_path(data_lag, data_now, alphas=alphas, max_iter=max_iter)
             # Select the maximum alpha that satisfies the sparsity requirement
             non_zeros = np.count_nonzero(coefs_lasso, axis=(0, 1))
 
@@ -535,7 +533,7 @@ class SparseMeanReversionPortfolio:
                 non_zeros = np.count_nonzero(coefs_lasso)
 
                 # Check if the number of non-zeros satisfies the requirements
-                if non_zeros <= (1 - sparsity) * coefs_nums:
+                if (1 - sparsity - 0.01) * coefs_nums <= non_zeros <= (1 - sparsity + 0.01) * coefs_nums:
                     best_alpha = np.min([best_alpha, alpha])
                     break
 
@@ -560,12 +558,10 @@ class SparseMeanReversionPortfolio:
         """
 
         # Construct the current data and lag-1 data such that they have the same shape
-        if use_standardized:
-            data_now = self.standardized.iloc[1:]
-            data_lag = self.standardized.iloc[:-1]
-        else:
-            data_now = self.demeaned.iloc[1:]
-            data_lag = self.demeaned.iloc[:-1]
+        data = self.standardized if use_standardized else self.demeaned
+
+        data_now = data.iloc[1:]
+        data_lag = data.iloc[:-1]
 
         # Fit the model with the optimized alpha
         if multi_task_lasso:
@@ -598,16 +594,15 @@ class SparseMeanReversionPortfolio:
         if clusters > self.assets.shape[1]:
             raise ValueError("The number of clusters cannot exceed the number of assets.")
 
+        data = self.standardized if use_standardized else self.demeaned
+
         # Set up the parameter space for the regularization parameter
         alphas = np.linspace(alpha_min, alpha_max, n_alphas)
 
         # Fit the graphical LASSO model
         for alpha in alphas:
             edge_model = GraphicalLasso(alpha=alpha, max_iter=max_iter)
-            if use_standardized:
-                edge_model.fit(self.standardized)
-            else:
-                edge_model.fit(self.demeaned)
+            edge_model.fit(data)
 
             # Retrieve the precision matrix (inverse of sparse covariance matrix) as the graph adjacency matrix
             adj_matrix = np.copy(edge_model.precision_)
@@ -641,12 +636,11 @@ class SparseMeanReversionPortfolio:
             i.e. precision matrix as graph representation.
         """
 
+        data = self.standardized if use_standardized else self.demeaned
+
         # Fit graphical LASSO model
         edge_model = GraphicalLasso(alpha=alpha, max_iter=max_iter)
-        if use_standardized:
-            edge_model.fit(self.standardized)
-        else:
-            edge_model.fit(self.demeaned)
+        edge_model.fit(data)
 
         # Return the sparse estimate of the covariance matrix and its inverse
         return np.around(edge_model.covariance_, threshold), np.around(edge_model.precision_, threshold)
