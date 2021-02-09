@@ -205,3 +205,75 @@ class TestSparseMeanReversionPortfolio(unittest.TestCase):
         self.assertIsNone(allclose(greedy_weight_max_nonzero_val,
                                    np.array([-0.0755304, -0.0269491, 0.0056099, 0.9055339,
                                              0.0175471, 0.2370267, -0.1867467, -0.2866737])))
+
+    def test_sdp_predictability_vol(self):
+        """
+        Test semidefinite relaxation optimization of predictability with a volatility threshold.
+        """
+
+        etf_sparse_portf = SparseMeanReversionPortfolio(self.data)
+
+        # Perform SDP
+        sdp_pred_vol_result = etf_sparse_portf.sdp_predictability_vol(rho=0.001, variance=5,
+                                                                      max_iter=5000, verbose=False,
+                                                                      use_standardized=False)
+        sdp_pred_vol_weights = etf_sparse_portf.sparse_eigen_deflate(sdp_pred_vol_result, 8, verbose=False)
+
+        sdp_pred_vol_weights_idx = sdp_pred_vol_weights.nonzero()
+        sdp_pred_vol_weights_val = sdp_pred_vol_weights[sdp_pred_vol_weights_idx]
+
+        # Verify minimization result
+        self.assertIsNone(allclose(sdp_pred_vol_weights_idx[0],
+                                   np.array([2, 5, 7, 11, 16, 28, 31, 41])))
+        self.assertIsNone(allclose(sdp_pred_vol_weights_val,
+                                   np.array([0.1186885, -0.15443337, -0.74239315, -0.09148464,
+                                             0.08558503, 0.52377153, -0.048962, 0.34422036])))
+
+    def test_sdp_portmanteau_vol(self):
+        """
+        Test semidefinite relaxation optimization of predictability with a volatility threshold.
+        """
+
+        etf_sparse_portf = SparseMeanReversionPortfolio(self.data)
+
+        # Perform SDP
+        sdp_port_vol_result = etf_sparse_portf.sdp_portmanteau_vol(rho=0.001, variance=5, nlags=3,
+                                                                   max_iter=10000, verbose=False,
+                                                                   use_standardized=False)
+        sdp_port_vol_weights = etf_sparse_portf.sparse_eigen_deflate(sdp_port_vol_result, 8, verbose=False)
+
+        sdp_port_vol_weights_idx = sdp_port_vol_weights.nonzero()
+        sdp_port_vol_weights_val = sdp_port_vol_weights[sdp_port_vol_weights_idx]
+
+        # Verify minimization result
+        self.assertIsNone(allclose(sdp_port_vol_weights_idx[0],
+                                   np.array([7, 9, 11, 16, 27, 28, 31, 38])))
+        self.assertIsNone(allclose(sdp_port_vol_weights_val,
+                                   np.array([0.35675015, -0.41894421, 0.47761845, -0.3175681,
+                                             -0.24383743, -0.3019539, 0.29348114, 0.3626047])))
+
+    def test_sdp_crossing_vol(self):
+        """
+        Test semidefinite relaxation optimization of predictability with a volatility threshold.
+        """
+
+        etf_sparse_portf = SparseMeanReversionPortfolio(self.data)
+
+        # Perform SDP
+        sdp_cross_vol_result = etf_sparse_portf.sdp_crossing_vol(rho=0.001, mu=0.01, variance=5, nlags=3,
+                                                                 max_iter=10000, verbose=False,
+                                                                 use_standardized=False)
+        sdp_cross_vol_weights = etf_sparse_portf.sparse_eigen_deflate(sdp_cross_vol_result, 8, verbose=False)
+
+        sdp_cross_vol_weights_idx = sdp_cross_vol_weights.nonzero()
+        sdp_cross_vol_weights_val = sdp_cross_vol_weights[sdp_cross_vol_weights_idx]
+
+        print(sdp_cross_vol_weights_idx)
+        print(sdp_cross_vol_weights_val)
+
+        # Verify minimization result
+        self.assertIsNone(allclose(sdp_cross_vol_weights_idx[0],
+                                   np.array([7, 9, 11, 16, 27, 28, 31, 38])))
+        self.assertIsNone(allclose(sdp_cross_vol_weights_val,
+                                   np.array([0.35380303, -0.41627861, 0.49314636, -0.30469972,
+                                             -0.24946532, -0.29270862, 0.28273044, 0.3710155])))
