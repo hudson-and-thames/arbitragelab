@@ -222,12 +222,13 @@ class TestSparseMeanReversionPortfolio(unittest.TestCase):
         sdp_pred_vol_weights_idx = sdp_pred_vol_weights.nonzero()
         sdp_pred_vol_weights_val = sdp_pred_vol_weights[sdp_pred_vol_weights_idx]
 
+        print(sdp_pred_vol_weights_val)
         # Verify minimization result
         self.assertIsNone(allclose(sdp_pred_vol_weights_idx[0],
                                    np.array([2, 5, 7, 11, 16, 28, 31, 41])))
         self.assertIsNone(allclose(sdp_pred_vol_weights_val,
-                                   np.array([0.1186885, -0.15443337, -0.74239315, -0.09148464,
-                                             0.08558503, 0.52377153, -0.048962, 0.34422036])))
+                                   np.array([0.12620314, -0.17946593, -0.7593694, -0.08145871,
+                                             0.10991965, 0.49000707, -0.0949668, 0.32768794])))
 
     def test_sdp_portmanteau_vol(self):
         """
@@ -245,12 +246,13 @@ class TestSparseMeanReversionPortfolio(unittest.TestCase):
         sdp_port_vol_weights_idx = sdp_port_vol_weights.nonzero()
         sdp_port_vol_weights_val = sdp_port_vol_weights[sdp_port_vol_weights_idx]
 
+        print(sdp_port_vol_weights_val)
         # Verify minimization result
         self.assertIsNone(allclose(sdp_port_vol_weights_idx[0],
                                    np.array([7, 9, 11, 16, 27, 28, 31, 38])))
         self.assertIsNone(allclose(sdp_port_vol_weights_val,
-                                   np.array([0.35675015, -0.41894421, 0.47761845, -0.3175681,
-                                             -0.24383743, -0.3019539, 0.29348114, 0.3626047])))
+                                   np.array([0.35675505, -0.41894012, 0.47761865, -0.31756771,
+                                             -0.24383587, -0.30195277, 0.29348291, 0.36260524])))
 
     def test_sdp_crossing_vol(self):
         """
@@ -268,13 +270,55 @@ class TestSparseMeanReversionPortfolio(unittest.TestCase):
         sdp_cross_vol_weights_idx = sdp_cross_vol_weights.nonzero()
         sdp_cross_vol_weights_val = sdp_cross_vol_weights[sdp_cross_vol_weights_idx]
 
-        print(sdp_cross_vol_weights_idx)
-        print(sdp_cross_vol_weights_val)
-
         # Verify minimization result
         self.assertIsNone(allclose(sdp_cross_vol_weights_idx[0],
                                    np.array([7, 9, 11, 16, 27, 28, 31, 38])))
         self.assertIsNone(allclose(sdp_cross_vol_weights_val,
                                    np.array([0.35380303, -0.41627861, 0.49314636, -0.30469972,
                                              -0.24946532, -0.29270862, 0.28273044, 0.3710155])))
-        
+
+    def test_LASSO_VAR_tuning(self):
+        """
+        Test LASSO paramater tuning for VAR(1) sparse estimate.
+        """
+
+        etf_sparse_portf = SparseMeanReversionPortfolio(self.data)
+
+        # Test column-wise LASSO tuning
+        best_alpha1 = etf_sparse_portf.LASSO_VAR_tuning(0.5, multi_task_lasso=False,
+                                                        alpha_min=4e-4, alpha_max=6e-4,
+                                                        n_alphas=10, max_iter=5000)
+        self.assertAlmostEqual(best_alpha1, 0.0005111111111111111)
+
+        # Test multi-task LASSO tuning
+        best_alpha2 = etf_sparse_portf.LASSO_VAR_tuning(0.5, multi_task_lasso=True,
+                                                        alpha_min=0.9, alpha_max=1.5,
+                                                        n_alphas=10)
+        self.assertAlmostEqual(best_alpha2, 1.3)
+
+        # Test for error
+        self.assertRaises(ValueError, etf_sparse_portf.LASSO_VAR_tuning, 0.2,
+                          multi_task_lasso=False, alpha_min=0.1, alpha_max=0.2,
+                          n_alphas=10, max_iter=1000)
+        self.assertRaises(ValueError, etf_sparse_portf.LASSO_VAR_tuning, 0.5,
+                          multi_task_lasso=True, alpha_min=0.6, alpha_max=0.7,
+                          n_alphas=10, use_standardized=False)
+
+    def test_covar_sparse_tuning(self):
+        """
+        Test graphical LASSO paramater tuning for covariance matrix sparse estimate.
+        """
+
+        etf_sparse_portf = SparseMeanReversionPortfolio(self.data)
+
+        # Test for graphical LASSO tuning
+        best_alpha = etf_sparse_portf.covar_sparse_tuning(alpha_min=0.7, alpha_max=0.9, n_alphas=20, clusters=4)
+
+        self.assertAlmostEqual(best_alpha, 0.8157894736842105)
+
+        # Test for errors
+        self.assertRaises(ValueError, etf_sparse_portf.covar_sparse_tuning, alpha_min=0.5, alpha_max=0.6,
+                          n_alphas=5, clusters=46)
+
+        self.assertRaises(ValueError, etf_sparse_portf.covar_sparse_tuning, alpha_min=0.5, alpha_max=0.6,
+                          n_alphas=10, clusters=4)
