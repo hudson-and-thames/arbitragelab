@@ -277,3 +277,4 @@ class TestSparseMeanReversionPortfolio(unittest.TestCase):
         self.assertIsNone(allclose(sdp_cross_vol_weights_val,
                                    np.array([0.35380303, -0.41627861, 0.49314636, -0.30469972,
                                              -0.24946532, -0.29270862, 0.28273044, 0.3710155])))
+        
