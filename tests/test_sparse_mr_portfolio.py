@@ -8,9 +8,12 @@ Tests function of Sparse Mean-reverting Portfolio Selection module:
 cointegration_approach/sparse_mr_portfolio.py
 """
 
+import io
 import os
 import unittest
+from unittest.mock import patch
 
+import networkx as nx
 import numpy as np
 import pandas as pd
 from numpy.testing import assert_allclose as allclose
@@ -222,7 +225,6 @@ class TestSparseMeanReversionPortfolio(unittest.TestCase):
         sdp_pred_vol_weights_idx = sdp_pred_vol_weights.nonzero()
         sdp_pred_vol_weights_val = sdp_pred_vol_weights[sdp_pred_vol_weights_idx]
 
-        print(sdp_pred_vol_weights_val)
         # Verify minimization result
         self.assertIsNone(allclose(sdp_pred_vol_weights_idx[0],
                                    np.array([2, 5, 7, 11, 16, 28, 31, 41])))
@@ -246,7 +248,6 @@ class TestSparseMeanReversionPortfolio(unittest.TestCase):
         sdp_port_vol_weights_idx = sdp_port_vol_weights.nonzero()
         sdp_port_vol_weights_val = sdp_port_vol_weights[sdp_port_vol_weights_idx]
 
-        print(sdp_port_vol_weights_val)
         # Verify minimization result
         self.assertIsNone(allclose(sdp_port_vol_weights_idx[0],
                                    np.array([7, 9, 11, 16, 27, 28, 31, 38])))
@@ -323,3 +324,58 @@ class TestSparseMeanReversionPortfolio(unittest.TestCase):
 
         self.assertRaises(ValueError, etf_sparse_portf.covar_sparse_tuning, alpha_min=0.5, alpha_max=0.6,
                           n_alphas=10, clusters=4)
+
+    def test_find_clusters(self):
+        """
+        Test clustering algorithm.
+        """
+        etf_sparse_portf = SparseMeanReversionPortfolio(self.data)
+
+        # First try multi-task LASSO
+        sparse_var_est = etf_sparse_portf.LASSO_VAR_fit(1.4, threshold=7, multi_task_lasso=True)
+        _, sparse_prec_est = etf_sparse_portf.covar_sparse_fit(0.89)
+
+        multi_LASSO_cluster_graph = etf_sparse_portf.find_clusters(sparse_prec_est, sparse_var_est)
+        multi_LASSO_clusters = list(sorted(nx.connected_components(multi_LASSO_cluster_graph), key=len, reverse=True))
+
+        target1 = ['EDEN', 'EWI', 'EWN', 'EWK', 'GXC', 'EWY', 'EIRL', 'EWL',
+                   'INDA', 'ENZL', 'EWT', 'EWJ', 'EWG', 'EFNL', 'EWQ']
+        target2 = ['GXG', 'EWP', 'EWO', 'THD', 'EZA', 'EWS', 'ECH', 'EWU']
+
+        self.assertListEqual(sorted(list(multi_LASSO_clusters[0])), sorted(target1))
+        self.assertListEqual(sorted(list(multi_LASSO_clusters[1])), sorted(target2))
+
+        # Then try column-wise LASSO
+        sparse_var_est = etf_sparse_portf.LASSO_VAR_fit(0.001, threshold=7, multi_task_lasso=False)
+
+        column_LASSO_cluster_graph = etf_sparse_portf.find_clusters(sparse_prec_est, sparse_var_est)
+        column_LASSO_clusters = list(sorted(nx.connected_components(column_LASSO_cluster_graph), key=len, reverse=True))
+
+        target3 = ['EWG', 'EWK', 'EWN', 'EWY', 'EIRL', 'EFNL', 'ENZL', 'EWI', 'GXC', 'EWJ', 'EWL', 'EDEN', 'EWT', 'EWQ']
+        target4 = ['NORW', 'THD', 'EWO', 'PGAL', 'EWS', 'EPU']
+
+        self.assertListEqual(sorted(list(column_LASSO_clusters[0])), sorted(target3))
+        self.assertListEqual(sorted(list(column_LASSO_clusters[1])), sorted(target4))
+
+    def test_truncated_power(self):
+        """
+        Branch testing for leading sparse eigenvector extraction.
+        """
+
+        etf_sparse_portf = SparseMeanReversionPortfolio(self.data)
+
+        # Generate a random positive semidefinite matrix
+        dim = 10
+        semipos_seed = np.random.rand(dim, dim)
+        semipos = semipos_seed @ semipos_seed.T
+
+        self.assertRaises(ValueError, etf_sparse_portf.sparse_eigen_deflate, semipos, 0)
+        self.assertRaises(ValueError, etf_sparse_portf.sparse_eigen_deflate, semipos, 11)
+
+        with self.assertWarns(Warning):
+            etf_sparse_portf.sparse_eigen_deflate(-semipos, 5, verbose=False)
+
+        with patch('sys.stdout', new=io.StringIO()) as fakeOutput:
+            etf_sparse_portf.sparse_eigen_deflate(semipos, 5)
+            self.assertRegex(fakeOutput.getvalue().strip(),
+                             r'Iteration: [0-9]+, Objective function value: [-]?[0-9]+[.][0-9]*')

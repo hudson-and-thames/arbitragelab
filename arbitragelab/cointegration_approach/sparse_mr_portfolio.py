@@ -691,7 +691,7 @@ class SparseMeanReversionPortfolio:
         if cardinality < 1:
             raise ValueError("Desired cardinality must be positive integers!")
 
-        if self.is_semi_pos_def(sdp_result):
+        if not self.is_semi_pos_def(sdp_result):
             warnings.warn("The SDP result is not positive semidefinite due to numerical issues. Please double check"
                           "if the negative eigenvalues are sufficiently small that they can be approximated as 0.")
 
