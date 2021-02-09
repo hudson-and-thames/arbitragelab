@@ -375,7 +375,8 @@ class TestSparseMeanReversionPortfolio(unittest.TestCase):
         with self.assertWarns(Warning):
             etf_sparse_portf.sparse_eigen_deflate(-semipos, 5, verbose=False)
 
+        # Max_iter was set to 2 to let the while loop finish on its own
         with patch('sys.stdout', new=io.StringIO()) as fakeOutput:
-            etf_sparse_portf.sparse_eigen_deflate(semipos, 5)
+            etf_sparse_portf.sparse_eigen_deflate(semipos, 5, max_iter=2)
             self.assertRegex(fakeOutput.getvalue().strip(),
                              r'Iteration: [0-9]+, Objective function value: [-]?[0-9]+[.][0-9]*')
