@@ -5,12 +5,7 @@
 # pylint: disable=invalid-name
 """
 This module selects sparse mean-reverting portfolios out of an asset universe. The methods implemented in this module
-are based on
-
-`d'Aspremont, A., 2011. Identifying small mean-reverting portfolios. Quantitative Finance, 11(3), pp.351-364. <https://arxiv.org/pdf/0708.3048.pdf>`__
-and
-`Cuturi, M. and d'Aspremont, A., 2015. Mean-reverting portfolios: Tradeoffs between sparsity and volatility. arXiv preprint arXiv:1509.05954. <https://arxiv.org/pdf/1509.05954.pdf>`__
-and include the following:
+include the following:
 
 1. Box-Tiao canonical decomposition.
 2. Greedy search.
@@ -61,6 +56,7 @@ class SparseMeanReversionPortfolio:
         standard_data = pd.DataFrame(scaler.fit_transform(assets))
         standard_data.index = assets.index
         self._standardized = standard_data
+        self._standardized.columns = self._assets.columns
 
     @property
     def assets(self) -> pd.DataFrame:
@@ -271,7 +267,7 @@ class SparseMeanReversionPortfolio:
 
     @staticmethod
     def sdp_eigenvalue(cardinality: float, var_est: np.array, cov_est: np.array,
-                       verbose: bool = True, max_iter: int = 10000, maximize: bool = False) -> np.array:
+                       verbose: bool = True, max_iter: int = 10000, maximize: bool = False) -> np.array:  # pragma: no cover
         r"""
         Semidefinite relaxation sparse decomposition following the formulation in d'Aspremont (2011).
 
