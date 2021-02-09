@@ -2,6 +2,7 @@
 # All rights reserved
 # Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 
+# pylint: disable=invalid-name
 """
 Tests function of Sparse Mean-reverting Portfolio Selection module:
 cointegration_approach/sparse_mr_portfolio.py
@@ -11,9 +12,9 @@ import os
 import unittest
 
 import numpy as np
+import pandas as pd
 from numpy.testing import assert_allclose as allclose
 from sklearn.linear_model import LinearRegression
-import pandas as pd
 
 from arbitragelab.cointegration_approach.sparse_mr_portfolio import SparseMeanReversionPortfolio
 
@@ -199,5 +200,3 @@ class TestSparseMeanReversionPortfolio(unittest.TestCase):
         self.assertIsNone(allclose(greedy_weight_max_nonzero_val,
                                    np.array([-0.0755304, -0.0269491, 0.0056099, 0.9055339,
                                              0.0175471, 0.2370267, -0.1867467, -0.2866737])))
-
-
