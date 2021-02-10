@@ -54,16 +54,12 @@ class BaseNeuralNetwork:
         """
         Method that returns visual plot of the loss trajectory in
         terms of epochs spent training.
-
-        :return: (list) List of Axes objects.
         """
 
         plt.plot(self.fitted_model.history['loss'])
         plt.xlabel("Epochs")
         plt.ylabel("Loss")
         plt.title("Loss Plot")
-
-        return result
 
 class MultiLayerPerceptron(BaseNeuralNetwork):
     """
