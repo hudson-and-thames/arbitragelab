@@ -10,7 +10,8 @@ import unittest
 import numpy as np
 import pandas as pd
 
-from arbitragelab.util import (CrudeOilFutureRoller, NBPFutureRoller, RBFutureRoller)
+from arbitragelab.util.rollers import (CrudeOilFutureRoller, NBPFutureRoller, RBFutureRoller,
+                                       GrainFutureRoller, EthanolFutureRoller, plot_historical_future_slope_state)
 
 
 class TestFuturesRoller(unittest.TestCase):
@@ -26,7 +27,6 @@ class TestFuturesRoller(unittest.TestCase):
         project_path = os.path.dirname(__file__)
 
         # Load individual contracts that have individual rolling implementations.
-
         cl_data = pd.read_csv(project_path + '/test_data/cl.csv',
                               parse_dates=True, index_col="Dates").dropna()
         cl_data = cl_data['2006-01': '2019-12']
@@ -41,6 +41,21 @@ class TestFuturesRoller(unittest.TestCase):
                               parse_dates=True, index_col="Dates").dropna()
         rb_data = rb_data['2006-01': '2019-12']
         self.rb_data = rb_data
+
+        s_data = pd.read_csv(project_path + '/test_data/s.csv',
+                             parse_dates=True, index_col="Date").dropna()
+        s_data = s_data['2006-01': '2019-12']
+        self.s_data = s_data
+
+        eh1_data = pd.read_csv(project_path + '/test_data/eh1.csv',
+                               parse_dates=True, index_col="Date").dropna()
+        eh1_data = eh1_data['2006-01': '2019-12']
+        self.eh1_data = eh1_data
+
+        eh2_data = pd.read_csv(project_path + '/test_data/eh2.csv',
+                               parse_dates=True, index_col="Date").dropna()
+        eh2_data = eh2_data['2006-01': '2019-12']
+        self.eh2_data = eh2_data
 
     def test_crude_roller(self):
         """
@@ -101,3 +116,38 @@ class TestFuturesRoller(unittest.TestCase):
 
         # Check that the forward rolled series is positive.
         self.assertEqual(np.sign(rbob_gaps.cumsum().mean()), np.sign(1))
+
+    def test_grain_roller(self):
+        """
+        Tests futures roller implementation that expects expiration to
+        be on 15th of each month. In this case the Soybean Contract as an
+        example.
+        """
+
+        # Fit the roller object with the Soybean future contract
+        soyb_roller = GrainFutureRoller().fit(self.s_data)
+        soyb_gaps = soyb_roller.transform()
+
+        # Roll the prices series, should be mostly positive.
+        self.assertEqual(np.sign(soyb_gaps.cumsum().mean()), np.sign(1))
+
+    def test_ethanol_roller(self):
+        """
+        Tests futures roller implementation that expects expiration to
+        be on the 3rd of each month.
+        """
+
+        # Fit the roller object with the Ethanol future contract
+        ethanol_roller = EthanolFutureRoller().fit(self.eh1_data)
+        ethanol_gaps = ethanol_roller.transform()
+
+        # Roll the prices series, should be mostly positive.
+        self.assertEqual(np.sign(ethanol_gaps.cumsum().mean()), np.sign(1))
+
+    def test_contango_backwardation_plotter(self):
+        """
+        Verifies execution of plot for contango/backwardation plotting
+        method.
+        """
+
+        plot_historical_future_slope_state(self.eh1_data['PX_LAST'], self.eh2_data['PX_OPEN'])

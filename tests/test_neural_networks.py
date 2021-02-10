@@ -32,7 +32,7 @@ class TestNeuralNetworks(unittest.TestCase):
 
         # Initialize mlp.
         regressor = MultiLayerPerceptron(frame_size, num_outputs=1, loss_fn="mean_squared_error",
-                                         optmz="adam", metrics=[], hidden_layer_activation_function="relu",
+                                         optmizer="adam", metrics=[], hidden_layer_activation_function="relu",
                                          output_layer_act_func="linear")
 
         # Check if built model is a valid keras model.
@@ -66,7 +66,7 @@ class TestNeuralNetworks(unittest.TestCase):
 
         # Initialize rnn.
         regressor = RecurrentNeuralNetwork((feat_train.shape[1], 1), num_outputs=1, loss_fn="mean_squared_error",
-                                           optmz="adam", metrics=["accuracy"], hidden_layer_activation_function="relu",
+                                           optmizer="adam", metrics=["accuracy"], hidden_layer_activation_function="relu",
                                            output_layer_act_func="linear")
 
         # Check if built model is a valid keras model.
@@ -96,7 +96,7 @@ class TestNeuralNetworks(unittest.TestCase):
 
         # Initialize honn.
         regressor = PiSigmaNeuralNetwork(frame_size, num_outputs=1, loss_fn="mean_squared_error",
-                                         optmz="adam", metrics=[], hidden_layer_activation_function="relu",
+                                         optmizer="adam", metrics=[], hidden_layer_activation_function="relu",
                                          output_layer_act_func="linear")
 
         # Check if built model is a valid keras model.

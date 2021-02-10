@@ -46,16 +46,16 @@ class BaseNeuralNetwork:
 
         return self.model.predict(*args, **kwargs)
 
-    def plot_loss(self) -> list:
+    def plot_loss(self):
         """
         Method that returns visual plot of the loss trajectory in
         terms of epochs spent training.
         """
 
-        result = plt.plot(self.fitted_model.history['loss'])
+        plt.plot(self.fitted_model.history['loss'])
         plt.xlabel("Epochs")
         plt.ylabel("Loss")
-        return result
+        plt.title("Loss Plot")
 
 class MultiLayerPerceptron(BaseNeuralNetwork):
     """
@@ -63,19 +63,21 @@ class MultiLayerPerceptron(BaseNeuralNetwork):
     """
 
     def __init__(self, frame_size: int, hidden_size: int = 2, num_outputs: int = 1,
-                 loss_fn: str = "mean_squared_error", optmz: str = "adam", metrics: str = "accuracy",
+                 loss_fn: str = "mean_squared_error", optmizer: str = "adam", metrics: str = "accuracy",
                  hidden_layer_activation_function: str = "relu", output_layer_act_func: str = "linear"):
         """
         Initialization of variables.
 
-        :param frame_size: (int)
-        :param hidden_size: (int)
-        :param num_outputs: (int)
-        :param loss_fn: (str)
-        :param optmz: (str)
-        :param metrics: (str)
-        :param hidden_layer_activation_function: (str)
-        :param output_layer_act_func: (str)
+        :param frame_size: (int) The size of the input dataset.
+        :param hidden_size: (int) Number of hidden units.
+        :param num_outputs: (int) Number of output units.
+        :param loss_fn: (str) String name of loss function to be used during training and testing.
+        :param optmizer: (str) String (name of optimizer) or optimizer instance.
+        :param metrics: (str) Metric to be use when evaluating the model during training and testing.
+        :param hidden_layer_activation_function: (str) String name of the activation function used by
+                                                        the hidden layer.
+        :param output_layer_act_func: (str) String name of the activation function used by the output
+                                            layer.
         """
 
         super().__init__()
@@ -85,7 +87,7 @@ class MultiLayerPerceptron(BaseNeuralNetwork):
         self.hidden_size = hidden_size
         self.output_size = num_outputs
         self.loss_fn = loss_fn
-        self.optimizer = optmz
+        self.optimizer = optmizer
         self.metrics = metrics
         self.hidden_layer_activation_function = hidden_layer_activation_function
         self.output_layer_activation_function = output_layer_act_func
@@ -120,19 +122,22 @@ class RecurrentNeuralNetwork(BaseNeuralNetwork):
     """
 
     def __init__(self, input_shape: tuple, hidden_size: int = 10, num_outputs: int = 1,
-                 loss_fn: str = "mean_squared_error", optmz: str = "adam", metrics: str = "accuracy",
+                 loss_fn: str = "mean_squared_error", optmizer: str = "adam", metrics: str = "accuracy",
                  hidden_layer_activation_function: str = "relu", output_layer_act_func: str = "linear"):
         """
         Initialization of Variables.
 
-        :param input_shape: (tuple)
-        :param hidden_size: (int)
-        :param num_outputs: (int)
-        :param loss_fn: (str)
-        :param optmz: (str)
-        :param metrics: (str)
-        :param hidden_layer_activation_function: (str)
-        :param output_layer_act_func: (str)
+        :param input_shape: (tuple) Three dimensional tuple explaining the structure of the windowed
+                                    data. Ex; (No_of_samples, Time_steps, No_of_features).
+        :param hidden_size: (int) Number of hidden units.
+        :param num_outputs: (int) Number of output units.
+        :param loss_fn: (str) String name of loss function to be used during training and testing.
+        :param optmizer: (str) String (name of optimizer) or optimizer instance.
+        :param metrics: (str) Metric to be use when evaluating the model during training and testing.
+        :param hidden_layer_activation_function: (str) String name of the activation function used by
+                                                        the hidden layer.
+        :param output_layer_act_func: (str) String name of the activation function used by the output
+                                            layer.
         """
 
         super().__init__()
@@ -142,7 +147,7 @@ class RecurrentNeuralNetwork(BaseNeuralNetwork):
         self.hidden_size = hidden_size
         self.output_size = num_outputs
         self.loss_fn = loss_fn
-        self.optimizer = optmz
+        self.optimizer = optmizer
         self.metrics = metrics
         self.hidden_layer_activation_function = hidden_layer_activation_function
         self.output_layer_activation_function = output_layer_act_func
@@ -177,19 +182,21 @@ class PiSigmaNeuralNetwork(BaseNeuralNetwork):
     """
 
     def __init__(self, frame_size: int, hidden_size: int = 2, num_outputs: int = 1,
-                 loss_fn: str = "mean_squared_error", optmz: str = "sgd", metrics: str = "accuracy",
+                 loss_fn: str = "mean_squared_error", optmizer: str = "sgd", metrics: str = "accuracy",
                  hidden_layer_activation_function: str = "linear", output_layer_act_func: str = "sigmoid"):
         """
-        Inialization of variables.
+        Initialization of variables.
 
-        :param frame_size: (int)
-        :param hidden_size: (int)
-        :param num_outputs: (int)
-        :param loss_fn: (str)
-        :param optmz: (str)
-        :param metrics: (str)
-        :param hidden_layer_activation_function: (str)
-        :param output_layer_act_func: (str)
+        :param frame_size: (int) The size of the input dataset.
+        :param hidden_size: (int) Number of hidden units.
+        :param num_outputs: (int) Number of output units.
+        :param loss_fn: (str) String name of loss function to be used during training and testing.
+        :param optmizer: (str) String (name of optimizer) or optimizer instance.
+        :param metrics: (str) Metric to be use when evaluating the model during training and testing.
+        :param hidden_layer_activation_function: (str) String name of the activation function used by
+                                                        the hidden layer.
+        :param output_layer_act_func: (str) String name of the activation function used by the output
+                                            layer.
         """
 
         super().__init__()
@@ -199,7 +206,7 @@ class PiSigmaNeuralNetwork(BaseNeuralNetwork):
         self.hidden_size = hidden_size
         self.output_size = num_outputs
         self.loss_fn = loss_fn
-        self.optimizer = optmz
+        self.optimizer = optmizer
         self.metrics = metrics
         self.hidden_layer_activation_function = hidden_layer_activation_function
         self.output_layer_activation_function = output_layer_act_func
@@ -232,7 +239,7 @@ class PiSigmaNeuralNetwork(BaseNeuralNetwork):
     @staticmethod
     def _pi_this(tensor: tf.Tensor) -> tf.Tensor:
         """
-        Computes the product of elements across 'axis=1' of the input tensor and 
+        Computes the product of elements across 'axis=1' of the input tensor and
         will return the reduced version of the tensor.
 
         :param tensor: (tf.Tensor) Weights from the hidden layer.

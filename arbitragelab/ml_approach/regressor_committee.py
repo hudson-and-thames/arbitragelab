@@ -5,9 +5,10 @@
 Regressor Committee.
 """
 
+import numpy as np
 import pandas as pd
-from sklearn.ensemble import VotingRegressor
-from keras.wrappers.scikit_learn import KerasRegressor
+from keras.callbacks import EarlyStopping
+import matplotlib.pyplot as plt
 
 from arbitragelab.ml_approach import neural_networks
 
@@ -15,62 +16,70 @@ from arbitragelab.ml_approach import neural_networks
 
 class RegressorCommittee:
     """
-    Regressor Committee implementation, based on the Sklearn VotingRegressor.
+    Regressor Committee implementation which basically fits N number of models
+    and takes the mean value of their predictions.
     """
 
     def __init__(self, regressor_params: dict, regressor_class: str = 'MultiLayerPerceptron',
-                 num_committee: int = 10, epochs: int = 20, verbose: bool = True):
+                 num_committee: int = 10, epochs: int = 20, patience: int = 100, verbose: bool = True):
         """
         Initializes Variables.
-        
+
         :param regressor_params: (dict) Any acceptable Keras model params.
-        :param regressor_class: (str) Any class from the 'neural_networks' namespace in arbitragelab. 
+        :param regressor_class: (str) Any class from the 'neural_networks' namespace in arbitragelab.
         :param num_committee: (int) Number of members in the voting committee.
         :param epochs: (int) Number of epochs per member.
+        :param patience: (int) Number of epochs to be used by the EarlyStopping class.
         :param verbose: (bool) Print debug information.
         """
 
         self.regressor_params = regressor_params
         self.regressor_class = regressor_class
         self.num_committee = num_committee
+        self.committee_members = []
         self.epochs = epochs
+        self.patience = patience
         self.verbose = verbose
         self.rvoter = None
 
-    def fit(self, xtrain: pd.DataFrame, ytrain: pd.DataFrame):
+    def fit(self, xtrain: pd.DataFrame, ytrain: pd.DataFrame, xtest: pd.DataFrame, ytest: pd.DataFrame):
         """
         Fits the member models, then the voting object.
-        
-        :param xtrain: (pd.DataFrame)
-        :param ytrain: (pd.DataFrame)
+
+        :param xtrain: (pd.DataFrame) Input training data.
+        :param ytrain: (pd.DataFrame) Target training data.
+        :param xtest: (pd.DataFrame) Input test data.
+        :param ytest: (pd.DataFrame) Target test data.
         """
 
         committee_members = []
+        idx = 0
 
-        for nth_member in range(self.num_committee):
+        while idx in range(self.num_committee):
             # Dynamically initialize the Neural Network class using the
-            # 'getattr' method.
+            # 'getattr' method. This lets us find an object using
+            # string class name.
             class_ = getattr(neural_networks, self.regressor_class)
-            regressor = class_(**self.regressor_params)
 
-            # KerasRegressor is an sklearn wrapper that is initialized
-            # with a build_fn which returns a compiled keras model.
-            r_estimator = KerasRegressor(build_fn=getattr(regressor, 'build'),
-                                         epochs=self.epochs, batch_size=10, verbose=self.verbose)
+            # Initialize class object and build keras model using
+            # given parameters.
+            regressor = class_(**self.regressor_params).build()
 
-            # The KerasRegressor implementation fails to have this
-            # constant set, which for newer versions of sklearn is
-            # mandatory to have.
-            r_estimator._estimator_type = 'regressor'
+            # Initialize Early Stopping Object to be used in the
+            # model fitting.
+            early_stopper = EarlyStopping(monitor='val_loss', mode='min',
+                                          verbose=self.verbose, patience=self.patience)
 
-            committee_members.append(('reg' + str(nth_member), r_estimator))
+            # Fit keras model with early stopper as callback.
+            regressor.fit(xtrain, ytrain, validation_data=(xtest, ytest), epochs=self.epochs,
+                          verbose=self.verbose, callbacks=[early_stopper])
 
-        # Initialize VotingRegressor with all the generated member instances.
-        rvoter = VotingRegressor(committee_members)
+            # Store all model instances for later use.
+            committee_members.append(regressor)
 
-        rvoter.fit(xtrain, ytrain)
+            idx = idx + 1
 
-        self.rvoter = rvoter
+        self.committee_members = committee_members
 
         return self
 
@@ -78,9 +87,36 @@ class RegressorCommittee:
         """
         Collects results from all the committee members and returns
         average result.
-        
-        :param xtest: (pd.DataFrame)
+
+        :param xtest: (pd.DataFrame) Input test data.
         :return: (pd.DataFrame) Model predictions.
         """
 
-        return self.rvoter.predict(xtest)
+        predictions = []
+
+        for member in self.committee_members:
+            predictions.append(member.predict(xtest))
+
+        # Take current shape (2, len(xtest), 1) and reshape to (2, len(xtest))
+        # to make it easier to get the mean of all the results.
+        reshaped_predictions = np.array(predictions).reshape(len(self.committee_members), len(xtest))
+
+        # Return Axis 0 wise mean.
+        return np.mean(reshaped_predictions, axis=0)
+
+    def plot_losses(self, figsize=(15, 5)):
+        """
+        Plot all individual member loss metrics.
+
+        :param figsize: (tuple)
+        """
+
+        for idx, member in enumerate(self.committee_members):
+            plt.figure(figsize=figsize)
+            plt.plot(member.history.history['loss'])
+            plt.plot(member.history.history['val_loss'])
+            plt.legend(['Training Loss', 'Validation Loss'])
+            plt.xlabel("Epochs")
+            plt.ylabel("Loss")
+            plt.title("Loss Plot of Member " + str(idx))
+            plt.show()

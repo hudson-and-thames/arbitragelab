@@ -16,6 +16,9 @@ class BaseFuturesRoller:
     def __init__(self, open_col: str = "PX_OPEN", close_col: str = "PX_LAST"):
         """
         Initialization of variables.
+
+        :param open_col: (str) Column name to used to select the 'Open' column.
+        :param close_col: (str) Column name to used to select the 'Close' column.
         """
 
         self.open_col = open_col
@@ -98,11 +101,11 @@ class BaseFuturesRoller:
         """
         Gets x days prior to target date(that must be available in the dataset index).
 
-        :param n_days: (int) Number of days to be shifted by
-        :param dataset_datetime_index: (pd.DateTimeIndex) All dates that occur in the dataset
+        :param n_days: (int) Number of days to be shifted by.
+        :param dataset_datetime_index: (pd.DateTimeIndex) All dates that occur in the dataset.
         :param target_dates: (pd.DateTimeIndex) Dates used as the start for the shift. Important
             these dates need to exist in 'dataset_datetime_index'.
-        :return: (pd.Series)
+        :return: (pd.DataFrame)
         """
 
         price_series = pd.DataFrame()
@@ -117,8 +120,8 @@ class BaseFuturesRoller:
         """
         Gets first available day per month from the dataset.
 
-        :param price_df: (pd.DataFrame)
-        :return: (pd.DataFrame)
+        :param price_df: (pd.DataFrame) Price data.
+        :return: (pd.DataFrame) All first available dates per month in the dataset.
         """
 
         price_series = pd.DataFrame()
@@ -146,9 +149,9 @@ class BaseFuturesRoller:
         by the input 'dataset_datetime_index'. The dates returned from this method do not take
         into consideration the fact of if the specified date happened in the dataset or not.
 
-        :param dataset_datetime_index: (pd.DateTimeIndex) All dates that occur in the dataset
-        :param day_of_month: (int) Day of month
-        :return: (pd.DataFrame) Dates
+        :param dataset_datetime_index: (pd.DateTimeIndex) All dates that occur in the dataset.
+        :param day_of_month: (int) Day of month.
+        :return: (pd.DataFrame) Dates.
         """
 
         price_series = pd.DataFrame()
@@ -172,10 +175,10 @@ class BaseFuturesRoller:
         This method will get x available day prior to a specific date, in the special case that that
         date doesn't exist in the dataset.
 
-        :param dataset: (pd.DataFrame)
+        :param dataset: (pd.DataFrame) Price data.
         :param working_month_delta: (pd.Period) specific Year-Month delta, ex. 1995-12
-        :param days_prior: (int)
-        :param target_day: (int)
+        :param days_prior: (int) Days prior the newly found target date.
+        :param target_day: (int) The target day to be used as a starting point.
         :return: (Date)
         """
 
@@ -196,11 +199,12 @@ class BaseFuturesRoller:
         roll gaps and returns a diagnostic dataframe with dates of rolls for
         further analysis.
 
-        :param dataset: (pd.DataFrame)
-        :param roll_dates: (pd.Series)
-        :param match_end: (bool)
-        :return: (pd.Series) (pd.DataFrame)
+        :param dataset: (pd.DataFrame) Price data.
+        :param roll_dates: (pd.Series) Specific dates that the roll will initialized on.
+        :param match_end: (bool) Defines from where to match the gaps.
+        :return: (pd.Series) (pd.DataFrame) Returns gaps and diagnostic frame.
         """
+
         gaps = dataset[self.close_col]*0
 
         iloc = list(dataset.index)
@@ -211,7 +215,7 @@ class BaseFuturesRoller:
 
         day_after_exp_vals = dataset[self.close_col].iloc[iloc].values
 
-        gaps.loc[roll_dates] = day_before_exp_vals - day_after_exp_vals            
+        gaps.loc[roll_dates] = day_before_exp_vals - day_after_exp_vals
 
         gaps = gaps.cumsum().dropna()
 
@@ -220,7 +224,8 @@ class BaseFuturesRoller:
 
         return gaps, self.generate_diagnostic_frame(dataset, iloc, roll_dates)
 
-    def non_negativeize(self, rolled_series: pd.Series, raw_series: pd.Series) -> pd.Series:
+    @staticmethod
+    def non_negativeize(rolled_series: pd.Series, raw_series: pd.Series) -> pd.Series:
         """
         In general, non negative series are preferred over negative series, which could
         easily occur particularly if the contract sold off while in contango. The method
@@ -234,6 +239,7 @@ class BaseFuturesRoller:
         :param raw_series: (pd.Series)
         :return: (pd.Series)
         """
+
         new_prices_series = rolled_series.copy()
         new_prices_series = rolled_series.diff() / raw_series.shift(1)
         new_prices_series = (1+new_prices_series).cumprod()

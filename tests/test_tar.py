@@ -8,12 +8,10 @@ import os
 import unittest
 
 import pandas as pd
-import matplotlib.pyplot as plt
 from statsmodels.regression.linear_model import RegressionResults
 from statsmodels.iolib.summary import Summary
 
 from arbitragelab.ml_approach.tar import TAR
-
 
 class TestTAR(unittest.TestCase):
     """
@@ -47,8 +45,7 @@ class TestTAR(unittest.TestCase):
         """
 
         # Initialize TAR model with the standard [leg1 - leg2] spread as input value.
-        model = TAR((self.working_df['gasoline'] -
-                     self.working_df['wti']), False)
+        model = TAR((self.working_df['gasoline'] - self.working_df['wti']))
 
         # Check if returned a valid object.
         self.assertTrue(type(model), TAR)
@@ -59,30 +56,6 @@ class TestTAR(unittest.TestCase):
         self.assertTrue(type(tar_results), RegressionResults)
 
         tar_results.fittedvalues.plot()
-
-        self.assertTrue(type(tar_results.summary()), Summary)
-
-        # Check that it returned valid custom model results.
-        self.assertTrue(type(model.summary()), pd.DataFrame)
-
-    def test_tar_coint(self):
-        """
-        Test TAR model using johansen cointegrated spread as input value.
-        """
-
-        # Initialize TAR model with data that will be processed through the Johansen
-        # Portfolio class, and the corresponding results used to fit the TAR model.
-        model = TAR(self.working_df[['gasoline', 'wti']])
-
-        # Check if returned a valid object.
-        self.assertTrue(type(model), TAR)
-
-        tar_results = model.fit()
-
-        # Check that it returned valid regression results.
-        self.assertTrue(type(tar_results), RegressionResults)
-
-        plt.plot(tar_results.fittedvalues.values)
 
         self.assertTrue(type(tar_results.summary()), Summary)
 

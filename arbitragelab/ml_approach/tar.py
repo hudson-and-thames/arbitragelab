@@ -2,15 +2,12 @@
 # All rights reserved
 # Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 """
-This module implements the TAR model by Enders and Granger (1998).
+This module implements the TAR model by (Enders and Granger 1998).
 """
 
 import pandas as pd
 import statsmodels.api as sm
 from statsmodels.regression.linear_model import RegressionResults
-
-from arbitragelab.cointegration_approach.johansen import JohansenPortfolio
-
 
 class TAR():
     """
@@ -28,6 +25,7 @@ class TAR():
         """
 
         self.spread = price_data
+        self.results = None
 
     @staticmethod
     def _tag_regime(series: pd.Series) -> pd.DataFrame:

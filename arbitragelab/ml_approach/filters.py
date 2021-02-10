@@ -2,8 +2,8 @@
 # All rights reserved
 # Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
 """
-This module Threshold Filter described in Dunis et al. (2005).
-This module implements the Correlation Filter described in Dunis et al. (2005).
+This module implements the Correlation Filter and the Threshold Filter described in Dunis et al. (2005).
+It also houses the Volatility Filter described in Dunis et al. (2013).
 """
 
 import numpy as np
@@ -82,6 +82,7 @@ class CorrelationFilter:
 
     def plot(self) -> list:
         """
+        Plots visualization of the spread correlation and when triggers happen.
 
         :return: (list) List of Axes objects.
         """
@@ -98,7 +99,7 @@ class CorrelationFilter:
         corr_events = self.transformed['side']
 
         plt.figure(figsize=(15, 10))
-        
+
         # Plot correlation change through time and set the
         # given buy/sell threshold as horizontal lines.
         plt.subplot(311)
@@ -131,8 +132,6 @@ class CorrelationFilter:
 
         :param frame: (pd.DataFrame) DataFrame representing both legs of the spread.
         :param lookback: (int) The lookback range of the rolling mean.
-        :param scale: (bool) If True the correlation range will be changed from
-            the usual [-1, 1] to [0, 1].
         :return: (pd.Series) Rolling correlation series of the input frame.
         """
 
@@ -146,20 +145,20 @@ class CorrelationFilter:
         # workable.
         daily_corr = daily_corr.iloc[:, 0].reset_index().dropna()
 
-        # We select a level from the previously reset correlation index, and specify a 
+        # We select a level from the previously reset correlation index, and specify a
         # column to be selected from the matrix.
         final_corr = daily_corr[daily_corr['level_1'] == two_legged_df.columns[1]]
         final_corr.set_index('_index_', inplace=True)
         # Cleanup of some of the duplicate correlation data.
-        final_corr.drop(['level_1'], axis=1, inplace=True)
-        final_corr.dropna(inplace=True)
+        final_corr = final_corr.drop(['level_1'], axis=1)
+        final_corr = final_corr.dropna()
 
         # Here we scale the correlation data to [0, 1]
         scaler = MinMaxScaler()
         scaled_corr = scaler.fit_transform(final_corr.iloc[:, 0].values.reshape(-1, 1))
         corr_series = pd.Series(data=scaled_corr.reshape(1, -1)[0],
                                 index=final_corr.index)
-        corr_series.dropna(inplace=True)
+        corr_series = corr_series.dropna()
 
         return corr_series
 
@@ -183,6 +182,8 @@ class ThresholdFilter:
 
     def plot(self) -> list:
         """
+        Plots buy/sell events on the spread.
+
         :return: (list) List of Axes objects.
         """
 
@@ -257,7 +258,7 @@ class VolatilityFilter:
     def __init__(self, lookback: int = 80):
         """
         Initialization of trade parameters.
-        
+
         :param lookback: (int)
         """
 
@@ -272,6 +273,9 @@ class VolatilityFilter:
 
     def plot(self) -> list:
         """
+        Plots spread, forecasted volatility and
+        the forecasted volatility discretized as regimes.
+
         :return: (list) List of Axes objects
         """
 
@@ -299,7 +303,7 @@ class VolatilityFilter:
         """
 
         self.spread = spread
-        self.frame = spread.diff().copy().to_frame()
+        self.frame = spread.diff().copy().to_frame().dropna()
 
         # Initialize an Exponentially Weighted Moving Average Variance Object,
         # also known as RiskMetrics.
@@ -316,7 +320,7 @@ class VolatilityFilter:
         # Calculate rolling estimated mean of estimated volatility.
         rolling_mean_vol = vol_forcast_series.rolling(window=self.lookback).mean()
 
-        # Calculate the mean of the rolling mean volatility estimate. 
+        # Calculate the mean of the rolling mean volatility estimate.
         mu_avg = rolling_mean_vol.rolling(window=self.lookback).mean().mean()
         # Calculate the mean of the rolling std dev of the volatility estimate.
         sigma = rolling_mean_vol.rolling(window=self.lookback).std().mean()
