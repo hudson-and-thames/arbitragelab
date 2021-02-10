@@ -31,10 +31,10 @@ class SpreadModelingHelper:
         """
         This method will break the spread in two major periods:
 
-        Insample Period - that will be broken down in two; the training period
+        In Sample Period - that will be broken down in two; the training period
         and the testing period.
         Out of Sample Period - the final stretch embargoed by a year from the
-        insample period.
+        in sample period.
 
         The dataset generated here according to the original paper, is based
         on lagged returns. Returns are assumed to be normalized thus no
@@ -115,7 +115,7 @@ class SpreadModelingHelper:
         :param ytrue: (pd.DataFrame) The ground truth data.
         :param ypred: (pd.DataFrame) The predicted data.
         :param std_dev_sample: (float) The range for the buy/sell threshold.
-        :return: (pd.DataFrame)
+        :return: (pd.DataFrame) Threshold filter results.
         """
 
         thresh_filter = ThresholdFilter(-std_dev_sample, std_dev_sample)
@@ -133,7 +133,7 @@ class SpreadModelingHelper:
 
         :param ytrue: (pd.DataFrame) The ground truth data.
         :param working_df: (pd.DataFrame) DataFrame with both legs of the spread.
-        :return: (pd.DataFrame)
+        :return: (pd.DataFrame) Correlation filter results.
         """
 
         corr_filter = CorrelationFilter(buy_threshold=0.05,
@@ -155,7 +155,7 @@ class SpreadModelingHelper:
         :param ytrue: (pd.DataFrame) The ground truth data.
         :param ypred: (pd.DataFrame) The predicted data.
         :param base_events: (pd.DataFrame) A DataFrame full of events to be filtered.
-        :return: (pd.DataFrame)
+        :return: (pd.DataFrame) Volatility filter results.
         """
 
         vol_filter = VolatilityFilter(lookback=80)
@@ -182,7 +182,7 @@ class SpreadModelingHelper:
         :param working_df: (pd.DataFrame) DataFrame with both legs of the spread.
         :param plot: (bool) Plot the trades of each filter.
         :param figsize: (tuple) Figure size as a tuple for plotting.
-        :return: (tuple) Filter events.
+        :return: (tuple) All events series: unfiltered, std, corr, std_vol, corr_vol.
         """
 
         unfiltered_events = self._wrap_threshold_filter(ytrain, ypred,
@@ -227,7 +227,7 @@ class SpreadModelingHelper:
         to each dataset slice.
 
         :param working_df: (pd.DataFrame) DataFrame with both legs of the spread.
-        :return: (pd.DataFrame) Metrics for all sets.
+        :return: (pd.DataFrame) DataFrame with all financial metrics.
         """
 
         train_filter_results = self.get_filtering_results(self.target_train, self.train_pred,
@@ -257,7 +257,8 @@ class SpreadModelingHelper:
 
         :param filter_events: (pd.DataFrame) Trade events tagged with a
             'side' column with 1/0/-1 referring to long, no trade, short.
-        :return: (pd.DataFrame) Financial metrics for each set.
+        :return: (pd.DataFrame) DataFrame with metrics: Returns, Volatility,
+            Max Drawdown, Sharpe Ratio.
         """
 
         metrics = []
@@ -315,7 +316,7 @@ class SpreadModelingHelper:
 
         :param model: (Object) ML model that has the method 'predict' implemented.
         :param figsize: (tuple) Figure size for plot.
-        :return: (tuple) Predicted target values for all sets.
+        :return: (tuple) Predicted target values for all sets
         """
 
         predicted_train_y = pd.Series(model.predict(self.input_train))
@@ -354,7 +355,7 @@ class SpreadModelingHelper:
         Plots long/short/all trades given a set of labeled returns.
 
         :param events: (pd.DataFrame) Trade DataFrame with returns and side as columns.
-        :param title: (str) Title for plot.
+        :param title: (str) Title to use for the plot.
         :param figsize: (tuple) Figure size for plot.
         """
 

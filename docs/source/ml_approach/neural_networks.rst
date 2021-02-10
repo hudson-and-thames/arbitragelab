@@ -8,11 +8,11 @@ Introduction
 ############
 
 Neural networks exist in a variety of different architectures and have been 
-implemented in numerous financial applications. However, the architecture that
-is most widely used for the analysis of stock markets is known as the MLP neural network.
+implemented in numerous financial applications. However, the most widely used
+architecture for the analysis of stock markets is known as the MLP neural network.
 
 A generic neural network is built with at least three layers comprising an input,
-hidden and output layer. The structure of the input layer is determined by the number 
+hidden and output layer. The input layer structure is determined by the number
 of explanatory variables depicted as nodes in the architecture. The hidden layer represents
 the capacity of complexity in which the model can support or ‘fit’. Moreover, both
 the input and hidden layers contain what is known as a bias node. The value attributed
@@ -41,6 +41,7 @@ Base Implementation
 
 Multi Layer Perceptron
 ######################
+
 The MLP allows the user to select a set of activation functions to explore including
 identity, logistic, hyperbolic tangent, negative exponential and sine. These activation
 functions can be used for both hidden and output neurons. MLP also trains networks 
@@ -86,7 +87,8 @@ Example
     
 Recurrent Neural Network (LSTM)
 ###############################
-Recurrent neural networks (RNNs) are a type of neural networks which leverage
+
+Recurrent neural networks (RNNs) are neural networks that leverage
 backpropagation through time (BPTT) algorithm to determine the gradients. Through
 this process, RNNs tend to run into two problems, known as exploding gradients and
 vanishing gradients. These issues are defined by the size of the gradient, which is
@@ -161,8 +163,8 @@ HONN models show a profit increase over the MLP of around 8%’.
 
 An example showing the capability of HONNs, is the XOR problem. The Exclusive OR problem
 could not be solved with a network without a hidden layer or by a single layer of
-first-order units, as it is not linearly separable. However the same problem is
-easily solved if the patterns are represented in three dimension in terms
+first-order units, as it is not linearly separable. However, the same problem is
+easily solved if the patterns are represented in three dimensions in terms
 of an enhanced representation `(Pao, 1989) <https://www.osti.gov/biblio/5238955>`_,
 by just using a single layer network with second-order terms. 
 
@@ -183,14 +185,14 @@ by just using a single layer network with second-order terms.
 .. centered:: HONN output.
 
 Typically HONNs are split into two types; the first type uses feature engineering
-to expand the input dataset in representing the higher order relationships in the original
+to expand the input dataset in representing the higher-order relationships in the original
 dataset. The second type uses architectural modifications to augment the ability of the 
-network to find higher order relations in the dataset.
+network to find higher-order relations in the dataset.
 
 .. figure:: images/honn_types.png
     :align: center
     
-    HONNs can be classified into single and multiple layer structures as explained by `(Liatsis et al. 2009) <https://www.igi-global.com/chapter/artificial-higher-order-neural-networks/5282>`_.
+    HONNs can be classified into single and multiple layer structures, as explained by `(Liatsis et al. 2009) <https://www.igi-global.com/chapter/artificial-higher-order-neural-networks/5282>`_.
 
 Single Layer - Functional Link NNs `(Dehuri et al. 2010) <https://link.springer.com/article/10.1007/s00521-009-0288-5>`_
 ************************************************************************************************************************
@@ -199,8 +201,8 @@ Single-layer, higher-order networks consist of a single processing layer
 and inputs nodes, such as the functional link network (FLN) `(Pao, 1989) <https://www.osti.gov/biblio/5238955>`_,
 which functionally expands the input space, by suitable pre-processing of the inputs.
 
-In contrast to a feed forward ANN structure, i.e., a multilayer perceptron (MLP),
-the FLANN is basically a single layer structure in which nonlinearity
+In contrast to a feed-forward ANN structure, i.e., a multilayer perceptron (MLP),
+the FLANN is basically a single-layer structure in which nonlinearity
 is introduced by enhancing the input pattern with nonlinear functional
 expansion. With proper choice of functional expansion in a FLANN, this
 network performs as good as and in some cases even better than the MLP
@@ -208,7 +210,10 @@ structure for the problem of nonlinear system identification.
 
 The dimensionality of the input space for FLNs can be increased in two ways `(Pao, 1989) <https://www.osti.gov/biblio/5238955>`_:
 
-- The tensor or output product model, where the cross-products of the input terms are added to the model. For example, for a network with three inputs :math:`X_1, X_2,` and :math:`X_3`, the cross products are: :math:`X_1 X_2, X_1 X_3, X_2 X_3` , therefore adding second order terms to the network. Third order terms such as :math:`X_1 X_2 X_3` can also be added.
+- The tensor or output product model, where the cross-products of the input terms are added to the model.
+  For example, for a network with three inputs :math:`X_1, X_2,` and :math:`X_3`, the cross products
+  are: :math:`X_1 X_2, X_1 X_3, X_2 X_3` , therefore adding second-order terms to the network. Third-order
+  terms such as :math:`X_1 X_2 X_3` can also be added.
 
 - Functional expansion of base inputs, where mathematical functions are used to transform the input data.
 
@@ -272,7 +277,7 @@ of a layer of summing units, connected to a single product unit. The output of t
 product unit is usually passed through a nonlinear transfer function. 
 
 The main difference between the pi-sigma and the sigma-pi networks is that the former utilise a smaller
-number of weights, however they are not universal approximators. To address this
+number of weights, however, they are not universal approximators. To address this
 disadvantage, `(Shin & Ghosh 1991) <https://ieeexplore.ieee.org/abstract/document/155142/>`_
 proposed an extension to the pi-sigma network, the so-called ridge polynomial neural network
 (RPN), which consists of a number of increasing order pi-sigma units. Most of the above 

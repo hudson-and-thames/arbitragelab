@@ -9,13 +9,14 @@ import itertools
 import numpy as np
 import pandas as pd
 
+# This silencer is related to dangerous-default-value in __init__
 # pylint: disable=W0102
 
 class FeatureExpander:
     """
-    Higher order term Feature Expander implementation. The implementation consists
+    Higher-order term Feature Expander implementation. The implementation consists
     of two major parts. The first part consists of using a collection of orthogonal
-    polynomials's coefficients, ordered from lowest order term to highest. The implemented
+    polynomials' coefficients, ordered from lowest order term to highest. The implemented
     series are [chebyshev, legendre, laguerre, power] polynomials. The second part is a combinatorial
     version of feature crossing, which involves the generation of feature collections
     of the n order and multiplying them together. This can be used by adding [product]
@@ -30,6 +31,7 @@ class FeatureExpander:
             laguerre, power, product].
         :param n_orders: (int) Number of orders.
         """
+
         self.methods = methods
         self.n_orders = n_orders
         self.dataset = None
@@ -40,8 +42,9 @@ class FeatureExpander:
         Retrieves the chebyshev polynomial coefficients of a specific
         degree.
 
-        :param series: (pd.Series)
-        :param degree: (int)
+        :param series: (pd.Series) Series to use.
+        :param degree: (int) Degree to use.
+        :return: (np.array) Resulting polynomial.
         """
 
         return np.polynomial.chebyshev.chebvander(series, degree)
@@ -52,8 +55,9 @@ class FeatureExpander:
         Retrieves the legendre polynomial coefficients of a specific
         degree.
 
-        :param series: (pd.Series)
-        :param degree: (int)
+        :param series: (pd.Series) Series to use.
+        :param degree: (int) Degree to use.
+        :return: (np.array) Resulting polynomial.
         """
 
         return np.polynomial.legendre.legvander(series, degree)
@@ -64,8 +68,9 @@ class FeatureExpander:
         Retrieves the laguerre polynomial coefficients of a specific
         degree.
 
-        :param series: (pd.Series)
-        :param degree: (int)
+        :param series: (pd.Series) Series to use.
+        :param degree: (int) Degree to use.
+        :return: (np.array) Resulting polynomial.
         """
 
         return np.polynomial.laguerre.lagvander(series, degree)
@@ -76,9 +81,9 @@ class FeatureExpander:
         Retrieves the power polynomial coefficients of a specific
         degree.
 
-        :param series: (pd.Series)
-        :param degree: (int)
-        :return: (np.array)
+        :param series: (pd.Series) Series to use.
+        :param degree: (int) Degree to use.
+        :return: (np.array) Resulting polynomial.
         """
 
         return np.polynomial.polynomial.polyvander(series, degree)
@@ -90,9 +95,9 @@ class FeatureExpander:
         which involves the generation of feature groups and appending
         the resulting product to the original series.
 
-        :param series: (pd.Series)
-        :param degree: (int)
-        :return: (pd.DataFrame)
+        :param series: (pd.Series) Series to use.
+        :param degree: (int) Degree to use.
+        :return: (pd.DataFrame) Resulting polynomial.
         """
 
         # Get feature count.
@@ -110,8 +115,9 @@ class FeatureExpander:
         """
         Stores the dataset inside the class object.
 
-        :param frame: (np.array) dataset
+        :param frame: (np.array) Dataset to store.
         """
+
         self.dataset = frame
         return self
 
@@ -122,6 +128,7 @@ class FeatureExpander:
 
         :return: (pd.DataFrame) Original DataFrame with the expanded values appended to it.
         """
+
         new_dataset = []
 
         for row in self.dataset:

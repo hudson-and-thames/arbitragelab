@@ -1,21 +1,23 @@
 # Copyright 2019, Hudson and Thames Quantitative Research
 # All rights reserved
-# Read more: https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt
+# Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 """
-This module implements the Multi Layer Perceptron, RNN model and the Pi Sigma Model.
+This module implements the Multi Layer Perceptron, RNN model and the Pi Sigma Model described in Dunis et al. (2005).
 """
 
 #pylint: disable=wrong-import-position
 import os
 import logging
+
+# Using this to avoid TensorFlow spamming to console
 logging.getLogger('tensorflow').setLevel(logging.ERROR)
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
+import matplotlib.pyplot as plt
 import tensorflow as tf
 from keras.models import Model
 from keras.callbacks.callbacks import History
-from keras.layers import  Input, LSTM, Dense, Activation, Lambda
-import matplotlib.pyplot as plt
+from keras.layers import Input, LSTM, Dense, Activation, Lambda
 
 class BaseNeuralNetwork:
     """
@@ -32,6 +34,8 @@ class BaseNeuralNetwork:
     def fit(self, *args, **kwargs) -> History:
         """
         Wrapper over the keras model fit function.
+
+        :return: (History) Fitted model.
         """
 
         fitted_model = self.model.fit(*args, **kwargs)
@@ -50,12 +54,16 @@ class BaseNeuralNetwork:
         """
         Method that returns visual plot of the loss trajectory in
         terms of epochs spent training.
+
+        :return: (list) List of Axes objects.
         """
 
         plt.plot(self.fitted_model.history['loss'])
         plt.xlabel("Epochs")
         plt.ylabel("Loss")
         plt.title("Loss Plot")
+
+        return result
 
 class MultiLayerPerceptron(BaseNeuralNetwork):
     """
@@ -96,7 +104,7 @@ class MultiLayerPerceptron(BaseNeuralNetwork):
         """
         Builds and compiles model architecture.
 
-        :return: (Model)
+        :return: (Model) Resulting model.
         """
 
         input_layer = Input((self.frame_size,))
@@ -156,7 +164,7 @@ class RecurrentNeuralNetwork(BaseNeuralNetwork):
         """
         Builds and compiles model architecture.
 
-        :return: (Model)
+        :return: (Model) Resulting model.
         """
 
         input_layer = Input(self.input_shape)
@@ -215,7 +223,7 @@ class PiSigmaNeuralNetwork(BaseNeuralNetwork):
         """
         Builds and compiles model architecture.
 
-        :return: (Model)
+        :return: (Model) Resulting model.
         """
 
         input_layer = Input((self.frame_size,))

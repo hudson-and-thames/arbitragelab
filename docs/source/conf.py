@@ -35,7 +35,6 @@ extensions = [
     'sphinx.ext.coverage',
     'sphinx.ext.intersphinx',
     'sphinx.ext.viewcode',
-    'sphinx.ext.graphviz',
     'releases'
 ]
 

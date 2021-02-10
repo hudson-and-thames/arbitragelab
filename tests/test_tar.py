@@ -43,6 +43,7 @@ class TestTAR(unittest.TestCase):
         """
         Test TAR model using standard unprocessed spread as input value.
         """
+        #pylint: disable=too-many-function-args
 
         # Initialize TAR model with the standard [leg1 - leg2] spread as input value.
         model = TAR((self.working_df['gasoline'] - self.working_df['wti']))
