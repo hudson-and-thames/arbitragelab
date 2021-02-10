@@ -16,7 +16,7 @@ class TestSpreadModelingHelper(unittest.TestCase):
     """
     Tests Spread Modeling Helper class.
     """
-    
+
     def setUp(self):
         """
         Loads data needed for model fitting.
@@ -64,13 +64,13 @@ class TestSpreadModelingHelper(unittest.TestCase):
         # Check if predictions of all sets are returned.
         self.assertTrue(len(helper.plot_model_results(committee)) == 3)
 
-        train_pred, test_pred, oos_pred = helper.plot_model_results(committee)
+        _, test_pred, oos_pred = helper.plot_model_results(committee)
 
         committee.plot_losses()
 
         helper.get_metrics(self.working_df)
 
-        helper.get_filtering_results(helper.target_oos, oos_pred, test_pred, self.working_df);
+        helper.get_filtering_results(helper.target_oos, oos_pred, test_pred, self.working_df)
 
     def test_honn_helper(self):
         """
