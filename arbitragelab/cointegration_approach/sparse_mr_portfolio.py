@@ -265,58 +265,6 @@ class SparseMeanReversionPortfolio:
 
         return np.around(selected_weights, threshold)
 
-    @staticmethod
-    def sdp_eigenvalue(cardinality: float, var_est: np.array, cov_est: np.array,
-                       verbose: bool = True, max_iter: int = 10000, maximize: bool = False) -> np.array:  # pragma: no cover
-        r"""
-        Semidefinite relaxation sparse decomposition following the formulation in d'Aspremont (2011).
-
-        .. math::
-            :nowrap:
-
-            \begin{align*}
-            \text{minimize } & \mathbf{Tr}(AY) \\
-            \text{subject to } & \mathbf{1}^T \lvert Y \rvert \mathbf{1} \leq k \, \mathbf{Tr}(Y) \\
-            & \mathbf{Tr}(Y) > 0 \\
-            & \mathbf{Tr}(BY) = 1 \\
-            & Y \succeq 0
-            \end{align*}
-
-        :param cardinality: (float) Cardinality constraint. A float value is allowed for fine-tuning.
-        :param var_est: (np.array) Estimated VAR(1) coefficient matrix.
-        :param cov_est: (np.array) Estimated covariance matrix.
-        :param verbose: (bool) If True, print the SDP solver iteration details for debugging; otherwise, suppress the
-            debug output.
-        :param max_iter: (int) Set number of iterations for the SDP solver.
-        :param maximize: (bool) If True, maximize predictability; otherwise, minimize predictability.
-        :return: (np.array) The optimized matrix :math:`Y`.
-        """
-
-        matrix_A = var_est.T @ cov_est @ var_est
-        matrix_B = cov_est
-
-        # Declare a symmetric matrix variable
-        Y_dim = matrix_B.shape[0]
-        Y = cp.Variable((Y_dim, Y_dim), symmetric=True)
-
-        # Constraints for the semidefinite program (SDP)
-        constraints = [
-            cp.sum(cp.abs(Y)) <= cardinality * cp.trace(Y),
-            cp.trace(Y) >= 0,
-            cp.trace(matrix_B @ Y) == 1,
-            Y >> 0
-        ]
-
-        # Solve the SDP
-        if maximize:
-            problem = cp.Maximize(cp.trace(matrix_A @ Y))
-        else:
-            problem = cp.Minimize(cp.trace(matrix_A @ Y))
-
-        cp.Problem(problem, constraints).solve(verbose=verbose, solver='SCS', max_iters=max_iter)
-
-        return Y.value
-
     def sdp_predictability_vol(self, rho: float, variance: float, use_standardized: bool = True,
                                verbose: bool = True, max_iter: int = 10000) -> np.array:
         r"""
@@ -693,7 +641,7 @@ class SparseMeanReversionPortfolio:
 
         if not self.is_semi_pos_def(sdp_result):
             warnings.warn("The SDP result is not positive semidefinite due to numerical issues. Please double check"
-                          "if the negative eigenvalues are sufficiently small that they can be approximated as 0.")
+                          " if the negative eigenvalues are sufficiently small that they can be approximated as 0.")
 
         # Implement the TPower method by Yuan and Zhang (2013)
         # Initialize the leading sparse vector
