@@ -30,7 +30,7 @@ Some basics about Futures trading
 .. figure:: images/back_cont.jpeg
     :align: center
     
-    Contango vs Backwardation.
+    Contango vs Backwardation. `(SeekingAlpha 2017) <https://seekingalpha.com/article/4108565-key-to-successfully-trading-commodity-contracts>`_
 
 - For our purposes, we will refer to front and back contracts, where the front contract is the
   first Futures due for expiry, while the back contract matures later by a particular frequency
@@ -66,7 +66,7 @@ Forming a Continuous Futures Contract
 .. figure:: images/rolling_intuition.png
     :align: center
     
-    Visual intuition of rolling procedure.
+    Visual intuition of rolling procedure. `(Winton 2014) <https://www.winton.com/research/roll-yield-and-futures-investing>`_
 
 Unfortunately, there is no single "standard" method for joining futures contracts together
 in the financial industry. Ultimately the method chosen will depend heavily upon the strategy
@@ -119,13 +119,29 @@ smoother transition between each. The problem with the rollover method is that i
 trading on all five days, which can increase transaction costs.
 
 
-Implementation
-**************
+Base Implementation
+*******************
 .. py:currentmodule:: arbitragelab.util.base_futures_roller
 
 .. autoclass:: BaseFuturesRoller
     :noindex:
     :members: __init__, fit, diagnostic_summary, transform
+    
+
+Contract Specific Implementations
+*********************************
+.. py:currentmodule:: arbitragelab.util.rollers
+
+.. autoclass:: CrudeOilFutureRoller
+    :noindex:
+.. autoclass:: NBPFutureRoller
+    :noindex:
+.. autoclass:: RBFutureRoller
+    :noindex:
+.. autoclass:: GrainFutureRoller
+    :noindex:
+.. autoclass:: EthanolFutureRoller
+    :noindex:
     
 References
 ##########

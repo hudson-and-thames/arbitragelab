@@ -20,7 +20,7 @@ Threshold Filter
 .. figure:: images/confirmation_filter.png
     :align: center
     
-    Visual intuition of the threshold filter method.
+    Visual intuition of the threshold filter method. `(Dunis et al. 2015) <https://www.tandfonline.com/doi/abs/10.1080/1351847X.2013.830140>`_
 
 The standard filter mainly stays out of the market if the predicted change in the
 spread is smaller in magnitude than X, X being the optimized filter level.
@@ -125,7 +125,7 @@ Correlation Filter
 .. figure:: images/correlation_filter.png
     :align: center
     
-    Side by side comparison of the legs correlation and the spread.
+    Side by side comparison of the legs correlation and the spread. (Dunis et al. 2015)
 
 As well as the application of a standard filter, trades can also be filtered in terms of correlation. This is
 presented as a new methodology to filter trading rule returns on spread markets. The idea is to enable the
@@ -267,9 +267,9 @@ Example
 References
 ##########
 
-* `Butterworth, D. and Holmes, P., 2005. The Hedging Effectiveness of UK Stock Index Futures Contracts Using an Extended Mean Gini Approach: Evidence for the FTSE 100 and FTSE Mid250 Contracts. Multinational Finance Journal, 9(3/4), pp.131-160. <https://www.tandfonline.com/doi/abs/10.1080/1351847X.2013.830140>`_
+* `Butterworth, D. and Holmes, P., 2005. The Hedging Effectiveness of UK Stock Index Futures Contracts Using an Extended Mean Gini Approach: Evidence for the FTSE 100 and FTSE Mid250 Contracts. Multinational Finance Journal, 9(3/4), pp.131-160. <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2625061>`_
 
-* `Dunis, C.L., Laws, J., Middleton, P.W. and Karathanasopoulos, A., 2015. Trading and hedging the corn/ethanol crush spread using time-varying leverage and nonlinear models. The European Journal of Finance, 21(4), pp.352-375. <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2625061>`_
+* `Dunis, C.L., Laws, J., Middleton, P.W. and Karathanasopoulos, A., 2015. Trading and hedging the corn/ethanol crush spread using time-varying leverage and nonlinear models. The European Journal of Finance, 21(4), pp.352-375. <https://www.tandfonline.com/doi/abs/10.1080/1351847X.2013.830140>`_
 
 * `Engle, R.F. and Bollerslev, T., 1986. Modelling the persistence of conditional variances. Econometric reviews, 5(1), pp.1-50. <https://www.tandfonline.com/doi/abs/10.1080/07474938608800095>`_
 

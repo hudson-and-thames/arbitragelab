@@ -170,7 +170,7 @@ class BaseFuturesRoller:
 
     @staticmethod
     def get_x_days_prior_missing_target_date(dataset: pd.DataFrame, working_month_delta: pd.Period,
-                                             days_prior: int = 3, target_day: int = 25) -> str:
+                                             days_prior: int = 3, target_day: int = 25):
         """
         This method will get x available day prior to a specific date, in the special case that that
         date doesn't exist in the dataset.
@@ -179,7 +179,7 @@ class BaseFuturesRoller:
         :param working_month_delta: (pd.Period) specific Year-Month delta, ex. 1995-12
         :param days_prior: (int) Days prior the newly found target date.
         :param target_day: (int) The target day to be used as a starting point.
-        :return: (Date)
+        :return: (np.array) Target Dates.
         """
 
         index_to_monthly = pd.to_datetime(dataset.index).to_period('M')

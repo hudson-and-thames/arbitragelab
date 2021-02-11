@@ -56,33 +56,45 @@ Example
 
 .. code-block::
 
-    # Importing packages
-    import pandas as pd
+    # Import package necessary for splitting the dataset.
     from sklearn.model_selection import train_test_split
+    # Import package to generate a synthetic dataset.
     from sklearn.datasets import make_regression
+    # Import package to quantify final prediction score.
     from sklearn.metrics import r2_score
+    
+    # Import the mlp implementation from arbitragelab.
     from arbitragelab.ml_approach.neural_networks import MultiLayerPerceptron
     
+    # Generate 500 samples with 100 features, to be used as our dataset.
     X, y = make_regression(500)
     
-    n_frames, frame_size = X.shape
+    # Get number of samples to be given to the network.
+    _, frame_size = X.shape
 
+    # Initialize a basic regression neural network.
     regressor = MultiLayerPerceptron(frame_size, num_outputs=1, loss_fn="mean_squared_error", 
-                                      optmz="adam", metrics=[], hidden_layer_activation_function="relu",
+                                      optmizer="adam", metrics=[], hidden_layer_activation_function="relu",
                                       output_layer_act_func="linear")
 
+    # This will compile the keras model structure implemented.
     regressor.build()
 
+    # Will supply information about the structure of the model.
     regressor.summary()
     
+    # Prepare dataset for training and testing.
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, shuffle=False)
 
+    # Fit compiled model with training data.
     regressor.fit(X_train, y_train,
                     batch_size=20, epochs=400,
                     verbose=1)
 
+    # Plot loss vs epochs
     regressor.plot_loss()
                     
+    # Finally use the fitted model to predict test set.
     predictions = r2_score(y_test, regressor.predict(X_test))
     
 Recurrent Neural Network (LSTM)
@@ -105,47 +117,58 @@ hidden state, and gating mechanism.
 .. figure:: images/rnn_lstm_example.png
    :align: center
    
-   Visual interpretation of the internal structures of RNNs and LSTMs.
+   Visual interpretation of the internal structures of RNNs and LSTMs. `(Olah 2015) <http://colah.github.io/posts/2015-08-Understanding-LSTMs/>`_.
 
 .. autoclass:: RecurrentNeuralNetwork
     :noindex:
     :members: __init__, build
 
 .. code-block::
-
-    # Importing packages
-    import pandas as pd
+  
+    # Import package necessary for splitting the dataset.
     from sklearn.model_selection import train_test_split
+    # Import package to generate a synthetic dataset.
     from sklearn.datasets import make_regression
+    # Import package to quantify final prediction score.
     from sklearn.metrics import r2_score
-    from arbitragelab.ml_approach.neural_networks import RecurrentNeuralNetwork
     
+    # Import the rnn implementation from arbitragelab.
+    from arbitragelab.ml_approach.neural_networks import RecurrentNeuralNetwork
+
+    # Generate 500 samples with 100 features, to be used as our dataset.
     X, y = make_regression(500)
     
+    # Prepare dataset for training and testing.
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, shuffle=False)
     
     n_features = 1
     
-    # Reshape from [samples, timesteps] into [samples, timesteps, features]
+    # Reshape from [samples, timesteps] into [samples, timesteps, features].
     X_train = X_train.reshape((X_train.shape[0], X_train.shape[1], n_features))
     X_test = X_test.reshape((X_test.shape[0], X_test.shape[1], n_features))
 
     _, frame_size, no_features = X_train.shape
   
+    # Initialize a basic regression recurrent neural network.
     regressor = RecurrentNeuralNetwork((frame_size, no_features), num_outputs=1, loss_fn="mean_squared_error", 
-                                      optmz="adam", metrics=[], hidden_layer_activation_function="relu",
+                                      optmizer="adam", metrics=[], hidden_layer_activation_function="relu",
                                       output_layer_act_func="linear")
 
+    # This will compile the keras model structure implemented.
     regressor.build()
 
+    # Will supply information about the structure of the model.
     regressor.summary()
 
+    # Fit compiled model with training data.
     regressor.fit(X_train, y_train,
                     batch_size=20, epochs=400,
                     verbose=1)
 
+    # Plot loss vs epochs.
     regressor.plot_loss()
                     
+    # Finally use the fitted model to predict test set.
     predictions = r2_score(y_test, regressor.predict(X_test))
     
 Higher Order Neural Network
@@ -232,36 +255,50 @@ Example
 
 .. code-block::
 
-    # Importing packages
-    import pandas as pd
+    # Import package necessary for splitting the dataset.
     from sklearn.model_selection import train_test_split
+    # Import package to generate a synthetic dataset.
     from sklearn.datasets import make_regression
+    # Import package to quantify final prediction score.
     from sklearn.metrics import r2_score
+
+    # Import the feature expander implementation from arbitragelab.
     from arbitragelab.ml_approach.feature_expander import FeatureExpander
+    
+    # Import the mlp implementation from arbitragelab.
     from arbitragelab.ml_approach.neural_networks import MultiLayerPerceptron
     
+    # Generate 500 samples with 100 features, to be used as our dataset.
     X, y = make_regression(500)
     
     expanded_X = FeatureExpander(methods=['product', 'power'], n_orders=2).fit(X).transform()
     
+    # Get number of samples to be given to the network.
     n_frames, frame_size = expanded_X.shape
 
+    # Initialize a basic regression neural network.
     regressor = MultiLayerPerceptron(frame_size, num_outputs=1, loss_fn="mean_squared_error", 
-                                      optmz="adam", metrics=[], hidden_layer_activation_function="relu",
+                                      optmizer="adam", metrics=[], hidden_layer_activation_function="relu",
                                       output_layer_act_func="linear")
 
+    # This will compile the keras model structure implemented.
     regressor.build()
 
+    # Will supply information about the structure of the model.
     regressor.summary()
-    
+
+    # Prepare dataset for training and testing.
     X_train, X_test, y_train, y_test = train_test_split(expanded_X, y, test_size=0.3, shuffle=False)
 
+    # Fit compiled model with training data.
     regressor.fit(X_train, y_train,
                     batch_size=20, epochs=100,
                     verbose=1)
 
+    # Plot loss vs epochs.
     regressor.plot_loss()
                     
+    # Finally use the fitted model to predict test set.
     predictions = r2_score(y_test, regressor.predict(X_test))
     
 Multiple Layer NNs `(Ghazali et al. 2009) <https://www.igi-global.com/chapter/artificial-higher-order-neural-networks/5286>`_
@@ -284,16 +321,10 @@ proposed an extension to the pi-sigma network, the so-called ridge polynomial ne
 networks have one layer of trainable weights, and hence simple weights updating procedures
 can be used for their training.
 
-.. math:: 
-    
-    Y = f \left ( \prod h_j \right)
-    
-    h_j = \theta_j + \sum^k_{i=1} W_{ij} X_{i}
-
 .. figure:: images/pi_sigma_nn.png
     :align: center
 
-    Visual representation of the Pi-Sigma Neural Network architecture. 
+    Visual representation of the Pi-Sigma Neural Network architecture. `(Ghazali, R. and Al-Jumeily, D., 2009) <https://www.igi-global.com/chapter/artificial-higher-order-neural-networks/5286>`_
 
 .. py:currentmodule:: arbitragelab.ml_approach.neural_networks
 
@@ -304,33 +335,45 @@ can be used for their training.
 
 .. code-block::
 
-    # Importing packages
-    import pandas as pd
+    # Import package necessary for splitting the dataset.
     from sklearn.model_selection import train_test_split
+    # Import package to generate a synthetic dataset.
     from sklearn.datasets import make_regression
+    # Import package to quantify final prediction score.
     from sklearn.metrics import r2_score
+    
+    # Import the psnn implementation from arbitragelab.
     from arbitragelab.ml_approach.neural_networks import PiSigmaNeuralNetwork
     
+    # Generate 500 samples with 100 features, to be used as our dataset.
     X, y = make_regression(500)
-    
+
+    # Get number of samples to be given to the network.
     n_frames, frame_size = X.shape
 
+    # Initialize a basic regression pi sigma neural network.
     regressor = PiSigmaNeuralNetwork(frame_size, num_outputs=1, loss_fn="mean_squared_error", 
-                                      optmz="adam", metrics=[], hidden_layer_activation_function="relu",
+                                      optmizer="adam", metrics=[], hidden_layer_activation_function="relu",
                                       output_layer_act_func="linear")
 
+    # This will compile the keras model structure implemented.
     regressor.build()
 
+    # Will supply information about the structure of the model.
     regressor.summary()
     
+    # Prepare dataset for training and testing.
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, shuffle=False)
 
+    # Fit compiled model with training data.
     regressor.fit(X_train, y_train,
                     batch_size=20, epochs=100,
                     verbose=1)
 
+    # Plot loss vs epochs.
     regressor.plot_loss()
                     
+    # Finally use the fitted model to predict test set.
     predictions = r2_score(y_test, regressor.predict(X_test))
 
 References

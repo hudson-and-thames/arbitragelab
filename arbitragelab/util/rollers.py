@@ -30,8 +30,8 @@ class CrudeOilFutureRoller(BaseFuturesRoller):
         """
         The implementation method for the rolling procedure for the CL future.
 
-        :param dataset: (pd.DataFrame)
-        :return: (pd.Series)
+        :param dataset: (pd.DataFrame) Future price data.
+        :return: (pd.Series) Target roll dates.
         """
 
         # Get all monthly 25ths in the date range specified in the dataset
@@ -80,8 +80,8 @@ class NBPFutureRoller(BaseFuturesRoller):
         """
         The implementation method for the rolling procedure for the NBP future.
 
-        :param dataset: (pd.DataFrame)
-        :return: (pd.Series)
+        :param dataset: (pd.DataFrame) Future price data.
+        :return: (pd.Series) Target roll dates.
         """
 
         target_dates = super().get_available_date_per_month_from(dataset)
@@ -129,8 +129,8 @@ class RBFutureRoller(BaseFuturesRoller):
         """
         The implementation method for the rolling procedure for the RB future.
 
-        :param dataset: (pd.DataFrame)
-        :return: (pd.Series)
+        :param dataset: (pd.DataFrame) Future price data.
+        :return: (pd.Series) Target roll dates.
         """
 
         target_dates = super().get_available_date_per_month_from(dataset)
@@ -154,10 +154,10 @@ class GrainFutureRoller(BaseFuturesRoller):
 
     def _get_rolldates(self, dataset: pd.DataFrame) -> pd.Series:
         """
-        The implementation method for the rolling procedure for the Grain futures.
+        The implementation method for the rolling procedure for Grain futures.
 
-        :param dataset: (pd.DataFrame)
-        :return: (pd.Series)
+        :param dataset: (pd.DataFrame) Future price data.
+        :return: (pd.Series) Target roll dates.
         """
 
         possible_dates_df = super().get_all_possible_static_dates_in(dataset.index, 15)
@@ -205,8 +205,8 @@ class EthanolFutureRoller(BaseFuturesRoller):
         """
         The implementation method for the rolling procedure for the Ethanol future.
 
-        :param dataset: (pd.DataFrame)
-        :return: (pd.Series)
+        :param dataset: (pd.DataFrame) Future price data.
+        :return: (pd.Series) Target roll dates.
         """
 
         possible_dates_df = super().get_all_possible_static_dates_in(dataset.index, 3)
@@ -242,9 +242,6 @@ class EthanolFutureRoller(BaseFuturesRoller):
                                     pd.Series(dataset.iloc[roll_over_dates_for_business_days].index.values)])
 
         return all_roll_overs.sort_values().values
-
-
-
 
 def plot_historical_future_slope_state(m1_last: pd.Series, m2_open: pd.Series):
     """
