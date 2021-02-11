@@ -220,12 +220,8 @@ class TestSparseMeanReversionPortfolio(unittest.TestCase):
         sdp_pred_vol_result = etf_sparse_portf.sdp_predictability_vol(rho=0.001, variance=5,
                                                                       max_iter=10000, verbose=False,
                                                                       use_standardized=False)
-        with np.printoptions(threshold=np.inf):
-            print(sdp_pred_vol_result)
 
         sdp_pred_vol_weights = etf_sparse_portf.sparse_eigen_deflate(sdp_pred_vol_result, 8, verbose=False)
-        with np.printoptions(threshold=np.inf):
-            print(sdp_pred_vol_weights)
 
         sdp_pred_vol_weights_idx = sdp_pred_vol_weights.nonzero()
         sdp_pred_vol_weights_val = sdp_pred_vol_weights[sdp_pred_vol_weights_idx]

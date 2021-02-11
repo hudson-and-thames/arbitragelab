@@ -16,7 +16,7 @@ Introduction
 
 Assets that exhibit significant mean-reversion are difficult to find in efficient markets. As a result, investors focus
 on creating long-short asset baskets to form a mean-reverting portfolio whose aggregate value shows mean-reversion.
-Classic solutions, including cointegration or canonical correlation analysis, can only construct dense mean-reverting
+Classic solutions including cointegration or canonical correlation analysis can only construct dense mean-reverting
 portfolios, i.e. they include every asset in the investing universe. These portfolios have shown significant
 disadvantages in transaction costs, P&L interpretability, and capturing meaningful statistical arbitrage opportunities.
 On the other hand, sparse mean-reverting portfolios, which requires trading as few assets as possible, can mitigate
@@ -56,7 +56,7 @@ speed parameter :math:`\lambda` to measure the mean-reversion strength.
 However, it is hard to express the OU mean-reversion speed :math:`\lambda` as a function of the portfolio weight vector
 :math:`\mathbf{x}`. Instead of optimizing :math:`\lambda`, this module will only use :math:`\lambda` to evaluate the
 sparse portfolios generated and employ three other mean-reversion strength proxies to solve the sparse mean-reverting
-portfolio selection problem:
+portfolio selection problem.
 
 1. Predictability based on Box-Tiao canonical decomposition.
 2. Portmanteau statistic.
@@ -125,7 +125,7 @@ The portfolio value is a linear combination of the asset prices, and can be expl
     \mathbf{x}^T S_t = \mathbf{x}^T \hat{S}_{t-1} + \mathbf{x}^T \varepsilon_t
 
 Without loss of generality, the price of each asset can be assumed to have a zero mean, and the predictability can now
-be written as:
+be written as
 
 .. math::
 
@@ -165,7 +165,7 @@ where :math:`\gamma_k` is the sample lag-:math:`k` autocovariance matrix, define
     \tilde{S}_t & \equiv S_t - \frac{1}{T} \sum_{t=1}^T S_t
     \end{align*}
 
-The module follows closely to the d'Aspremont (2011) and Cuturi (2015) papers as to which estimate of :math:`A` is used
+The module follows closely to the d'Aspremont (2011) and Cuturi (2015) paper as to which estimate of :math:`A` is used
 in the portfolio selection optimization.
 
 The predictablity of the time series under the VAR(1) model assumption can be now written as:
@@ -231,7 +231,7 @@ Covariance Selection via Graphical LASSO and Structured VAR(1) Estimate via Pena
 ################################################################################################
 
 The Box-Tiao canonical decomposition relies on estimates of both the covariance matrix :math:`\Gamma_0` and the VAR(1)
-coefficient matrix :math:`A` of the asset prices. Using an :math:`\ell_1`-penalty term, as shown in d'Aspremont (2011),
+coefficient matrix :math:`A` of the asset prices. Using an :math:`\ell_1`-penalty, as shown in d'Aspremont (2011),
 is able to simultaneously obtain numerically stable estimates and isolate key idiosyncratic dependencies
 in the asset prices. The penalized estimates of :math:`\Gamma_0` and :math:`A` provides different perspective on the
 conditional dependencies and their graphical representations help cluster the assets into several smaller groups.
@@ -471,11 +471,11 @@ This is now a convex optimization problem that can be solved with SDP. However, 
 suffers from a few drawbacks.
 
 1. It has numerical stability issues;
-2. It cannot proper handle volatility constraints;
+2. It cannot properly handle volatility constraints;
 3. It cannot optimize mean-reversion strength proxies other than predictability.
 
-Therefore, while this module kept the implementation of the above SDP proposed by d'Aspremont (2011), it is recommended
-to use the regularizer form of the SDP proposed by Cuturi (2015) to mitigate these drawbacks.
+Instead of implementing this SDP formulation with a relaxed cardinality constraint, this module followed the regularizer
+form of the SDP proposed by Cuturi (2015) to mitigate the above drawbacks.
 
 The predictability optimization SDP is as follows:
 
@@ -705,4 +705,3 @@ References
 * Ljung, G.M. and Box, G.E., 1978. On a measure of lack of fit in time series models. Biometrika, 65(2), pp.297-303.
 * Natarajan, B.K., 1995. Sparse approximate solutions to linear systems. SIAM journal on computing, 24(2), pp.227-234.
 * Yuan, X.T. and Zhang, T., 2013. Truncated Power Method for Sparse Eigenvalue Problems. Journal of Machine Learning Research, 14(4).
-
