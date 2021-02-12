@@ -1,19 +1,21 @@
 # Production
-numpy==1.18.5
-pandas==1.0.4
-scipy==1.5.4
-statsmodels==0.12.1
-scikit-learn==0.23.1
-matplotlib==3.2.1
+cvxpy==1.1.10
+numpy==1.20.1
+matplotlib==3.2.2
+pandas==1.1.5
+scikit-learn==0.24.1
+scipy==1.6.0
+statsmodels==0.12.2
 cython==0.29.17
 POT==0.7.0
-yfinance==0.1.54
+yfinance==0.1.55
 yahoo-fin==0.8.6
 mpldatacursor==0.7.1
-lxml==4.5.2
+lxml==4.6.2
 requests_html==0.10.0
-seaborn==0.10.0
+seaborn==0.11.1
 pmdarima==1.8.0
+networkx==2.5
 analytics-python==1.2.9
 cvxpy==1.1.8
 networkx==2.4
@@ -21,9 +23,9 @@ networkx==2.4
 # Develop
 bump2version==1.0.1
 bumpversion==0.6.0
-codecov==2.0.15
-coverage==5.3.1
-pylint==2.5.3
-sphinx==2.2.1 # Docs
-sphinx-rtd-theme==0.4.3 # Docs
+codecov==2.1.11
+coverage==5.4
+pylint==2.6.0
+sphinx==3.4.3 # Docs
+sphinx-rtd-theme==0.5.1 # Docs
 releases==1.6.3 # Docs
