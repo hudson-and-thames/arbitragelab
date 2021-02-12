@@ -5,7 +5,9 @@
 
 # Python code to execute, usually for sys.path manipulation such as
 # pygtk.require().
-#init-hook=
+
+# This line is added because pylint was breaking on new pandas versions
+init-hook='import sys; sys.setrecursionlimit(8 * sys.getrecursionlimit())'
 
 # Add files or directories to the blacklist. They should be base names, not
 # paths.
