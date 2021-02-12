@@ -123,13 +123,13 @@ class PairsSelector:
         """
         Calculate scores based on different methods.
 
-        The scores is recorded in a series with row index multi-indexed in the form of ('ABC', 'XYZ') for stocks pair
+        The scores are recorded in a series with row index multi-indexed in the form of ('ABC', 'XYZ') for stocks pair
         'ABC' and 'XYZ'.
 
         :param stocks_universe: (pd.DataFrame) The stocks universe to be analyzed. Require no multi-indexing for
             columns.
         :param pairs_names: (list) All the possible pairs to be analyzed in list of tuples of their names.
-        :param method: (pd.DataFrame) The method to pick pairs. One can choose from ['spearman rho',
+        :param method: (str) The method to pick pairs. One can choose from ['spearman rho',
             'kendall tau', 'euc distance'] for Spearman's rho, Kendall's Tau and Euclidean distance.
         :return: (pd.Series) The calculated scores stored in a series.
         """
