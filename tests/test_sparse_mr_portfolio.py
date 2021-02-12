@@ -230,8 +230,8 @@ class TestSparseMeanReversionPortfolio(unittest.TestCase):
         self.assertIsNone(allclose(sdp_pred_vol_weights_idx[0],
                                    np.array([2, 5, 7, 11, 16, 28, 31, 41])))
         self.assertIsNone(allclose(sdp_pred_vol_weights_val,
-                                   np.array([0.11224112, -0.16136463, -0.74748693, -0.09120843,
-                                             0.10046743, 0.51952607, -0.06539062, 0.33170881])))
+                                   np.array([0.123879, -0.14753, -0.741946, -0.093619,
+                                             0.087365, 0.524529, -0.053632, 0.343513])))
 
     def test_sdp_portmanteau_vol(self):
         """
