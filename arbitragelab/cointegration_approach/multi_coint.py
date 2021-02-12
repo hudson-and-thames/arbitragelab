@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from arbitragelab.cointegration_approach import JohansenPortfolio
+from arbitragelab.cointegration_approach.johansen import JohansenPortfolio
 
 
 class MultivariateCointegration:
