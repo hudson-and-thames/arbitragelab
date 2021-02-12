@@ -15,6 +15,8 @@ Changelog
 * :support:`35` Upgrade ArbitrageLab requirements versions (numpy==1.20.1, matplotlib==3.3.4
   pandas==1.1.5, scikit-learn==0.24.1, scipy==1.6.0, statsmodels==0.12.2).
 * :bug:`34` Data Importer, Distance Approach, ML Approach modules imports were not exposed.
+* :feature:`26` Multivariate Cointegration strategy (Galenko et al. 2010) added to the Cointegration Approach Module.
+* :support:`26` Multivariate Cointegration strategy documentation.
 
 * :release:`0.2.2 <2020-12-24>`
 * :bug:`32` Copulas module imports were not exposed.
@@ -42,7 +44,6 @@ Changelog
 * :support:`27` CIR-model documentation.
 * :feature:`30` Track user analytics using Segment
 * :support:`30` Analytics documentation.
-
 
 * :release:`0.1.0 <2020-11-18>`
 * :feature:`2` Kalman Filter + Kalman strategy added.
