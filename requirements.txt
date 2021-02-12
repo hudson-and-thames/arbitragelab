@@ -17,8 +17,6 @@ seaborn==0.11.1
 pmdarima==1.8.0
 networkx==2.5
 analytics-python==1.2.9
-cvxpy==1.1.8
-networkx==2.4
 
 # Develop
 bump2version==1.0.1
