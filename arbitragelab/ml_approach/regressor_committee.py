@@ -84,7 +84,7 @@ class RegressorCommittee:
 
         return self
 
-    def predict(self, xtest: pd.DataFrame):
+    def predict(self, xtest: pd.DataFrame) -> pd.DataFrame:
         """
         Collects results from all the committee members and returns
         average result.
@@ -105,7 +105,7 @@ class RegressorCommittee:
         # Return Axis 0 wise mean.
         return np.mean(reshaped_predictions, axis=0)
 
-    def plot_losses(self, figsize=(15, 5)):
+    def plot_losses(self, figsize: tuple = (15, 5)):
         """
         Plot all individual member loss metrics.
 

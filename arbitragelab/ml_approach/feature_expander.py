@@ -17,9 +17,9 @@ class FeatureExpander:
     Higher-order term Feature Expander implementation. The implementation consists
     of two major parts. The first part consists of using a collection of orthogonal
     polynomials' coefficients, ordered from lowest order term to highest. The implemented
-    series are [chebyshev, legendre, laguerre, power] polynomials. The second part is a combinatorial
+    series are ['chebyshev', 'legendre', 'laguerre', 'power'] polynomials. The second part is a combinatorial
     version of feature crossing, which involves the generation of feature collections
-    of the n order and multiplying them together. This can be used by adding [product]
+    of the n order and multiplying them together. This can be used by adding ['product']
     in the 'methods' parameter in the constructor.
     """
 
@@ -27,8 +27,8 @@ class FeatureExpander:
         """
         Initializes main variables.
 
-        :param methods: (list) Possible expansion methods [chebyshev, legendre,
-            laguerre, power, product].
+        :param methods: (list) Possible expansion methods are ['chebyshev', 'legendre',
+            'laguerre', 'power', 'product'].
         :param n_orders: (int) Number of orders.
         """
 
@@ -115,10 +115,11 @@ class FeatureExpander:
         """
         Stores the dataset inside the class object.
 
-        :param frame: (np.array) Dataset to store.
+        :param frame: (pd.DataFrame) Dataset to store.
         """
 
         self.dataset = frame
+
         return self
 
     def transform(self) -> pd.DataFrame:

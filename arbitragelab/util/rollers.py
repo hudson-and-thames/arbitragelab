@@ -2,12 +2,13 @@
 # All rights reserved
 # Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 """
-This module implements the (Crude Oil Future, NBP Future, RBOB Future, Grain Based Futures, Ethanol Future) Rollers
+This module implements the (Crude Oil Future, NBP Future, RBOB Future, Grain Based Futures, Ethanol Future) Rollers.
 """
 
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+
 from arbitragelab.util.base_futures_roller import BaseFuturesRoller
 
 

@@ -273,7 +273,7 @@ class VolatilityFilter:
 
     def plot(self) -> list:
         """
-        Function to plot spread series,  regime states, and forecasted volatility.
+        Function to plot spread series, regime states, and forecasted volatility.
 
         :return: (list) List of Axes objects.
         """

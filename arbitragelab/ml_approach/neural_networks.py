@@ -79,7 +79,7 @@ class MultiLayerPerceptron(BaseNeuralNetwork):
         :param optmizer: (str) String (name of optimizer) or optimizer instance.
         :param metrics: (str) Metric to be use when evaluating the model during training and testing.
         :param hidden_layer_activation_function: (str) String name of the activation function used by
-                                                        the hidden layer.
+                                                       the hidden layer.
         :param output_layer_act_func: (str) String name of the activation function used by the output
                                             layer.
         """
@@ -198,7 +198,7 @@ class PiSigmaNeuralNetwork(BaseNeuralNetwork):
         :param optmizer: (str) String (name of optimizer) or optimizer instance.
         :param metrics: (str) Metric to be use when evaluating the model during training and testing.
         :param hidden_layer_activation_function: (str) String name of the activation function used by
-                                                        the hidden layer.
+                                                       the hidden layer.
         :param output_layer_act_func: (str) String name of the activation function used by the output
                                             layer.
         """

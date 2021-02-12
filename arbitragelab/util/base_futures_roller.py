@@ -101,7 +101,7 @@ class BaseFuturesRoller:
         """
         Gets x days prior to target date(that must be available in the dataset index).
 
-        :param n_days: (int) Number of days to be shifted by
+        :param n_days: (int) Number of days to be shifted by.
         :param dataset_datetime_index: (pd.DateTimeIndex) All dates that occur in the dataset
         :param target_dates: (pd.DateTimeIndex) Dates used as the start for the shift. Important(!)
             these dates need to exist in 'dataset_datetime_index'.
@@ -227,17 +227,17 @@ class BaseFuturesRoller:
     @staticmethod
     def non_negativeize(rolled_series: pd.Series, raw_series: pd.Series) -> pd.Series:
         """
-        In general, non negative series are preferred over negative series, which could
-        easily occur particularly if the contract sold off while in contango. The method
-        employed here works as follows; the return as rolled price change is divided by
+        In general, non-negative series are preferred over negative series, which could
+        easily occur, particularly if the contract sold off while in contango. The method
+        employed here works as follows: the return as rolled price change is divided by
         the raw price and then a series is formed using those returns, ex (1+r).cumprod().
 
-        This method has been described originally in De Prado, M.L., 2018. Advances in
-        financial machine learning. John Wiley & Sons.
+        This method has been described originally in De Prado, M.L., 2018. "Advances in
+        financial machine learning". John Wiley & Sons.
 
-        :param rolled_series: (pd.Series)
-        :param raw_series: (pd.Series)
-        :return: (pd.Series)
+        :param rolled_series: (pd.Series) Rolled price change.
+        :param raw_series: (pd.Series) Raw price.
+        :return: (pd.Series) Resulting non-negative series.
         """
 
         new_prices_series = rolled_series.copy()

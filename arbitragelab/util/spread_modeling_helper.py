@@ -15,8 +15,6 @@ from sklearn.metrics import r2_score
 from arbitragelab.ml_approach.feature_expander import FeatureExpander
 from arbitragelab.ml_approach.filters import ThresholdFilter, CorrelationFilter, VolatilityFilter
 
-# pylint: disable=R0914
-
 class SpreadModelingHelper:
     """
     This class basically wraps most of the framework's most
@@ -24,17 +22,17 @@ class SpreadModelingHelper:
     - init - where the datasets given the spread are generated.
     - plot_model_results - given a model plot strategy results and metrics.
     """
-
+    # pylint: disable=too-many-locals
     def __init__(self, sprd: pd.Series, insample_date_range: tuple,
                  oosample_date_range: tuple, feat_expansion: bool = True,
                  unique_sampling: bool = True):
         """
-        This method will break the spread in two major periods:
+        This method will break the spread into two major periods:
 
-        In Sample Period - that will be broken down in two; the training period
+        In-Sample Period - that will be broken down in two; the training period
         and the testing period.
-        Out of Sample Period - the final stretch embargoed by a year from the
-        in sample period.
+        Out-of-Sample Period - the final stretch embargoed by a year from the
+        in-sample period.
 
         The dataset generated here according to the original paper, is based
         on lagged returns. Returns are assumed to be normalized thus no
@@ -70,13 +68,13 @@ class SpreadModelingHelper:
         # Get the target 'y' variable from the dataset variable.
         target_data = dataset_df.iloc[:, 0]
 
-        # Prepare the date slice we are going to use for the insample dataset.
+        # Prepare the date slice we are going to use for the in-sample dataset.
         insample_sliced = slice(insample_date_range[0], insample_date_range[1])
 
         # Cut and set the input and target data for insample.
         insample_input, insample_target = input_data[insample_sliced], target_data[insample_sliced]
 
-        # Split insample dataset into training and test sets.
+        # Split in-sample dataset into training and test sets.
         input_train, input_test, target_train, target_test = train_test_split(
             insample_input, insample_target, test_size=0.3, shuffle=False)
 
@@ -88,10 +86,10 @@ class SpreadModelingHelper:
 
         if unique_sampling:
             # What is '.iloc[::N, N]' ?
-            # - In most machine learning algorithm one of the assumptions is that the input data must be
-            #     i.i.d 'independent and identically distributed'. When there is significant use of lagged
-            #     variables, there will a lot of overlap thus breaking the independence assumption. To take
-            #     care of this we sample the dataset every N rows.
+            # - In most machine learning algorithms one of the assumptions is that the input data must be
+            #   i.i.d 'independent and identically distributed'. When there is significant use of lagged
+            #   variables, there will a lot of overlap thus breaking the independence assumption. To take
+            #   care of this we sample the dataset every N rows.
             input_train = input_train.iloc[::6, :]
             target_train = target_train.iloc[::6]
 
@@ -253,7 +251,7 @@ class SpreadModelingHelper:
         """
         Convert a set of returns to financial metrics. The metrics
         include annual returns, annual volatility, max drawdown and
-        sharpe ratio.
+        Sharpe ratio.
 
         :param filter_events: (pd.DataFrame) Trade events tagged with a
             'side' column with 1/0/-1 referring to long, no trade, short.
