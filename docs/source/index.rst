@@ -91,6 +91,7 @@ This project is licensed under an all rights reserved licence.
     cointegration_approach/trading_strategies
     cointegration_approach/minimum_profit_simulation
     cointegration_approach/minimum_profit
+    cointegration_approach/multivariate_cointegration
 
 .. toctree::
     :maxdepth: 2
