@@ -232,22 +232,22 @@ class PCAStrategy:
 
             # If no generated S-score then we exit the current position
             if ticker not in s_scores.index:
-                if position_stock[ticker]['stock'] != 0:
+                if position_stock[ticker][-1] != 0:
                     position_stock[ticker] = 0
 
             # If we have an S-score generated
             else:
-                if position_stock[ticker]['stock'] == 0:
+                if position_stock[ticker][-1] == 0:
 
                     # Entering a long position
                     if s_scores[ticker] < -sbo:
-                        position_stock.loc['stock', ticker] = size
-                        position_stock.loc[1:, ticker] = -size * coeff[ticker]
+                        position_stock.loc[-1, ticker] = size
+                        position_stock.loc[0:, ticker] = -size * coeff[ticker]
 
                     # Entering a short position
                     elif s_scores[ticker] > sso:
-                        position_stock.loc['stock', ticker] = - size
-                        position_stock.loc[1:, ticker] = size * coeff[ticker]
+                        position_stock.loc[-1, ticker] = - size
+                        position_stock.loc[0:, ticker] = size * coeff[ticker]
 
                 # Exiting a long position
                 elif position_stock[ticker][0] > 0 and s_scores[ticker] > -ssc:
@@ -334,7 +334,7 @@ class PCAStrategy:
         target_quantities = pd.DataFrame()
 
         # Series of current positions for assets in our portfolio
-        position_stock = pd.DataFrame(0, columns=matrix.columns, index=['stock'] + list(range(self.n_components)))
+        position_stock = pd.DataFrame(0, columns=matrix.columns, index=[-1] + list(range(self.n_components)))
 
         # Iterating through time windows
         for t in range(corr_window - 1, len(matrix.index) - 1):
