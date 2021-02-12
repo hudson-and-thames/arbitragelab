@@ -11,35 +11,38 @@ from datetime import datetime as dt
 from requests import get
 import analytics
 
-# Env Var
-API_KEY_ENV_VAR = "ARBLAB_API_KEY"  # User ID
-SEGMENT = 'r7uCHEvWWUshccLG6CYTOaZ3j3gA9Wpf'
+
+# pylint: disable=missing-function-docstring
+def validate_env_variable(env_variable_name):
+    try:
+        is_valid = bool(os.environ[env_variable_name])
+    except KeyError:
+        is_valid = False
+
+    return is_valid
 
 
-try:
-    IS_CIRCLECI = bool(os.environ['IS_CIRCLECI'])
-except KeyError:
-    IS_CIRCLECI = False
+# pylint: disable=missing-function-docstring
+def get_user():
+    try:
+        user = os.environ[API_KEY_ENV_VAR]
+    except KeyError:
+        user = 'Robert Angier'
 
-# Set Location and User
-IP = None
-USER = "unknown"
-IS_DEV = IS_CIRCLECI or (os.environ["ARBLAB_API_KEY"][-4:] == '62a0')
+    return user
 
-# pylint: disable=bare-except
-try:
-    IP = get('https://api.ipify.org').text
-    LOCATION = {"ip": IP}
-except:
-    LOCATION = None
 
-try:
-    USER = os.environ[API_KEY_ENV_VAR]
-except KeyError:
-    USER = 'Robert Angier'
+# pylint: disable=missing-function-docstring
+def validate_alum():
+    try:
+        is_circle = bool(validate_env_variable('IS_CIRCLECI'))
+        is_rtd = bool(validate_env_variable('IS_RTD'))
+        is_alum = get_user()[-4:] == '62a0'
+        is_dev = is_circle or is_rtd or is_alum
+    except KeyError:
+        is_dev = False
 
-# Connect with DB
-analytics.write_key = SEGMENT
+    return is_dev
 
 
 # Identify
@@ -64,3 +67,23 @@ def page(url):
 def track(func):
     if not IS_DEV:
         analytics.track(USER, func, {'time': dt.now()})
+
+
+# Env Var
+API_KEY_ENV_VAR = "ARBLAB_API_KEY"  # User ID
+SEGMENT = 'r7uCHEvWWUshccLG6CYTOaZ3j3gA9Wpf'
+
+IP = None
+LOCATION = None
+USER = get_user()
+IS_DEV = validate_alum()
+
+# pylint: disable=bare-except
+try:
+    IP = get('https://api.ipify.org').text
+    LOCATION = {"ip": IP}
+except:
+    LOCATION = None
+
+# Connect with DB
+analytics.write_key = SEGMENT

@@ -91,9 +91,12 @@ will later be used to generate trading signals.\
 Implementation
 **************
 
-.. py:currentmodule:: arbitragelab.distance_approach.DistanceStrategy
+.. automodule:: arbitragelab.distance_approach
 
-.. autofunction:: form_pairs
+.. autoclass:: DistanceStrategy
+   :members: __init__
+
+.. automethod:: DistanceStrategy.form_pairs
 
 Trading signals generation
 ##########################
@@ -139,7 +142,7 @@ quantities of portfolios to hold for each pair (with values -1, 0, or +1).
 Implementation
 **************
 
-.. autofunction:: trade_pairs
+.. automethod:: DistanceStrategy.trade_pairs
 
 Results output and plotting
 ###########################
@@ -166,17 +169,17 @@ Functions that can be used to plot data:
 Implementation
 **************
 
-.. autofunction:: get_signals
+.. automethod:: DistanceStrategy.get_signals
 
-.. autofunction:: get_portfolios
+.. automethod:: DistanceStrategy.get_portfolios
 
-.. autofunction:: get_scaling_parameters
+.. automethod:: DistanceStrategy.get_scaling_parameters
 
-.. autofunction:: get_pairs
+.. automethod:: DistanceStrategy.get_pairs
 
-.. autofunction:: plot_pair
+.. automethod:: DistanceStrategy.plot_pair
 
-.. autofunction:: plot_portfolio
+.. automethod:: DistanceStrategy.plot_portfolio
 
 Examples
 ########

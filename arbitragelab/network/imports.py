@@ -46,6 +46,7 @@ class Golem:
         import arbitragelab.ml_approach as ml_approach
         import arbitragelab.codependence as codependence
         import arbitragelab.cointegration_approach as cointegration_approach
+        import arbitragelab.copula_approach as copula_approach
         import arbitragelab.distance_approach as distance_approach
         import arbitragelab.other_approaches as other_approaches
         import arbitragelab.util as util

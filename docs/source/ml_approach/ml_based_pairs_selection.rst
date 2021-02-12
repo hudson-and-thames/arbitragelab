@@ -69,10 +69,13 @@ dimensions is upper bounded at this value and is chosen empirically.
 Implementation
 **************
 
-.. py:currentmodule:: arbitragelab.ml_approach.PairsSelector
+.. automodule:: arbitragelab.ml_approach
 
-.. autofunction:: dimensionality_reduction_by_components
-.. autofunction:: plot_pca_matrix
+.. autoclass:: PairsSelector
+   :members: __init__
+
+.. automethod:: PairsSelector.dimensionality_reduction_by_components
+.. automethod:: PairsSelector.plot_pca_matrix
 
 Unsupervised Learning
 #####################
@@ -105,10 +108,10 @@ suitable :math:`\epsilon` by observing the global curve turning point.
 Implementation
 **************
 
-.. autofunction:: cluster_using_optics
-.. autofunction:: cluster_using_dbscan
-.. autofunction:: plot_clustering_info
-.. autofunction:: plot_knee_plot
+.. automethod:: PairsSelector.cluster_using_optics
+.. automethod:: PairsSelector.cluster_using_dbscan
+.. automethod:: PairsSelector.plot_clustering_info
+.. automethod:: PairsSelector.plot_knee_plot
 
 Select Pairs 
 ############
@@ -169,15 +172,15 @@ thus providing enough opportunities to exit a position.
 Implementation
 **************
 
-.. autofunction:: get_pairs_by_sector
-.. autofunction:: unsupervised_candidate_pair_selector
-.. autofunction:: plot_selected_pairs
+.. automethod:: PairsSelector.get_pairs_by_sector
+.. automethod:: PairsSelector.unsupervised_candidate_pair_selector
+.. automethod:: PairsSelector.plot_selected_pairs
 
 Following methods describe the results of the selector in various ways.
 
-.. autofunction:: describe
-.. autofunction:: describe_extra
-.. autofunction:: describe_pairs_sectoral_info
+.. automethod:: PairsSelector.describe
+.. automethod:: PairsSelector.describe_extra
+.. automethod:: PairsSelector.describe_pairs_sectoral_info
 
 
 Examples

@@ -12,6 +12,17 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+* :support:`35` Upgrade ArbitrageLab requirements versions (numpy==1.20.1, matplotlib==3.3.4
+  pandas==1.1.5, scikit-learn==0.24.1, scipy==1.6.0, statsmodels==0.12.2).
+* :bug:`34` Data Importer, Distance Approach, ML Approach modules imports were not exposed.
+
+* :release:`0.2.2 <2020-12-24>`
+* :bug:`32` Copulas module imports were not exposed.
+
+* :release:`0.2.1 <2020-12-22>`
+* :bug:`Hot` Error with environment variables in analytics module.
+
+* :release:`0.2.0 <2020-12-14>`
 * :feature:`5` ML Based Pairs Selection (Horta, 2020) and Data Importer added.
 * :support:`5` ML Based Pairs Selection and Data Importer documentation.
 * :feature:`8` Copula strategy added (Liew et al. 2013): Log price (or equivalently, cumulative log returns) based copula strategy.
