@@ -16,11 +16,11 @@ Introduction
 
 Assets that exhibit significant mean-reversion are difficult to find in efficient markets. As a result, investors focus
 on creating long-short asset baskets to form a mean-reverting portfolio whose aggregate value shows mean-reversion.
-Classic solutions including cointegration or canonical correlation analysis can only construct dense mean-reverting
+Classic solutions, including cointegration or canonical correlation analysis, can only construct dense mean-reverting
 portfolios, i.e. they include every asset in the investing universe. These portfolios have shown significant
-disadvantages in transaction costs, P&L interpretability, and capturing meaningful statistical arbitrage opportunities.
-On the other hand, sparse mean-reverting portfolios, which requires trading as few assets as possible, can mitigate
-these shortcomings.
+such as higher transaction costs, worse P&L interpretability, and inability to capture meaningful statistical arbitrage
+opportunities. On the other hand, sparse mean-reverting portfolios, which require trading as few assets as possible, can
+mitigate these shortcomings.
 
 This module provides all the tools to construct sparse mean-reverting portfolios, including:
 
@@ -125,7 +125,7 @@ The portfolio value is a linear combination of the asset prices, and can be expl
     \mathbf{x}^T S_t = \mathbf{x}^T \hat{S}_{t-1} + \mathbf{x}^T \varepsilon_t
 
 Without loss of generality, the price of each asset can be assumed to have a zero mean, and the predictability can now
-be written as
+be written as:
 
 .. math::
 
@@ -165,10 +165,10 @@ where :math:`\gamma_k` is the sample lag-:math:`k` autocovariance matrix, define
     \tilde{S}_t & \equiv S_t - \frac{1}{T} \sum_{t=1}^T S_t
     \end{align*}
 
-The module follows closely to the d'Aspremont (2011) and Cuturi (2015) paper as to which estimate of :math:`A` is used
+The module follows closely to the d'Aspremont (2011) and Cuturi (2015) papers as to which estimate of :math:`A` is used
 in the portfolio selection optimization.
 
-The predictablity of the time series under the VAR(1) model assumption can be now written as:
+The predictability of the time series under the VAR(1) model assumption can be now written as:
 
 .. math::
 
@@ -190,12 +190,12 @@ predictability.
 Portmanteau Statistic
 *********************
 
-Portmanteau statistic of order :math:`p` (Ljung and Box, 1978) tests if a process is white noise.
-By definition, the portmanteau statistic is 0 if a process is white noise. Therefore, maximizing mean-reversion strength
+Portmanteau statistic of order :math:`p` (Ljung and Box, 1978) tests if a process is a white noise.
+By definition, the portmanteau statistic is 0 if a process is a white noise. Therefore, maximizing mean-reversion strength
 is equivalent to minimizing the portmanteau statistic.
 
-The advantage of portmanteau statistic over the Box-Tiao predictability is that this statistic requires no modeling
-assumptions. The disadvantage, on the other hand, is higher computational complexity. The estimate of portmanteau
+The advantage of the portmanteau statistic over the Box-Tiao predictability is that this statistic requires no modeling
+assumptions. The disadvantage, on the other hand, is higher computational complexity. The estimate of the portmanteau
 statistic of order :math:`p` is given as follows:
 
 .. math::
@@ -233,7 +233,7 @@ Covariance Selection via Graphical LASSO and Structured VAR(1) Estimate via Pena
 The Box-Tiao canonical decomposition relies on estimates of both the covariance matrix :math:`\Gamma_0` and the VAR(1)
 coefficient matrix :math:`A` of the asset prices. Using an :math:`\ell_1`-penalty, as shown in d'Aspremont (2011),
 is able to simultaneously obtain numerically stable estimates and isolate key idiosyncratic dependencies
-in the asset prices. The penalized estimates of :math:`\Gamma_0` and :math:`A` provides different perspective on the
+in the asset prices. The penalized estimates of :math:`\Gamma_0` and :math:`A` provides a different perspective on the
 conditional dependencies and their graphical representations help cluster the assets into several smaller groups.
 Therefore, both covariance selection and structured VAR(1) estimation can be regarded as a preprocessing step for the
 sparse canonical decomposition techniques, i.e. the greedy search and the SDP approach.
@@ -334,7 +334,7 @@ demonstrates an example of the clustering process.
     :width: 100 %
     :align: center
 
-    Figure 5. The clustering process via penalized estimates of inverse covariance matrix and VAR(1) coefficient matrix.
+    Figure 5. The clustering process via penalized estimates of the inverse covariance matrix and VAR(1) coefficient matrix.
 
 Greedy Search
 #############
@@ -368,7 +368,7 @@ To get a sparse portfolio, a cardinality constraint has to be added to this mini
 where :math:`\lVert \mathbf{x} \rVert_0` denotes the number of non-zeros coefficients in the portfolio weight vector
 :math:`\mathbf{x}`. Natarajan (1995) has shown that this sparse generalized eigenvalue problem is equivalent to subset
 selection, which is an NP-hard problem. Since no polynomial time solutions are available to get the global optimal
-solution, greedy search is thus used to get good approximate solutions of the problem, which will have a polynomial time
+solution, a greedy search is thus used to get good approximate solutions to the problem, which will have a polynomial time
 complexity.
 
 Algorithm Description
@@ -697,11 +697,11 @@ portfolio selection module.
 References
 ##########
 
-* Cuturi, M. and d'Aspremont, A., 2015. Mean-reverting portfolios: Tradeoffs between sparsity and volatility. arXiv preprint arXiv:1509.05954.
-* d'Aspremont, A., 2011. Identifying small mean-reverting portfolios. Quantitative Finance, 11(3), pp.351-364.
-* Fogarasi, N. and Levendovszky, J., 2012. Improved parameter estimation and simple trading algorithm for sparse, mean-reverting portfolios. In Annales Univ. Sci. Budapest., Sect. Comp, 37, pp. 121-144.
-* Gilbert, J.R., 1994. Predicting structure in sparse matrix computations. SIAM Journal on Matrix Analysis and Applications, 15(1), pp.62-79.
-* Kedem, B. and Yakowitz, S., 1994. Time series analysis by higher order crossings (pp. 115-143). New York: IEEE press.
-* Ljung, G.M. and Box, G.E., 1978. On a measure of lack of fit in time series models. Biometrika, 65(2), pp.297-303.
-* Natarajan, B.K., 1995. Sparse approximate solutions to linear systems. SIAM journal on computing, 24(2), pp.227-234.
-* Yuan, X.T. and Zhang, T., 2013. Truncated Power Method for Sparse Eigenvalue Problems. Journal of Machine Learning Research, 14(4).
+* `Cuturi, M. and d'Aspremont, A., 2015. Mean-reverting portfolios: Tradeoffs between sparsity and volatility. arXiv preprint arXiv:1509.05954. <https://arxiv.org/pdf/1509.05954.pdf>`__
+* `d'Aspremont, A., 2011. Identifying small mean-reverting portfolios. Quantitative Finance, 11(3), pp.351-364. <https://arxiv.org/pdf/0708.3048.pdf>`__
+* `Fogarasi, N. and Levendovszky, J., 2012. Improved parameter estimation and simple trading algorithm for sparse, mean-reverting portfolios. In Annales Univ. Sci. Budapest., Sect. Comp, 37, pp. 121-144. <http://www.hit.bme.hu/~fogarasi/Fogarasi12Improved.pdf>`__
+* `Gilbert, J.R., 1994. Predicting structure in sparse matrix computations. SIAM Journal on Matrix Analysis and Applications, 15(1), pp.62-79. <https://www.osti.gov/servlets/purl/6987948>`__
+* `Kedem, B. and Yakowitz, S., 1994. Time series analysis by higher order crossings (pp. 115-143). New York: IEEE press. <http://www2.math.umd.edu/~bnk/HOC.Japan02.pdf>`__
+* `Ljung, G.M. and Box, G.E., 1978. On a measure of lack of fit in time series models. Biometrika, 65(2), pp.297-303. <https://apps.dtic.mil/sti/pdfs/ADA049397.pdf>`__
+* `Natarajan, B.K., 1995. Sparse approximate solutions to linear systems. SIAM journal on computing, 24(2), pp.227-234. <https://epubs.siam.org/doi/abs/10.1137/S0097539792240406?journalCode=smjcat>`__
+* `Yuan, X.T. and Zhang, T., 2013. Truncated Power Method for Sparse Eigenvalue Problems. Journal of Machine Learning Research, 14(4). <https://www.jmlr.org/papers/volume14/yuan13a/yuan13a.pdf>`__
