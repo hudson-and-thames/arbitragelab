@@ -23,7 +23,7 @@ bump2version==1.0.1
 bumpversion==0.6.0
 codecov==2.1.11
 coverage==5.4
-pylint==2.6.0
+pylint==2.5.3
 sphinx==3.4.3 # Docs
 sphinx-rtd-theme==0.5.1 # Docs
 releases==1.6.3 # Docs
