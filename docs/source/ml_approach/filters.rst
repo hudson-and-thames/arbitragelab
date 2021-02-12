@@ -61,7 +61,7 @@ Example
     # Calculating spread returns and std dev.
     spread_series = data['spread']
     spread_diff_series = spread_series.diff()
-    spread_diff_std = self.spread_diff_series.std()
+    spread_diff_std = spread_diff_series.std()
     
     # Initializing ThresholdFilter with 2 std dev band for buying and selling triggers.
     thres_filter = ThresholdFilter(buy_threshold=-spread_diff_std*2,
@@ -101,7 +101,7 @@ Example
     # Calculate spread returns and std dev.
     spread_series = data['spread']
     spread_diff_series = spread_series.diff()
-    spread_diff_std = self.spread_diff_series.std()
+    spread_diff_std = spread_diff_series.std()
     
     # Initialize the TAR asymmetry coefficients.
     p_1 = -0.012957
@@ -110,7 +110,7 @@ Example
     buy_thresh = abs(p_1) * spread_diff_std*2
     sell_thresh = - abs(p_2) * spread_diff_std*2
     
-    # Initialize ThresholdFilter with 2 std dev band for buying and selling triggers.
+    # Initialize ThresholdFilter with asymmetric buying and selling triggers.
     asym_thres_filter = ThresholdFilter(buy_threshold=buy_thresh,
                                         sell_threshold=sell_thresh)
 
@@ -239,6 +239,8 @@ Similarly, periods of lower volatility are categorised as
     
     Example plot from a fitted VolatilityFilter class.
 
+Implementation
+**************
 
 .. autoclass:: VolatilityFilter
     :noindex:

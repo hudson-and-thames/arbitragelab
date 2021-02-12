@@ -74,8 +74,9 @@ Example
 
     # Initialize a basic regression neural network.
     regressor = MultiLayerPerceptron(frame_size, num_outputs=1, loss_fn="mean_squared_error", 
-                                      optmizer="adam", metrics=[], hidden_layer_activation_function="relu",
-                                      output_layer_act_func="linear")
+                                     optmizer="adam", metrics=[],
+                                     hidden_layer_activation_function="relu",
+                                     output_layer_act_func="linear")
 
     # This will compile the keras model structure implemented.
     regressor.build()
@@ -88,10 +89,10 @@ Example
 
     # Fit compiled model with training data.
     regressor.fit(X_train, y_train,
-                    batch_size=20, epochs=400,
-                    verbose=1)
+                  batch_size=20, epochs=400,
+                  verbose=1)
 
-    # Plot loss vs epochs
+    # Plot loss vs epochs.
     regressor.plot_loss()
                     
     # Finally use the fitted model to predict test set.
@@ -150,9 +151,10 @@ hidden state, and gating mechanism.
     _, frame_size, no_features = X_train.shape
   
     # Initialize a basic regression recurrent neural network.
-    regressor = RecurrentNeuralNetwork((frame_size, no_features), num_outputs=1, loss_fn="mean_squared_error", 
-                                      optmizer="adam", metrics=[], hidden_layer_activation_function="relu",
-                                      output_layer_act_func="linear")
+    regressor = RecurrentNeuralNetwork((frame_size, no_features), num_outputs=1,
+                                       loss_fn="mean_squared_error", optmizer="adam",
+                                       metrics=[], hidden_layer_activation_function="relu",
+                                       output_layer_act_func="linear")
 
     # This will compile the keras model structure implemented.
     regressor.build()
@@ -162,8 +164,8 @@ hidden state, and gating mechanism.
 
     # Fit compiled model with training data.
     regressor.fit(X_train, y_train,
-                    batch_size=20, epochs=400,
-                    verbose=1)
+                  batch_size=20, epochs=400,
+                  verbose=1)
 
     # Plot loss vs epochs.
     regressor.plot_loss()
@@ -278,8 +280,9 @@ Example
 
     # Initialize a basic regression neural network.
     regressor = MultiLayerPerceptron(frame_size, num_outputs=1, loss_fn="mean_squared_error", 
-                                      optmizer="adam", metrics=[], hidden_layer_activation_function="relu",
-                                      output_layer_act_func="linear")
+                                     optmizer="adam", metrics=[],
+                                     hidden_layer_activation_function="relu",
+                                     output_layer_act_func="linear")
 
     # This will compile the keras model structure implemented.
     regressor.build()
@@ -292,8 +295,8 @@ Example
 
     # Fit compiled model with training data.
     regressor.fit(X_train, y_train,
-                    batch_size=20, epochs=100,
-                    verbose=1)
+                  batch_size=20, epochs=100,
+                  verbose=1)
 
     # Plot loss vs epochs.
     regressor.plot_loss()
@@ -353,8 +356,9 @@ can be used for their training.
 
     # Initialize a basic regression pi sigma neural network.
     regressor = PiSigmaNeuralNetwork(frame_size, num_outputs=1, loss_fn="mean_squared_error", 
-                                      optmizer="adam", metrics=[], hidden_layer_activation_function="relu",
-                                      output_layer_act_func="linear")
+                                     optmizer="adam", metrics=[],
+                                     hidden_layer_activation_function="relu",
+                                     output_layer_act_func="linear")
 
     # This will compile the keras model structure implemented.
     regressor.build()
@@ -367,8 +371,8 @@ can be used for their training.
 
     # Fit compiled model with training data.
     regressor.fit(X_train, y_train,
-                    batch_size=20, epochs=100,
-                    verbose=1)
+                  batch_size=20, epochs=100,
+                  verbose=1)
 
     # Plot loss vs epochs.
     regressor.plot_loss()

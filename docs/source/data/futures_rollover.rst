@@ -147,4 +147,4 @@ References
 ##########
 
 - `Masteika, S., Rutkauskas, A.V. and Alexander, J.A., 2012, February. Continuous futures data series for back testing and technical analysis. In Conference proceedings, 3rd international conference on financial theory and engineering (Vol. 29, pp. 265-269). IACSIT Press. <http://www.ipedr.com/vol29/48-CEBMM2012-R00003.pdf>`__
-- `Seykota, Ed 2003, Continuous Contracts, <https://www.seykota.com/tribe/TSP/Continuous/index.htm>`_
+- `Seykota, Ed 2003, Continuous Contracts <https://www.seykota.com/tribe/TSP/Continuous/index.htm>`_
