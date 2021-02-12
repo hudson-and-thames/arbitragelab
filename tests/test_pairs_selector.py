@@ -15,6 +15,7 @@ from arbitragelab.ml_approach import PairsSelector
 
 # pylint: disable=protected-access
 
+
 class TestPairsSelector(unittest.TestCase):
     """
     Tests Pairs Selector class.

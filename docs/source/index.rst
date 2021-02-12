@@ -51,6 +51,7 @@ This project is licensed under an all rights reserved licence.
     getting_started/installation
     getting_started/research_tools
     getting_started/roadmap
+    getting_started/equity_curve_convention
 
 .. toctree::
     :maxdepth: 2
@@ -100,7 +101,10 @@ This project is licensed under an all rights reserved licence.
 
     copula_approach/introduction
     copula_approach/copula_brief_intro
-    copula_approach/trading_strategy
+    copula_approach/copula_deeper_intro
+    copula_approach/basic_trading_strategy
+    copula_approach/mispricing_index_strategy
+    copula_approach/utility_functions
 
 .. toctree::
     :maxdepth: 2
