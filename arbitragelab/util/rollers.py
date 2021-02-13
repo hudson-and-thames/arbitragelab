@@ -7,7 +7,6 @@ This module implements the (Crude Oil Future, NBP Future, RBOB Future, Grain Bas
 
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 from matplotlib.axes._axes import Axes
 
 from arbitragelab.util.base_futures_roller import BaseFuturesRoller

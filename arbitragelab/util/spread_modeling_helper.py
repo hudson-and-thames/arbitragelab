@@ -330,20 +330,17 @@ class SpreadModelingHelper:
         self.plot_regression_results(axs[0],
                                      self.target_train,
                                      predicted_train_y,
-                                     "Predicting Training Set",
-                                     figsize)
+                                     "Predicting Training Set")
 
         self.plot_regression_results(axs[1],
                                      self.target_test,
                                      predicted_test_y,
-                                     "Predicting Test Set",
-                                     figsize)
+                                     "Predicting Test Set")
 
         self.plot_regression_results(axs[2],
                                      self.target_oos,
                                      predicted_oos_y,
-                                     "Predicting Out of Sample Set",
-                                     figsize)
+                                     "Predicting Out of Sample Set")
 
         self.train_pred = predicted_train_y
         self.test_pred = predicted_test_y
@@ -377,7 +374,7 @@ class SpreadModelingHelper:
 
     @staticmethod
     def plot_regression_results(ax_object: object, y_true: pd.Series, y_pred: pd.Series,
-                                title: str, figsize: tuple = (15, 10)) -> Axes:
+                                title: str) -> Axes:
         """
         Plots Regression results (predicted vs ground) for visual comparison.
 
@@ -385,7 +382,6 @@ class SpreadModelingHelper:
         :param ytrue: (pd.Series) The ground truth data.
         :param ypred: (pd.Series) The predicted data.
         :param title: (str) Title for plot.
-        :param figsize: (tuple) Figure size for plot.
         :return: (Axes)
         """
 

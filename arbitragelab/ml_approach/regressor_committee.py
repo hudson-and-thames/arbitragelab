@@ -117,12 +117,12 @@ class RegressorCommittee:
         _, axs = plt.subplots(len(self.committee_members),
                               figsize=(figsize[0], figsize[1] * len(self.committee_members)))
 
-        for idx, (ax, member) in enumerate(zip(axs, self.committee_members)):
-            ax.plot(member.history.history['loss'])
-            ax.plot(member.history.history['val_loss'])
-            ax.legend(['Training Loss', 'Validation Loss'])
-            ax.set_xlabel("Epochs")
-            ax.set_ylabel("Loss")
-            ax.set_title("Loss Plot of Member " + str(idx))
+        for idx, (plot_obj, member) in enumerate(zip(axs, self.committee_members)):
+            plot_obj.plot(member.history.history['loss'])
+            plot_obj.plot(member.history.history['val_loss'])
+            plot_obj.legend(['Training Loss', 'Validation Loss'])
+            plot_obj.set_xlabel("Epochs")
+            plot_obj.set_ylabel("Loss")
+            plot_obj.set_title("Loss Plot of Member " + str(idx))
 
         return axs
