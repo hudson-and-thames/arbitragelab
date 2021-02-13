@@ -26,11 +26,13 @@ class TestFeatureExpander(unittest.TestCase):
         expanded_data = FeatureExpander(methods=['laguerre', 'power', 'chebyshev', 'legendre'],
                                         n_orders=2).fit(data).transform()
 
-        # Check that it returned the right amount of terms.
-        self.assertEqual(len(expanded_data.columns), 26)
+        # Check that it returned the right values.
+        self.assertAlmostEqual(expanded_data.iloc[-1].mean(), 0.807, 2)
+        self.assertAlmostEqual(expanded_data.iloc[:, 6].mean(), 0.5)
 
         expanded_data = FeatureExpander(methods=['product'],
                                         n_orders=2).fit(data).transform()
 
-        # Check that it returned the right amount of terms.
-        self.assertEqual(len(expanded_data.columns), 3)
+        # Check that it returned the right values.
+        self.assertAlmostEqual(expanded_data.iloc[-1].mean(), 1)
+        self.assertAlmostEqual(expanded_data.iloc[2].mean(), 0.33, 2)

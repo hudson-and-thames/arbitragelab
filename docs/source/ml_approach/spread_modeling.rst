@@ -90,6 +90,19 @@ Trading and hedging the corn/ethanol crush spread using time-varying leverage an
 - Novel Modes : MLP, HONN, GPA
 - Filters : Time Varying Volatility Filter 
 
+Research Notebooks
+##################
+
+The following research notebooks can be used to better understand the components of the framework described above.
+
+* `Crack Spread Modeling`_ - implements the use of the filters and networks on the crack spread.
+* `Fair Value Modeling`_ - implements the use of the TAR model on the crack spread.
+
+.. _`Crack Spread Modeling`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/ML%20Approach/crack_spread_modeling.ipynb
+
+.. _`Fair Value Modeling`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/ML%20Approach/fair_value_modeling.ipynb
+
+
 References
 ##########
 

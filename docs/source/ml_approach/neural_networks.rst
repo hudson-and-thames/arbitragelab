@@ -30,15 +30,6 @@ inputs and the target variables. They can overcome messy data such as noise and
 imprecision in the measurement system. Neural networks are appropriate for regression
 as well as classification, time series analysis and clustering. 
 
-Base Implementation
-*******************
-
-.. py:currentmodule:: arbitragelab.ml_approach.neural_networks
-
-.. autoclass:: BaseNeuralNetwork
-    :noindex:
-    :members: __init__, fit, predict, plot_loss
-
 Multi Layer Perceptron
 ######################
 
@@ -46,6 +37,8 @@ The MLP allows the user to select a set of activation functions to explore inclu
 identity, logistic, hyperbolic tangent, negative exponential and sine. These activation
 functions can be used for both hidden and output neurons. MLP also trains networks 
 using a variety of algorithms such as gradient descent and conjugant descent.
+
+.. py:currentmodule:: arbitragelab.ml_approach.neural_networks
 
 .. autoclass:: MultiLayerPerceptron
     :noindex:

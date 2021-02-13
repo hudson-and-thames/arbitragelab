@@ -118,15 +118,13 @@ taking a linearly weighted proportion of each contract over a number of days to 
 smoother transition between each. The problem with the rollover method is that it requires
 trading on all five days, which can increase transaction costs.
 
-
 Base Implementation
 *******************
 .. py:currentmodule:: arbitragelab.util.base_futures_roller
 
-.. autoclass:: BaseFuturesRoller
-    :noindex:
-    :members: __init__, fit, diagnostic_summary, transform
-    
+.. automethod:: BaseFuturesRoller.fit
+.. automethod:: BaseFuturesRoller.transform
+.. automethod:: BaseFuturesRoller.diagnostic_summary
 
 Contract Specific Implementations
 *********************************
@@ -142,7 +140,46 @@ Contract Specific Implementations
     :noindex:
 .. autoclass:: EthanolFutureRoller
     :noindex:
-    
+
+Example
+*******
+
+.. code-block::
+
+    # Importing packages
+    from arbitragelab.util.rollers import *
+
+    # Getting the dataframe with time series of continous future prices.
+    data = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])
+
+    # Fit corresponding roller and retrieve gaps.
+    wti_roller = CrudeOilFutureRoller().fit(data)
+    wti_gaps = wti_roller.transform()
+
+    # Store forward rolled series.
+    rolled_contract = cl_df['PX_LAST'] - wti_gaps
+
+    # Sometimes rolled contracts dip into negative territory. This
+    # can cause problems when used for ml models, thus there is the
+    # ability of using the parameter 'handle_negative_roll', which
+    # will process the price data into positive returns data.
+    non_negative_contract = wti_roller.transform(handle_negative_roll=True)
+
+    # The diagnostic summary is a helper function to help the user
+    # easily double check expiration dates and their respective gap
+    # calculations.
+    wti_diag_frame = wti_roller.diagnostic_summary()
+    wti_diag_frame.head(10)
+
+Research Notebooks
+##################
+
+The following research notebook can be used to better understand the implementation described above.
+
+* `Futures Rollover`_ - implements the use of the various rollers on specific contracts.
+
+.. _`Futures Rollover`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/ML%20Approach/futures_rollover.ipynb
+
 References
 ##########
 

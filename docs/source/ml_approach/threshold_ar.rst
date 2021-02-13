@@ -115,7 +115,7 @@ Example
     
     tar_results.fittedvalues.plot()
 
-    # Plotting results.
+    # Show metrics on model fit.
     model.summary()
     
 

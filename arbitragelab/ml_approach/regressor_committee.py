@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 from keras.callbacks import EarlyStopping
 import matplotlib.pyplot as plt
+from matplotlib.axes._axes import Axes
 
 from arbitragelab.ml_approach import neural_networks
 
@@ -105,19 +106,23 @@ class RegressorCommittee:
         # Return Axis 0 wise mean.
         return np.mean(reshaped_predictions, axis=0)
 
-    def plot_losses(self, figsize: tuple = (15, 5)):
+    def plot_losses(self, figsize: tuple = (15, 8)) -> Axes:
         """
         Plot all individual member loss metrics.
 
         :param figsize: (tuple)
+        :return: (Axes)
         """
 
-        for idx, member in enumerate(self.committee_members):
-            plt.figure(figsize=figsize)
-            plt.plot(member.history.history['loss'])
-            plt.plot(member.history.history['val_loss'])
-            plt.legend(['Training Loss', 'Validation Loss'])
-            plt.xlabel("Epochs")
-            plt.ylabel("Loss")
-            plt.title("Loss Plot of Member " + str(idx))
-            plt.show()
+        _, axs = plt.subplots(len(self.committee_members),
+                              figsize=(figsize[0], figsize[1] * len(self.committee_members)))
+
+        for idx, (ax, member) in enumerate(zip(axs, self.committee_members)):
+            ax.plot(member.history.history['loss'])
+            ax.plot(member.history.history['val_loss'])
+            ax.legend(['Training Loss', 'Validation Loss'])
+            ax.set_xlabel("Epochs")
+            ax.set_ylabel("Loss")
+            ax.set_title("Loss Plot of Member " + str(idx))
+
+        return axs

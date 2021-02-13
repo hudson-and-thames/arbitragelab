@@ -6,7 +6,7 @@ Tests functionality of Futures Rolling module.
 """
 import os
 import unittest
-
+import matplotlib
 import numpy as np
 import pandas as pd
 
@@ -23,6 +23,9 @@ class TestFuturesRoller(unittest.TestCase):
         """
         Loads futures price data.
         """
+
+        # Set working seed.
+        np.random.seed(0)
 
         project_path = os.path.dirname(__file__)
 
@@ -70,7 +73,7 @@ class TestFuturesRoller(unittest.TestCase):
 
         # Roll the prices series, should be mostly positive, but at the end there should be
         # a negative dip that needs to show up in the rolled up series.
-        self.assertEqual(np.sign(wti_gaps.cumsum().mean()), np.sign(-1))
+        self.assertAlmostEqual(wti_gaps.cumsum().mean(), -40567.73, 1)
 
         # Roll the future price series and handle negative roll, (the event of march 2020).
         # The end result from the 'handle_negative_roll' should always be positive.
@@ -81,7 +84,8 @@ class TestFuturesRoller(unittest.TestCase):
         # Check sign of top 10 gaps from the whole series. Should be negative.
         top_gaps = summary.sort_values(by='gap').head(10)['gap']
         mean_top_gaps = top_gaps.values.cumsum().mean()
-        self.assertEqual(np.sign(mean_top_gaps), np.sign(-1))
+
+        self.assertAlmostEqual(mean_top_gaps, -20.79, 1)
 
     def test_uk_gas_roller(self):
         """
@@ -95,13 +99,13 @@ class TestFuturesRoller(unittest.TestCase):
         nbp_gaps = nbp_roller.transform()
 
         # Check that the forward rolled series is positive.
-        self.assertEqual(
-            np.sign((self.nbp_data['PX_LAST'] - nbp_gaps).mean()), np.sign(1))
+        self.assertAlmostEqual((self.nbp_data['PX_LAST'] - nbp_gaps).mean(), 139.27, 1)
 
         # Check that the backward rolled series is also positive.
         non_negative_nbp = nbp_roller.transform(
             roll_forward=False, handle_negative_roll=True)
-        self.assertEqual(np.sign(non_negative_nbp.cumsum().mean()), np.sign(1))
+
+        self.assertAlmostEqual(non_negative_nbp.cumsum().mean(), 188.19, 1)
 
     def test_gasoline_roller(self):
         """
@@ -115,7 +119,7 @@ class TestFuturesRoller(unittest.TestCase):
         rbob_gaps = rbob_roller.transform()
 
         # Check that the forward rolled series is positive.
-        self.assertEqual(np.sign(rbob_gaps.cumsum().mean()), np.sign(1))
+        self.assertAlmostEqual(rbob_gaps.cumsum().mean(), 264658.23, 1)
 
     def test_grain_roller(self):
         """
@@ -129,7 +133,7 @@ class TestFuturesRoller(unittest.TestCase):
         soyb_gaps = soyb_roller.transform()
 
         # Roll the prices series, should be mostly positive.
-        self.assertEqual(np.sign(soyb_gaps.cumsum().mean()), np.sign(1))
+        self.assertAlmostEqual(soyb_gaps.cumsum().mean(), 719093.54, 1)
 
     def test_ethanol_roller(self):
         """
@@ -142,7 +146,7 @@ class TestFuturesRoller(unittest.TestCase):
         ethanol_gaps = ethanol_roller.transform()
 
         # Roll the prices series, should be mostly positive.
-        self.assertEqual(np.sign(ethanol_gaps.cumsum().mean()), np.sign(1))
+        self.assertAlmostEqual(ethanol_gaps.cumsum().mean(), 615.54, 1)
 
     def test_contango_backwardation_plotter(self):
         """
@@ -150,4 +154,6 @@ class TestFuturesRoller(unittest.TestCase):
         method.
         """
 
-        plot_historical_future_slope_state(self.eh1_data['PX_LAST'], self.eh2_data['PX_OPEN'])
+        result_plot = plot_historical_future_slope_state(self.eh1_data['PX_LAST'], self.eh2_data['PX_OPEN'])
+
+        self.assertTrue(issubclass(type(result_plot), matplotlib.axes.SubplotBase))

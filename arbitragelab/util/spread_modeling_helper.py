@@ -8,6 +8,7 @@ This module implements the Spread Modeling Helper class.
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib.axes._axes import Axes
 
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score
@@ -206,16 +207,12 @@ class SpreadModelingHelper:
         corr_vol_events.dropna(inplace=True)
 
         if plot:
-            self.plot_trades(unfiltered_events, "Unfiltered", figsize=figsize)
-            plt.show()
-            self.plot_trades(std_events, "Threshold Filter", figsize=figsize)
-            plt.show()
-            self.plot_trades(corr_events, "Correlation Filter", figsize=figsize)
-            plt.show()
-            self.plot_trades(std_vol_events, "Threshold + Volatility Leverage Filter", figsize=figsize)
-            plt.show()
-            self.plot_trades(corr_vol_events, "Correlation + Volatility Leverage Filter", figsize=figsize)
-            plt.show()
+            _, axs = plt.subplots(5, figsize=(figsize[0], figsize[1]*5))
+            self.plot_trades(axs[0], unfiltered_events, "Unfiltered")
+            self.plot_trades(axs[1], std_events, "Threshold Filter")
+            self.plot_trades(axs[2], corr_events, "Correlation Filter")
+            self.plot_trades(axs[3], std_vol_events, "Threshold + Volatility Leverage Filter")
+            self.plot_trades(axs[4], corr_vol_events, "Correlation + Volatility Leverage Filter")
 
         return unfiltered_events, std_events, corr_events, std_vol_events, corr_vol_events
 
@@ -308,15 +305,16 @@ class SpreadModelingHelper:
                                               'Annual Volatility', 'Max Drawdown',
                                               'Sharpe Ratio'])
 
-    def plot_model_results(self, model, figsize=(15, 10)):
+    def plot_model_results(self, model, figsize=(15, 10)) -> Axes:
         """
         Plots the regression results for the training, test and oos sets.
 
         :param model: (Object) ML model that has the method 'predict' implemented.
         :param figsize: (tuple) Figure size for plot.
-        :return: (tuple) Predicted target values for all sets
+        :return: (Axes)
         """
 
+        # Run model on each of the sets.
         predicted_train_y = pd.Series(model.predict(self.input_train))
         predicted_train_y.index = self.target_train.index
 
@@ -326,17 +324,23 @@ class SpreadModelingHelper:
         predicted_oos_y = pd.Series(model.predict(self.input_oos))
         predicted_oos_y.index = self.target_oos.index
 
-        self.plot_regression_results(self.target_train,
+        # Plot predictions for all sets.
+        _, axs = plt.subplots(3, figsize=(figsize[0], figsize[1]*3))
+
+        self.plot_regression_results(axs[0],
+                                     self.target_train,
                                      predicted_train_y,
                                      "Predicting Training Set",
                                      figsize)
-        plt.show()
-        self.plot_regression_results(self.target_test,
+
+        self.plot_regression_results(axs[1],
+                                     self.target_test,
                                      predicted_test_y,
                                      "Predicting Test Set",
                                      figsize)
-        plt.show()
-        self.plot_regression_results(self.target_oos,
+
+        self.plot_regression_results(axs[2],
+                                     self.target_oos,
                                      predicted_oos_y,
                                      "Predicting Out of Sample Set",
                                      figsize)
@@ -345,48 +349,52 @@ class SpreadModelingHelper:
         self.test_pred = predicted_test_y
         self.oos_pred = predicted_oos_y
 
-        return predicted_train_y, predicted_test_y, predicted_oos_y
+        return axs
 
     @staticmethod
-    def plot_trades(events: pd.DataFrame, title: str, figsize: tuple = (15, 10)):
+    def plot_trades(ax_object: object, events: pd.DataFrame, title: str) -> Axes:
         """
         Plots long/short/all trades given a set of labeled returns.
 
+        :param ax_object: (Object) Matplotlib plotting object.
         :param events: (pd.DataFrame) Trade DataFrame with returns and side as columns.
         :param title: (str) Title to use for the plot.
-        :param figsize: (tuple) Figure size for plot.
+        :return: (Axes)
         """
-
-        plt.figure(figsize=figsize)
 
         long_trades = events[(events['side'] == 1)].iloc[:, 0]
         short_trades = -(events[(events['side'] == -1)].iloc[:, 0])
         all_trades = pd.concat([long_trades, short_trades]).sort_index()
 
-        plt.plot(np.cumprod(1 + long_trades.values) - 1)
-        plt.plot(np.cumprod(1 + short_trades.values) - 1)
-        plt.plot(np.cumprod(1 + all_trades.values) - 1)
+        ax_object.plot(np.cumprod(1 + long_trades.values) - 1)
+        ax_object.plot(np.cumprod(1 + short_trades.values) - 1)
+        ax_object.plot(np.cumprod(1 + all_trades.values) - 1)
 
-        plt.legend(['long trades', 'short trades', 'all trades'])
-        plt.title(title)
+        ax_object.legend(['long trades', 'short trades', 'all trades'])
+        ax_object.set_title(title)
+
+        return ax_object
 
     @staticmethod
-    def plot_regression_results(y_true: pd.Series, y_pred: pd.Series, title: str, figsize: tuple = (15, 10)):
+    def plot_regression_results(ax_object: object, y_true: pd.Series, y_pred: pd.Series,
+                                title: str, figsize: tuple = (15, 10)) -> Axes:
         """
         Plots Regression results (predicted vs ground) for visual comparison.
 
+        :param ax_object: (Object) Matplotlib plotting object.
         :param ytrue: (pd.Series) The ground truth data.
         :param ypred: (pd.Series) The predicted data.
         :param title: (str) Title for plot.
         :param figsize: (tuple) Figure size for plot.
+        :return: (Axes)
         """
 
         print("This is r^2 score for " + str(title) + ": " + str(r2_score(y_true, y_pred)))
 
-        plt.figure(figsize=figsize)
+        ax_object.plot(y_pred)
+        ax_object.plot(y_true, alpha=0.5)
 
-        plt.plot(y_pred)
-        plt.plot(y_true, alpha=0.5)
+        ax_object.legend(["Predicted Y", "True Y"])
+        ax_object.set_title(title)
 
-        plt.legend(["Predicted Y", "True Y"])
-        plt.title(title)
+        return ax_object

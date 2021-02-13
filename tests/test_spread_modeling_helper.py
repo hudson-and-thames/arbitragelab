@@ -6,7 +6,9 @@ Tests Spread Modeling Helper Class.
 """
 import os
 import unittest
+import numpy as np
 import pandas as pd
+import tensorflow as tf
 
 from arbitragelab.cointegration_approach.johansen import JohansenPortfolio
 from arbitragelab.ml_approach.regressor_committee import RegressorCommittee
@@ -22,6 +24,16 @@ class TestSpreadModelingHelper(unittest.TestCase):
         Loads data needed for model fitting.
         """
 
+        # Set seed values to numerical libraries.
+        seed_value = 0
+        np.random.seed(seed_value)
+        tf.random.set_seed(seed_value)
+
+        session_conf = tf.compat.v1.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
+        sess = tf.compat.v1.Session(graph=tf.compat.v1.get_default_graph(), config=session_conf)
+        tf.compat.v1.keras.backend.set_session(sess)
+
+        # Collect all contract price data.
         project_path = os.path.dirname(__file__)
 
         wti_contract_df = pd.read_csv(project_path + '/test_data/NonNegative_CL_forward_roll.csv').set_index('Dates')
@@ -33,6 +45,7 @@ class TestSpreadModelingHelper(unittest.TestCase):
 
         working_df.dropna(inplace=True)
 
+        # Transform contract price data to spread.
         johansen_portfolio = JohansenPortfolio()
         johansen_portfolio.fit(working_df)
         sprd = johansen_portfolio.construct_mean_reverting_portfolio(working_df).pct_change()
@@ -55,22 +68,30 @@ class TestSpreadModelingHelper(unittest.TestCase):
                       'optmizer': "adam", 'metrics': [], 'hidden_layer_activation_function': "sigmoid",
                       'output_layer_act_func': "linear"}
 
-        committee = RegressorCommittee(mlp_params, num_committee=1, epochs=100, verbose=False)
+        committee = RegressorCommittee(mlp_params, num_committee=2, epochs=100, verbose=False)
         fitted_com = committee.fit(helper.input_train, helper.target_train, helper.input_test, helper.target_test)
+
+        # Check Result plotting functionality.
+        self.assertTrue(issubclass(type(helper.plot_model_results(committee)), np.ndarray))
 
         # Check if fit return is a valid Committee object.
         self.assertTrue(type(fitted_com), RegressorCommittee)
 
-        # Check if predictions of all sets are returned.
-        self.assertTrue(len(helper.plot_model_results(committee)) == 3)
+        # Check Loss plotting functionality.
+        self.assertTrue(issubclass(type(committee.plot_losses()), np.ndarray))
 
-        _, test_pred, oos_pred = helper.plot_model_results(committee)
+        # Check metrics return results.
+        self.assertTrue(issubclass(type(helper.get_metrics(self.working_df)), pd.DataFrame))
 
-        committee.plot_losses()
+        # Check Predicted values' means.
+        self.assertAlmostEqual(helper.oos_pred.mean(), 0, 1)
+        self.assertAlmostEqual(helper.test_pred.mean(), 0, 1)
 
-        helper.get_metrics(self.working_df)
+        filter_events = helper.get_filtering_results(helper.target_oos, helper.oos_pred,
+                                                     helper.test_pred, self.working_df)
 
-        helper.get_filtering_results(helper.target_oos, oos_pred, test_pred, self.working_df)
+        # Check Number of events returned.
+        self.assertTrue(len(filter_events), 3)
 
     def test_honn_helper(self):
         """
@@ -90,8 +111,12 @@ class TestSpreadModelingHelper(unittest.TestCase):
         committee = RegressorCommittee(mlp_params, num_committee=1, epochs=100, verbose=False)
         fitted_com = committee.fit(helper.input_train, helper.target_train, helper.input_test, helper.target_test)
 
+        # Check Result plotting functionality.
+        self.assertTrue(issubclass(type(helper.plot_model_results(committee)), np.ndarray))
+
+        # Check Predicted values' means.
+        self.assertAlmostEqual(helper.oos_pred.mean(), 0, 1)
+        self.assertAlmostEqual(helper.test_pred.mean(), 0, 1)
+
         # Check if fit return is a valid Committee object.
         self.assertTrue(type(fitted_com), RegressorCommittee)
-
-        # Check if predictions of all sets are returned.
-        self.assertTrue(len(helper.plot_model_results(committee)) == 3)

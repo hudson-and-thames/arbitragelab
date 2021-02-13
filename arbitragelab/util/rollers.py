@@ -8,9 +8,9 @@ This module implements the (Crude Oil Future, NBP Future, RBOB Future, Grain Bas
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib.axes._axes import Axes
 
 from arbitragelab.util.base_futures_roller import BaseFuturesRoller
-
 
 class CrudeOilFutureRoller(BaseFuturesRoller):
     """
@@ -244,19 +244,22 @@ class EthanolFutureRoller(BaseFuturesRoller):
 
         return all_roll_overs.sort_values().values
 
-def plot_historical_future_slope_state(m1_last: pd.Series, m2_open: pd.Series):
+def plot_historical_future_slope_state(m1_last: pd.Series, m2_open: pd.Series) -> Axes:
     """
     Plots a historical plot of the contango/backwardation states between two
     contracts.
 
     :param m1_last: (pd.Series) The 'close' price vector for the month one contract.
     :param m2_last: (pd.Series) The 'open' price vector for the month two contract.
+    :return: (Axes) Axes object.
     """
 
     premium = (m1_last - m2_open)
     perc_chg = ((premium/m1_last)*100)
 
-    perc_chg.plot(figsize=(15, 10), alpha=0)
-    plt.fill_between(premium.index, perc_chg, where=perc_chg > 0, facecolor='green')
-    plt.fill_between(premium.index, perc_chg, where=perc_chg < 0, facecolor='red')
-    plt.legend(["", "Contango", "Backwardation"])
+    ax_object = perc_chg.plot(figsize=(15, 10), alpha=0)
+    ax_object.fill_between(premium.index, perc_chg, where=perc_chg > 0, facecolor='green')
+    ax_object.fill_between(premium.index, perc_chg, where=perc_chg < 0, facecolor='red')
+    ax_object.legend(["", "Contango", "Backwardation"])
+
+    return ax_object

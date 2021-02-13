@@ -7,6 +7,7 @@ Tests Spread modeling Threshold AutoRegression model implementation.
 import os
 import unittest
 
+import numpy as np
 import pandas as pd
 from statsmodels.regression.linear_model import RegressionResults
 from statsmodels.iolib.summary import Summary
@@ -22,6 +23,9 @@ class TestTAR(unittest.TestCase):
         """
         Loads data needed for model fitting.
         """
+
+        # Set working seed.
+        np.random.seed(0)
 
         project_path = os.path.dirname(__file__)
 
@@ -56,7 +60,10 @@ class TestTAR(unittest.TestCase):
         # Check that it returned valid regression results.
         self.assertTrue(type(tar_results), RegressionResults)
 
-        tar_results.fittedvalues.plot()
+        # Check fitted values characteristics.
+        self.assertAlmostEqual(tar_results.fittedvalues.mean(), 0, 0)
+        self.assertAlmostEqual(tar_results.fittedvalues.max(), 0.011, 3)
+        self.assertTrue(np.sign(tar_results.fittedvalues.min()), np.sign(-1))
 
         self.assertTrue(type(tar_results.summary()), Summary)
 
