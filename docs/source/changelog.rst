@@ -42,7 +42,8 @@ Changelog
 * :support:`27` CIR-model documentation.
 * :feature:`30` Track user analytics using Segment
 * :support:`30` Analytics documentation.
-
+* :feature:`25` Spread Modeling using Neural Networks, Filters and Fair Value Model added.
+* :support:`25` Spread Modeling related documentation.
 
 * :release:`0.1.0 <2020-11-18>`
 * :feature:`2` Kalman Filter + Kalman strategy added.
