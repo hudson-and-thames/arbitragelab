@@ -7,6 +7,17 @@
     - `d'Aspremont, A. (2011). Identifying small mean-reverting portfolios. Quantitative Finance, 11(3), pp.351-364. <https://arxiv.org/pdf/0708.3048.pdf>`__
     - `Cuturi, M. and d'Aspremont, A. (2015). Mean-reverting portfolios: Tradeoffs between sparsity and volatility. arXiv preprint arXiv:1509.05954. <https://arxiv.org/abs/1509.05954>`__
 
+.. warning::
+
+    In order for this module to work correctly on Windows machines, please install the cvxpy package
+    from conda:
+
+    .. code-block::
+
+      conda install -c conda-forge "cvxpy=1.1.10"
+
+    For more information on the installation process, please visit :ref:`ArbitrageLab installation guide <getting_started-installation>`.
+
 =========================================
 Sparse Mean-reverting Portfolio Selection
 =========================================
