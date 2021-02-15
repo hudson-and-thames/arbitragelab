@@ -1,3 +1,4 @@
+.. _getting_started-installation:
 
 ============
 Installation
@@ -154,7 +155,19 @@ Accept all the requests to install.
          os.environ['ARBLAB_API_KEY'] = "426303b02cb7475984b2d484319062a0"
          import arbitragelab as al
 
-7. Install arbitragelab into your python environment via the terminal.
+7. Install cvxpy into your conda environment via the terminal.
+
+   .. warning::
+
+        Please make sure to perform this step in order for the Sparse Mean-reverting Portfolio Module to work properly.
+
+   This is needed for the cvxpy optimizers to work properly on Windows:
+
+   .. code-block::
+
+      conda install -c conda-forge "cvxpy=1.1.10"
+
+8. Install arbitragelab into your python environment via the terminal.
 
    Please make sure to use this exact statement:
 

@@ -93,6 +93,7 @@ This project is licensed under an all rights reserved licence.
     cointegration_approach/minimum_profit_simulation
     cointegration_approach/minimum_profit
     cointegration_approach/multivariate_cointegration
+    cointegration_approach/sparse_mr_portfolio
 
 .. toctree::
     :maxdepth: 2
