@@ -30,7 +30,7 @@ Changelog
 * :support:`28` Equity Curve Convention documentation.
 * :feature:`26` Multivariate Cointegration strategy (Galenko et al. 2010) added to the Cointegration Approach Module.
 * :support:`26` Multivariate Cointegration strategy documentation.
-* :support:`35` Updated requirements versions (numpy==1.20.1, matplotlib==3.3.4
+* :support:`35` Updated requirements versions (numpy==1.20.1, matplotlib==3.2.2
   pandas==1.1.5, scikit-learn==0.24.1, scipy==1.6.0, statsmodels==0.12.2).
 * :bug:`34` Data Importer, Distance Approach, ML Approach modules imports were not exposed.
 
