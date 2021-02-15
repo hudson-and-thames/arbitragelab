@@ -8,7 +8,7 @@ Recommended Versions
 ####################
 
 * Anaconda
-* Python 3.7 and up.
+* Python 3.8 and up.
 
 Installation
 ############
@@ -37,7 +37,7 @@ Ubuntu Linux
 
 .. code-block::
 
-   conda create -n <env name> python=3.7 anaconda
+   conda create -n <env name> python=3.8 anaconda
 
 Accept all the requests to install.
 
@@ -113,7 +113,7 @@ Mac OS X
 
 .. code-block::
 
-   conda create -n <env name> python=3.7 anaconda
+   conda create -n <env name> python=3.8 anaconda
 
 Accept all the requests to install.
 
@@ -191,7 +191,7 @@ Windows
 
 .. code-block::
 
-   conda create -n <env name> python=3.7 anaconda
+   conda create -n <env name> python=3.8 anaconda
 
 4. Activate the new environment:
 
