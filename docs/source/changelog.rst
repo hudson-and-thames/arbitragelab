@@ -12,6 +12,19 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+* :feature:`25` Spread Modeling using Neural Networks, Filters and Fair Value Model added to the ML Approach Module.
+* :feature:`25` Futures Rollover added to the Data Module.
+* :support:`25` Spread Modeling, Filters and Fair Value Model documentation.
+* :support:`25` Futures Rollover documentation.
+* :feature:`28` CopulaStrategy replaced with improved BasicCopulaStrategy in the Copula Approach Module.
+* :feature:`28` Support of Clayton-Frank-Gumbel and Clayton-Student-Gumbel mixed copulas added to the Copula Approach Module.
+* :feature:`28` Mispricing Index Trading Strategy added to the Copula Approach Module.
+* :feature:`28` Quick Pairs Selection and ECDF added to the Copula Approach Module.
+* :support:`28` Updated Copula Brief Intro and added Copula Deeper Intro to documentation.
+* :support:`28` Mispricing Index Trading Strategy, Quick Pairs Selection and ECDF documentation.
+* :support:`28` Equity Curve Convention documentation.
+* :feature:`26` Multivariate Cointegration strategy (Galenko et al. 2010) added to the Cointegration Approach Module.
+* :support:`26` Multivariate Cointegration strategy documentation.
 * :support:`35` Upgrade ArbitrageLab requirements versions (numpy==1.20.1, matplotlib==3.3.4
   pandas==1.1.5, scikit-learn==0.24.1, scipy==1.6.0, statsmodels==0.12.2).
 * :bug:`34` Data Importer, Distance Approach, ML Approach modules imports were not exposed.
@@ -42,8 +55,6 @@ Changelog
 * :support:`27` CIR-model documentation.
 * :feature:`30` Track user analytics using Segment
 * :support:`30` Analytics documentation.
-* :feature:`25` Spread Modeling using Neural Networks, Filters and Fair Value Model added.
-* :support:`25` Spread Modeling related documentation.
 
 * :release:`0.1.0 <2020-11-18>`
 * :feature:`2` Kalman Filter + Kalman strategy added.
