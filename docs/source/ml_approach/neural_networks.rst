@@ -38,6 +38,9 @@ identity, logistic, hyperbolic tangent, negative exponential and sine. These act
 functions can be used for both hidden and output neurons. MLP also trains networks 
 using a variety of algorithms such as gradient descent and conjugant descent.
 
+Implementation
+**************
+
 .. py:currentmodule:: arbitragelab.ml_approach.neural_networks
 
 .. autoclass:: MultiLayerPerceptron
@@ -113,9 +116,15 @@ hidden state, and gating mechanism.
    
    Visual interpretation of the internal structures of RNNs and LSTMs. `(Olah 2015) <http://colah.github.io/posts/2015-08-Understanding-LSTMs/>`_.
 
+Implementation
+**************
+
 .. autoclass:: RecurrentNeuralNetwork
     :noindex:
     :members: __init__, build
+
+Example
+*******
 
 .. code-block::
   
@@ -238,6 +247,9 @@ The dimensionality of the input space for FLNs can be increased in two ways `(Pa
 Due to the nature of single layer HONNs and the fact that the number of inputs can be numerous,
 orders of 4 and over are rarely used. 
 
+Implementation
+**************
+
 .. py:currentmodule:: arbitragelab.ml_approach.feature_expander
 
 .. autoclass:: FeatureExpander
@@ -298,7 +310,7 @@ Example
     predictions = r2_score(y_test, regressor.predict(X_test))
     
 Multiple Layer NNs `(Ghazali et al. 2009) <https://www.igi-global.com/chapter/artificial-higher-order-neural-networks/5286>`_
-*****************************************************************************************************************************
+#############################################################################################################################
 
 Multilayered HONNs incorporate hidden layers, in addition to the output layer.
 A popular example of such structures is the sigma-pi network, which consists of
@@ -322,12 +334,17 @@ can be used for their training.
 
     Visual representation of the Pi-Sigma Neural Network architecture. `(Ghazali, R. and Al-Jumeily, D., 2009) <https://www.igi-global.com/chapter/artificial-higher-order-neural-networks/5286>`_
 
+Implementation
+**************
+
 .. py:currentmodule:: arbitragelab.ml_approach.neural_networks
 
 .. autoclass:: PiSigmaNeuralNetwork
     :noindex:
     :members: __init__, build
     
+Example
+*******
 
 .. code-block::
 

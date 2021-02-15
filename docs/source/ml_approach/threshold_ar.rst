@@ -84,6 +84,7 @@ If :math:`p_1 \neq p_2`, cointegration between the underlying assets is non-line
 
 Implementation
 **************
+
 .. py:currentmodule:: arbitragelab.ml_approach.tar
 
 .. autoclass:: TAR
@@ -118,6 +119,15 @@ Example
     # Show metrics on model fit.
     model.summary()
     
+
+Research Notebooks
+##################
+
+The following research notebooks can be used to better understand the components of the model described above.
+
+* `Fair Value Modeling`_ - showcases the use of the TAR model on the crack spread.
+
+.. _`Fair Value Modeling`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/ML%20Approach/fair_value_modeling.ipynb
 
 References
 ##########

@@ -95,8 +95,8 @@ Research Notebooks
 
 The following research notebooks can be used to better understand the components of the framework described above.
 
-* `Crack Spread Modeling`_ - implements the use of the filters and networks on the crack spread.
-* `Fair Value Modeling`_ - implements the use of the TAR model on the crack spread.
+* `Crack Spread Modeling`_ - showcases the use of the filters and networks on the crack spread.
+* `Fair Value Modeling`_ - showcases the use of the TAR model on the crack spread.
 
 .. _`Crack Spread Modeling`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/ML%20Approach/crack_spread_modeling.ipynb
 

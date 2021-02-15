@@ -161,12 +161,12 @@ Example
 
     # Sometimes rolled contracts dip into negative territory. This
     # can cause problems when used for ml models, thus there is the
-    # ability of using the parameter 'handle_negative_roll', which
+    # ability to use the parameter 'handle_negative_roll', which
     # will process the price data into positive returns data.
     non_negative_contract = wti_roller.transform(handle_negative_roll=True)
 
     # The diagnostic summary is a helper function to help the user
-    # easily double check expiration dates and their respective gap
+    # easily double-check expiration dates and their respective gap
     # calculations.
     wti_diag_frame = wti_roller.diagnostic_summary()
     wti_diag_frame.head(10)
@@ -176,7 +176,7 @@ Research Notebooks
 
 The following research notebook can be used to better understand the implementation described above.
 
-* `Futures Rollover`_ - implements the use of the various rollers on specific contracts.
+* `Futures Rollover`_ - showcases the use of various rollers on specific contracts.
 
 .. _`Futures Rollover`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/ML%20Approach/futures_rollover.ipynb
 
