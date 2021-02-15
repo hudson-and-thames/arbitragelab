@@ -13,6 +13,20 @@ Recommended Versions
 Installation
 ############
 
+.. warning::
+
+    You may be encountering the following errors during the installation:
+
+    ``ERROR: tensorflow 2.2.1 has requirement h5py<2.11.0,>=2.10.0,``
+    ``but you'll have h5py 3.1.0 which is incompatible.``
+
+    ``ERROR: tensorflow 2.2.1 has requirement numpy<1.19.0,>=1.16.0,``
+    ``but you'll have numpy 1.20.1 which is incompatible.``
+
+    You can ignore these messages. They appear due to the updated dependency versions in the ArbitrageLab package.
+    
+    All the ArbitrageLab functionality still works as expected.
+
 Ubuntu Linux
 ************
 

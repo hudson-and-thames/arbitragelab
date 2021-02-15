@@ -12,6 +12,10 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+* :feature:`25` Spread Modeling using Neural Networks, Filters and Fair Value Model added to the ML Approach Module.
+* :feature:`25` Futures Rollover added to the Data Module.
+* :support:`25` Spread Modeling, Filters and Fair Value Model documentation.
+* :support:`25` Futures Rollover documentation.
 * :feature:`28` CopulaStrategy replaced with improved BasicCopulaStrategy in the Copula Approach Module.
 * :feature:`28` Support of Clayton-Frank-Gumbel and Clayton-Student-Gumbel mixed copulas added to the Copula Approach Module.
 * :feature:`28` Mispricing Index Trading Strategy added to the Copula Approach Module.
