@@ -51,6 +51,7 @@ This project is licensed under an all rights reserved licence.
     getting_started/installation
     getting_started/research_tools
     getting_started/roadmap
+    getting_started/equity_curve_convention
 
 .. toctree::
     :maxdepth: 2
@@ -58,6 +59,7 @@ This project is licensed under an all rights reserved licence.
     :hidden:
 
     data/data_importer
+    data/futures_rollover
 
 .. toctree::
     :maxdepth: 2
@@ -90,6 +92,8 @@ This project is licensed under an all rights reserved licence.
     cointegration_approach/trading_strategies
     cointegration_approach/minimum_profit_simulation
     cointegration_approach/minimum_profit
+    cointegration_approach/multivariate_cointegration
+    cointegration_approach/sparse_mr_portfolio
 
 .. toctree::
     :maxdepth: 2
@@ -98,7 +102,10 @@ This project is licensed under an all rights reserved licence.
 
     copula_approach/introduction
     copula_approach/copula_brief_intro
-    copula_approach/trading_strategy
+    copula_approach/copula_deeper_intro
+    copula_approach/basic_trading_strategy
+    copula_approach/mispricing_index_strategy
+    copula_approach/utility_functions
 
 .. toctree::
     :maxdepth: 2
@@ -134,6 +141,10 @@ This project is licensed under an all rights reserved licence.
 
     ml_approach/introduction
     ml_approach/ml_based_pairs_selection
+    ml_approach/spread_modeling
+    ml_approach/threshold_ar
+    ml_approach/neural_networks
+    ml_approach/filters
 
 .. toctree::
     :maxdepth: 3

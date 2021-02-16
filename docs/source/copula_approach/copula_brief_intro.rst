@@ -38,7 +38,7 @@ variable pairs under the copula framework, instead of spending efforts in idiosy
 distributions.
 
 The process of sampling:
-    1. For two random variables with foxed distributions, find their own marginal CDFs. (The CDFs need to be continuous.)
+    1. For two random variables with fixed distributions, find their own marginal CDFs. (The CDFs need to be continuous.)
     2. Pick a specific realization :math:`\omega \in \Omega`, and from it sample the two random variables.
     3. Sample multiple times and map the random samples into their quantile domain by their CDFs.
     4. Plot the pair's quantile data.
@@ -206,13 +206,13 @@ For Archimedean copulas, the general methodology for sampling or simulation come
 
 For some copulas, the above method can greatly be simplified due to having closed-form solutions for step :math:`2`.
 Otherwise, one will have to use appropriate numerical methods to find :math:`w`.
-Interested reader can check `Procedure to Generate Uniform Random Variates from Each Copula
+Interested readers can check `Procedure to Generate Uniform Random Variates from Each Copula
 <https://www.caee.utexas.edu/prof/bhat/ABSTRACTS/Supp_material.pdf>`_
 for all the simplified forms.
 
 For Gaussian and Student-t copulas, one can follow the procedures below:
 
-	1. Generate two i.i.d.'s :math:`(v_1, v_2)` using a bivariate Gaussian/Student-t distribution with desired 
+	1. Generate two a pair :math:`(v_1, v_2)` using a bivariate Gaussian/Student-t distribution with desired 
 	   correlation (and degrees of freedom).
 
 	2. Transform those into quantiles using CDF :math:`\Phi` from standard Gaussian or Student-t distribution (with
@@ -234,7 +234,9 @@ To be able to use the copula method, to its root there are three fundamental que
 Data transform
 **************
 
-One can use the implied **cumulative log return** (Liew et al., 2013) or **log return** (Stander et al., 2013).
+One may use the implied **cumulative log return** (Liew et al., 2013) or **log return** (Stander et al., 2013) instead
+of the raw prices but the fitted copula will be identical.
+Because copula is invariant under any strictly monotone mappings for its marginal random variables.
 
 .. Note::
     One key concern is that, the type of processed data fed in needs to be **approximately stationary**.
@@ -252,8 +254,8 @@ There is no rule of thumb in regard to choosing a certain copula. However, there
 One may likely consider the **tail dependency** significant, as large correlated moves in prices need to be accounted for.
 In such case, Gumbel is a good choice.
 
-Realistically when using the module, one can fit the data to every copula and compare the score (in SIC, AIC, HQIC) to find
-the appropriate copula since the calculations are quick.
+Realistically when using the module, one can fit the data to every copula and compare the score (in SIC, AIC, HQIC,
+log-likelihood) to find the appropriate copula since the calculations are quick.
 However, such approach should always be proceeded with caution, as certain important characteristics of the stocks pair
 might have been neglected.
 
@@ -265,32 +267,64 @@ For all Archimedean copulas in this module, we follow a two-step pseudo-MLE appr
 	1. Use Empirical CDF (ECDF) to map each marginal data to its quantile.
 	2. Calculate Kendall's :math:`\hat\tau` for the quantile data, and use Kendall's :math:`\hat\tau` to calculate :math:`\hat\theta`.
 
+.. Tip::
+    The :code:`construct_ecdf_lin` function we provide in the :code:`copula_calculation` module is a wrapper around :code:`ECDF`
+    from :code:`statsmodels.distributions.empirical_distribution`
+    `[Link] <https://www.statsmodels.org/stable/generated/statsmodels.distributions.empirical_distribution.ECDF.html>`__
+    that allows linear interpolations instead of using a step function.
+    Also it will not hit :math:`0` or :math:`1` but stays sufficiently close to avoid numerical issues in calculations.
+
 .. Note::
 	For Archimedean copula, :math:`\tau` and :math:`\theta` are implicitly related via
 	
 	.. math::
 		\tau(\theta) = 1 + 4 \int_0^1 \frac{\phi(t;\theta)}{\phi'(t;\theta)} dt
 	
-	Then one inversely solve :math:`\hat\theta(\hat\tau)`. For some copulas, the inversion has a closed-form solution. For
+	Then one inversely solves :math:`\hat\theta(\hat\tau)`. For some copulas, the inversion has a closed-form solution. For
 	others, one has to use numerical methods.
 
-For elliptic copulas, we calculate the covariance matrix :math:`\mathbf{\sigma}_{2 \times 2}` (though technically speaking, for bivariate
-copulas, only correlation :math:`\rho` is needed) from the quantile data, then use :math:`\mathbf{\sigma}_{2 \times 2}` for 
-a Gaussian or Student-t copula.
-In the future, we will add the choice of fitting by Spearman's :math:`\rho` for elliptic copulas for more flexibility.
+For elliptical copulas, we calculate the Kendall's :math:`\hat{\tau}` and then find :math:`\hat{\rho}` via
 
-Also note that, theoretically speaking, for Student-t copula, Determing :math:`\nu` (degrees of freedom) analytically from
-arbitrary time series is still an open problem.
-Therefore we opted to use a maximum likelihood fit for :math:`\nu` for the family of Student-t copulas initated by
+.. math::
+		\hat{\rho} = \sin \left( \frac{\hat{\tau} \pi}{2} \right)
+
+for the covariance matrix :math:`\mathbf{\sigma}_{2 \times 2}` (though technically speaking, for bivariate
+copulas, only correlation :math:`\rho` is needed, and thus it is uniquely determined) from the quantile data,
+then use :math:`\mathbf{\sigma}_{2 \times 2}` for a Gaussian or Student-t copula.
+Fitting by Spearman's :math:`\rho` for the variance-covariance matrix from data for elliptic copulas is also practiced
+by some.
+But Spearman's :math:`\rho` is in general less stable than Kendall's :math:`\tau` (though with faster calculation speed).
+And using var-covar implicitly assumes a multi-variate Gaussian model, and it is sensitive to outliers because it is a
+parametric fit.
+See `An Introduction to Copulas <http://www.columbia.edu/~mh2078/QRM/Copulas.pdf>`__ for more detail.
+
+Also note that, theoretically speaking, for Student-t copula, Determining :math:`\nu` (degrees of freedom) analytically from
+an arbitrary time series is still an open problem.
+Therefore we opted to use a maximum likelihood fit for :math:`\nu` for the family of Student-t copulas initiated by
 :math:`\mathbf{\sigma}_{2 \times 2}`.
 This calculation is relatively slow.
+
+Fitting mixed copula is a process that is a bit more complicated and is discussed in the
+separate documentation: :ref:`A Deeper Intro to Copulas <copula_approach-copula_deeper_intro>`.
+Here are a few takeaways:
+
+- Generic max likelihood fit is not stable, and does not drive small weights to 0.
+
+- We opt for an expectation-maximization(EM) algorithm, which greatly increases the stability, and generally converges to
+  a much better result than a generic max likelihood algorithm.
+  
+- Any mixture with Student-t copula will greatly decrease the speed for fitting.
+
+- Mixed copulas generally give the best result in terms of max likelihood across all copulas we provide.
 
 Research Notebooks
 ##################
 
+The following research notebook can be used to better understand the basic copula strategy.
+
 * `Basic Copula Strategy`_
 
-.. _`Basic Copula Strategy`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Copula%20Approach/Copula_Notebook_Liew_etal.ipynb
+.. _`Basic Copula Strategy`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Copula%20Approach/Copula_Strategy_Basic.ipynb
 
 References
 ##########

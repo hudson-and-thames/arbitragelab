@@ -9,7 +9,6 @@ import warnings
 import sys
 from contextlib import nullcontext
 
-import numpy as np
 import pandas as pd
 
 from pmdarima.arima import auto_arima, ADFTest
@@ -152,7 +151,7 @@ class AutoARIMAForecast:
         """
 
         # Setting input parameters
-        prediction = pd.Series(index=y.index, dtype=np.float)
+        prediction = pd.Series(index=y.index, dtype=float)
         retrain_idx = 0
 
         if silence_warnings:

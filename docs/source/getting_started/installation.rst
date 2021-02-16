@@ -1,3 +1,4 @@
+.. _getting_started-installation:
 
 ============
 Installation
@@ -7,10 +8,24 @@ Recommended Versions
 ####################
 
 * Anaconda
-* Python 3.7 and up.
+* Python 3.8 and up.
 
 Installation
 ############
+
+.. warning::
+
+    You may be encountering the following errors during the installation:
+
+    ``ERROR: tensorflow 2.2.1 has requirement h5py<2.11.0,>=2.10.0,``
+    ``but you'll have h5py 3.1.0 which is incompatible.``
+
+    ``ERROR: tensorflow 2.2.1 has requirement numpy<1.19.0,>=1.16.0,``
+    ``but you'll have numpy 1.20.1 which is incompatible.``
+
+    You can ignore these messages. They appear due to the updated dependency versions in the ArbitrageLab package.
+    
+    All the ArbitrageLab functionality still works as expected.
 
 Ubuntu Linux
 ************
@@ -22,7 +37,7 @@ Ubuntu Linux
 
 .. code-block::
 
-   conda create -n <env name> python=3.7 anaconda
+   conda create -n <env name> python=3.8 anaconda
 
 Accept all the requests to install.
 
@@ -98,7 +113,7 @@ Mac OS X
 
 .. code-block::
 
-   conda create -n <env name> python=3.7 anaconda
+   conda create -n <env name> python=3.8 anaconda
 
 Accept all the requests to install.
 
@@ -140,7 +155,19 @@ Accept all the requests to install.
          os.environ['ARBLAB_API_KEY'] = "426303b02cb7475984b2d484319062a0"
          import arbitragelab as al
 
-7. Install arbitragelab into your python environment via the terminal.
+7. Install cvxpy into your conda environment via the terminal.
+
+   .. warning::
+
+        Please make sure to perform this step in order for the Sparse Mean-reverting Portfolio Module to work properly.
+
+   This is needed for the cvxpy optimizers to work properly on Windows:
+
+   .. code-block::
+
+      conda install -c conda-forge "cvxpy=1.1.10"
+
+8. Install arbitragelab into your python environment via the terminal.
 
    Please make sure to use this exact statement:
 
@@ -164,7 +191,7 @@ Windows
 
 .. code-block::
 
-   conda create -n <env name> python=3.7 anaconda
+   conda create -n <env name> python=3.8 anaconda
 
 4. Activate the new environment:
 

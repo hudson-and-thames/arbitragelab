@@ -3,12 +3,16 @@
 # Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 """
 Master module that uses copula for trading strategy.
+
+This is a legacy module.
 """
 
 # pylint: disable = invalid-name
 from typing import Callable
+import warnings
 import matplotlib.pyplot as plt
 import numpy as np
+
 
 import arbitragelab.copula_approach.copula_generate as cg
 import arbitragelab.copula_approach.copula_calculation as ccalc
@@ -46,6 +50,11 @@ class CopulaStrategy:
             trading signal generation. Defaults to 0.95.
         """
 
+        msg = ("CopulaStrategy is deprecated and will be removed in a future version. "
+               "Please switch to the copula_strategy_basic module and use the BasicCopulaStrategy class that contains"
+               "all previous CopulaStrategy functionality.")
+        warnings.warn(msg, DeprecationWarning, stacklevel=2)
+
         # Copulas that uses theta as parameter
         self.theta_copula_names = ['Gumbel', 'Clayton', 'Frank',
                                    'Joe', 'N13', 'N14']
@@ -73,7 +82,7 @@ class CopulaStrategy:
     def fit_copula(self, s1_series: np.array, s2_series: np.ndarray, copula_name: str,
                    if_empirical_cdf: bool = True, if_renew: bool = True, nu_tol: float = 0.05) -> tuple:
         """
-        Conduct a max likelihood estimation and information criterion.
+        Conduct a pseudo max likelihood estimation and information criterion.
 
         Note: s1_series and s2_series need to be pre-processed. In general, raw price data is depreciated.
             One may use log return or cumulative log return. CopulaStrategy class provides a method to
