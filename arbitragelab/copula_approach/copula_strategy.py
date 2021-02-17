@@ -16,6 +16,7 @@ import numpy as np
 
 import arbitragelab.copula_approach.copula_generate as cg
 import arbitragelab.copula_approach.copula_calculation as ccalc
+from arbitragelab.util import devadarsh
 
 
 class CopulaStrategy:
@@ -29,7 +30,6 @@ class CopulaStrategy:
         2. Use a given copula to generate trading positions based on test data. By default it uses
            the fitted copula generated in functionality 1.
         3. Scatter plot of a given copula about its probability density.
-
     """
 
     def __init__(self, copula: cg.Copula = None, position_kind: list = None,
@@ -52,8 +52,8 @@ class CopulaStrategy:
 
         msg = ("CopulaStrategy is deprecated and will be removed in a future version. "
                "Please switch to the copula_strategy_basic module and use the BasicCopulaStrategy class that contains"
-               "all previous CopulaStrategy functionality.")  # pragma: no cover
-        warnings.warn(msg, DeprecationWarning, stacklevel=2)  # pragma: no cover
+               "all previous CopulaStrategy functionality.")
+        warnings.warn(msg, DeprecationWarning, stacklevel=2)
 
         # Copulas that uses theta as parameter
         self.theta_copula_names = ['Gumbel', 'Clayton', 'Frank',
@@ -76,6 +76,8 @@ class CopulaStrategy:
         # Default thresholds for opening trading positions.
         self.lower_threshold = default_lower_threshold
         self.upper_threshold = default_upper_threshold
+
+        devadarsh.track('CopulaStrategy')
 
     def fit_copula(self, s1_series: np.array, s2_series: np.ndarray, copula_name: str,
                    if_empirical_cdf: bool = True, if_renew: bool = True, nu_tol: float = 0.05) -> tuple:

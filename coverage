@@ -5,11 +5,21 @@ echo "----Running Code Coverage----"
 # Remove multiprocessing coverage files in case a previous combine wasn't performed
 rm -fR cover/
 # Remove the main coverage file (.coverage)
+. venv/bin/activate
 coverage erase
 
-# Discover and run all tests
+# Discover and run all tests, check unit tests results
+. venv/bin/activate
 coverage run --concurrency=multiprocessing -m unittest discover
+res_test=$?
+if [ $res_test -ne 0 ]
+then
+  echo -e "Circle CI Build FAILURE: Unit tests failed"
+  exit 1
+fi
 
+# Check coverage results
+. venv/bin/activate
 coverage combine
 res_combine=$?
 if [ $res_combine -ne 0 ]
@@ -18,6 +28,7 @@ then
   exit 1
 fi
 
+. venv/bin/activate
 coverage report --fail-under=100
 coverage_report=$?
 if [ $coverage_report -ne 0 ]

@@ -7,5 +7,9 @@ ArbitrageLab helps portfolio managers and traders who want to leverage the power
 reproducible, interpretable, and easy to use tools.
 """
 
-from arbitragelab.network.validation import Security
-Security()
+from arbitragelab.network.imports import Golem
+from arbitragelab.util import devadarsh
+
+devadarsh.identify()
+devadarsh.page('import')
+Golem()

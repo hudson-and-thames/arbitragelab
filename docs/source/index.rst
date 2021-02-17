@@ -59,6 +59,7 @@ This project is licensed under an all rights reserved licence.
     :hidden:
 
     data/data_importer
+    data/futures_rollover
 
 .. toctree::
     :maxdepth: 2
@@ -91,6 +92,8 @@ This project is licensed under an all rights reserved licence.
     cointegration_approach/trading_strategies
     cointegration_approach/minimum_profit_simulation
     cointegration_approach/minimum_profit
+    cointegration_approach/multivariate_cointegration
+    cointegration_approach/sparse_mr_portfolio
 
 .. toctree::
     :maxdepth: 2
@@ -111,6 +114,17 @@ This project is licensed under an all rights reserved licence.
 
     optimal_mean_reversion/introduction
     optimal_mean_reversion/ou_model
+    optimal_mean_reversion/xou_model
+    optimal_mean_reversion/cir_model
+    optimal_mean_reversion/heat_potentials
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Time Series Approach
+    :hidden:
+
+    time_series_approach/introduction
+    time_series_approach/quantile_time_series_strategy
 
 .. toctree::
     :maxdepth: 2
@@ -127,6 +141,10 @@ This project is licensed under an all rights reserved licence.
 
     ml_approach/introduction
     ml_approach/ml_based_pairs_selection
+    ml_approach/spread_modeling
+    ml_approach/threshold_ar
+    ml_approach/neural_networks
+    ml_approach/filters
 
 .. toctree::
     :maxdepth: 3
@@ -141,4 +159,5 @@ This project is licensed under an all rights reserved licence.
     :caption: Additional Information
     :hidden:
 
+    additional_information/analytics
     additional_information/license

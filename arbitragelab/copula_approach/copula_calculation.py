@@ -7,7 +7,7 @@ Back end module that handles maximum likelihood related copula calculations.
 Functions include:
 
     - Finding (marginal) cumulative distribution function from data.
-    - Findind empirical cumulative distribution function from data with linear interpolation.
+    - Finding empirical cumulative distribution function from data with linear interpolation.
     - Maximum likelihood estimation of theta_hat (empirical theta) from data.
     - Calculating the sum log-likelihood given a copula and data.
     - Calculating SIC (Schwarz information criterion).
@@ -18,10 +18,9 @@ Functions include:
     - Adjust weights for mixed copulas for normality.
 
 For more information about the SCAD penalty functions on fitting mixed copulas, please refer to
-Cai, Z. and Wang, X., 2014. Selection of mixed copula model via penalized likelihood. Journal of the American
+`Cai, Z. and Wang, X., 2014. Selection of mixed copula model via penalized likelihood. Journal of the American
 Statistical Association, 109(506), pp.788-801.
-<https://www.tandfonline.com/doi/pdf/10.1080/01621459.2013.873366?casa_token=sey8HrojSgYAAAAA:TEMBX8wLYdGFGyM78UXSYm6hXl
-1Qp_K6wiLgRJf6kPcqW4dYT8z3oA3I_odrAL48DNr3OSoqkQsEmQ>
+<https://www.tandfonline.com/doi/pdf/10.1080/01621459.2013.873366?casa_token=sey8HrojSgYAAAAA:TEMBX8wLYdGFGyM78UXSYm6hXl1Qp_K6wiLgRJf6kPcqW4dYT8z3oA3I_odrAL48DNr3OSoqkQsEmQ>`__
 """
 # pylint: disable = invalid-name
 from typing import Callable
@@ -240,6 +239,7 @@ def hqic(log_likelihood: float, n: int, k: int = 1) -> float:
     hqic_value = 2*np.log(np.log(n))*k - 2*log_likelihood
 
     return hqic_value
+
 
 def fit_nu_for_t_copula(x: np.array, y: np.array, nu_tol: float = None) -> float:
     r"""

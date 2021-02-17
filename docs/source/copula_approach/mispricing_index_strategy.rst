@@ -5,7 +5,7 @@ Mispricing Index Trading Strategy
 =================================
 
 .. Note::
-    The following strategy closely follow the implementations:
+    The following strategy closely follows the implementations:
 
     * `Pairs trading with copulas. (2014) <https://efmaefm.org/0efmameetings/EFMA%20ANNUAL%20MEETINGS/2014-Rome/papers/EFMA2014_0222_FullPaper.pdf>`__ by Xie, W., Liew, R.Q., Wu, Y. and Zou, X.
     * `The profitability of pairs trading strategies: distance, cointegration and copula methods. (2016) <https://www.tandfonline.com/doi/pdf/10.1080/14697688.2016.1164337?casa_token=X0-FdUqDsv4AAAAA:ZFothfEHF-dO2-uDtFo2ZuFH0uzF6qijsweHD888yfPx3OZGXW6Szon1jvA2BB_AsgC5-kGYreA4fw>`__ by Rad, H., Low, R.K.Y. and Faff, R.
@@ -61,12 +61,12 @@ How is the MPI Strategy Constructed?
 ************************************
 
 At first glance, the MPI strategy documented in [Xie et al. 2016] looks quite bizarre.
-However it is reasonably consistant when one goes through the logic of its construction:
+However, it is reasonably consistent when one goes through the logic of its construction:
 In order to use returns to generate trading signals, one needs to be creative about utilizing the information.
 It is one thing to know the dependence structure of a pair of stocks, it is another thing to trade based on it
 because intrinsically stocks are traded on prices, not returns.
 
-If one regard using conditional probabilities as a distance measure, then it is natural to think about how far
+If one regards using conditional probabilities as a distance measure, then it is natural to think about how far
 the returns have cumulatively driven the prices apart (or together), thereby introducing trading opportunities.
 
 Hence we introduce the following concepts for the strategy framework:
@@ -94,7 +94,7 @@ Therefore we introduce the **flag** series:
 Flag and Raw Flag
 *****************
 
-A more descriptive name than flag in my opinion would be **cumulative mispricing index**.
+A more descriptive name than flag, in my opinion, would be **cumulative mispricing index**.
 The **raw flag** series (with a star) is the cumulative sum of daily MPIs minus 0.5, i.e.,
 
 .. math::
@@ -125,7 +125,7 @@ Trading Logic
 Default Opening and Exiting Rules
 *********************************
 
-The authors proposes a **dollar-neutral** trade scheme worded as follows:
+The authors propose a **dollar-neutral** trade scheme worded as follows:
 
 Suppose stock :math:`X`, :math:`Y` are associated with :math:`FlagX`, :math:`FlagY` respectively.
 
@@ -169,7 +169,7 @@ The authors did not specify what will happen if the following occurs:
 Here is our take on the above issues:
 
 1. Do nothing.
-2. Change to the trigger position. For example, long position with a short trigger will go short.
+2. Change to the trigger position. For example, a long position with a short trigger will go short.
 3. Go for the exiting signal.
 4. Do nothing.
 
@@ -292,7 +292,7 @@ in [Rad et al. 2016] on comparisons with other common strategies, using the AND-
 2. The trading signal is generated from the flags series, and the flags series will be calculated from the
    copula that we use to model.
    Therefore the explainability suffers.
-   Also it is based on the model in second order, and therefore the flag series and the suggested positions
+   Also, it is based on the model in second order, and therefore the flag series and the suggested positions
    will be quite different across different copulas, making it not stable and not directly comparable mutually.
 
 3. The way the flags series are defined does not handle well when both stocks are underpriced/overpriced concurrently.
@@ -323,4 +323,3 @@ References
 * `Xie, W., Liew, R.Q., Wu, Y. and Zou, X., 2016. Pairs trading with copulas. The Journal of Trading, 11(3), pp.41-52. <https://efmaefm.org/0efmameetings/EFMA%20ANNUAL%20MEETINGS/2014-Rome/papers/EFMA2014_0222_FullPaper.pdf>`__
 * `Liew, R.Q. and Wu, Y., 2013. Pairs trading: A copula approach. Journal of Derivatives & Hedge Funds, 19(1), pp.12-30. <https://link.springer.com/article/10.1057/jdhf.2013.1>`__
 * `Rad, H., Low, R.K.Y. and Faff, R., 2016. The profitability of pairs trading strategies: distance, cointegration and copula methods. Quantitative Finance, 16(10), pp.1541-1558. <https://www.tandfonline.com/doi/pdf/10.1080/14697688.2016.1164337?casa_token=X0-FdUqDsv4AAAAA:ZFothfEHF-dO2-uDtFo2ZuFH0uzF6qijsweHD888yfPx3OZGXW6Szon1jvA2BB_AsgC5-kGYreA4fw>`__
-

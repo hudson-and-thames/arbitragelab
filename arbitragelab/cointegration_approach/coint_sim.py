@@ -15,6 +15,7 @@ import pandas as pd
 import statsmodels.api as sm
 
 from arbitragelab.cointegration_approach.engle_granger import EngleGrangerPortfolio
+from arbitragelab.util import devadarsh
 
 
 class CointegrationSimulation:
@@ -40,6 +41,7 @@ class CointegrationSimulation:
         self.ts_num = ts_num
         self.ts_length = ts_length
         self.__price_params, self.__coint_params = self.initialize_params()
+        devadarsh.track('CointegrationSimulation')
 
     @staticmethod
     def initialize_params() -> Tuple[dict, dict]:
@@ -168,14 +170,14 @@ class CointegrationSimulation:
             constant_trend = params['constant_trend']
             ar_coeff = params['ar_coeff']
             white_noise_var = params['white_noise_var']
-        except KeyError:
+        except KeyError as bad_input:
             raise KeyError("Missing crucial parameters. The parameter dictionary should contain"
                            " the following keys:\n"
                            "1. constant_trend\n"
                            "2. ar_coeff\n"
                            "3. white_noise_var\n"
                            "Call initialize_params() to reset the configuration of the "
-                           "parameters to default.")
+                           "parameters to default.") from bad_input
 
         # If using statsmodels
         if use_statsmodels:

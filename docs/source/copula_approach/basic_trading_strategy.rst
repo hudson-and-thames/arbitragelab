@@ -5,7 +5,7 @@ Basic Trading Strategy
 ======================
 
 .. Note::
-    The following strategy closely follow the implementations:
+    The following strategy closely follows the implementations:
 
     `Pairs trading: a copula approach. (2013) <https://link.springer.com/article/10.1057/jdhf.2013.1>`__ by Liew, Rong Qi, and Yuan Wu.
 
@@ -79,12 +79,12 @@ Here is our take:
 2. Flip the position to the signal's suggestion. For example, originally have a short position, and receives a long
    signal, then the position becomes long.
    
-3. Technically this should never happen with the default trading logic. However if it did happen for whatever
+3. Technically this should never happen with the default trading logic. However, if it did happen for whatever
    reason, long + short signal will lead to no opening signal and the positions will not change, unless there is
    an exit signal and that resets the position to 0.
 
 For exiting a position, the authors proposed using **'and'** logic: Both conditional probabilities need to cross :math:`0.5`.
-However we found this too strict and sometimes fails to exit a position when it should. Therefore we also provide the
+However, we found this too strict and sometimes fails to exit a position when it should. Therefore we also provide the
 **'or'** logic: At least one of the conditional probabilities cross :math:`0.5`.
 
 .. figure:: images/positions_log_prices.png
@@ -107,7 +107,7 @@ Implementation
 .. Warning::
     The original :code:`CopulaStrategy` class is still available in Arbitrage Lab but is considered a legacy module.
     One can keep using it if it is already in use, but we highly recommend new users to use :code:`BasicCopulaStrategy`
-    exclusively for more flecibility, better consistency with other copula modules, and full support of :code:`pandas`. 
+    exclusively for more flexibility, better consistency with other copula modules, and full support of :code:`pandas`.
 
 .. automodule:: arbitragelab.copula_approach.copula_strategy_basic
         
@@ -166,7 +166,7 @@ The following research notebook can be used to better understand the copula stra
 
 * `Basic Copula Strategy`_
 
-.. _`Basic Copula Strategy`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Copula%20Approach/Copula_Notebook_Liew_etal.ipynb
+.. _`Basic Copula Strategy`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Copula%20Approach/Copula_Strategy_Basic.ipynb
 
 References
 ##########

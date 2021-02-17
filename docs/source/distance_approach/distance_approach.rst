@@ -40,14 +40,14 @@ This stage of the DistanceStrategy consists of the following steps:
 
 1. **Normalization of the input data.**
 
-To use the Euclidean square distance, the price time series are being normalized using the following
+To use the Euclidean square distance, the training price time series are being normalized using the following
 formula:
 
 .. math::
 
-    P_{normalized} = \frac{P - max(P)}{max(P) - min(P)}
+    P_{normalized} = \frac{P - min(P)}{max(P) - min(P)}
 
-where :math:`P` is the price series of an asset, :math:`min(P)` and :math:`max(P)` are the minimum
+where :math:`P` is the training price series of an asset, :math:`min(P)` and :math:`max(P)` are the minimum
 and maximum values from the price series.
 
 2. **Finding pairs.**
@@ -91,9 +91,12 @@ will later be used to generate trading signals.\
 Implementation
 **************
 
-.. py:currentmodule:: arbitragelab.distance_approach.DistanceStrategy
+.. automodule:: arbitragelab.distance_approach
 
-.. autofunction:: form_pairs
+.. autoclass:: DistanceStrategy
+   :members: __init__
+
+.. automethod:: DistanceStrategy.form_pairs
 
 Trading signals generation
 ##########################
@@ -106,8 +109,8 @@ This stage of the DistanceStrategy consists of the following steps:
 
 1. **Normalization of the input data.**
 
-Using the same approach as in the pairs formation stage, we normalize the input dataset using
-the same maximum and minimum historical values for price series.
+Using the same approach as in the pairs formation stage, we normalize the input trading dataset using
+the same maximum and minimum historical values from the training price series.
 
 2. **Portfolios creation.**
 
@@ -139,7 +142,7 @@ quantities of portfolios to hold for each pair (with values -1, 0, or +1).
 Implementation
 **************
 
-.. autofunction:: trade_pairs
+.. automethod:: DistanceStrategy.trade_pairs
 
 Results output and plotting
 ###########################
@@ -166,17 +169,17 @@ Functions that can be used to plot data:
 Implementation
 **************
 
-.. autofunction:: get_signals
+.. automethod:: DistanceStrategy.get_signals
 
-.. autofunction:: get_portfolios
+.. automethod:: DistanceStrategy.get_portfolios
 
-.. autofunction:: get_scaling_parameters
+.. automethod:: DistanceStrategy.get_scaling_parameters
 
-.. autofunction:: get_pairs
+.. automethod:: DistanceStrategy.get_pairs
 
-.. autofunction:: plot_pair
+.. automethod:: DistanceStrategy.plot_pair
 
-.. autofunction:: plot_portfolio
+.. automethod:: DistanceStrategy.plot_portfolio
 
 Examples
 ########
