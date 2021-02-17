@@ -191,7 +191,7 @@ class CVineCopStrat():
                                                lower_threshold=init_mean - threshold_std*init_std)
         new_position = self._signal_to_position(past_pos, signal)
         
-        return new_position, cur_mpi
+        return new_position, cur_cmpi
     
     @staticmethod
     def positions_to_units_cohort(prices_df: pd.DataFrame, positions: pd.Series, pv_target_idx: int = 1,
@@ -291,7 +291,7 @@ cvinecop = CVineCop(cvine_cop)
 import time
 start_time = time.time()
 cvcs = CVineCopStrat(cvinecop=cvinecop)
-# mpis = cvcs.calc_mpi(returns=test_returns, cdfs=cdfs, subtract_mean=True)
+mpis = cvcs.calc_mpi(returns=test_returns, cdfs=cdfs, subtract_mean=True)
 print("--- %s seconds ---" % (time.time() - start_time))
 #%%
 start_time = time.time()
@@ -302,6 +302,7 @@ positions, bband = cvcs.get_positions_bollinger(
 print("--- %s seconds ---" % (time.time() - start_time))
 #%%
 import matplotlib.pyplot as plt
+plt.style.use('seaborn')
 fig, ax = plt.subplots(nrows=3, dpi=300, figsize=(10, 7), gridspec_kw={'height_ratios': [0.5, 0.2, 0.7]}, sharex=True)
 ax[0].plot(stocks_universe['AAPL'].iloc[1200:] / stocks_universe['AAPL'].iloc[1200], label='Target Stock Price')
 ax[0].plot(stocks_universe['MSFT'].iloc[1200:] / stocks_universe['MSFT'].iloc[1200], label='Cohort Stock 2', linewidth=1)
@@ -309,9 +310,9 @@ ax[0].plot(stocks_universe['BA'].iloc[1200:] / stocks_universe['BA'].iloc[1200],
 ax[0].plot(stocks_universe['V'].iloc[1200:] / stocks_universe['V'].iloc[1200], label='Cohort Stock 4',linewidth=1)
 ax[1].plot(positions, label='positions')
 ax[2].plot(mpis.cumsum(), label='CMPI')
-ax[2].plot(bband['LowerBound'], label='B Band Lower Bound', linewidth=1, color='brown')
+ax[2].plot(bband['LowerBound'], label='B Band Bound', linewidth=1, color='brown')
 ax[2].plot(bband['Mean'], label='B Band Mean')
-ax[2].plot(bband['UpperBound'], label='B Band Upper Bound', linewidth=1, color='brown')
+ax[2].plot(bband['UpperBound'], linewidth=1, color='brown')
 plt.tight_layout()
 ax[0].legend()
 ax[2].legend()
