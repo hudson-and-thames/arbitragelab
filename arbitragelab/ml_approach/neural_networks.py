@@ -5,7 +5,7 @@
 This module implements the Multi Layer Perceptron, RNN model and the Pi Sigma Model described in Dunis et al. (2005).
 """
 
-#pylint: disable=wrong-import-position
+#pylint: disable=wrong-import-position, import-outside-toplevel
 import os
 import logging
 
@@ -14,10 +14,6 @@ logging.getLogger('tensorflow').setLevel(logging.ERROR)
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 import matplotlib.pyplot as plt
-import tensorflow as tf
-from keras.models import Model
-from keras.callbacks.callbacks import History
-from keras.layers import Input, LSTM, Dense, Activation, Lambda
 
 class BaseNeuralNetwork:
     """
@@ -29,9 +25,15 @@ class BaseNeuralNetwork:
         Initializing variables.
         """
 
+        # Importing needed packages
+        import tensorflow as tf
+        from keras.models import Model
+        from keras.callbacks.callbacks import History
+        from keras.layers import Input, LSTM, Dense, Activation, Lambda
+
         self.fitted_model = None
 
-    def fit(self, *args, **kwargs) -> History:
+    def fit(self, *args, **kwargs):
         """
         Wrapper over the keras model fit function.
 
@@ -96,12 +98,16 @@ class MultiLayerPerceptron(BaseNeuralNetwork):
         self.hidden_layer_activation_function = hidden_layer_activation_function
         self.output_layer_activation_function = output_layer_act_func
 
-    def build(self) -> Model:
+    def build(self):
         """
         Builds and compiles model architecture.
 
         :return: (Model) Resulting model.
         """
+
+        # Importing needed packages
+        from keras.models import Model
+        from keras.layers import Input, Dense
 
         input_layer = Input((self.frame_size,))
 
@@ -156,12 +162,16 @@ class RecurrentNeuralNetwork(BaseNeuralNetwork):
         self.hidden_layer_activation_function = hidden_layer_activation_function
         self.output_layer_activation_function = output_layer_act_func
 
-    def build(self) -> Model:
+    def build(self):
         """
         Builds and compiles model architecture.
 
         :return: (Model) Resulting model.
         """
+
+        # Importing needed packages
+        from keras.models import Model
+        from keras.layers import Input, LSTM, Dense
 
         input_layer = Input(self.input_shape)
 
@@ -215,12 +225,16 @@ class PiSigmaNeuralNetwork(BaseNeuralNetwork):
         self.hidden_layer_activation_function = hidden_layer_activation_function
         self.output_layer_activation_function = output_layer_act_func
 
-    def build(self) -> Model:
+    def build(self):
         """
         Builds and compiles model architecture.
 
         :return: (Model) Resulting model.
         """
+
+        # Importing needed packages
+        from keras.models import Model
+        from keras.layers import Input, Dense, Activation, Lambda
 
         input_layer = Input((self.frame_size,))
 
@@ -241,7 +255,7 @@ class PiSigmaNeuralNetwork(BaseNeuralNetwork):
         return model
 
     @staticmethod
-    def _pi_this(tensor: tf.Tensor) -> tf.Tensor:
+    def _pi_this(tensor):
         """
         Computes the product of elements across 'axis=1' of the input tensor and
         will return the reduced version of the tensor.
@@ -249,6 +263,9 @@ class PiSigmaNeuralNetwork(BaseNeuralNetwork):
         :param tensor: (tf.Tensor) Weights from the hidden layer.
         :return: (tf.Tensor) Product of input tensor.
         """
+
+        # Importing needed packages
+        import tensorflow as tf
 
         prod = tf.math.reduce_prod(tensor, keepdims=True, axis=1)
 
