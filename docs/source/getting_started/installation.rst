@@ -95,7 +95,7 @@ Accept all the requests to install.
 
    .. code-block::
 
-      pip install git+https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@github.com/hudson-and-thames/arbitragelab.git@0.2.2
+      pip install git+https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@github.com/hudson-and-thames/arbitragelab.git@0.3.0
 
 .. tip::
 
@@ -173,7 +173,7 @@ Accept all the requests to install.
 
    .. code-block::
 
-      pip install git+https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@github.com/hudson-and-thames/arbitragelab.git@0.2.2
+      pip install git+https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@github.com/hudson-and-thames/arbitragelab.git@0.3.0
 
 .. tip::
 
@@ -235,7 +235,7 @@ Windows
 
    .. code-block::
 
-      pip install git+https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@github.com/hudson-and-thames/arbitragelab.git@0.2.2
+      pip install git+https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@github.com/hudson-and-thames/arbitragelab.git@0.3.0
 
 .. tip::
 
