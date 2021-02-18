@@ -21,6 +21,7 @@ Adding our libraries to your company’s pipeline is like adding a department of
 * [Website](https://hudsonthames.org/)
 * [Github Group](https://github.com/hudson-and-thames)
 * [MlFinLab](https://mlfinlab.readthedocs.io/en/latest/)
+* [PortfolioLab](https://hudson-and-thames-portfoliolab.readthedocs-hosted.com/en/latest/)
 
 ---
 
