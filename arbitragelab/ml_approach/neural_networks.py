@@ -5,7 +5,7 @@
 This module implements the Multi Layer Perceptron, RNN model and the Pi Sigma Model described in Dunis et al. (2005).
 """
 
-#pylint: disable=wrong-import-position, import-outside-toplevel
+#pylint: disable=wrong-import-position, import-outside-toplevel, unused-import
 import os
 import logging
 
