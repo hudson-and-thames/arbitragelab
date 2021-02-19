@@ -12,6 +12,8 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+* :support:`38` Removed TensorFlow from requirements and adjusted installation guide.
+
 * :release:`0.3.0 <2021-02-16>`
 * :feature:`33` Sparse Mean-Reverting Portfolios Model added to the Cointegration Approach Module.
 * :support:`33` Sparse Mean-Reverting Portfolios Model documentation.
