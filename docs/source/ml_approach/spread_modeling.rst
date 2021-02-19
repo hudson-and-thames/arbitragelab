@@ -3,6 +3,10 @@
 .. note::
    The following documentation closely follows the work of Dunis et al. (2015)
 
+.. warning::
+   In order to use this module, you should additionally install *TensorFlow v2.2.1.* and *Keras v2.3.1.*
+   For more details, please visit our :ref:`ArbitrageLab installation guide <getting_started-installation>`.
+
 ===============
 Spread Modeling
 ===============
