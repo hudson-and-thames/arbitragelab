@@ -13,20 +13,6 @@ Recommended Versions
 Installation
 ############
 
-.. warning::
-
-    You may be encountering the following errors during the installation:
-
-    ``ERROR: tensorflow 2.2.1 has requirement h5py<2.11.0,>=2.10.0,``
-    ``but you'll have h5py 3.1.0 which is incompatible.``
-
-    ``ERROR: tensorflow 2.2.1 has requirement numpy<1.19.0,>=1.16.0,``
-    ``but you'll have numpy 1.20.1 which is incompatible.``
-
-    You can ignore these messages. They appear due to the updated dependency versions in the ArbitrageLab package.
-    
-    All the ArbitrageLab functionality still works as expected.
-
 Ubuntu Linux
 ************
 
@@ -35,23 +21,23 @@ Ubuntu Linux
 2. Launch a terminal
 3. Create a New Conda Environment. From terminal.
 
-.. code-block::
+   .. code-block::
 
-   conda create -n <env name> python=3.8 anaconda
+      conda create -n <env name> python=3.8 anaconda
 
-Accept all the requests to install.
+   Accept all the requests to install.
 
 4. Now activate the environment with:
 
-.. code-block::
+   .. code-block::
 
-   source activate <env name>
+      source activate <env name>
 
 5. Purchase ArbitrageLab from the `Hudson & Thames website <https://app.hudsonthames.org/auth/signin>`__. This will provide you with an API key.
 
-.. code-block::
+   .. code-block::
 
-    Example: "26303adb02cb759b2d484233162a0"
+       Example: "26303adb02cb759b2d484233162a0"
 
 6. Add API key as an environment variable:
 
@@ -97,6 +83,37 @@ Accept all the requests to install.
 
       pip install git+https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@github.com/hudson-and-thames/arbitragelab.git@0.3.0
 
+8. (Optional) **Only if you want to use the ML Approach Module**, install the TensorFlow and Keras packages.
+   Note that you should have pip version "pip==20.1.1" to do this. Supported TensorFlow and Keras versions
+   are "tensorflow==2.2.1" and "keras==2.3.1".
+
+   To change the pip version:
+
+   .. code-block::
+
+      pip install --user "pip==20.1.1"
+
+   To install TensorFlow and Keras:
+
+   .. code-block::
+
+      pip install "tensorflow==2.2.1"
+      pip install "keras==2.3.1"
+
+   .. warning::
+
+      You may be encountering the following errors during the installation:
+
+      ``ERROR: tensorflow 2.2.1 has requirement h5py<2.11.0,>=2.10.0,``
+      ``but you'll have h5py 3.1.0 which is incompatible.``
+
+      ``ERROR: tensorflow 2.2.1 has requirement numpy<1.19.0,>=1.16.0,``
+      ``but you'll have numpy 1.20.1 which is incompatible.``
+
+      You can ignore these messages. They appear due to the updated dependency versions in the ArbitrageLab package.
+
+      All the ArbitrageLab functionality still works as expected.
+
 .. tip::
 
    * We have added error handling which will raise an error if your environment variables are incorrect.
@@ -111,23 +128,23 @@ Mac OS X
 2. Launch a terminal
 3. Create a New Conda Environment. From terminal.
 
-.. code-block::
+   .. code-block::
 
-   conda create -n <env name> python=3.8 anaconda
+      conda create -n <env name> python=3.8 anaconda
 
-Accept all the requests to install.
+   Accept all the requests to install.
 
 4. Now activate the environment with:
 
-.. code-block::
+   .. code-block::
 
-   source activate <env name>
+      source activate <env name>
 
 5. Purchase ArbitrageLab from the `Hudson & Thames website <https://app.hudsonthames.org/auth/signin>`__. This will provide you with an API key.
 
-.. code-block::
+   .. code-block::
 
-    Example: "26303adb02cb759b2d484233162a0"
+      Example: "26303adb02cb759b2d484233162a0"
 
 6. Add API key as an environment variable:
 
@@ -175,6 +192,37 @@ Accept all the requests to install.
 
       pip install git+https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@github.com/hudson-and-thames/arbitragelab.git@0.3.0
 
+9. (Optional) **Only if you want to use the ML Approach Module**, install the TensorFlow and Keras packages.
+   Note that you should have pip version "pip==20.1.1" to do this. Supported TensorFlow and Keras versions
+   are "tensorflow==2.2.1" and "keras==2.3.1".
+
+   To change the pip version:
+
+   .. code-block::
+
+      pip install --user "pip==20.1.1"
+
+   To install TensorFlow and Keras:
+
+   .. code-block::
+
+      pip install "tensorflow==2.2.1"
+      pip install "keras==2.3.1"
+
+   .. warning::
+
+      You may be encountering the following errors during the installation:
+
+      ``ERROR: tensorflow 2.2.1 has requirement h5py<2.11.0,>=2.10.0,``
+      ``but you'll have h5py 3.1.0 which is incompatible.``
+
+      ``ERROR: tensorflow 2.2.1 has requirement numpy<1.19.0,>=1.16.0,``
+      ``but you'll have numpy 1.20.1 which is incompatible.``
+
+      You can ignore these messages. They appear due to the updated dependency versions in the ArbitrageLab package.
+
+      All the ArbitrageLab functionality still works as expected.
+
 .. tip::
 
    * We have added error handling which will raise an error if your environment variables are incorrect.
@@ -189,21 +237,21 @@ Windows
 2. Launch Anacoda Prompt
 3. Create new environment (replace <env name> with a name, for example ``arbitragelab``):
 
-.. code-block::
+   .. code-block::
 
-   conda create -n <env name> python=3.8 anaconda
+      conda create -n <env name> python=3.8 anaconda
 
 4. Activate the new environment:
 
-.. code-block::
+   .. code-block::
 
-   conda activate <env name>
+      conda activate <env name>
 
 5. Purchase ArbitrageLab from the `Hudson & Thames website <https://app.hudsonthames.org/auth/signin>`__. This will provide you with an API key.
 
-.. code-block::
+   .. code-block::
 
-    Example: "26303adb02cb759b2d484233162a0"
+      Example: "26303adb02cb759b2d484233162a0"
 
 6. Add API key as an environment variable:
 
@@ -236,6 +284,37 @@ Windows
    .. code-block::
 
       pip install git+https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@github.com/hudson-and-thames/arbitragelab.git@0.3.0
+
+8. (Optional) **Only if you want to use the ML Approach Module**, install the TensorFlow and Keras packages.
+   Note that you should have pip version "pip==20.1.1" to do this. Supported TensorFlow and Keras versions
+   are "tensorflow==2.2.1" and "keras==2.3.1".
+
+   To change the pip version:
+
+   .. code-block::
+
+      pip install --user "pip==20.1.1"
+
+   To install TensorFlow and Keras:
+
+   .. code-block::
+
+      pip install "tensorflow==2.2.1"
+      pip install "keras==2.3.1"
+
+   .. warning::
+
+      You may be encountering the following errors during the installation:
+
+      ``ERROR: tensorflow 2.2.1 has requirement h5py<2.11.0,>=2.10.0,``
+      ``but you'll have h5py 3.1.0 which is incompatible.``
+
+      ``ERROR: tensorflow 2.2.1 has requirement numpy<1.19.0,>=1.16.0,``
+      ``but you'll have numpy 1.20.1 which is incompatible.``
+
+      You can ignore these messages. They appear due to the updated dependency versions in the ArbitrageLab package.
+
+      All the ArbitrageLab functionality still works as expected.
 
 .. tip::
 
