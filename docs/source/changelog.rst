@@ -12,6 +12,7 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+* :release:`0.3.1 <2021-02-19>`
 * :support:`38` Removed TensorFlow from requirements and adjusted installation guide.
 
 * :release:`0.3.0 <2021-02-16>`

@@ -9,7 +9,7 @@ from setuptools import setup
 setup()
 
 # Bump version
-# Make sure install codes are updated in the docs.
+# Make sure install codes are updated in the docs (Installation guide).
 # Update Changelog release
 # bumpversion major/minor/patch --allow-dirty
 # Double-check if you did a Git Push

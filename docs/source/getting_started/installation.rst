@@ -81,7 +81,7 @@ Ubuntu Linux
 
    .. code-block::
 
-      pip install git+https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@github.com/hudson-and-thames/arbitragelab.git@0.3.0
+      pip install git+https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@github.com/hudson-and-thames/arbitragelab.git@0.3.1
 
 8. (Optional) **Only if you want to use the ML Approach Module**, install the TensorFlow and Keras packages.
    Note that you should have pip version "pip==20.1.1" to do this. Supported TensorFlow and Keras versions
@@ -190,7 +190,7 @@ Mac OS X
 
    .. code-block::
 
-      pip install git+https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@github.com/hudson-and-thames/arbitragelab.git@0.3.0
+      pip install git+https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@github.com/hudson-and-thames/arbitragelab.git@0.3.1
 
 9. (Optional) **Only if you want to use the ML Approach Module**, install the TensorFlow and Keras packages.
    Note that you should have pip version "pip==20.1.1" to do this. Supported TensorFlow and Keras versions
@@ -283,7 +283,7 @@ Windows
 
    .. code-block::
 
-      pip install git+https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@github.com/hudson-and-thames/arbitragelab.git@0.3.0
+      pip install git+https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@github.com/hudson-and-thames/arbitragelab.git@0.3.1
 
 8. (Optional) **Only if you want to use the ML Approach Module**, install the TensorFlow and Keras packages.
    Note that you should have pip version "pip==20.1.1" to do this. Supported TensorFlow and Keras versions
