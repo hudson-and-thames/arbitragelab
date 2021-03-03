@@ -5,10 +5,11 @@ import os
 import unittest
 import pandas as pd
 
+from matplotlib import axes
 from statsmodels.distributions.empirical_distribution import ECDF
 from arbitragelab.copula_approach.vine_copula_partner_selection import PartnerSelection
 from arbitragelab.copula_approach.vine_copula_partner_selection_utils import get_sum_correlations, multivariate_rho, \
-    diagonal_measure, extremal_measure, get_co_variance_matrix
+    diagonal_measure, extremal_measure, get_co_variance_matrix, get_sector_data
 
 
 class PartnerSelectionTests(unittest.TestCase):
@@ -35,6 +36,8 @@ class PartnerSelectionTests(unittest.TestCase):
 
         cls.co_variance_matrix = get_co_variance_matrix()
 
+        cls.constituents = pd.read_csv(project_path + '/test_data/sp500_constituents-detailed.csv', index_col='Symbol')
+
     def test_sum_correlations(self):
         """
         Tests Traditional Approach.
@@ -58,6 +61,25 @@ class PartnerSelectionTests(unittest.TestCase):
         Tests Extremal Approach.
         """
         self.assertEqual(round(extremal_measure(self.ps.ranked_returns[self.quadruple], self.co_variance_matrix), 4), 108.5128)
+
+    def test_get_sector_data(self):
+        """
+        Tests Util method which returns sector data.
+        """
+        self.assertIsInstance(get_sector_data(self.quadruple, self.constituents), pd.DataFrame)
+
+    def test_plot_all_target_measures(self):
+        """
+        Tests plot_all_target_measures plotting method.
+        """
+        self.assertIsInstance(self.ps.plot_all_target_measures('A', 'traditional'), axes.Axes)
+
+    def test_plot_selected_pairs(self):
+        """
+        Tests plot_selected_pairs plotting method.
+        """
+        self.assertIsInstance(self.ps.plot_selected_pairs([self.quadruple]), axes.Axes)
+
 
 if __name__ == '__main__':
     unittest.main()

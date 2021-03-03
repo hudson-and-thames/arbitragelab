@@ -15,7 +15,7 @@ def get_sector_data(quadruple, constituents):
     try:
         return constituents.loc[quadruple, ['Security', 'GICS Sector', 'GICS Sub-Industry']]
     except KeyError:
-        return None
+        return pd.DataFrame()
 
 
 def get_sum_correlations(corr_matrix, quadruple: list) -> float:

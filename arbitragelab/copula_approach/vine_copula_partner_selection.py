@@ -252,12 +252,21 @@ class PartnerSelection:
                                 figsize=(15, 3 * len(quadruples)))
 
         plt.subplots_adjust(hspace=0.6)
-        for i, quadruple in enumerate(quadruples):
+
+        if len(quadruples) == 1:
+            quadruple = quadruples[0]
             data = self.universe.loc[:, quadruple].apply(lambda x: np.log(x).diff()).cumsum()
-            sns.lineplot(ax=axs[i], data=data, legend=quadruple)
-            axs[i].set_title(f'Final Quadruple of stocks with {quadruple[0]} as target')
-            axs[i].set_ylabel('Cumulative Daily Returns')
-        plt.show()
+            sns.lineplot(ax=axs, data=data, legend=quadruple)
+            axs.set_title(f'Final Quadruple of stocks with {quadruple[0]} as target')
+            axs.set_ylabel('Cumulative Daily Returns')
+        else:
+            for i, quadruple in enumerate(quadruples):
+                data = self.universe.loc[:, quadruple].apply(lambda x: np.log(x).diff()).cumsum()
+                sns.lineplot(ax=axs[i], data=data, legend=quadruple)
+                axs[i].set_title(f'Final Quadruple of stocks with {quadruple[0]} as target')
+                axs[i].set_ylabel('Cumulative Daily Returns')
+
+        return axs
 
     def plot_all_target_measures(self, target: str, procedure: str):
         """
@@ -314,7 +323,7 @@ class PartnerSelection:
 
         print(final_quadruple)
 
-        self._plot_all_target_measures_helper(measures_list, target, procedure)
+        return self._plot_all_target_measures_helper(measures_list, target, procedure)
 
     @staticmethod
     def _plot_all_target_measures_helper(measures_list: list, target:str, procedure: str):
@@ -334,7 +343,8 @@ class PartnerSelection:
             data.loc[data['measure'].idxmin(), 'hue'] = 1
         else:
             data.loc[data['measure'].idxmax(), 'hue'] = 1
-        sns.scatterplot(x='indices', y='measure', data=data, alpha=0.5, hue='hue', size='hue',
+        ax = sns.scatterplot(x='indices', y='measure', data=data, alpha=0.5, hue='hue', size='hue',
                         sizes={0: 5, 1: 40}, legend=False)
         plt.title(f"Measures calculated from {procedure} approach for all quadruples of target {target}")
-        plt.show()
+
+        return ax
