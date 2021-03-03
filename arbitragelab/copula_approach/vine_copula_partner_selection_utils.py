@@ -1,3 +1,7 @@
+"""
+Utils for implementing partner selection approaches for vine copulas.
+"""
+# pylint: disable = invalid-name
 import itertools
 import numpy as np
 import pandas as pd
@@ -49,7 +53,7 @@ def multivariate_rho(u: pd.DataFrame) -> float:
     rho_2 = h_d * (-1 + (((2 ** d) / n) * sum_2))
 
     # Calculating the third estimator of multivariate rho
-    pairs = [x for x in itertools.combinations(range(u.shape[-1]), 2)]
+    pairs = itertools.combinations(range(u.shape[-1]), 2)
     sum_3 = np.sum([(1 - u.iloc[:, k]) * (1 - u.iloc[:, l]) for (k, l) in pairs])
     dc2 = scipy.special.comb(d, 2, exact=True)
     rho_3 = -3 + (12 / (n * dc2)) * sum_3
@@ -81,7 +85,7 @@ def diagonal_measure(points) -> float:
     :param points: (pd.DataFrame) : ranked returns of 4 stock tickers
     :return total_distance: (float) : total euclidean distance
     """
-    n, d = points.shape  # n : Number of samples, d : Number of stocks
+    d = points.shape[-1]  # d : Number of stocks
     a = np.zeros((1, d))  # Point a denotes origin which is present on hyper-diagonal
     b = np.ones((1, d))  # Point b denotes point (1,1,1,1) on hyper-diagonal
     ba = (b - a).T  # ba represents the hyper-diagonal
@@ -152,10 +156,14 @@ def func(t, value):
     :param value: (int) Flag denoting equation form of variable
     :return:
     """
+
+    res = None
     if value == 1:
-        return (t - 1) * (3 * t - 1)
+        res =  (t - 1) * (3 * t - 1)
     if value == 2:
-        return t * (2 - 3 * t)
+        res =  t * (2 - 3 * t)
+
+    return res
 
 
 def variance_integral_func(u1, u2, u3, u4, l1, l2):

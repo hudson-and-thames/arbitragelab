@@ -1,3 +1,7 @@
+"""
+Module for implementing partner selection approaches for vine copulas.
+"""
+# pylint: disable = invalid-name
 import itertools
 import matplotlib.pyplot as plt
 import numpy as np
@@ -5,7 +9,8 @@ import pandas as pd
 import seaborn as sns
 
 from statsmodels.distributions.empirical_distribution import ECDF
-from arbitragelab.copula_approach.vine_copula_partner_selection_utils import get_sum_correlations, multivariate_rho, diagonal_measure, extremal_measure, get_co_variance_matrix
+from arbitragelab.copula_approach.vine_copula_partner_selection_utils import get_sum_correlations, \
+    multivariate_rho, diagonal_measure, extremal_measure, get_co_variance_matrix
 
 
 class PartnerSelection:
@@ -243,7 +248,7 @@ class PartnerSelection:
         if quadruples is None:
             raise Exception("Input list is empty")
 
-        fig, axs = plt.subplots(len(quadruples),
+        _, axs = plt.subplots(len(quadruples),
                                 figsize=(15, 3 * len(quadruples)))
 
         plt.subplots_adjust(hspace=0.6)
@@ -276,12 +281,12 @@ class PartnerSelection:
         # Preprocessing steps for some approaches
         if procedure == 'extremal':
             co_variance_matrix = get_co_variance_matrix()
-        if procedure == 'extended':
+        elif procedure == 'extended':
             u = self.returns.copy()  # Generating ranked returns from quantiles using statsmodels ECDF
             for column in self.returns.columns:
                 ecdf = ECDF(self.returns.loc[:, column])
                 u[column] = ecdf(self.returns.loc[:, column])
-        if procedure == 'geometric':
+        elif procedure == 'geometric':
             final_measure = np.inf
 
         for quadruple in quadruples:
@@ -308,6 +313,17 @@ class PartnerSelection:
                 final_quadruple = quadruple
 
         print(final_quadruple)
+
+        self._plot_all_target_measures_helper(measures_list, target, procedure)
+
+    @staticmethod
+    def _plot_all_target_measures_helper(measures_list: list, target:str, procedure: str):
+        """
+        Helper Method for self.plot_all_target_measures.
+        :measures_list: (list) : List of calculated measures for all quadruples of a target
+        :param target: (str) : target stock ticker
+        :param procedure: (str) : name of procedure for calculating measure
+        """
 
         # Code for plotting the final list of calculated measures
         plt.figure(figsize=(20, 6))
