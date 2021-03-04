@@ -15,14 +15,22 @@ Vine Copula Partner Selection Approaches
 
 This module contains implementation of the four partner selection approaches mentioned in Section 3.1.1 of Statistical Arbitrage with Vine Copulas.
 
-In this paper[1], Stubinger, Mangold and Krauss developed a multivariate statistical arbitrage strategy based on vine copulas - a highly flexible instrument for linear and nonlinear multivariate dependence modeling. Pairs trading is a relative-value arbitrage strategy, where an investor seeks to profit from mean-reversion properties of the price spread between two co-moving securities. Existing literature focused on using bivariate copulas to model the dependence structure between two stock return time series, and to identify mispricings that can potentially be exploited in a pairs trading application.
+In this paper[1], Stubinger, Mangold and Krauss developed a multivariate statistical arbitrage strategy based on vine copulas -
+a highly flexible instrument for linear and nonlinear multivariate dependence modeling. Pairs trading is a relative-value arbitrage strategy,
+where an investor seeks to profit from mean-reversion properties of the price spread between two co-moving securities.
+Existing literature focused on using bivariate copulas to model the dependence structure between two stock return time series,
+and to identify mispricings that can potentially be exploited in a pairs trading application.
 
-This paper proposes a multivariate copula-based statistical arbitrage framework, where specifically, for each stock in the S&P 500 data base, the three most suitable partners are selected by leveraging different selection criteria. Then, the multivariate copula models are benchmarked to capture the dependence structure of the selected quadruples. Later on, the paper focusses on the generation of trading signals and backtesting.
+This paper proposes a multivariate copula-based statistical arbitrage framework, where specifically,
+for each stock in the S&P 500 data base, the three most suitable partners are selected by leveraging different selection criteria.
+Then, the multivariate copula models are benchmarked to capture the dependence structure of the selected quadruples.
+Later on, the paper focusses on the generation of trading signals and backtesting.
 
 Introduction
 ############
 
-This module will focus on the various Partner Selection procedures and their implementations, as described in the paper. For every stock in the S&P 500, a partner triple is identified based on adequate measures of association. The following four partner selection approaches are implemented :
+This module will focus on the various Partner Selection procedures and their implementations, as described in the paper.
+For every stock in the S&P 500, a partner triple is identified based on adequate measures of association. The following four partner selection approaches are implemented :
 
 - Traditional Approach - baseline approach where the high dimensional relation between the four stocks is approximated by their pairwise bivariate correlations via Spearman’s :math:`\rho`;
 
@@ -32,26 +40,33 @@ This module will focus on the various Partner Selection procedures and their imp
 
 - Extremal Approach - involves calculating a non-parametric :math:`\chi^2` test statistic based on Mangold (2015)[3] to measure the degree of deviation from independence.
 
-Firstly, all measures of association are calculated using the ranks of the daily discrete returns of our samples. Ranked transformation provides robustness against outliers. Secondly, only the top 50 most highly correlated stocks are taken into consideration for each target stock, to reduce the computational burden.
+Firstly, all measures of association are calculated using the ranks of the daily discrete returns of our samples.
+Ranked transformation provides robustness against outliers.
+Secondly, only the top 50 most highly correlated stocks are taken into consideration for each target stock, to reduce the computational burden.
 
 Traditional Approach
-********************
-
-Extended Approach
-********************
-
-Geometric Approach
-********************
-
-Extremal Approach
-********************
-
+####################
 
 Implementation
-##############
+**************
 
+Extended Approach
+#################
 
+Implementation
+**************
 
+Geometric Approach
+##################
+
+Implementation
+**************
+
+Extremal Approach
+#################
+
+Implementation
+**************
 
 Research Notebooks
 ##################

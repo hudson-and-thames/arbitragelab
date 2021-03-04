@@ -1,3 +1,6 @@
+# Copyright 2019, Hudson and Thames Quantitative Research
+# All rights reserved
+# Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 """
 Module for implementing partner selection approaches for vine copulas.
 """
@@ -9,8 +12,8 @@ import pandas as pd
 import seaborn as sns
 
 from statsmodels.distributions.empirical_distribution import ECDF
-from arbitragelab.copula_approach.vine_copula_partner_selection_utils import get_sum_correlations, \
-    multivariate_rho, diagonal_measure, extremal_measure, get_co_variance_matrix
+from arbitragelab.copula_approach.vine_copula_partner_selection_utils import extremal_measure, \
+    get_co_variance_matrix, get_sum_correlations_vectorized, diagonal_measure_vectorized, multivariate_rho_vectorized
 
 
 class PartnerSelection:
@@ -18,8 +21,10 @@ class PartnerSelection:
     Implementation of the Partner Selection procedures proposed in Section 3.1.1 in the following paper.
 
     3 partner stocks are selected for a target stock based on four different approaches namely, Traditional approach,
-    Extended approach,Geometric approach and Extremal approach.
-    https://www.econstor.eu/bitstream/10419/147450/1/870932616.pdf
+    Extended approach, Geometric approach and Extremal approach.
+
+    `Stübinger, J., Mangold, B. and Krauss, C., 2018. Statistical arbitrage with vine copulas. Quantitative Finance, 18(11), pp.1831-1849.
+    <https://www.econstor.eu/bitstream/10419/147450/1/870932616.pdf>`__
     """
 
     def __init__(self, prices: pd.DataFrame):
@@ -114,6 +119,20 @@ class PartnerSelection:
             quadruples.append([target] + list(triple))
         return quadruples
 
+    @staticmethod
+    def _prepare_combinations_of_partners(stock_selection: list) -> np.array:
+        """Helper function to calculate all combinations for a target stock and it's potential partners
+        :param: stock_selection (pd.DataFrame): the target stock has to be the first element of the array
+        :return: the possible combinations for the quadruples.Shape (19600,4) or
+        if the target stock is left out (19600,3)
+        """
+        # We will convert the stock names into integers and then get a list of all combinations with a length of 3
+        num_of_stocks = len(stock_selection)
+        # We turn our partner stocks into numerical indices so we can use them directly for indexing
+        partner_stocks_idx = np.arange(1, num_of_stocks)  # basically exclude the target stock
+        partner_stocks_idx_combs = itertools.combinations(partner_stocks_idx, 3)
+        return np.array(list((0,) + comb for comb in partner_stocks_idx_combs))
+
     # Method 1
     def traditional(self, n_targets=5) -> list:
         """
@@ -128,17 +147,12 @@ class PartnerSelection:
         output_matrix = []  # Stores the final set of quadruples.
         # Iterating on the top 50 indices for each target stock.
         for target in self.top_50_correlations.index[:n_targets]:
-            max_sum_correlations = 0  # Variable used to extract the desired maximum value
-            final_quadruple = None  # Stores the final desired quadruple
 
-            # Iterating on all unique quadruples generated for a target
-            for quadruple in self.all_quadruples[target]:
-                sum_correlations = get_sum_correlations(self.correlation_matrix, quadruple)
-                if sum_correlations > max_sum_correlations:
-                    max_sum_correlations = sum_correlations
-                    final_quadruple = quadruple
+            stock_selection = [target] + self.top_50_correlations.loc[target].tolist()
+            data_subset = self.correlation_matrix.loc[stock_selection, stock_selection]
+            all_possible_combinations = self._prepare_combinations_of_partners(stock_selection)
 
-            print(final_quadruple)
+            final_quadruple = get_sum_correlations_vectorized(data_subset, all_possible_combinations)[0]
             # Appending the final quadruple for each target to the output matrix
             output_matrix.append(final_quadruple)
 
@@ -156,25 +170,16 @@ class PartnerSelection:
         :return output_matrix: list: List of all selected quadruples
         """
 
-        u = self.returns.copy()  # Generating ranked returns from quantiles using statsmodels ECDF
-        for column in self.returns.columns:
-            ecdf = ECDF(self.returns.loc[:, column])
-            u[column] = ecdf(self.returns.loc[:, column])
+        ecdf_df = self.returns.apply(lambda x: ECDF(x)(x), axis=0)
 
         output_matrix = []  # Stores the final set of quadruples.
         # Iterating on the top 50 indices for each target stock.
         for target in self.top_50_correlations.index[:n_targets]:
-            max_correlation = -np.inf  # Variable used to extract the desired maximum value
-            final_quadruple = None  # Stores the final desired quadruple
+            stock_selection = [target] + self.top_50_correlations.loc[target].tolist()
+            data_subset = ecdf_df[stock_selection]
+            all_possible_combinations = self._prepare_combinations_of_partners(stock_selection)
 
-            # Iterating on all unique quadruples generated for a target
-            for quadruple in self.all_quadruples[target]:
-                correlation = multivariate_rho(u[quadruple])
-                if correlation > max_correlation:
-                    max_correlation = correlation
-                    final_quadruple = quadruple
-
-            print(final_quadruple)
+            final_quadruple = multivariate_rho_vectorized(data_subset, all_possible_combinations)[0]
             # Appending the final quadruple for each target to the output matrix
             output_matrix.append(final_quadruple)
 
@@ -194,16 +199,11 @@ class PartnerSelection:
         output_matrix = []  # Stores the final set of quadruples.
         # Iterating on the top 50 indices for each target stock.
         for target in self.top_50_correlations.index[:n_targets]:
-            min_measure = np.inf  # Variable used to extract the desired minimum value
-            final_quadruple = None  # Stores the final desired quadruple
+            stock_selection = [target] + self.top_50_correlations.loc[target].tolist()
+            data_subset = self.ranked_returns[stock_selection]
+            all_possible_combinations = self._prepare_combinations_of_partners(stock_selection)
 
-            # Iterating on all unique quadruples generated for a target
-            for quadruple in self.all_quadruples[target]:
-                measure = diagonal_measure(self.ranked_returns[quadruple])
-                if measure < min_measure:
-                    min_measure = measure
-                    final_quadruple = quadruple
-            print(final_quadruple)
+            final_quadruple = diagonal_measure_vectorized(data_subset, all_possible_combinations)[0]
             # Appending the final quadruple for each target to the output matrix
             output_matrix.append(final_quadruple)
 
@@ -233,7 +233,6 @@ class PartnerSelection:
                 if measure > max_measure:
                     max_measure = measure
                     final_quadruple = quadruple
-            print(final_quadruple)
             # Appending the final quadruple for each target to the output matrix
             output_matrix.append(final_quadruple)
 
@@ -267,84 +266,3 @@ class PartnerSelection:
                 axs[i].set_ylabel('Cumulative Daily Returns')
 
         return axs
-
-    def plot_all_target_measures(self, target: str, procedure: str):
-        """
-        Plots a scatterplot showing measures calculated for all possible quadruples of a given target stock.
-        :param target: (str) : target stock ticker
-        :param procedure: (str) : name of procedure for calculating measure
-        """
-
-        if procedure not in ('traditional', 'extended', 'geometric', 'extremal'):
-            raise Exception("Please enter a valid procedure name, i.e ('traditional', 'extended', 'geometric', "
-                            "'extremal') ")
-
-        measures_list = []
-        quadruples = self.all_quadruples[target]  # List of all quadruples
-        final_quadruple = None
-        final_measure = -np.inf
-
-        co_variance_matrix = None
-        u = None
-
-        # Preprocessing steps for some approaches
-        if procedure == 'extremal':
-            co_variance_matrix = get_co_variance_matrix()
-        elif procedure == 'extended':
-            u = self.returns.copy()  # Generating ranked returns from quantiles using statsmodels ECDF
-            for column in self.returns.columns:
-                ecdf = ECDF(self.returns.loc[:, column])
-                u[column] = ecdf(self.returns.loc[:, column])
-        elif procedure == 'geometric':
-            final_measure = np.inf
-
-        for quadruple in quadruples:
-            # Separate functionality for geometric approach because here the minimum measure is required.
-            if procedure == 'geometric':
-                measure = diagonal_measure(self.ranked_returns[quadruple])
-                measures_list.append(measure)
-                if measure < final_measure:
-                    final_measure = measure
-                    final_quadruple = quadruple
-                continue
-
-            measure = 0
-            if procedure == 'traditional':
-                measure = get_sum_correlations(self.correlation_matrix, quadruple)
-            elif procedure == 'extended':
-                measure = multivariate_rho(u[quadruple])
-            elif procedure == 'extremal':
-                measure = extremal_measure(self.ranked_returns[quadruple], co_variance_matrix)
-
-            measures_list.append(measure)  # Storing all calculated measures
-            if measure > final_measure:
-                final_measure = measure
-                final_quadruple = quadruple
-
-        print(final_quadruple)
-
-        return self._plot_all_target_measures_helper(measures_list, target, procedure)
-
-    @staticmethod
-    def _plot_all_target_measures_helper(measures_list: list, target:str, procedure: str):
-        """
-        Helper Method for self.plot_all_target_measures.
-        :measures_list: (list) : List of calculated measures for all quadruples of a target
-        :param target: (str) : target stock ticker
-        :param procedure: (str) : name of procedure for calculating measure
-        """
-
-        # Code for plotting the final list of calculated measures
-        plt.figure(figsize=(20, 6))
-        data = pd.DataFrame(measures_list, columns=['measure'])
-        data['indices'] = range(len(measures_list))
-        data['hue'] = [0] * len(data)
-        if procedure == 'geometric':
-            data.loc[data['measure'].idxmin(), 'hue'] = 1
-        else:
-            data.loc[data['measure'].idxmax(), 'hue'] = 1
-        ax = sns.scatterplot(x='indices', y='measure', data=data, alpha=0.5, hue='hue', size='hue',
-                        sizes={0: 5, 1: 40}, legend=False)
-        plt.title(f"Measures calculated from {procedure} approach for all quadruples of target {target}")
-
-        return ax

@@ -1,3 +1,6 @@
+# Copyright 2019, Hudson and Thames Quantitative Research
+# All rights reserved
+# Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 """
 Utils for implementing partner selection approaches for vine copulas.
 """
@@ -18,63 +21,73 @@ def get_sector_data(quadruple, constituents):
         return pd.DataFrame()
 
 
-def get_sum_correlations(corr_matrix, quadruple: list) -> float:
+def get_sum_correlations_vectorized(data_subset: pd.DataFrame, all_possible_combinations: np.array) -> tuple:
     """
     Helper function for traditional approach to partner selection.
     Calculates sum of pairwise correlations between all stocks in the quadruple.
 
-    :param corr_matrix: Correlation Matrix
-    :param quadruple: (list) : list of 4 stock tickers
-    :return: (float) : sum of correlations
+    :param data_subset: (pd.DataFrame) :
+    :param all_possible_combinations: (np.array) :
+    :return:
     """
 
-    return (corr_matrix.loc[quadruple, quadruple].sum().sum() - len(quadruple)) / 2
+    # Here the magic happens:
+    # We use the combinations as an index
+    corr_matrix_a = data_subset.values[:, all_possible_combinations]
+    # corr_matrix_a has now the shape of (51, 19600, 4)
+    # We now use take along axis to get the shape (4,19600,4), then we can sum the first and the last dimension
+    corr_sums = np.sum(np.take_along_axis(corr_matrix_a, all_possible_combinations.T[..., np.newaxis], axis=0),
+                       axis=(0, 2))
+
+    d = all_possible_combinations.shape[-1]
+    corr_sums = (corr_sums - d) / 2
+    # this returns the shape of
+    # (19600,1)
+    # Afterwards we return the maximum index for the sums
+    max_index = np.argmax(
+        corr_sums)
+    final_quadruple = data_subset.columns[list(all_possible_combinations[max_index])].tolist()
+
+    return final_quadruple, corr_sums[max_index]
 
 
-def multivariate_rho(u: pd.DataFrame) -> float:
+def multivariate_rho_vectorized(data_subset: pd.DataFrame, all_possible_combinations: np.array) -> tuple:
     """
     Helper function for extended approach to partner selection. Calculates 3 proposed estimators for
     high dimensional generalization for Spearman's rho. These implementations are present in
     Schmid, F., Schmidt, R., 2007. Multivariate extensions of Spearman’s rho and related statis-tics.
 
-    :param u: (pd.DataFrame) : ranked returns of quadruple
-    :return: (float) : mean of the three estimators of multivariate rho
     """
+    quadruples_combinations_data = data_subset.values[:, all_possible_combinations]
 
-    n, d = u.shape  # n : Number of samples, d : Number of stocks
-    h_d = (d + 1) / ((2 ** d) - d - 1)
+    n, _, d = quadruples_combinations_data.shape  # n : Number of samples, d : Number of stocks
+    h_d = (d + 1) / (2 ** d - d - 1)
 
-    # # Calculating the first estimator of multivariate rho
-    sum_1 = np.prod(1 - u, axis=1).sum()
-    rho_1 = h_d * (-1 + (((2 ** d) / n) * sum_1))
+    # Calculating the first estimator of multivariate rho
+    sum_1 = np.product(1 - quadruples_combinations_data, axis=-1).sum(axis=0)
+    rho_1 = h_d * (-1 + (2 ** d / n) * sum_1)
 
-    # # Calculating the second estimator of multivariate rho
-    sum_2 = np.prod(u, axis=1).sum()
-    rho_2 = h_d * (-1 + (((2 ** d) / n) * sum_2))
+    # Calculating the second estimator of multivariate rho
+    sum_2 = np.product(quadruples_combinations_data, axis=-1).sum(axis=0)
+    rho_2 = h_d * (-1 + (2 ** d / n) * sum_2)
 
     # Calculating the third estimator of multivariate rho
-    pairs = itertools.combinations(range(u.shape[-1]), 2)
-    sum_3 = np.sum([(1 - u.iloc[:, k]) * (1 - u.iloc[:, l]) for (k, l) in pairs])
+    pairs = np.array(list(itertools.combinations(range(d), 2)))
+    k, l = pairs[:, 0], pairs[:, 1]
+    sum_3 = ((1 - quadruples_combinations_data[:, :, k]) * (1 - quadruples_combinations_data[:, :, l])).sum(axis=(0, 2))
     dc2 = scipy.special.comb(d, 2, exact=True)
     rho_3 = -3 + (12 / (n * dc2)) * sum_3
 
-    return (rho_1 + rho_2 + rho_3) / 3
+    quadruples_scores = (rho_1 + rho_2 + rho_3) / 3
+    # The quadruple scores have the shape of (19600,1) now
+    max_index = np.argmax(quadruples_scores)
+
+    final_quadruple = data_subset.columns[list(all_possible_combinations[max_index])].tolist()
+
+    return final_quadruple, quadruples_scores[max_index]
 
 
-def distance_calc(a, ba, x):
-    """
-    Helper function to calculate Euclidean distance between Point and diagonal used to calculate diagonal measure.
-    :param a: Origin (0,0,0,0)
-    :param ba: d-dimensional Diagonal
-    :param x: list of points on d-dimensions
-    :return:
-    """
-    pa = x - a  # Shape : (n,d), pa represents vector from point p to point a
-    t = np.dot(pa, ba) / np.dot(ba.T, ba)
-    return np.linalg.norm(pa - np.dot(t, ba.T), ord=2, axis=1)
-
-
-def diagonal_measure(points) -> float:
+def diagonal_measure_vectorized(data_subset: pd.DataFrame, all_possible_combinations: np.array) -> tuple:
     """
     Helper function for geometric approach to partner selection. Calculates the sum of Euclidean distances
     from the relative ranks to the (hyper-)diagonal in four dimensional space for a given target stock.
@@ -82,15 +95,21 @@ def diagonal_measure(points) -> float:
     Reference for calculating the euclidean distance from a point to diagonal
     https://in.mathworks.com/matlabcentral/answers/76727-how-can-i-calculate-distance-between-a-point-and-a-line-in-4d-or-space-higer-than-3d
 
-    :param points: (pd.DataFrame) : ranked returns of 4 stock tickers
-    :return total_distance: (float) : total euclidean distance
+
     """
-    d = points.shape[-1]  # d : Number of stocks
-    a = np.zeros((1, d))  # Point a denotes origin which is present on hyper-diagonal
-    b = np.ones((1, d))  # Point b denotes point (1,1,1,1) on hyper-diagonal
-    ba = (b - a).T  # ba represents the hyper-diagonal
-    total_distance = distance_calc(a, ba, points).sum()
-    return total_distance
+
+    quadruples_combinations_data = data_subset.values[:, all_possible_combinations]
+    d = quadruples_combinations_data.shape[-1] # Shape : (n, 19600, d) where n : Number of samples, d : Number of stocks
+
+    line = np.ones(d)
+    # Einsum is great for specifying which dimension to multiply together
+    # this extends the distance method for all 19600 combinations
+    pp = (np.einsum("ijk,k->ji", quadruples_combinations_data, line) / np.linalg.norm(line))
+    pn = np.sqrt(np.einsum('ijk,ijk->ji', quadruples_combinations_data, quadruples_combinations_data))
+    distance_scores = np.sqrt(pn ** 2 - pp ** 2).sum(axis=1)
+    min_index = np.argmin(distance_scores)
+    final_quadruple = data_subset.columns[list(all_possible_combinations[min_index])].tolist()
+    return final_quadruple, distance_scores[min_index]
 
 
 def extremal_measure(u, co_variance_matrix):
