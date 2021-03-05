@@ -5,6 +5,7 @@
 Utils for implementing partner selection approaches for vine copulas.
 """
 # pylint: disable = invalid-name
+from contextlib import suppress
 import itertools
 import numpy as np
 import pandas as pd
@@ -22,10 +23,8 @@ def get_sector_data(quadruple, constituents):
     """
     Function returns Sector and Sub sector information for all tickers in quadruple.
     """
-    try:
+    with suppress(KeyError):
         return constituents.loc[quadruple, ['Security', 'GICS Sector', 'GICS Sub-Industry']]
-    except KeyError:
-        return pd.DataFrame()
 
 
 def get_sum_correlations_vectorized(data_subset: pd.DataFrame, all_possible_combinations: np.array) -> tuple:
@@ -163,8 +162,11 @@ def get_co_variance_matrix(d):
 
     inds = np.tri(d**2, k=-1, dtype=bool)  # Storing the indices of elements in lower triangle.
     co_variance_matrix[inds] = co_variance_matrix.T[inds]
-    return np.linalg.inv(co_variance_matrix)
 
+    try:
+        return np.linalg.inv(co_variance_matrix)
+    except np.linalg.LinAlgError as err:
+        raise Exception("Singular Matrix found. Cannot proceed further.") if 'Singular matrix' in str(err) else err
 
 def t_calc(u):
     """

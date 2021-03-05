@@ -226,8 +226,8 @@ class PartnerSelection:
         :return output_matrix: (list) List of all selected quadruples.
         """
 
-        if d > 50:
-            raise Exception("Please make sure number of partner stocks is <= 50")
+        if d > 50 or d < 2:
+            raise Exception("Please make sure number of partner stocks d is 2<=d<=50")
 
         co_variance_matrix = get_co_variance_matrix(d)
         all_combinations = self._generate_all_combinations(d)
@@ -255,7 +255,7 @@ class PartnerSelection:
         :param quadruples: (list) List of quadruples.
         """
 
-        if quadruples is None:
+        if len(quadruples) == 0:
             raise Exception("Input list is empty")
 
         _, axs = plt.subplots(len(quadruples),

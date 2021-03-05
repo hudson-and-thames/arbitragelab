@@ -37,6 +37,18 @@ class PartnerSelectionTests(unittest.TestCase):
 
         cls.constituents = pd.read_csv(project_path + '/test_data/sp500_constituents-detailed.csv', index_col='Symbol')
 
+    def test_partner_selection_exceptions(self):
+        """
+        Tests exceptions in partner selection __init__.
+        """
+        with self.assertRaises(Exception):
+            # Testing empty DataFrame exception.
+            PartnerSelection(pd.DataFrame())
+
+        with self.assertRaises(Exception):
+            # Testing input type exception.
+            PartnerSelection(np.array([0]))
+
     def test_traditional(self):
         """
         Tests Traditional Approach.
@@ -59,7 +71,11 @@ class PartnerSelectionTests(unittest.TestCase):
         """
         Tests Extremal Approach.
         """
-        self.assertEqual(self.ps.extremal(1), [['A', 'AAL', 'AAPL', 'AAP']])
+        with self.assertRaises(Exception):
+            # Testing number of partner stocks exception.
+            self.ps.extremal(1, 100)
+
+        self.assertEqual(self.ps.extremal(1, 2), [['A', 'AAL']])
 
     def test_sum_correlations(self):
         """
@@ -85,6 +101,10 @@ class PartnerSelectionTests(unittest.TestCase):
         """
         Tests helper function for extremal approach which calculates the covariance matrix.
         """
+        with self.assertRaises(Exception):
+            # Testing Singular Matrix exception.
+            get_co_variance_matrix(3)
+
         self.assertIsNone(np.testing.assert_almost_equal(get_co_variance_matrix(2), [[ 64., -16., -16.,   4.],
                                                                                      [-16., 64.,   4., -16.],
                                                                                      [-16.,   4.,  64., -16.],
@@ -107,4 +127,9 @@ class PartnerSelectionTests(unittest.TestCase):
         """
         Tests plot_selected_pairs plotting method.
         """
+        with self.assertRaises(Exception):
+            # Testing empty list of quadruples exception.
+            self.ps.plot_selected_pairs([])
+
         self.assertIsInstance(self.ps.plot_selected_pairs([self.quadruple]), axes.Axes)
+        self.assertIsInstance(self.ps.plot_selected_pairs([self.quadruple, self.quadruple])[0], axes.Axes)
