@@ -4,6 +4,10 @@
    The following documentation closely follows a book by Simão Moraes Sarmento and Nuno Horta:
    `A Machine Learning based Pairs Trading Investment Strategy <https://www.springer.com/gp/book/9783030472504>`__.
 
+.. warning::
+   In order to use this module, you should additionally install *TensorFlow v2.2.1.* and *Keras v2.3.1.*
+   For more details, please visit our :ref:`ArbitrageLab installation guide <getting_started-installation>`.
+
 ========================
 ML Based Pairs Selection
 ========================

@@ -10,6 +10,7 @@ a violation of the license agreement. If you have any problems, please contact u
 import os
 import json
 from urllib.request import urlopen
+from urllib.error import HTTPError, URLError
 
 from arbitragelab.util import devadarsh
 
@@ -32,12 +33,32 @@ class Golem:
         # Check environment variables is present
         if API_KEY_ENV_VAR in os.environ:
             # Validate key
-            with urlopen("https://us-central1-hudson-and-thames.cloudfunctions.net/checkKey/" + os.environ[API_KEY_ENV_VAR]) as response:
-                response_content = response.read()
-                json_response = json.loads(response_content)
-                return json_response['status'] == 'active'
-        else:
-            raise Exception(" ARBLAB_API_KEY not found in your environment variables.")
+            old_key, new_key = '', ''
+
+            # Check old server
+            try:
+                with urlopen("https://us-central1-hudson-and-thames.cloudfunctions.net/checkKey/" + os.environ[API_KEY_ENV_VAR]) as response:
+                    response_content = response.read()
+                    json_response = json.loads(response_content)
+                    old_key = json_response['status'] == 'active'
+            except HTTPError:
+                pass
+            except URLError as err:
+                raise ConnectionError('Can not reach the server. Please check your connection or firewall.') from err
+
+            # Check new server
+            try:
+                if not old_key:
+                    with urlopen("https://hudson-thames.ew.r.appspot.com/api/access/" + os.environ[API_KEY_ENV_VAR]) as response:
+                        response_content = response.read().decode()
+                        new_key = response_content == 'OK'
+            except HTTPError as err:
+                raise Exception(" ARBLAB_API_KEY is not valid.") from err
+
+            # Return the results
+            return old_key or new_key
+        # Else the API KEy has not been registered.
+        raise Exception(" ARBLAB_API_KEY not found in your environment variables. Please check the install instructions.")
 
     # pylint: disable=missing-function-docstring
     @staticmethod

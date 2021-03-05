@@ -7,14 +7,13 @@ Regressor Committee.
 
 import numpy as np
 import pandas as pd
-from keras.callbacks import EarlyStopping
 import matplotlib.pyplot as plt
 from matplotlib.axes._axes import Axes
 
 from arbitragelab.ml_approach import neural_networks
 
 # This silencer is related to the protected access
-# pylint: disable=W0212
+# pylint: disable=W0212, import-outside-toplevel, unused-import
 
 class RegressorCommittee:
     """
@@ -35,6 +34,9 @@ class RegressorCommittee:
         :param verbose: (bool) Print debug information.
         """
 
+        # Importing needed packages
+        from keras.callbacks import EarlyStopping
+
         self.regressor_params = regressor_params
         self.regressor_class = regressor_class
         self.num_committee = num_committee
@@ -53,6 +55,9 @@ class RegressorCommittee:
         :param xtest: (pd.DataFrame) Input test data.
         :param ytest: (pd.DataFrame) Target test data.
         """
+
+        # Importing needed packages
+        from keras.callbacks import EarlyStopping
 
         committee_members = []
         idx = 0

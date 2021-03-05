@@ -12,6 +12,9 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+* :support:`38` Removed TensorFlow from requirements and adjusted installation guide.
+
+* :release:`0.3.0 <2021-02-16>`
 * :feature:`33` Sparse Mean-Reverting Portfolios Model added to the Cointegration Approach Module.
 * :support:`33` Sparse Mean-Reverting Portfolios Model documentation.
 * :support:`35` Updated requirements - new package (cvxpy==1.1.10).
@@ -32,6 +35,7 @@ Changelog
 * :support:`26` Multivariate Cointegration strategy documentation.
 * :support:`35` Updated requirements versions (numpy==1.20.1, matplotlib==3.2.2
   pandas==1.1.5, scikit-learn==0.24.1, scipy==1.6.0, statsmodels==0.12.2).
+* :support:`35` Moved package to python version 3.8.
 * :bug:`34` Data Importer, Distance Approach, ML Approach modules imports were not exposed.
 
 * :release:`0.2.2 <2020-12-24>`
