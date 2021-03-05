@@ -35,6 +35,7 @@ class DistanceStrategy:
         self.train_std = None  # Historical volatility for each chosen pair portfolio
         self.normalized_data = None  # Normalized test dataset
         self.portfolios = None  # Pair portfolios composed from test dataset
+        self.train_portfolio = None  # Pair portfolios composed from train dataset
         self.trading_signals = None  # Final trading signals
         self.num_crossing = None  # Number of zero crossings from train dataset
 
@@ -53,6 +54,9 @@ class DistanceStrategy:
         prices that would have a minimum sum of square differences between normalized prices.
         Only unique pairs are picked in this step (pairs ('AA', 'BD') and ('BD', 'AA') are assumed
         to be one pair ('AA', 'BD')).
+        During this step, if one decides to match pairs within the same industry group, with the
+        industry dictionary given, the sum of square differences is calculated only for the pairs
+        of prices within the same industry group.
 
         Third, based on the desired number of top pairs to chose and the pairs to skip, they are
         taken from the list of created pairs in the previous step. Pairs are sorted so that ones
@@ -89,9 +93,12 @@ class DistanceStrategy:
 
         # If sector is set to True, pairs are matched within the same industry group
         if by_industry:
+
             # Check whether the input of industry group dictionary is well given
             if industry_dict is None:
                 raise Exception("Industry group dictionary is not given. Please provide the input")
+
+            # Finding closest pairs for each element, excluding duplicates
             all_pairs = self.find_pair(normalized, industry_dict)
 
         else:
@@ -105,10 +112,10 @@ class DistanceStrategy:
         self.train_std = self.find_volatility(normalized, self.pairs)
 
         # Creating portfolios for pairs chosen in the pairs formation stage with train dataset
-        train_portfolio = self.find_portfolios(normalized, self.pairs)
+        self.train_portfolio = self.find_portfolios(normalized, self.pairs)
 
         # Calculating the number of zero crossings from the dataset
-        self.num_crossing = self.get_number_crossing(train_portfolio)
+        self.num_crossing = self.count_number_crossing()
 
     def trade_pairs(self, test_data, divergence=2):
         """
@@ -227,6 +234,47 @@ class DistanceStrategy:
         top_pairs = [x[0] for x in top_pairs]
 
         return top_pairs
+
+    def get_num_crossing(self):
+        """
+        Outputs pairs that were created in the pairs formation step with its number of zero crossing
+        :return: (dictionary) Dictionary with keys as pairs and values as the number of zero
+            crossings for pairs.
+        """
+        return self.num_crossing
+
+    def count_number_crossing(self):
+        """
+        Calculate the number of zero crossings for the portfolio dataframe generated with train dataset.
+
+        As the number of zero crossings in the formation period does have some usefulness in predicting
+        future convergence, this method calculates the number of times the normalized spread crosses the
+        value zero which measures the frequency of divergence and convergence between two securities.
+
+        :return: (dictionary) Dictionary with keys as pairs and values as the number of zero
+            crossings for pairs.
+        """
+
+        # Creating a dictionary for number of zero crossings
+        num_zeros_dict = {}
+
+        # Iterating through pairs
+        for pair in self.train_portfolio:
+            # Getting names of individual elements from dataframe column names
+            pair_val = pair.strip('\')(\'').split('\', \'')
+            pair_val = tuple(pair_val)
+
+            # Check if portfolio price crossed zero
+            portfolio = self.train_portfolio[pair].to_frame()
+            pair_mult = portfolio * portfolio.shift(1)
+
+            # Get the number of zero crossings for the portfolio
+            num_zero_crossings = len(portfolio[pair_mult.iloc[:, 0] <= 0].index)
+
+            # Adding the pair's number of zero crossings to the dictionary
+            num_zeros_dict[pair_val] = num_zero_crossings
+
+        return num_zeros_dict
 
     def plot_portfolio(self, num_pair):
         """
@@ -508,33 +556,3 @@ class DistanceStrategy:
         signals.columns = portfolios.columns
 
         return signals
-
-    @staticmethod
-    def get_number_crossing(train_portfolio):
-        """
-        Get number of crossings
-        :param train_portfolio: (pd.DataFrame) Dataframe with portfolio price series for pairs.
-        :return: (dictionary) Dictionary with keys as pairs and values as the number of zero
-            crossings for pairs.
-        """
-
-        # Creating a dictionary for number of zero crossings
-        num_zero_crossings = {}
-
-        # Iterating through pairs
-        for pair in train_portfolio:
-            # Getting names of individual elements from dataframe column names
-            pair_val = pair.strip('\')(\'').split('\', \'')
-            pair_val = tuple(pair_val)
-
-            # Check if portfolio price crossed zero
-            portfolio = train_portfolio[pair].to_frame()
-            pair_mult = portfolio * portfolio.shift(1)
-
-            # Get the number of zero crossings for the portfolio
-            num_zero_crossings = len(portfolio[pair_mult.iloc[:, 0] <= 0].index)
-
-            # Adding the pair's number of zero crossings to the dictionary
-            num_zero_crossings[pair_val] = num_zero_crossings
-
-        return num_zero_crossings
