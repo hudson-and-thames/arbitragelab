@@ -34,7 +34,7 @@ class PartnerSelection:
         These steps include, finding the returns and ranked returns of the stocks, and calculating the top 50
         correlated stocks for each stock in the universe.
 
-        :param prices: (pd.DataFrame): Contains price series of all stocks in universe
+        :param prices: (pd.DataFrame) Contains price series of all stocks in universe.
         """
 
         if len(prices) == 0:
@@ -57,7 +57,7 @@ class PartnerSelection:
         """
         Calculates correlation between all stocks in universe.
 
-        :return: (pd.DataFrame) : Correlation Matrix
+        :return: (pd.DataFrame) Correlation Matrix.
         """
 
         return self.ranked_returns.corr(method='pearson')  # Pearson or spearman,we get same results as input is ranked
@@ -67,8 +67,8 @@ class PartnerSelection:
         Calculating daily returns and ranked daily returns of the stocks.
 
         :return (tuple):
-            returns_df : (pd.DataFrame) : Dataframe consists of daily returns
-            returns_df_ranked : (pd.DataFrame) : Dataframe consists of ranked daily returns between [0,1]
+            returns_df : (pd.DataFrame) Dataframe consists of daily returns.
+            returns_df_ranked : (pd.DataFrame) Dataframe consists of ranked daily returns between [0,1].
         """
 
         returns_df = self.universe.pct_change()
@@ -82,7 +82,7 @@ class PartnerSelection:
         """
         Calculates the top 50 correlated stocks for each target stock.
 
-        :return: (pd.DataFrame) : Dataframe consisting of 50 columns for each stock in the universe
+        :return: (pd.DataFrame) Dataframe consisting of 50 columns for each stock in the universe.
         """
 
         def tickers_list(col):
@@ -99,7 +99,7 @@ class PartnerSelection:
         """
          Method generates unique quadruples for all target stocks in universe.
 
-         :return: (pd.DataFrame) : consists of all quadruples for every target stock
+         :return: (pd.DataFrame) consists of all quadruples for every target stock.
          """
 
         return self.top_50_correlations.apply(self._generate_all_quadruples_helper, axis=1)
@@ -109,8 +109,8 @@ class PartnerSelection:
         """
          Helper function which generates unique quadruples for each target stock.
 
-         :param row: (pd.Series) : list of 50 partner stocks
-         :return: (list) : quadruples
+         :param row: (pd.Series) list of 50 partner stocks.
+         :return: (list) quadruples.
          """
 
         target = row.name
@@ -121,15 +121,17 @@ class PartnerSelection:
 
     @staticmethod
     def _prepare_combinations_of_partners(stock_selection: list) -> np.array:
-        """Helper function to calculate all combinations for a target stock and it's potential partners
-        :param: stock_selection (pd.DataFrame): the target stock has to be the first element of the array
-        :return: the possible combinations for the quadruples.Shape (19600,4) or
-        if the target stock is left out (19600,3)
+        """Helper function to calculate all combinations for a target stock and it's potential partners.
+        Stocks are treated as integers for vectorization purposes.
+
+        :param stock_selection: (pd.DataFrame) the target stock has to be the first element of the array.
+        :return: the possible combinations for the quadruples. Shape (19600,4) .
         """
-        # We will convert the stock names into integers and then get a list of all combinations with a length of 3
+
+        # We will convert the stock names into integers and then get a list of all combinations with a length of 3.
         num_of_stocks = len(stock_selection)
-        # We turn our partner stocks into numerical indices so we can use them directly for indexing
-        partner_stocks_idx = np.arange(1, num_of_stocks)  # basically exclude the target stock
+        # We turn our partner stocks into numerical indices so we can use them directly for indexing.
+        partner_stocks_idx = np.arange(1, num_of_stocks)  # basically exclude the target stock.
         partner_stocks_idx_combs = itertools.combinations(partner_stocks_idx, 3)
         return np.array(list((0,) + comb for comb in partner_stocks_idx_combs))
 
@@ -140,20 +142,20 @@ class PartnerSelection:
         For all possible quadruples of a given stock, we calculate the sum of all pairwise correlations.
         For every target stock the quadruple with the highest sum is returned.
 
-        :param n_targets: (int) : number of target stocks to select
-        :return output_matrix: list: List of all selected quadruples
+        :param n_targets: (int) number of target stocks to select.
+        :return output_matrix: (list) List of all selected quadruples.
         """
 
         output_matrix = []  # Stores the final set of quadruples.
         # Iterating on the top 50 indices for each target stock.
         for target in self.top_50_correlations.index[:n_targets]:
 
-            stock_selection = [target] + self.top_50_correlations.loc[target].tolist()
+            stock_selection = [target] + self.top_50_correlations.loc[target].tolist() # List of 51 stocks including target.
             data_subset = self.correlation_matrix.loc[stock_selection, stock_selection]
-            all_possible_combinations = self._prepare_combinations_of_partners(stock_selection)
+            all_possible_combinations = self._prepare_combinations_of_partners(stock_selection) # Shape: (19600, 4).
 
             final_quadruple = get_sum_correlations_vectorized(data_subset, all_possible_combinations)[0]
-            # Appending the final quadruple for each target to the output matrix
+            # Appending the final quadruple for each target to the output matrix.
             output_matrix.append(final_quadruple)
 
         return output_matrix
@@ -166,21 +168,21 @@ class PartnerSelection:
         for all possible quadruples of a given stock.
         For every target stock the quadruple with the highest correlation is returned.
 
-        :param n_targets: (int) : number of target stocks to select
-        :return output_matrix: list: List of all selected quadruples
+        :param n_targets: (int) number of target stocks to select.
+        :return output_matrix: (list) List of all selected quadruples.
         """
 
-        ecdf_df = self.returns.apply(lambda x: ECDF(x)(x), axis=0)
+        ecdf_df = self.returns.apply(lambda x: ECDF(x)(x), axis=0) # Calculating ranks of returns using quantiles data.
 
         output_matrix = []  # Stores the final set of quadruples.
         # Iterating on the top 50 indices for each target stock.
         for target in self.top_50_correlations.index[:n_targets]:
-            stock_selection = [target] + self.top_50_correlations.loc[target].tolist()
+            stock_selection = [target] + self.top_50_correlations.loc[target].tolist() # List of 51 stocks including target.
             data_subset = ecdf_df[stock_selection]
-            all_possible_combinations = self._prepare_combinations_of_partners(stock_selection)
+            all_possible_combinations = self._prepare_combinations_of_partners(stock_selection) # Shape: (19600, 4).
 
             final_quadruple = multivariate_rho_vectorized(data_subset, all_possible_combinations)[0]
-            # Appending the final quadruple for each target to the output matrix
+            # Appending the final quadruple for each target to the output matrix.
             output_matrix.append(final_quadruple)
 
         return output_matrix
@@ -192,19 +194,19 @@ class PartnerSelection:
         It involves calculating the four dimensional diagonal measure for all possible quadruples of a given stock.
         For every target stock the quadruple with the lowest diagonal measure is returned.
 
-        :param n_targets: (int) : number of target stocks to select
-        :return output_matrix: list: List of all selected quadruples
+        :param n_targets: (int) number of target stocks to select.
+        :return output_matrix: (list) List of all selected quadruples.
         """
 
         output_matrix = []  # Stores the final set of quadruples.
         # Iterating on the top 50 indices for each target stock.
         for target in self.top_50_correlations.index[:n_targets]:
-            stock_selection = [target] + self.top_50_correlations.loc[target].tolist()
+            stock_selection = [target] + self.top_50_correlations.loc[target].tolist() # List of 51 stocks including target.
             data_subset = self.ranked_returns[stock_selection]
-            all_possible_combinations = self._prepare_combinations_of_partners(stock_selection)
+            all_possible_combinations = self._prepare_combinations_of_partners(stock_selection) # Shape: (19600, 4).
 
             final_quadruple = diagonal_measure_vectorized(data_subset, all_possible_combinations)[0]
-            # Appending the final quadruple for each target to the output matrix
+            # Appending the final quadruple for each target to the output matrix.
             output_matrix.append(final_quadruple)
 
         return output_matrix
@@ -216,24 +218,24 @@ class PartnerSelection:
         It involves calculating a non-parametric test statistic based on Mangold (2015) to measure the
         degree of deviation from independence. Main focus of this measure is the occurrence of joint extreme events.
 
-        :param n_targets: (int) : number of target stocks to select
-        :return output_matrix: list: List of all selected quadruples
+        :param n_targets: (int) number of target stocks to select.
+        :return output_matrix: (list) List of all selected quadruples.
         """
 
         co_variance_matrix = get_co_variance_matrix()
         output_matrix = []  # Stores the final set of quadruples.
         # Iterating on the top 50 indices for each target stock.
         for target in self.top_50_correlations.index[:n_targets]:
-            max_measure = -np.inf  # Variable used to extract the desired maximum value
-            final_quadruple = None  # Stores the final desired quadruple
+            max_measure = -np.inf  # Variable used to extract the desired maximum value.
+            final_quadruple = None  # Stores the final desired quadruple.
 
-            # Iterating on all unique quadruples generated for a target
+            # Iterating on all unique quadruples generated for a target.
             for quadruple in self.all_quadruples[target]:
                 measure = extremal_measure(self.ranked_returns[quadruple], co_variance_matrix)
                 if measure > max_measure:
                     max_measure = measure
                     final_quadruple = quadruple
-            # Appending the final quadruple for each target to the output matrix
+            # Appending the final quadruple for each target to the output matrix.
             output_matrix.append(final_quadruple)
 
         return output_matrix
@@ -241,7 +243,8 @@ class PartnerSelection:
     def plot_selected_pairs(self, quadruples: list):
         """
         Plots the final selection of quadruples.
-        :param quadruples: List of quadruples
+
+        :param quadruples: (list) List of quadruples.
         """
 
         if quadruples is None:

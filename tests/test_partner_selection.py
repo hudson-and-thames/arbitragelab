@@ -25,6 +25,7 @@ class PartnerSelectionTests(unittest.TestCase):
     def setUpClass(cls) -> None:
         """
         Creates dataframes with returns and quantile data to work with corresponding test cases.
+        Using setUpClass instead of setUp for performance reasons as setUpClass is executed just once for all test cases.
         """
 
         project_path = os.path.dirname(__file__)
