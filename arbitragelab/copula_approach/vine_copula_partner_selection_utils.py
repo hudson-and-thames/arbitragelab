@@ -10,6 +10,13 @@ import numpy as np
 import pandas as pd
 import scipy
 
+from statsmodels.distributions.empirical_distribution import ECDF
+
+def get_quantiles_data(col):
+    """
+    Returns ranked quantiles from returns.
+    """
+    return ECDF(col)(col)
 
 def get_sector_data(quadruple, constituents):
     """
@@ -135,42 +142,51 @@ def extremal_measure(u, co_variance_matrix):
     return t_test_statistic[0, 0]
 
 
-def get_co_variance_matrix():
+def get_co_variance_matrix(d):
     """
-    Calculates 16x16 dimensional covariance matrix. Since the matrix is symmetric, only the integrals
+    Calculates d**2 x d**2 dimensional covariance matrix. Since the matrix is symmetric, only the integrals
     in the upper triangle are calculated. The remaining values are filled from the transpose.
+
+    :param d: (int) Number of stocks
     """
-    co_variance_matrix = np.zeros((16, 16))
-    for i, l1 in enumerate(itertools.product([1, 2], [1, 2], [1, 2], [1, 2])):
-        for j, l2 in enumerate(itertools.product([1, 2], [1, 2], [1, 2], [1, 2])):
+    args = [[1,2]] * d
+
+    co_variance_matrix = np.zeros((d**2, d**2))
+    for i, l1 in enumerate(itertools.product(*args)):
+        for j, l2 in enumerate(itertools.product(*args)):
             if j < i:
                 # Integrals in lower triangle are skipped.
                 continue
 
-            # Numerical Integration of 4 dimensions.
-            co_variance_matrix[i, j] = scipy.integrate.nquad(variance_integral_func, [(0, 1)] * 4, args=(l1, l2))[0]
+            # Numerical Integration of d dimensions.
+            co_variance_matrix[i, j] = scipy.integrate.nquad(variance_integral_func, [(0, 1)] * d, args=(l1, l2))[0]
 
-    inds = np.tri(16, k=-1, dtype=bool)  # Storing the indices of elements in lower triangle.
+    inds = np.tri(d**2, k=-1, dtype=bool)  # Storing the indices of elements in lower triangle.
     co_variance_matrix[inds] = co_variance_matrix.T[inds]
     return np.linalg.inv(co_variance_matrix)
 
 
 def t_calc(u):
     """
-    Calculates T_(4,n) as seen in proposition 3.3. Each of the 16 rows in the array are appended to output and
+    Calculates T_(d,n) as seen in proposition 3.3. Each of the d**2 rows in the array are appended to output and
     returned as numpy array.
 
     :param u: (pd.DataFrame) ranked returns of stocks in quadruple.
-    :return: (np.array) of Shape (16, n).
+    :return: (np.array) of Shape (d**2, n).
     """
+
+    d = u.shape[1]
+    args = [[1,2]] * d
     output = []
-    for l in itertools.product([1, 2], [1, 2], [1, 2], [1, 2]):
-        # Equation form for each one of u1,u2,u3,u4 after partial differentials are calculated and multiplied
+    for l in itertools.product(*args):
+        # Equation form for each one of u1,u2,u3,u4,... after partial differentials are calculated and multiplied
         # together.
-        res = func(u[:, 0], l[0]) * func(u[:, 1], l[1]) * func(u[:, 2], l[2]) * func(u[:, 3], l[3])
+        res = 1
+        for ind in range(d):
+            res *= func(u[:, ind], l[ind])
         output.append(res)
 
-    return np.array(output)  # Shape (16, n).
+    return np.array(output)  # Shape (d**2, n).
 
 
 def func(t, value):
@@ -192,9 +208,16 @@ def func(t, value):
     return res
 
 
-def variance_integral_func(u1, u2, u3, u4, l1, l2):
+def variance_integral_func(*args):
     """
     Calculates Integrand for covariance matrix calculation.
     """
-    return func(u1, l1[0]) * func(u2, l1[1]) * func(u3, l1[2]) * func(u4, l1[3]) * \
-           func(u1, l2[0]) * func(u2, l2[1]) * func(u3, l2[2]) * func(u4, l2[3])
+
+    l1 = args[-2]
+    l2 = args[-1]
+
+    res = 1
+    for ind in range(len(args[:-2])):
+        res *= func(args[ind], l1[ind]) * func(args[ind], l2[ind])
+
+    return res

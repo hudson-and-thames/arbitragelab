@@ -10,9 +10,8 @@ import numpy as np
 import pandas as pd
 
 from matplotlib import axes
-from statsmodels.distributions.empirical_distribution import ECDF
 from arbitragelab.copula_approach.vine_copula_partner_selection import PartnerSelection
-from arbitragelab.copula_approach.vine_copula_partner_selection_utils import multivariate_rho_vectorized, \
+from arbitragelab.copula_approach.vine_copula_partner_selection_utils import multivariate_rho_vectorized, get_quantiles_data, \
     extremal_measure, get_co_variance_matrix, get_sector_data, get_sum_correlations_vectorized, diagonal_measure_vectorized
 
 
@@ -34,9 +33,7 @@ class PartnerSelectionTests(unittest.TestCase):
         prices = pd.read_csv(data_path, parse_dates=True, index_col='Date').dropna()
         cls.ps = PartnerSelection(prices)
 
-        cls.u = cls.ps.returns.apply(lambda x: ECDF(x)(x), axis=0)
-
-        cls.co_variance_matrix = get_co_variance_matrix()
+        cls.u = cls.ps.returns.apply(get_quantiles_data, axis=0)
 
         cls.constituents = pd.read_csv(project_path + '/test_data/sp500_constituents-detailed.csv', index_col='Symbol')
 
@@ -84,11 +81,21 @@ class PartnerSelectionTests(unittest.TestCase):
         """
         self.assertEqual(round(diagonal_measure_vectorized(self.ps.ranked_returns[self.quadruple], np.array([[0,1,2,3]]))[1], 4), 91.9374)
 
+    def test_extremal_covariance_matrix(self):
+        """
+        Tests helper function for extremal approach which calculates the covariance matrix.
+        """
+        self.assertIsNone(np.testing.assert_almost_equal(get_co_variance_matrix(2), [[ 64., -16., -16.,   4.],
+                                                                                     [-16., 64.,   4., -16.],
+                                                                                     [-16.,   4.,  64., -16.],
+                                                                                     [  4., -16., -16., 64.]] ,7))
+
     def test_extremal_measure(self):
         """
         Tests helper function of Extremal Approach.
         """
-        self.assertEqual(round(extremal_measure(self.ps.ranked_returns[self.quadruple], self.co_variance_matrix), 4), 108.5128)
+        co_variance_matrix = get_co_variance_matrix(4)
+        self.assertEqual(round(extremal_measure(self.ps.ranked_returns[self.quadruple], co_variance_matrix), 4), 108.5128)
 
     def test_get_sector_data(self):
         """

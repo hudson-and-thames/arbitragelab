@@ -5,14 +5,14 @@
 Module for implementing partner selection approaches for vine copulas.
 """
 # pylint: disable = invalid-name
+import functools
 import itertools
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
 
-from statsmodels.distributions.empirical_distribution import ECDF
-from arbitragelab.copula_approach.vine_copula_partner_selection_utils import extremal_measure, \
+from arbitragelab.copula_approach.vine_copula_partner_selection_utils import extremal_measure, get_quantiles_data ,\
     get_co_variance_matrix, get_sum_correlations_vectorized, diagonal_measure_vectorized, multivariate_rho_vectorized
 
 
@@ -51,7 +51,7 @@ class PartnerSelection:
         # For each stock in universe, tickers of top 50 most correlated stocks are stored
         self.top_50_correlations = self._top_50_tickers()
         # Quadruple combinations for all stocks in universe
-        self.all_quadruples = self._generate_all_quadruples()
+        self.all_quadruples = self._generate_all_combinations()
 
     def _correlation(self) -> pd.DataFrame:
         """
@@ -95,33 +95,36 @@ class PartnerSelection:
         # Returns DataFrame with all stocks as indices and their respective top 50 correlated stocks as columns.
         return self.correlation_matrix.apply(tickers_list, axis=0).T
 
-    def _generate_all_quadruples(self) -> pd.DataFrame:
+    def _generate_all_combinations(self, d = 4) -> pd.DataFrame:
         """
-         Method generates unique quadruples for all target stocks in universe.
+         Method generates unique combinations for all target stocks in universe.
 
-         :return: (pd.DataFrame) consists of all quadruples for every target stock.
+         :param d: (int) number of partner stocks.
+         :return: (pd.DataFrame) consists of all combinations for every target stock.
          """
-
-        return self.top_50_correlations.apply(self._generate_all_quadruples_helper, axis=1)
+        generate_all_combinations_helper_wrapper = functools.partial(self._generate_all_combinations_helper, d=d)
+        return self.top_50_correlations.apply(generate_all_combinations_helper_wrapper, axis=1)
 
     @staticmethod
-    def _generate_all_quadruples_helper(row: pd.Series) -> list:
+    def _generate_all_combinations_helper(row: pd.Series, d) -> list:
         """
-         Helper function which generates unique quadruples for each target stock.
+         Helper function which generates unique combinations for each target stock.
 
          :param row: (pd.Series) list of 50 partner stocks.
-         :return: (list) quadruples.
+         :param d: (int) number of partner stocks.
+         :return: (list) combinations.
          """
 
         target = row.name
-        quadruples = []
-        for triple in itertools.combinations(row, 3):
-            quadruples.append([target] + list(triple))
-        return quadruples
+        combinations = []
+        for comb in itertools.combinations(row, d - 1):
+            combinations.append([target] + list(comb))
+        return combinations
 
     @staticmethod
     def _prepare_combinations_of_partners(stock_selection: list) -> np.array:
-        """Helper function to calculate all combinations for a target stock and it's potential partners.
+        """
+        Helper function to calculate all combinations for a target stock and it's potential partners.
         Stocks are treated as integers for vectorization purposes.
 
         :param stock_selection: (pd.DataFrame) the target stock has to be the first element of the array.
@@ -172,7 +175,7 @@ class PartnerSelection:
         :return output_matrix: (list) List of all selected quadruples.
         """
 
-        ecdf_df = self.returns.apply(lambda x: ECDF(x)(x), axis=0) # Calculating ranks of returns using quantiles data.
+        ecdf_df = self.returns.apply(get_quantiles_data, axis=0) # Calculating ranks of returns using quantiles data.
 
         output_matrix = []  # Stores the final set of quadruples.
         # Iterating on the top 50 indices for each target stock.
@@ -212,17 +215,22 @@ class PartnerSelection:
         return output_matrix
 
     # Method 4
-    def extremal(self, n_targets=5) -> list:
+    def extremal(self, n_targets = 5, d = 4) -> list:
         """
         This method implements the fourth procedure described in Section 3.1.1.
         It involves calculating a non-parametric test statistic based on Mangold (2015) to measure the
         degree of deviation from independence. Main focus of this measure is the occurrence of joint extreme events.
 
         :param n_targets: (int) number of target stocks to select.
+        :param d: (int) number of partner stocks.
         :return output_matrix: (list) List of all selected quadruples.
         """
 
-        co_variance_matrix = get_co_variance_matrix()
+        if d > 50:
+            raise Exception("Please make sure number of partner stocks is <= 50")
+
+        co_variance_matrix = get_co_variance_matrix(d)
+        all_combinations = self._generate_all_combinations(d)
         output_matrix = []  # Stores the final set of quadruples.
         # Iterating on the top 50 indices for each target stock.
         for target in self.top_50_correlations.index[:n_targets]:
@@ -230,7 +238,7 @@ class PartnerSelection:
             final_quadruple = None  # Stores the final desired quadruple.
 
             # Iterating on all unique quadruples generated for a target.
-            for quadruple in self.all_quadruples[target]:
+            for quadruple in all_combinations[target]:
                 measure = extremal_measure(self.ranked_returns[quadruple], co_variance_matrix)
                 if measure > max_measure:
                     max_measure = measure
