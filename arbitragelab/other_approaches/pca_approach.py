@@ -379,7 +379,7 @@ class PCAStrategy:
             # Iterating through tickers inside weights
             for ticker in weights.columns:
                 # Multiplying our target quantities by weights
-                position_stock_temp = sum(weights[ticker] * fac_sum)
+                position_stock_temp[ticker] = sum(weights[ticker] * fac_sum)
 
             # Adding also first stocks from all eigen portfolios
             position_stock_temp = position_stock_temp + position_stock.iloc[0]
