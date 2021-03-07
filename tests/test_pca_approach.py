@@ -45,7 +45,7 @@ class TestPCAStrategy(unittest.TestCase):
         Tests the function to calculate weights (scaled eigenvectors).
         """
 
-        factorweights = self.pca_strategy.get_factorweights(self.data)
+        factorweights = self.pca_strategy.get_factorweights(self.data, explained_var=0.55)
 
         # Check factor weights
         self.assertAlmostEqual(factorweights.mean()['EEM'], 0.2359, delta=1e-3)
@@ -58,7 +58,7 @@ class TestPCAStrategy(unittest.TestCase):
         """
 
         # Calculating factor returns
-        factorweights = self.pca_strategy.get_factorweights(self.data)
+        factorweights = self.pca_strategy.get_factorweights(self.data, explained_var=0.55)
         factorret = pd.DataFrame(np.dot(self.data, factorweights.transpose()), index=self.data.index)
 
         residual, coefficient = self.pca_strategy.get_residuals(self.data, factorret)
@@ -78,7 +78,7 @@ class TestPCAStrategy(unittest.TestCase):
         """
 
         # Calculating residuals
-        factorweights = self.pca_strategy.get_factorweights(self.data)
+        factorweights = self.pca_strategy.get_factorweights(self.data, explained_var=0.55)
         factorret = pd.DataFrame(np.dot(self.data, factorweights.transpose()), index=self.data.index)
         residual, _ = self.pca_strategy.get_residuals(self.data, factorret)
 
