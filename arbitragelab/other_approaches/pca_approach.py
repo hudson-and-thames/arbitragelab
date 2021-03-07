@@ -8,16 +8,13 @@ This module implements the PCA approach described by by Marco Avellaneda and Jeo
 <https://math.nyu.edu/faculty/avellane/AvellanedaLeeStatArb20090616.pdf>`_.
 """
 
-
 import numpy as np
 import pandas as pd
 from sklearn.decomposition import PCA
 from sklearn.linear_model import LinearRegression
 
-
 # pylint: disable=invalid-name
 from arbitragelab.util import devadarsh
-
 
 class PCAStrategy:
     """
@@ -65,7 +62,7 @@ class PCAStrategy:
 
         return standardized, matrix.std()
 
-    def get_factorweights(self, matrix: pd.DataFrame) -> pd.DataFrame:
+    def get_factorweights(self, matrix: pd.DataFrame, explained_var: float) -> pd.DataFrame:
         """
         A function to calculate weights (scaled eigen vectors) to use for factor return calculation.
 
@@ -76,6 +73,7 @@ class PCAStrategy:
         So the output is a dataframe containing the weight for each asset in a portfolio for each eigen vector.
 
         :param matrix: (pd.DataFrame) Dataframe with index and columns containing asset returns.
+        :param explained_var (float) The user-defined explained variance criteria.
         :return: (pd.DataFrame) Weights (scaled PCA components) for each index from the matrix.
         """
 
@@ -85,6 +83,14 @@ class PCAStrategy:
         # Fitting PCA
         pca_factors = self.pca_model.fit(standardized)
 
+        # If a user requires a fixed explained variance
+        if explained_var is not None:
+            expl_variance = pca_factors.explained_variance_ratio_
+            num_pc = np.argmax(np.cumsum(expl_variance) > explained_var)
+            # Fit the PCA model to standardized return data, again.
+            pca_factors = PCA(n_components=num_pc)
+            pca_factors.fit(standardized)
+
         # Output eigen vectors for weights calculation
         weights = pd.DataFrame(pca_factors.components_, columns=standardized.columns)
 
@@ -93,7 +99,8 @@ class PCAStrategy:
 
         return weights
 
-    def get_residuals(self, matrix: pd.DataFrame, pca_factorret: pd.DataFrame) -> (pd.DataFrame, pd.Series):
+    @staticmethod
+    def get_residuals(matrix: pd.DataFrame, pca_factorret: pd.DataFrame) -> (pd.DataFrame, pd.Series):
         """
         A function to calculate residuals given matrix of returns and factor returns.
 
@@ -113,7 +120,7 @@ class PCAStrategy:
         residual = pd.DataFrame(columns=matrix.columns, index=matrix.index)
 
         # And a DataFrame to store regression coefficients
-        coefficient = pd.DataFrame(columns=matrix.columns, index=range(self.n_components))
+        coefficient = pd.DataFrame(columns=matrix.columns, index=range(pca_factorret.shape[1]))
 
         # A class for regression
         regression = LinearRegression()
@@ -261,7 +268,7 @@ class PCAStrategy:
 
     def get_signals(self, matrix: pd.DataFrame, k: float = 8.4, corr_window: int = 252,
                     residual_window: int = 60, sbo: float = 1.25, sso: float = 1.25,
-                    ssc: float = 0.5, sbc: float = 0.75, size: float = 1) -> pd.DataFrame:
+                    ssc: float = 0.5, sbc: float = 0.75, size: float = 1, explained_var: float = None) -> pd.DataFrame:
         """
         A function to generate trading signals for given returns matrix with parameters.
 
@@ -324,6 +331,7 @@ class PCAStrategy:
         :param size: (float) Number of units invested in assets when opening trades. So when opening
             a long position, buying (size) units of stock and selling (size) * betas units of other
             stocks.
+        :param explained_var: (float) The user-defined explained variance criteria.
         :return: (pd.DataFrame) DataFrame with target weights for each asset at every observation.
             It is being calculated as a combination of all eigen portfolios that are satisfying the
             mean reversion speed requirement and S-score values.
@@ -333,9 +341,6 @@ class PCAStrategy:
         # Dataframe containing target quantities - trading signals
         target_quantities = pd.DataFrame()
 
-        # Series of current positions for assets in our portfolio
-        position_stock = pd.DataFrame(0, columns=matrix.columns, index=[-1] + list(range(self.n_components)))
-
         # Iterating through time windows
         for t in range(corr_window - 1, len(matrix.index) - 1):
 
@@ -344,7 +349,7 @@ class PCAStrategy:
                 # Getting a new set of observations for correlation matrix generation
                 obs_corr = matrix[(t - corr_window + 1):(t + 1)]
                 # Updating factor weights
-                weights = self.get_factorweights(obs_corr)
+                weights = self.get_factorweights(obs_corr, explained_var)
 
             # Look-back window of observations used
             obs_residual = matrix[(t - residual_window + 1):(t + 1)]
@@ -357,6 +362,9 @@ class PCAStrategy:
 
             # Finding the S-scores for eigen portfolios in this period
             s_scores = self.get_sscores(resid, k)
+
+            # Series of current positions for assets in our portfolio
+            position_stock = pd.DataFrame(0, columns=matrix.columns, index=[-1] + list(range(factorret_resid.shape[1])))
 
             # Generating signals using obtained S-scores
             position_stock = self._generate_signals(position_stock, s_scores, coeff,
