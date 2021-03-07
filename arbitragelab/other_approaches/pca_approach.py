@@ -16,6 +16,7 @@ from sklearn.linear_model import LinearRegression
 # pylint: disable=invalid-name
 from arbitragelab.util import devadarsh
 
+
 class PCAStrategy:
     """
     This strategy creates mean reverting portfolios using Principal Components Analysis. The idea of the strategy
@@ -96,6 +97,12 @@ class PCAStrategy:
 
         # Scaling eigen vectors to get weights for eigen portfolio creation
         weights = weights / std
+
+        # marginal explained variance percentage by each eigenvectors
+        expl_variance = pca_factors.explained_variance_ratio_
+        port_weights = np.append(expl_variance[0], np.diff(expl_variance.cumsum())) / expl_variance.cumsum()[-1]
+
+        weights = weights.mul(port_weights)
 
         return weights
 
