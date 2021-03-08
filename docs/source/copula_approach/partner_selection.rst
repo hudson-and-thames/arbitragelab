@@ -277,9 +277,41 @@ Implementation
 Code Example
 ############
 
+.. code-block::
 
+    # Importing the module and other libraries
+    from arbitragelab.copula_approach.vine_copula_partner_selection import PartnerSelection
+    import pandas as pd
 
+    # Importing DataFrame of daily pricing data for all stocks in S&P 500.(atleast 12 months data)
+    df = pd.read_csv(DATA_PATH, parse_dates=True, index_col='Date').dropna()
 
+    # Instantiating the partner selection module.
+    ps = PartnerSelection(df)
+
+    # Calculating final quadruples using traditional approach for first 20 target stocks.
+    Q = ps.traditional(20)
+    print(Q)
+    # Plotting the final quadruples.
+    ps.plot_selected_pairs(Q)
+
+    # Calculating final quadruples using extended approach for first 20 target stocks.
+    Q = ps.extended(20)
+    print(Q)
+    # Plotting the final quadruples.
+    ps.plot_selected_pairs(Q)
+
+    # Calculating final quadruples using geometric approach for first 20 target stocks.
+    Q = ps.geometric(20)
+    print(Q)
+    # Plotting the final quadruples.
+    ps.plot_selected_pairs(Q)
+
+    # Calculating final quadruples using extremal approach for first 20 target stocks.
+    Q = ps.extremal(20)
+    print(Q)
+    # Plotting the final quadruples.
+    ps.plot_selected_pairs(Q)
 
 
 Research Notebooks
@@ -289,7 +321,7 @@ The following research notebook can be used to better understand the partner sel
 
 * `Vine Copula Partner Selection Approaches`_
 
-.. _`Vine Copula Partner Selection Approaches`:
+.. _`Vine Copula Partner Selection Approaches`: https://github.com/hudson-and-thames/arbitrage_research/blob/partner_selection_vine_copula/Copula%20Approach/vine_copula_partner_selection.ipynb
 
 References
 ##########
