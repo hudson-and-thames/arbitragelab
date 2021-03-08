@@ -7,7 +7,7 @@ This module is a user data helper wrapping various yahoo finance libraries.
 
 import pandas as pd
 import yfinance as yf
-import yahoo_fin.stock_info as ys
+#import yahoo_fin.stock_info as ys
 
 class DataImporter:
     """
@@ -19,9 +19,8 @@ class DataImporter:
     said data.
     """
 
+    #These tests are breaking due to yahoo_fin issue now: https://github.com/atreadw1492/yahoo_fin/issues/36
     '''
-    These tests are breaking due to yahoo_fin issue now: https://github.com/atreadw1492/yahoo_fin/issues/36
-
     @staticmethod
     def get_sp500_tickers() -> list:
         """
