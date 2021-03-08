@@ -19,6 +19,9 @@ class DataImporter:
     said data.
     """
 
+    '''
+    These tests are breaking due to yahoo_fin issue now: https://github.com/atreadw1492/yahoo_fin/issues/36
+
     @staticmethod
     def get_sp500_tickers() -> list:
         """
@@ -42,6 +45,7 @@ class DataImporter:
         tickers_dow = ys.tickers_dow()
 
         return tickers_dow
+    '''
 
     @staticmethod
     def remove_nuns(dataframe: pd.DataFrame, threshold: int = 100) -> pd.DataFrame:
