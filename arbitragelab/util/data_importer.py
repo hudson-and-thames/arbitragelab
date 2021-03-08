@@ -18,6 +18,7 @@ class DataImporter:
     various indexes, pulling of relevant pricing data and processing
     said data.
     """
+    #pylint: disable=pointless-string-statement
 
     #These tests are breaking due to yahoo_fin issue now: https://github.com/atreadw1492/yahoo_fin/issues/36
     '''
