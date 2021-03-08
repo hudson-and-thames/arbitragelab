@@ -7,7 +7,7 @@ This module is a user data helper wrapping various yahoo finance libraries.
 
 import pandas as pd
 import yfinance as yf
-#import yahoo_fin.stock_info as ys
+import yahoo_fin.stock_info as ys
 
 class DataImporter:
     """
@@ -18,10 +18,7 @@ class DataImporter:
     various indexes, pulling of relevant pricing data and processing
     said data.
     """
-    #pylint: disable=pointless-string-statement
 
-    #These tests are breaking due to yahoo_fin issue now: https://github.com/atreadw1492/yahoo_fin/issues/36
-    '''
     @staticmethod
     def get_sp500_tickers() -> list:
         """
@@ -45,7 +42,6 @@ class DataImporter:
         tickers_dow = ys.tickers_dow()
 
         return tickers_dow
-    '''
 
     @staticmethod
     def remove_nuns(dataframe: pd.DataFrame, threshold: int = 100) -> pd.DataFrame:
