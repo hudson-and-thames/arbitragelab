@@ -33,7 +33,7 @@ Ubuntu Linux
 
       source activate <env name>
 
-5. Purchase ArbitrageLab from the `Hudson & Thames website <https://app.hudsonthames.org/auth/signin>`__. This will provide you with an API key.
+5. Purchase ArbitrageLab from the `Hudson & Thames website <https://portal.hudsonthames.org>`__. This will provide you with an API key.
 
    .. code-block::
 
@@ -140,7 +140,7 @@ Mac OS X
 
       source activate <env name>
 
-5. Purchase ArbitrageLab from the `Hudson & Thames website <https://app.hudsonthames.org/auth/signin>`__. This will provide you with an API key.
+5. Purchase ArbitrageLab from the `Hudson & Thames website <https://portal.hudsonthames.org>`__. This will provide you with an API key.
 
    .. code-block::
 
@@ -247,7 +247,7 @@ Windows
 
       conda activate <env name>
 
-5. Purchase ArbitrageLab from the `Hudson & Thames website <https://app.hudsonthames.org/auth/signin>`__. This will provide you with an API key.
+5. Purchase ArbitrageLab from the `Hudson & Thames website <https://portal.hudsonthames.org>`__. This will provide you with an API key.
 
    .. code-block::
 
