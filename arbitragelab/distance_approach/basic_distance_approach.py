@@ -205,35 +205,57 @@ class DistanceStrategy:
 
         return scale
 
-    def get_pairs(self):
+    def get_pairs(self, method='standard', num_top=20, skip_top=0):
         """
-        Outputs pairs that were created in the pairs formation step.
+        Outputs pairs that were created in the pairs formation step and sorted by the method.
 
-        :return: (list) List containing tuples of two strings, for names of elements in a pair.
-        """
-
-        return self.pairs
-
-    def get_pairs_crossing(self, num_top=20, skip_top=0):
-        """
-        Outputs pairs sorted by the number of zero crossings.
-
+        :param method: (str) Method for choosing ways of sorting pairs. By default, it uses
+            ‘standard’ and other available methods are: ‘industry’, ‘zero_crossing’ and ‘variance’.
         :param num_top: (int) Number of top pairs to use for portfolio formation.
         :param skip_top: (int) Number of first top pairs to skip. For example, use skip_top=10
             if you'd like to take num_top pairs starting from the 10th one.
         :return: (list) List containing tuples of two strings, for names of elements in a pair.
         """
 
-        # Sorting pairs from the dictionary by the number of zero crossings in an descending order
-        sorted_pairs = sorted(self.num_crossing.items(), key=lambda x: x[1], reverse=True)
+        if method == 'standard':
 
-        # Picking top pairs
-        top_pairs = sorted_pairs[skip_top:(skip_top + num_top)]
+            return self.pairs
 
-        # Removing the number of crossings, so we have only tuples with elements
-        top_pairs = [x[0] for x in top_pairs]
+        elif method == 'industry':
 
-        return top_pairs
+            return self.pairs
+
+        elif method == 'zero_crossing':
+
+            # Sorting pairs from the dictionary by the number of zero crossings in a descending order
+            sorted_pairs = sorted(self.num_crossing.items(), key=lambda x: x[1], reverse=True)
+
+            # Picking top pairs
+            self.pairs = sorted_pairs[skip_top:(skip_top + num_top)]
+
+            # Removing the number of crossings, so we have only tuples with elements
+            self.pairs = [x[0] for x in self.pairs]
+
+            return self.pairs
+
+        elif method == 'variance':
+
+            # Sorting pairs from the dictionary by the size of variance in a descending order
+            sorted_pairs = sorted(self.train_std.items(), key=lambda x: x[1], reverse=True)
+
+            # Picking top pairs
+            self.pairs = sorted_pairs[skip_top:(skip_top + num_top)]
+
+            # Removing the variance, so we have only tuples with elements
+            self.pairs = [x[0] for x in self.pairs]
+
+            return self.pairs
+
+        else:
+
+            # Raise an error if the given method is inappropriate.
+            raise Exception("Please give an appropriate method for sorting pairs between ‘standard’, ‘zero_crossing’, "
+                            "‘industry’, or ‘variance’.")
 
     def get_num_crossing(self):
         """

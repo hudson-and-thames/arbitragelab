@@ -26,23 +26,41 @@ class TestDistanceStrategy(unittest.TestCase):
         """
 
         # Using saved ETF price series for testing and trading
-        project_path = os.path.dirname(__file__)
+
+        # Change back the path to relative path
+        project_path = os.path.dirname(os.path.abspath(__file__))
         data_path = project_path + "/test_data/stock_prices.csv"
         data = pd.read_csv(data_path, parse_dates=True, index_col="Date")
+
+        # Generate a random industry dictionary for testing
+        industry_dict = {}
+        for index, ticker in enumerate(data.columns):
+            if index < len(data.columns) * (1 / 3):
+                industry_dict[ticker] = 'Information Technology'
+            elif index < len(data.columns) * (2 / 3):
+                industry_dict[ticker] = 'Financials'
+            else:
+                industry_dict[ticker] = 'Industrials'
 
         # Datasets for pairs formation and trading steps of the strategy
         self.train_data = data[:100]
         self.test_data = data[100:]
+        self.industry_dict = industry_dict
 
     def test_form_pairs(self):
         """
         Tests the generation of pairs from the DistanceStrategy class.
         """
-
+        # Basic Strategy
         strategy = DistanceStrategy()
+
+        # Industry based Strategy
+        strategy_industry = DistanceStrategy()
 
         # Performing the pairs formation step
         strategy.form_pairs(self.train_data, num_top=5, skip_top=0)
+        strategy_industry.form_pairs(self.train_data, by_industry=True,
+                                     industry_dict=self.industry_dict, num_top=5, skip_top=0)
 
         # Testing min and max values of series used for dataset normalization
         self.assertAlmostEqual(strategy.min_normalize.mean(), 63.502009, delta=1e-5)
@@ -51,11 +69,19 @@ class TestDistanceStrategy(unittest.TestCase):
         # Testing values of historical volatility for portfolios
         self.assertAlmostEqual(np.mean(list(strategy.train_std.values())), 0.056361, delta=1e-5)
 
-        # Testing the list of created pairs
+        # Testing values of train portfolio which was created to get the number of zero crossings
+        self.assertAlmostEqual(strategy_industry.train_portfolio.mean().mean(), 0.011405, delta=1e-5)
+
+        # Testing the number of zero crossings for the pairs
+        self.assertAlmostEqual(np.mean(list(strategy_industry.num_crossing.values())), 16.4, delta=1e-5)
+
+        # Testing the list of created pairs for both of the cases
         expected_pairs = [('EFA', 'VGK'), ('EPP', 'VPL'), ('EWQ', 'VGK'),
                           ('EFA', 'EWQ'), ('EPP', 'SPY')]
-
+        expected_pairs_industry = [('EFA', 'EWQ'), ('EFA', 'EWU'), ('SPY', 'VPL'),
+                                   ('EEM', 'EWU'), ('DIA', 'SPY')]
         self.assertCountEqual(strategy.pairs, expected_pairs)
+        self.assertCountEqual(strategy_industry.pairs,expected_pairs_industry)
 
     def test_trade_pairs(self):
         """
@@ -182,7 +208,10 @@ class TestDistanceStrategy(unittest.TestCase):
         expected_pairs = [('EFA', 'VGK'), ('EPP', 'VPL'), ('EWQ', 'VGK'),
                           ('EFA', 'EWQ'), ('EPP', 'SPY')]
 
-        self.assertCountEqual(strategy.get_pairs(), expected_pairs)
+        self.assertCountEqual(strategy.get_pairs(method='standard'), expected_pairs)
+        self.assertCountEqual(strategy.get_pairs(method='zero_crossing'), expected_pairs)
+        self.assertCountEqual(strategy.get_pairs(method='industry'), expected_pairs)
+        self.assertCountEqual(strategy.get_pairs(method='variance'), expected_pairs)
 
     def test_exceptions(self):
         """
@@ -194,3 +223,11 @@ class TestDistanceStrategy(unittest.TestCase):
         # When trying to generate trading signals without creating pairs first
         with self.assertRaises(Exception):
             strategy.trade_pairs(self.test_data, divergence=2)
+
+        # When trying to form pairs based on industry approach without giving an industry dictionary as an input
+        with self.assertRaises(Exception):
+            strategy.form_pairs(self.train_data, by_industry=True)
+
+        # When trying to get pairs with inappropriate method
+        with self.assertRaises(Exception):
+            strategy.get_pairs(method='wrong input')
