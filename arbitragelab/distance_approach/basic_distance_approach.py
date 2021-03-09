@@ -216,16 +216,21 @@ class DistanceStrategy:
             if you'd like to take num_top pairs starting from the 10th one.
         :return: (list) List containing tuples of two strings, for names of elements in a pair.
         """
+        if method not in ['standard', 'industry', 'zero_crossing', 'variance']:
+
+            # Raise an error if the given method is inappropriate.
+            raise Exception("Please give an appropriate method for sorting pairs between ‘standard’, ‘zero_crossing’, "
+                            "‘industry’, or ‘variance’.")
 
         if method == 'standard':
 
             return self.pairs
 
-        elif method == 'industry':
+        if method == 'industry':
 
             return self.pairs
 
-        elif method == 'zero_crossing':
+        if method == 'zero_crossing':
 
             # Sorting pairs from the dictionary by the number of zero crossings in a descending order
             sorted_pairs = sorted(self.num_crossing.items(), key=lambda x: x[1], reverse=True)
@@ -238,7 +243,7 @@ class DistanceStrategy:
 
             return self.pairs
 
-        elif method == 'variance':
+        if method == 'variance':
 
             # Sorting pairs from the dictionary by the size of variance in a descending order
             sorted_pairs = sorted(self.train_std.items(), key=lambda x: x[1], reverse=True)
@@ -251,11 +256,7 @@ class DistanceStrategy:
 
             return self.pairs
 
-        else:
-
-            # Raise an error if the given method is inappropriate.
-            raise Exception("Please give an appropriate method for sorting pairs between ‘standard’, ‘zero_crossing’, "
-                            "‘industry’, or ‘variance’.")
+        return None
 
     def get_num_crossing(self):
         """

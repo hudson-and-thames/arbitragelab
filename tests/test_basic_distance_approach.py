@@ -28,7 +28,7 @@ class TestDistanceStrategy(unittest.TestCase):
         # Using saved ETF price series for testing and trading
 
         # Change back the path to relative path
-        project_path = os.path.dirname(os.path.abspath(__file__))
+        project_path = os.path.dirname(__file__)
         data_path = project_path + "/test_data/stock_prices.csv"
         data = pd.read_csv(data_path, parse_dates=True, index_col="Date")
 
