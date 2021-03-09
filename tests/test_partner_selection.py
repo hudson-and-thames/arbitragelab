@@ -53,7 +53,7 @@ class PartnerSelectionTests(unittest.TestCase):
         """
         Tests Traditional Approach.
         """
-        self.assertEqual(self.ps.traditional(1),[['A', 'AAL', 'AAPL', 'AAP']])
+        self.assertEqual(self.ps.traditional(1), [['A', 'AAL', 'AAPL', 'AAP']])
 
     def test_extended(self):
         """
@@ -65,7 +65,7 @@ class PartnerSelectionTests(unittest.TestCase):
         """
         Tests Geometric Approach.
         """
-        self.assertEqual(self.ps.geometric(1),[['A', 'AAL', 'AAPL', 'AAP']])
+        self.assertEqual(self.ps.geometric(1), [['A', 'AAL', 'AAPL', 'AAP']])
 
     def test_extremal(self):
         """
@@ -89,13 +89,13 @@ class PartnerSelectionTests(unittest.TestCase):
         """
         Tests helper function of Extended Approach.
         """
-        self.assertEqual(round(multivariate_rho_vectorized(self.u[self.quadruple], np.array([[0,1,2,3]]))[1], 4), 0.3114)
+        self.assertEqual(round(multivariate_rho_vectorized(self.u[self.quadruple], np.array([[0, 1, 2, 3]]))[1], 4), 0.3114)
 
     def test_diagonal_measure(self):
         """
         Tests helper function of Geometric Approach.
         """
-        self.assertEqual(round(diagonal_measure_vectorized(self.ps.ranked_returns[self.quadruple], np.array([[0,1,2,3]]))[1], 4), 91.9374)
+        self.assertEqual(round(diagonal_measure_vectorized(self.ps.ranked_returns[self.quadruple], np.array([[0, 1, 2, 3]]))[1], 4), 91.9374)
 
     def test_extremal_covariance_matrix(self):
         """
