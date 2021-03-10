@@ -80,9 +80,9 @@ class TestPCAStrategy(unittest.TestCase):
         # Calculating residuals
         factorweights = self.pca_strategy.get_factorweights(self.data, explained_var=0.55)
         factorret = pd.DataFrame(np.dot(self.data, factorweights.transpose()), index=self.data.index)
-        residual, _ = self.pca_strategy.get_residuals(self.data, factorret)
+        residual, _, intercept = self.pca_strategy.get_residuals(self.data, factorret)
 
-        s_scores = self.pca_strategy.get_sscores(residual, k=4)
+        s_scores = self.pca_strategy.get_sscores(residual, intercept, k=4, drift=True)
 
         # Check S-scores
         self.assertAlmostEqual(s_scores['EFA'], -0.371478, delta=1e-5)

@@ -10,6 +10,7 @@ This module implements the PCA approach described by by Marco Avellaneda and Jeo
 
 import numpy as np
 import pandas as pd
+import statsmodels.api as sm
 from sklearn.decomposition import PCA
 from sklearn.linear_model import LinearRegression
 
@@ -29,7 +30,7 @@ class PCAStrategy:
     of all eigen portfolios that satisfy the required properties.
     """
 
-    def __init__(self, n_components: int = 15):
+    def __init__(self, n_components: int = 75):
         """
         Initialize PCA StatArb Strategy.
 
@@ -102,12 +103,12 @@ class PCAStrategy:
         expl_variance = pca_factors.explained_variance_ratio_
         port_weights = np.append(expl_variance[0], np.diff(expl_variance.cumsum())) / expl_variance.cumsum()[-1]
 
-        weights = weights.mul(port_weights)
+        weights = weights.mul(port_weights, axis=0)
 
         return weights
 
     @staticmethod
-    def get_residuals(matrix: pd.DataFrame, pca_factorret: pd.DataFrame) -> (pd.DataFrame, pd.Series):
+    def get_residuals(matrix: pd.DataFrame, pca_factorret: pd.DataFrame) -> (pd.DataFrame, pd.Series, pd.Series):
         """
         A function to calculate residuals given matrix of returns and factor returns.
 
@@ -120,7 +121,8 @@ class PCAStrategy:
 
         :param matrix: (pd.DataFrame) Dataframe with index and columns containing asset returns.
         :param pca_factorret: (pd.DataFrame) Dataframe with PCA factor returns for assets.
-        :return: (pd.DataFrame, pd.Series) Dataframe with residuals and series of beta coefficients.
+        :return: (pd.DataFrame, pd.Series, pd.Series) Dataframe with residuals and series of beta coefficients,
+                intercept.
         """
 
         # Creating a DataFrame to store residuals
@@ -128,6 +130,9 @@ class PCAStrategy:
 
         # And a DataFrame to store regression coefficients
         coefficient = pd.DataFrame(columns=matrix.columns, index=range(pca_factorret.shape[1]))
+
+        # And a pd.Series to store regression intercept(beta0)
+        intercept = pd.Series(index=matrix.columns)
 
         # A class for regression
         regression = LinearRegression()
@@ -143,10 +148,13 @@ class PCAStrategy:
             # Writing down the regression coefficient
             coefficient[ticker] = regression.coef_
 
-        return residual, coefficient
+            # Writing down the regression intercept
+            intercept[ticker] = regression.intercept_
+
+        return residual, coefficient, intercept
 
     @staticmethod
-    def get_sscores(residuals: pd.DataFrame, k: float) -> pd.Series:
+    def get_sscores(residuals: pd.DataFrame, intercept: pd.Series, k: float, drift: bool) -> pd.Series:
         """
         A function to calculate S-scores for asset eigen portfolios given dataframes of residuals
         and a mean reversion speed threshold.
@@ -167,8 +175,16 @@ class PCAStrategy:
             PCA factor returns.
         :param k: (float) Required speed of mean reversion to use the eigen portfolio in
             trading.
+        :param intercept: (pd.Series) Pandas Series containining intercept(beta0) of each
+            stocks.
+        :param drift: (bool) True if the user want to take drift into consideration, Flase, otherwise.
         :return: (pd.Series) Series of S-scores for each asset for a given residual dataframe.
         """
+        # Check residual stationarity(Drop a ticker if its residual not stationary.)
+        for ticker in residuals.columns:
+            adf, p, usedlag, nobs, cvs, aic = sm.tsa.stattools.adfuller(residuals[ticker])
+            if p > 0.01:
+                residuals.drop([ticker], axis=1)
 
         # Creating the auxiliary process K_k - discrete version of X(t)
         X_k = residuals.cumsum()
@@ -179,11 +195,20 @@ class PCAStrategy:
         # Variable sigma for S-score calculation
         sigma_eq = pd.Series(index=X_k.columns, dtype=np.float64)
 
+        # Variable tau for modified S-socore calculation
+        tau = pd.Series(index=X_k.columns, dtype=np.float64)
+
+        # Update (pd.Series) intercept's index
+        intercept = intercept[X_k.columns]
+
         # Iterating over tickers
         for ticker in X_k.columns:
 
             # Calculate parameter b using auto-correlations
             b = X_k[ticker].autocorr()
+
+            # Calculating the tau for every ticker
+            tau[ticker] = 1 / (-np.log(b) * 252)
 
             # If mean reversion times are good, enter trades
             if -np.log(b) * 252 > k:
@@ -212,7 +237,13 @@ class PCAStrategy:
         # S-score calculation for each ticker
         s_score = -m / sigma_eq
 
-        return s_score
+        if not drift:
+            return s_score
+
+        if drift:
+            m = -m - intercept * tau
+            mod_sscore = m / sigma_eq
+            return mod_sscore
 
     @staticmethod
     def _generate_signals(position_stock: pd.DataFrame, s_scores: pd.Series, coeff: pd.DataFrame,
@@ -275,7 +306,8 @@ class PCAStrategy:
 
     def get_signals(self, matrix: pd.DataFrame, k: float = 8.4, corr_window: int = 252,
                     residual_window: int = 60, sbo: float = 1.25, sso: float = 1.25,
-                    ssc: float = 0.5, sbc: float = 0.75, size: float = 1, explained_var: float = None) -> pd.DataFrame:
+                    ssc: float = 0.5, sbc: float = 0.75, size: float = 1, explained_var: float = None,
+                    drift=False) -> pd.DataFrame:
         """
         A function to generate trading signals for given returns matrix with parameters.
 
@@ -339,6 +371,7 @@ class PCAStrategy:
             a long position, buying (size) units of stock and selling (size) * betas units of other
             stocks.
         :param explained_var: (float) The user-defined explained variance criteria.
+        :param drift: (bool) True if the user want to take drift into consideration, Flase, otherwise.
         :return: (pd.DataFrame) DataFrame with target weights for each asset at every observation.
             It is being calculated as a combination of all eigen portfolios that are satisfying the
             mean reversion speed requirement and S-score values.
@@ -365,10 +398,10 @@ class PCAStrategy:
             factorret_resid = pd.DataFrame(np.dot(obs_residual, weights.transpose()), index=obs_residual.index)
 
             # Calculating residuals for this window
-            resid, coeff = self.get_residuals(obs_residual, factorret_resid)
+            resid, coeff, intercept = self.get_residuals(obs_residual, factorret_resid)
 
             # Finding the S-scores for eigen portfolios in this period
-            s_scores = self.get_sscores(resid, k)
+            s_scores = self.get_sscores(resid, intercept, k, drift)
 
             # Series of current positions for assets in our portfolio
             position_stock = pd.DataFrame(0, columns=matrix.columns, index=[-1] + list(range(factorret_resid.shape[1])))
