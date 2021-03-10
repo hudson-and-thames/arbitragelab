@@ -16,8 +16,9 @@ from statsmodels.distributions.empirical_distribution import ECDF
 def get_quantiles_data(col: pd.Series):
     """
     Returns ranked quantiles from returns.
-    :param col: (pd.Series) returns data for a single stock.
-    :return: ranked returns from quantiles.
+
+    :param col: (pd.Series) Returns data for a single stock.
+    :return: Ranked returns from quantiles.
     """
 
     return ECDF(col)(col)
@@ -26,6 +27,7 @@ def get_quantiles_data(col: pd.Series):
 def get_sector_data(quadruple: list, constituents: pd.DataFrame):
     """
     Function returns Sector and Sub sector information for all tickers in quadruple.
+
     :param quadruple: (list) List of four tickers.
     :param constituents: (pd.DataFrame) Dataframe consisting of sector data for all tickers in universe.
     :return: Data corresponding to the quadruple.
