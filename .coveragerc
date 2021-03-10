@@ -11,6 +11,9 @@ omit =
      /opt/conda/*
      # Ensure we exclude any files in .local
      */.local/*
+     # Temporary fix for YFinance issues
+     arbitragelab/util/data_importer.py
+
 disable_warnings = no-data-collected
 
 [report]
