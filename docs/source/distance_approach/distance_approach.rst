@@ -88,6 +88,46 @@ will later be used to generate trading signals.\
     Portfolio value (difference of normalized price series), constructed from a pair of elements
     from the previous example.
 
+
+Pair selection criteria
+#######################
+
+As basic pairs formation confirms declining profitability in pairs trading, some other refined pair
+selection criteria have emerged. Here, we describe three different methods from the basic approach in
+selecting pairs for trading.
+
+First is only allowing for matching securities within the same industry group. The second is sorting
+selected pairs based on the number of zero-crossings in the formation period and the third is sorting
+selected pairs based on the historical standard deviation where pairs with high standard deviation are selected.
+
+1. **Pairs within the same industry group**
+
+In the pairs formation step above, one can add this method when finding pairs in order to match securities
+within the same industry group.
+
+With a dictionary containing the name/ticker of the securities and each corresponding industry group,
+the securities are first separated into different industry groups. Then, by calculating the Euclidean
+square distance for each of the pair within the same group, the :math:`n` closest pairs are selected(in default,
+our function also allows skipping a number of first pairs, so one can choose pairs 10-15 to study).
+
+2. **Pairs with a higher number of zero-crossings**
+
+The number of zero crossings in the formation period does have some usefulness in predicting the future
+convergence according to the work of Do and Faff (2010).
+
+After pairs were matched either within the same industry group or every industry, the top :math:`n` pairs
+that had the highest number of zero crossings during the 12-month formation period are admitted to the
+portfolio we select. This method incorporates the time-series dimension of the historical data in the
+form of the number of zero crossings.
+
+3. **Pairs with a higher historical standard deviation**
+
+The historical standard deviation calculated in the formation period can also be a criterion to sort
+selected pairs.
+
+After pairs were matched, by sorting the pairs based on their historical standard deviation in the
+formation period, we can select top :math:`n` pairs that have the highest standard deviation.
+
 Implementation
 **************
 
@@ -207,6 +247,10 @@ Code Example
    strategy = DistanceStrategy()
    strategy.form_pairs(data_pairs_formation, num_top=20, skip_top=5)
 
+   # Using the number of zero-crossing for pair selection method
+   strategy_zero_crossing = DistanceStrategy()
+   strategy_zero_crossing.form_pairs(data_pairs_formation, method='zero_crossing', num_top=20, skip_top=5)
+
    # Checking a list of pairs that were created
    pairs = strategy.get_pairs()
 
@@ -236,5 +280,7 @@ References
 ##########
 
 * `Do, B. and Faff, R., 2010. Does simple pairs trading still work?. Financial Analysts Journal, 66(4), pp.83-95. <https://www.jstor.org/stable/pdf/25741293.pdf?casa_token=nIfIcPq13NAAAAAA:Nfrg__C0Q1lcvoBi6Z8DwC_-6pA_cHDdLxxINYg7BPvuq-R5nNzbhVWra2PBL7t2hntj_WBxGH_vCezpp-ZN7NKYhKuZMoX97A7im7PREt7oh2mAew>`_
+* `Do, B., and Faff, R. (2012). Are pairs trading profits robust to trading costs? Journal of Financial Research, 35(2):261–287. <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1707125>`_
 * `Gatev, E., Goetzmann, W.N. and Rouwenhorst, K.G., 2006. Pairs trading: Performance of a relative-value arbitrage rule. The Review of Financial Studies, 19(3), pp.797-827. <https://www.nber.org/system/files/working_papers/w7032/w7032.pdf>`_
 * `Krauss, C., 2017. Statistical arbitrage pairs trading strategies: Review and outlook. Journal of Economic Surveys, 31(2), pp.513-545. <https://www.econstor.eu/bitstream/10419/116783/1/833997289.pdf>`_
+

@@ -41,7 +41,7 @@ class DistanceStrategy:
 
         devadarsh.track('DistanceStrategy')
 
-    def form_pairs(self, train_data, by_industry=False, industry_dict=None, num_top=50, skip_top=0, list_names=None):
+    def form_pairs(self, train_data, method='standard', industry_dict=None, num_top=50, skip_top=0, list_names=None):
         """
         Forms pairs based on input training data.
 
@@ -77,7 +77,8 @@ class DistanceStrategy:
         :param skip_top: (int) Number of first top pairs to skip. For example, use skip_top=10
             if you'd like to take num_top pairs starting from the 10th one.
         :param list_names: (list) List containing names of elements if Numpy array is used as input.
-        :param by_industry: (boolean) Whether to use pair selection based on industry group or not.
+        :param method: (str) Methods to use for sorting pairs [``standard`` by default, ``industry``,
+                             ``zero_crossing``, ``variance``].
         :param industry_dict: (dictionary) Dictionary matching ticker to industry group.
         """
 
@@ -92,7 +93,7 @@ class DistanceStrategy:
         normalized = normalized.dropna(axis=0)
 
         # If sector is set to True, pairs are matched within the same industry group
-        if by_industry:
+        if method == 'industry':
 
             # Check whether the input of industry group dictionary is well given
             if industry_dict is None:
@@ -116,6 +117,44 @@ class DistanceStrategy:
 
         # Calculating the number of zero crossings from the dataset
         self.num_crossing = self.count_number_crossing()
+
+        self._selection_method(method, num_top, skip_top)
+
+    def _selection_method(self, method, num_top, skip_top):
+        """
+        Select pairs based on the method.
+        """
+
+        if method not in ['standard', 'industry', 'zero_crossing', 'variance']:
+            # Raise an error if the given method is inappropriate.
+            raise Exception("Please give an appropriate method for sorting pairs between ‘standard’, ‘zero_crossing’, "
+                            "‘industry’, or ‘variance’.")
+
+        if method == 'zero_crossing':
+
+            # Sorting pairs from the dictionary by the number of zero crossings in a descending order
+            sorted_pairs = sorted(self.num_crossing.items(), key=lambda x: x[1], reverse=True)
+
+            # Picking top pairs
+            pairs_selected = sorted_pairs[skip_top:(skip_top + num_top)]
+
+            # Removing the number of crossings, so we have only tuples with elements
+            pairs_selected = [x[0] for x in pairs_selected]
+
+            self.pairs = pairs_selected
+
+        elif method == 'variance':
+
+            # Sorting pairs from the dictionary by the size of variance in a descending order
+            sorted_pairs = sorted(self.train_std.items(), key=lambda x: x[1], reverse=True)
+
+            # Picking top pairs
+            pairs_selected = sorted_pairs[skip_top:(skip_top + num_top)]
+
+            # Removing the variance, so we have only tuples with elements
+            pairs_selected = [x[0] for x in pairs_selected]
+
+            self.pairs = pairs_selected
 
     def trade_pairs(self, test_data, divergence=2):
         """
@@ -205,48 +244,12 @@ class DistanceStrategy:
 
         return scale
 
-    def get_pairs(self, method='standard', num_top=20, skip_top=0):
+    def get_pairs(self):
         """
         Outputs pairs that were created in the pairs formation step and sorted by the method.
 
-        :param method: (str) Method for choosing ways of sorting pairs. By default, it uses
-            ‘standard’ and other available methods are: ‘industry’, ‘zero_crossing’ and ‘variance’.
-        :param num_top: (int) Number of top pairs to use for portfolio formation.
-        :param skip_top: (int) Number of first top pairs to skip. For example, use skip_top=10
-            if you'd like to take num_top pairs starting from the 10th one.
         :return: (list) List containing tuples of two strings, for names of elements in a pair.
         """
-        if method not in ['standard', 'industry', 'zero_crossing', 'variance']:
-
-            # Raise an error if the given method is inappropriate.
-            raise Exception("Please give an appropriate method for sorting pairs between ‘standard’, ‘zero_crossing’, "
-                            "‘industry’, or ‘variance’.")
-
-        if method == 'zero_crossing':
-
-            # Sorting pairs from the dictionary by the number of zero crossings in a descending order
-            sorted_pairs = sorted(self.num_crossing.items(), key=lambda x: x[1], reverse=True)
-
-            # Picking top pairs
-            pairs_selected = sorted_pairs[skip_top:(skip_top + num_top)]
-
-            # Removing the number of crossings, so we have only tuples with elements
-            pairs_selected = [x[0] for x in pairs_selected]
-
-            self.pairs = pairs_selected
-
-        elif method == 'variance':
-
-            # Sorting pairs from the dictionary by the size of variance in a descending order
-            sorted_pairs = sorted(self.train_std.items(), key=lambda x: x[1], reverse=True)
-
-            # Picking top pairs
-            pairs_selected = sorted_pairs[skip_top:(skip_top + num_top)]
-
-            # Removing the variance, so we have only tuples with elements
-            pairs_selected = [x[0] for x in pairs_selected]
-
-            self.pairs = pairs_selected
 
         return self.pairs
 

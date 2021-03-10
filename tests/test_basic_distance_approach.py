@@ -57,10 +57,18 @@ class TestDistanceStrategy(unittest.TestCase):
         # Industry based Strategy
         strategy_industry = DistanceStrategy()
 
+        # Zero-crossing based Strategy
+        strategy_zero_crossing = DistanceStrategy()
+
+        # Variance based Strategy
+        strategy_variance = DistanceStrategy()
+
         # Performing the pairs formation step
         strategy.form_pairs(self.train_data, num_top=5, skip_top=0)
-        strategy_industry.form_pairs(self.train_data, by_industry=True,
+        strategy_industry.form_pairs(self.train_data, method='industry',
                                      industry_dict=self.industry_dict, num_top=5, skip_top=0)
+        strategy_zero_crossing.form_pairs(self.train_data, method='zero_crossing', num_top=5, skip_top=0)
+        strategy_variance.form_pairs(self.train_data, method='variance', num_top=5, skip_top=0)
 
         # Testing min and max values of series used for dataset normalization
         self.assertAlmostEqual(strategy.min_normalize.mean(), 63.502009, delta=1e-5)
@@ -80,8 +88,15 @@ class TestDistanceStrategy(unittest.TestCase):
                           ('EFA', 'EWQ'), ('EPP', 'SPY')]
         expected_pairs_industry = [('EFA', 'EWQ'), ('EFA', 'EWU'), ('SPY', 'VPL'),
                                    ('EEM', 'EWU'), ('DIA', 'SPY')]
+        expected_pairs_zero_crossing = [('EPP', 'SPY'), ('EFA', 'VGK'), ('EPP', 'VPL'),
+                                        ('EWQ', 'VGK'), ('EFA', 'EWQ')]
+        expected_pairs_variance = [('EPP', 'SPY'), ('EPP', 'VPL'), ('EFA', 'EWQ'),
+                                   ('EWQ', 'VGK'), ('EFA', 'VGK')]
+
         self.assertCountEqual(strategy.pairs, expected_pairs)
-        self.assertCountEqual(strategy_industry.pairs,expected_pairs_industry)
+        self.assertCountEqual(strategy_industry.pairs, expected_pairs_industry)
+        self.assertCountEqual(strategy_zero_crossing.pairs, expected_pairs_zero_crossing)
+        self.assertCountEqual(strategy_variance.pairs, expected_pairs_variance)
 
     def test_trade_pairs(self):
         """
@@ -208,10 +223,7 @@ class TestDistanceStrategy(unittest.TestCase):
         expected_pairs = [('EFA', 'VGK'), ('EPP', 'VPL'), ('EWQ', 'VGK'),
                           ('EFA', 'EWQ'), ('EPP', 'SPY')]
 
-        self.assertCountEqual(strategy.get_pairs(method='standard'), expected_pairs)
-        self.assertCountEqual(strategy.get_pairs(method='zero_crossing'), expected_pairs)
-        self.assertCountEqual(strategy.get_pairs(method='industry'), expected_pairs)
-        self.assertCountEqual(strategy.get_pairs(method='variance'), expected_pairs)
+        self.assertCountEqual(strategy.get_pairs(), expected_pairs)
 
     def test_get_num_crossing(self):
         """
@@ -237,8 +249,8 @@ class TestDistanceStrategy(unittest.TestCase):
 
         # When trying to form pairs based on industry approach without giving an industry dictionary as an input
         with self.assertRaises(Exception):
-            strategy.form_pairs(self.train_data, by_industry=True)
+            strategy.form_pairs(self.train_data, method='industry', industry_dict=None)
 
         # When trying to get pairs with inappropriate method
         with self.assertRaises(Exception):
-            strategy.get_pairs(method='wrong input')
+            strategy._selection_method(method='wrong input',num_top=5,skip_top=0)
