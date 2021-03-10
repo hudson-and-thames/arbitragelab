@@ -222,41 +222,33 @@ class DistanceStrategy:
             raise Exception("Please give an appropriate method for sorting pairs between ‘standard’, ‘zero_crossing’, "
                             "‘industry’, or ‘variance’.")
 
-        if method == 'standard':
-
-            return self.pairs
-
-        if method == 'industry':
-
-            return self.pairs
-
         if method == 'zero_crossing':
 
             # Sorting pairs from the dictionary by the number of zero crossings in a descending order
             sorted_pairs = sorted(self.num_crossing.items(), key=lambda x: x[1], reverse=True)
 
             # Picking top pairs
-            self.pairs = sorted_pairs[skip_top:(skip_top + num_top)]
+            pairs_selected = sorted_pairs[skip_top:(skip_top + num_top)]
 
             # Removing the number of crossings, so we have only tuples with elements
-            self.pairs = [x[0] for x in self.pairs]
+            pairs_selected = [x[0] for x in pairs_selected]
 
-            return self.pairs
+            self.pairs = pairs_selected
 
-        if method == 'variance':
+        elif method == 'variance':
 
             # Sorting pairs from the dictionary by the size of variance in a descending order
             sorted_pairs = sorted(self.train_std.items(), key=lambda x: x[1], reverse=True)
 
             # Picking top pairs
-            self.pairs = sorted_pairs[skip_top:(skip_top + num_top)]
+            pairs_selected = sorted_pairs[skip_top:(skip_top + num_top)]
 
             # Removing the variance, so we have only tuples with elements
-            self.pairs = [x[0] for x in self.pairs]
+            pairs_selected = [x[0] for x in pairs_selected]
 
-            return self.pairs
+            self.pairs = pairs_selected
 
-        return None
+        return self.pairs
 
     def get_num_crossing(self):
         """

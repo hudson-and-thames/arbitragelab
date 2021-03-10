@@ -213,6 +213,17 @@ class TestDistanceStrategy(unittest.TestCase):
         self.assertCountEqual(strategy.get_pairs(method='industry'), expected_pairs)
         self.assertCountEqual(strategy.get_pairs(method='variance'), expected_pairs)
 
+    def test_get_num_crossing(self):
+        """
+        Tests the number of crossings.
+        """
+
+        strategy = DistanceStrategy()
+
+        strategy.form_pairs(self.train_data, num_top=5, skip_top=0)
+
+        self.assertAlmostEqual(len(strategy.get_num_crossing()), 5, delta=1e-5)
+
     def test_exceptions(self):
         """
         Tests exceptions from methods of the class.
