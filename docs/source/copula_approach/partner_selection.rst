@@ -32,7 +32,7 @@ Introduction
 
 This module will focus on the various Partner Selection procedures and their implementations, as described in the paper.
 For every stock in the S&P 500, a partner triple is identified based on adequate measures of association.
-The following four partner selection approaches are implemented :
+The following four partner selection approaches are implemented:
 
 - Traditional Approach - baseline approach where the high dimensional relation between the four stocks is approximated by their pairwise bivariate correlations via Spearman’s :math:`\rho`;
 
@@ -56,7 +56,7 @@ On the other hand, the extremal approach tries to maximize the distance to indep
 Traditional Approach
 ####################
 
-As baseline approach, the high dimensional relation between the four stocks is approximated
+As a baseline approach, the high dimensional relation between the four stocks is approximated
 by their pairwise bi-variate correlations via Spearman’s :math:`\rho`.
 We used ranked returns data for this approach. In addition to the robustness obtained by rank transformation,
 it allows to capture non-linearities in the data to a certain degree.
@@ -65,7 +65,7 @@ The procedure is as follows:
 
 - Calculate the sum of all pairwise correlations for all possible quadruples, consisting of a fixed target stock.
 
-- Quadruple with the largest sum of pairwise correlations is considered as the final quadruple and saved to the output matrix.
+- Quadruple with the largest sum of pairwise correlations is considered the final quadruple and saved to the output matrix.
 
 Implementation
 **************
@@ -91,7 +91,7 @@ The procedure is as follows:
 
 - Calculate the multivariate version of Spearman’s :math:`\rho` for all possible quadruples, consisting of a fixed target stock.
 
-- Quadruple with the largest value is considered as the final quadruple and saved to the output matrix.
+- Quadruple with the largest value is considered the final quadruple and saved to the output matrix.
 
 
 :math:`d` denotes the number of stocks daily returns observed from day :math:`1` to day :math:`n`. :math:`X_i` denotes the :math:`i`-th stock's return.
@@ -144,7 +144,7 @@ The procedure is as follows:
 
 - Calculate the four dimensional diagonal measure for all possible quadruples, consisting of a fixed target stock.
 
-- Quadruple with the smallest diagonal measure is considered as the final quadruple and saved to the output matrix.
+- Quadruple with the smallest diagonal measure is considered the final quadruple and saved to the output matrix.
 
 
 The diagonal measure in four dimensional space is calculated using the following equation,
@@ -186,7 +186,7 @@ The procedure is as follows:
 
 - Calculate the :math:`\chi^2` test statistic for all possible quadruples, consisting of a fixed target stock.
 
-- Quadruple with the largest test statistic is considered as the final quadruple and saved to the output matrix.
+- Quadruple with the largest test statistic is considered the final quadruple and saved to the output matrix.
 
 Given below are the steps to calculate the :math:`\chi^2` test statistic described in Proposition 3.3 of Mangold (2015):
 
@@ -283,7 +283,7 @@ Code Example
     from arbitragelab.copula_approach.vine_copula_partner_selection import PartnerSelection
     import pandas as pd
 
-    # Importing DataFrame of daily pricing data for all stocks in S&P 500.(atleast 12 months data)
+    # Importing DataFrame of daily pricing data for all stocks in S&P 500.(at least 12 months data)
     df = pd.read_csv(DATA_PATH, parse_dates=True, index_col='Date').dropna()
 
     # Instantiating the partner selection module.
