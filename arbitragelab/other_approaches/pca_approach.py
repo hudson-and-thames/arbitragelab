@@ -173,16 +173,16 @@ class PCAStrategy:
 
         :param residuals: (pd.DataFrame) Dataframe with residuals after fitting returns to
             PCA factor returns.
-        :param k: (float) Required speed of mean reversion to use the eigen portfolio in
-            trading.
         :param intercept: (pd.Series) Pandas Series containining intercept(beta0) of each
             stocks.
+        :param k: (float) Required speed of mean reversion to use the eigen portfolio in
+            trading.
         :param drift: (bool) True if the user want to take drift into consideration, Flase, otherwise.
         :return: (pd.Series) Series of S-scores for each asset for a given residual dataframe.
         """
         # Check residual stationarity(Drop a ticker if its residual not stationary.)
         for ticker in residuals.columns:
-            adf, p, usedlag, nobs, cvs, aic = sm.tsa.stattools.adfuller(residuals[ticker])
+            p = sm.tsa.stattools.adfuller(residuals[ticker])[1]
             if p > 0.01:
                 residuals.drop([ticker], axis=1)
 
