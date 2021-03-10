@@ -101,9 +101,6 @@ class PartnerSelectionTests(unittest.TestCase):
         """
         Tests helper function for extremal approach which calculates the covariance matrix.
         """
-        with self.assertRaises(Exception):
-            # Testing Singular Matrix exception.
-            get_co_variance_matrix(3)
 
         self.assertIsNone(np.testing.assert_almost_equal(get_co_variance_matrix(2), [[ 64., -16., -16.,   4.],
                                                                                      [-16., 64.,   4., -16.],

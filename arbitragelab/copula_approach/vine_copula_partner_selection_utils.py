@@ -13,16 +13,22 @@ import scipy
 
 from statsmodels.distributions.empirical_distribution import ECDF
 
-def get_quantiles_data(col):
+def get_quantiles_data(col: pd.Series):
     """
     Returns ranked quantiles from returns.
+    :param col: (pd.Series) returns data for a single stock.
+    :return: ranked returns from quantiles.
     """
 
     return ECDF(col)(col)
 
-def get_sector_data(quadruple, constituents):
+
+def get_sector_data(quadruple: list, constituents: pd.DataFrame):
     """
     Function returns Sector and Sub sector information for all tickers in quadruple.
+    :param quadruple: (list) List of four tickers.
+    :param constituents: (pd.DataFrame) Dataframe consisting of sector data for all tickers in universe.
+    :return: Data corresponding to the quadruple.
     """
 
     with suppress(KeyError):
@@ -64,7 +70,10 @@ def multivariate_rho_vectorized(data_subset: pd.DataFrame, all_possible_combinat
 
     Calculates 3 proposed estimators for high dimensional generalization for Spearman's rho.
     These implementations are present in
-    Schmid, F., Schmidt, R., 2007. Multivariate extensions of Spearman’s rho and related statis-tics.
+    `Multivariate extensions of Spearman’s rho and related statistics. (2007)
+    <https://wisostat.uni-koeln.de/fileadmin/sites/statistik/pdf_publikationen/SchmidSchmidtSpearmansRho.pdf>`__
+    by Schmid, F., Schmidt, R.
+
     Returns the quadruple with the largest measure.
 
     :param data_subset: (pd.DataFrame) Dataset storing ranked returns data.
@@ -133,7 +142,8 @@ def extremal_measure(u: pd.DataFrame, co_variance_matrix: np.array):
     """
     Helper function to calculate chi-squared test statistic based on p-dimensional Nelsen copulas.
 
-    Specifically, proposition 3.3 from Mangold (2015) is implemented for 4 dimensions.
+    Specifically, proposition 3.3 from `Mangold (2015) <https://www.statistik.rw.fau.de/files/2016/03/IWQW-10-2015.pdf>`__
+    is implemented for 4 dimensions.
 
     :param u: (pd.DataFrame) Ranked returns of stocks in quadruple.
     :param co_variance_matrix: (np.array) Covariance matrix.
@@ -153,7 +163,7 @@ def extremal_measure(u: pd.DataFrame, co_variance_matrix: np.array):
 
 def get_co_variance_matrix(d: int):
     """
-    Calculates d**2 x d**2 dimensional covariance matrix. Since the matrix is symmetric, only the integrals
+    Calculates 2**d x 2**d dimensional covariance matrix. Since the matrix is symmetric, only the integrals
     in the upper triangle are calculated. The remaining values are filled from the transpose.
 
     :param d: (int) Number of stocks.
@@ -161,7 +171,7 @@ def get_co_variance_matrix(d: int):
 
     args = [[1,2]] * d
 
-    co_variance_matrix = np.zeros((d**2, d**2))
+    co_variance_matrix = np.zeros((2**d, 2**d))
     for i, l1 in enumerate(itertools.product(*args)):
         for j, l2 in enumerate(itertools.product(*args)):
             if j < i:
@@ -171,22 +181,19 @@ def get_co_variance_matrix(d: int):
             # Numerical Integration of d dimensions.
             co_variance_matrix[i, j] = scipy.integrate.nquad(variance_integral_func, [(0, 1)] * d, args=(l1, l2))[0]
 
-    inds = np.tri(d**2, k=-1, dtype=bool)  # Storing the indices of elements in lower triangle.
+    inds = np.tri(2**d, k=-1, dtype=bool)  # Storing the indices of elements in lower triangle.
     co_variance_matrix[inds] = co_variance_matrix.T[inds]
 
-    try:
-        return np.linalg.inv(co_variance_matrix)
-    except np.linalg.LinAlgError as err:
-        raise Exception("Singular Matrix found. Cannot proceed further.") if 'Singular matrix' in str(err) else err
+    return np.linalg.inv(co_variance_matrix)
 
 
 def t_calc(u):
     """
-    Calculates T_(d,n) as seen in proposition 3.3. Each of the d**2 rows in the array are appended to output and
+    Calculates T_(d,n) as seen in proposition 3.3. Each of the 2**d rows in the array are appended to output and
     returned as numpy array.
 
     :param u: (pd.DataFrame) Ranked returns of stocks in quadruple.
-    :return: (np.array) Array of Shape (d**2, n).
+    :return: (np.array) Array of Shape (2**d, n).
     """
 
     d = u.shape[1]
@@ -200,7 +207,7 @@ def t_calc(u):
             res *= func(u[:, ind], l[ind])
         output.append(res)
 
-    return np.array(output)  # Shape (d**2, n)
+    return np.array(output)  # Shape (2**d, n)
 
 
 def func(t: np.array, value: int):

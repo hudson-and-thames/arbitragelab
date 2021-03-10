@@ -132,7 +132,7 @@ class PartnerSelection:
         Helper function to calculate all combinations for a target stock and it's potential partners.
         Stocks are treated as integers for vectorization purposes.
 
-        :param stock_selection: (pd.DataFrame) The target stock has to be the first element of the array.
+        :param stock_selection: (list) The target stock has to be the first element of the array.
         :return: (np.array) The possible combinations for the quadruples. Shape (19600,4).
         """
 
@@ -228,12 +228,13 @@ class PartnerSelection:
         """
         This method implements the fourth procedure described in Section 3.1.1.
 
-        It involves calculating a non-parametric test statistic based on Mangold (2015) to measure the
+        It involves calculating a non-parametric test statistic based on
+        `Mangold (2015) <https://www.statistik.rw.fau.de/files/2016/03/IWQW-10-2015.pdf>`__ to measure the
         degree of deviation from independence. Main focus of this measure is the occurrence of joint extreme events.
 
         :param n_targets: (int) Number of target stocks to select.
         :param d: (int) Number of partner stocks.
-        :return output_matrix: (list) List of all selected quadruples.
+        :return output_matrix: (list) List of all selected combinations.
         """
 
         if d > 50 or d < 2:
@@ -241,20 +242,20 @@ class PartnerSelection:
 
         co_variance_matrix = get_co_variance_matrix(d)
         all_combinations = self._generate_all_combinations(d)
-        output_matrix = []  # Stores the final set of quadruples
+        output_matrix = []  # Stores the final set of combinations
         # Iterating on the top 50 indices for each target stock
         for target in self.top_50_correlations.index[:n_targets]:
             max_measure = -np.inf  # Variable used to extract the desired maximum value
-            final_quadruple = None  # Stores the final desired quadruple
+            final_combination = None  # Stores the final desired combination
 
-            # Iterating on all unique quadruples generated for a target
-            for quadruple in all_combinations[target]:
-                measure = extremal_measure(self.ranked_returns[quadruple], co_variance_matrix)
+            # Iterating on all unique combinations generated for a target
+            for combination in all_combinations[target]:
+                measure = extremal_measure(self.ranked_returns[combination], co_variance_matrix)
                 if measure > max_measure:
                     max_measure = measure
-                    final_quadruple = quadruple
-            # Appending the final quadruple for each target to the output matrix
-            output_matrix.append(final_quadruple)
+                    final_combination = combination
+            # Appending the final combination for each target to the output matrix
+            output_matrix.append(final_combination)
 
         return output_matrix
 
