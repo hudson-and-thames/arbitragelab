@@ -41,7 +41,7 @@ class DistanceStrategy:
 
         devadarsh.track('DistanceStrategy')
 
-    def form_pairs(self, train_data, method='standard', industry_dict=None, num_top=50, skip_top=0, list_names=None):
+    def form_pairs(self, train_data, method='standard', industry_dict=None, num_top=5, skip_top=0, list_names=None):
         """
         Forms pairs based on input training data.
 
@@ -79,7 +79,7 @@ class DistanceStrategy:
         :param list_names: (list) List containing names of elements if Numpy array is used as input.
         :param method: (str) Methods to use for sorting pairs [``standard`` by default, ``industry``,
                              ``zero_crossing``, ``variance``].
-        :param industry_dict: (dictionary) Dictionary matching ticker to industry group.
+        :param industry_dict: (dict) Dictionary matching ticker to industry group.
         """
 
         # If np.array given as an input
@@ -118,6 +118,8 @@ class DistanceStrategy:
         # Calculating the number of zero crossings from the dataset
         self.num_crossing = self.count_number_crossing()
 
+        # In case of a selection method other than standard or industry is used, sorting paris
+        # based on the method
         self._selection_method(method, num_top, skip_top)
 
     def _selection_method(self, method, num_top, skip_top):
@@ -256,6 +258,7 @@ class DistanceStrategy:
     def get_num_crossing(self):
         """
         Outputs pairs that were created in the pairs formation step with its number of zero crossing
+
         :return: (dictionary) Dictionary with keys as pairs and values as the number of zero
             crossings for pairs.
         """

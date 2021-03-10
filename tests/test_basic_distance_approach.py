@@ -27,7 +27,6 @@ class TestDistanceStrategy(unittest.TestCase):
 
         # Using saved ETF price series for testing and trading
 
-        # Change back the path to relative path
         project_path = os.path.dirname(__file__)
         data_path = project_path + "/test_data/stock_prices.csv"
         data = pd.read_csv(data_path, parse_dates=True, index_col="Date")
@@ -234,7 +233,9 @@ class TestDistanceStrategy(unittest.TestCase):
 
         strategy.form_pairs(self.train_data, num_top=5, skip_top=0)
 
-        self.assertAlmostEqual(len(strategy.get_num_crossing()), 5, delta=1e-5)
+        expected_number_crossings = [22, 20, 17, 16, 31]
+
+        self.assertEqual(list(strategy.get_num_crossing().values()), expected_number_crossings)
 
     def test_exceptions(self):
         """
