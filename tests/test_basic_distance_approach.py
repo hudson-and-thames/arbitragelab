@@ -26,7 +26,6 @@ class TestDistanceStrategy(unittest.TestCase):
         """
 
         # Using saved ETF price series for testing and trading
-
         project_path = os.path.dirname(__file__)
         data_path = project_path + "/test_data/stock_prices.csv"
         data = pd.read_csv(data_path, parse_dates=True, index_col="Date")
@@ -250,4 +249,4 @@ class TestDistanceStrategy(unittest.TestCase):
 
         # When trying to get pairs with inappropriate method
         with self.assertRaises(Exception):
-            strategy._selection_method(method='wrong input',num_top=5,skip_top=0)
+            strategy.selection_method(method='wrong input',num_top=5,skip_top=0)

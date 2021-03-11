@@ -116,9 +116,9 @@ class DistanceStrategy:
 
         # In case of a selection method other than standard or industry is used, sorting paris
         # based on the method
-        self._selection_method(method, num_top, skip_top)
+        self.selection_method(method, num_top, skip_top)
 
-    def _selection_method(self, method, num_top, skip_top):
+    def selection_method(self, method, num_top, skip_top):
         """
         Select pairs based on the method.
         """
