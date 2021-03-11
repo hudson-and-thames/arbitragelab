@@ -23,19 +23,24 @@ class PartnerSelection:
     3 partner stocks are selected for a target stock based on four different approaches namely, Traditional approach,
     Extended approach, Geometric approach and Extremal approach.
 
+    In this module, target stock implies the ticker for which a unique combination of stocks is returned.
+    The stocks present in this unique combination are called partner stocks.
+
     `Stübinger, J., Mangold, B. and Krauss, C., 2018. Statistical arbitrage with vine copulas. Quantitative Finance, 18(11), pp.1831-1849.
     <https://www.econstor.eu/bitstream/10419/147450/1/870932616.pdf>`__
     """
 
-    def __init__(self, prices: pd.DataFrame):
+    def __init__(self, prices: pd.DataFrame, n: int = 50):
         """
         Inputs the price series required for further calculations.
 
         It also includes preprocessing steps described in the paper, before starting the Partner Selection procedures.
-        These steps include, finding the returns and ranked returns of the stocks, and calculating the top 50
+        These steps include, finding the returns and ranked returns of the stocks, and calculating the top n
         correlated stocks for each stock in the universe.
 
         :param prices: (pd.DataFrame) Contains price series of all stocks in the universe.
+        :param n: (int) For each target stock, the total number of stocks taken into consideration for partner stocks
+            in the final combination, from 500 stocks in the universe.
         """
 
         if len(prices) == 0:
@@ -45,12 +50,13 @@ class PartnerSelection:
             raise Exception("Partner Selection Class requires a pandas DataFrame as input.")
 
         self.universe = prices  # Contains daily prices for all stocks in universe
+        self.num_stocks_per_target = n # Total number of stocks taken into consideration as partner stocks for each target
         self.returns, self.ranked_returns = self._get_returns()  # Daily returns and corresponding ranked returns
 
         # Correlation matrix containing all stocks in universe
         self.correlation_matrix = self._correlation()
-        # For each stock in universe, tickers of top 50 most correlated stocks are stored
-        self.top_50_correlations = self._top_50_tickers()
+        # For each stock in universe, tickers of top n most correlated stocks are stored
+        self.top_n_correlations = self._top_n_tickers()
         # Quadruple combinations for all stocks in universe
         self.all_quadruples = self._generate_all_combinations()
 
@@ -79,23 +85,26 @@ class PartnerSelection:
         returns_df_ranked = returns_df.rank(axis=0, method='first', pct=True)
         return returns_df, returns_df_ranked
 
-    def _top_50_tickers(self) -> pd.DataFrame:
+    def _tickers_list(self, col: pd.Series) -> list:
         """
-        Calculates the top 50 correlated stocks for each target stock.
+        Returns list of tickers ordered according to correlations with target.
 
-        :return: (pd.DataFrame) Dataframe consisting of 50 columns for each stock in the universe.
+        :param col: (pd.Series) Correlation data for a stock.
+        :return: (list) List of top n tickers.
         """
 
-        def tickers_list(col):
-            """
-            Returns list of tickers ordered according to correlations with target.
-            """
+        # Sort the column data in descending order and return the index of top n rows
+        return col.sort_values(ascending=False)[1: self.num_stocks_per_target + 1].index.to_list()
 
-            # Sort the column data in descending order and return the index of top 50 rows
-            return col.sort_values(ascending=False)[1:51].index.to_list()
+    def _top_n_tickers(self) -> pd.DataFrame:
+        """
+        Calculates the top n correlated stocks for each target stock.
 
-        # Returns DataFrame with all stocks as indices and their respective top 50 correlated stocks as columns
-        return self.correlation_matrix.apply(tickers_list, axis=0).T
+        :return: (pd.DataFrame) Dataframe consisting of n columns for each stock in the universe.
+        """
+
+        # Returns DataFrame with all stocks as indices and their respective top n correlated stocks as columns
+        return self.correlation_matrix.apply(self._tickers_list, axis=0).T
 
     def _generate_all_combinations(self, d: int = 4) -> pd.DataFrame:
         """
@@ -107,14 +116,14 @@ class PartnerSelection:
 
         generate_all_combinations_helper_wrapper = functools.partial(self._generate_all_combinations_helper, d=d)
 
-        return self.top_50_correlations.apply(generate_all_combinations_helper_wrapper, axis=1)
+        return self.top_n_correlations.apply(generate_all_combinations_helper_wrapper, axis=1)
 
     @staticmethod
     def _generate_all_combinations_helper(row: pd.Series, d: int) -> list:
         """
         Helper function which generates unique combinations for each target stock.
 
-        :param row: (pd.Series) List of 50 partner stocks.
+        :param row: (pd.Series) List of n partner stocks.
         :param d: (int) Number of partner stocks.
         :return: (list) Combinations.
         """
@@ -157,10 +166,10 @@ class PartnerSelection:
         """
 
         output_matrix = []  # Stores the final set of quadruples.
-        # Iterating on the top 50 indices for each target stock.
-        for target in self.top_50_correlations.index[:n_targets]:
+        # Iterating on the top n indices for each target stock.
+        for target in self.top_n_correlations.index[:n_targets]:
 
-            stock_selection = [target] + self.top_50_correlations.loc[target].tolist()  # List of 51 stocks including target
+            stock_selection = [target] + self.top_n_correlations.loc[target].tolist()  # List of n + 1 stocks including target
             data_subset = self.correlation_matrix.loc[stock_selection, stock_selection]
             all_possible_combinations = self._prepare_combinations_of_partners(stock_selection)  # Shape: (19600, 4)
 
@@ -175,9 +184,10 @@ class PartnerSelection:
         """
         This method implements the second procedure described in Section 3.1.1.
 
-        It involves calculating the multivariate version of Spearman's correlation
-        for all possible quadruples of a given stock.
-        For every target stock the quadruple with the highest correlation is returned.
+        It involves calculating the multivariate version of Spearman's correlation for all possible quadruples of a given stock.
+        The final measure taken into consideration is the mean of the three versions of Spearman's rho given in
+        `Schmid and Schmidt (2007) <https://wisostat.uni-koeln.de/fileadmin/sites/statistik/pdf_publikationen/SchmidSchmidtSpearmansRho.pdf>`__.
+        For every target stock the quadruple with the highest calculated measure is returned.
 
         :param n_targets: (int) Number of target stocks to select.
         :return: (list) List of all selected quadruples.
@@ -186,9 +196,9 @@ class PartnerSelection:
         ecdf_df = self.returns.apply(get_quantiles_data, axis=0)  # Calculating ranks of returns using quantiles data
 
         output_matrix = []  # Stores the final set of quadruples
-        # Iterating on the top 50 indices for each target stock
-        for target in self.top_50_correlations.index[:n_targets]:
-            stock_selection = [target] + self.top_50_correlations.loc[target].tolist()  # List of 51 stocks including target
+        # Iterating on the top n indices for each target stock
+        for target in self.top_n_correlations.index[:n_targets]:
+            stock_selection = [target] + self.top_n_correlations.loc[target].tolist()  # List of n + 1 stocks including target
             data_subset = ecdf_df[stock_selection]
             all_possible_combinations = self._prepare_combinations_of_partners(stock_selection) # Shape: (19600, 4)
 
@@ -204,6 +214,8 @@ class PartnerSelection:
         This method implements the third procedure described in Section 3.1.1.
 
         It involves calculating the four dimensional diagonal measure for all possible quadruples of a given stock.
+        For example, visually, say we are in 2D, we have a Quantile-Quantile plot for the data,
+        and this measure is just the sum of Euclidean distance for all data points to the y=x line (diagonal).
         For every target stock the quadruple with the lowest diagonal measure is returned.
 
         :param n_targets: (int) number of target stocks to select.
@@ -211,9 +223,9 @@ class PartnerSelection:
         """
 
         output_matrix = []  # Stores the final set of quadruples
-        # Iterating on the top 50 indices for each target stock
-        for target in self.top_50_correlations.index[:n_targets]:
-            stock_selection = [target] + self.top_50_correlations.loc[target].tolist()  # List of 51 stocks including target
+        # Iterating on the top n indices for each target stock
+        for target in self.top_n_correlations.index[:n_targets]:
+            stock_selection = [target] + self.top_n_correlations.loc[target].tolist()  # List of n + 1 stocks including target
             data_subset = self.ranked_returns[stock_selection]
             all_possible_combinations = self._prepare_combinations_of_partners(stock_selection)  # Shape: (19600, 4)
 
@@ -233,18 +245,18 @@ class PartnerSelection:
         degree of deviation from independence. Main focus of this measure is the occurrence of joint extreme events.
 
         :param n_targets: (int) Number of target stocks to select.
-        :param d: (int) Number of partner stocks.
+        :param d: (int) Number of partner stocks(including target stock).
         :return output_matrix: (list) List of all selected combinations.
         """
 
-        if d > 50 or d < 2:
-            raise Exception("Please make sure number of partner stocks d is 2<=d<=50.")
+        if d > self.num_stocks_per_target or d < 2:
+            raise Exception("Please make sure number of partner stocks d is 2<=d<=n.")
 
         co_variance_matrix = get_co_variance_matrix(d)
         all_combinations = self._generate_all_combinations(d)
         output_matrix = []  # Stores the final set of combinations
-        # Iterating on the top 50 indices for each target stock
-        for target in self.top_50_correlations.index[:n_targets]:
+        # Iterating on the top n indices for each target stock
+        for target in self.top_n_correlations.index[:n_targets]:
             max_measure = -np.inf  # Variable used to extract the desired maximum value
             final_combination = None  # Stores the final desired combination
 
@@ -261,7 +273,7 @@ class PartnerSelection:
 
     def plot_selected_pairs(self, quadruples: list) -> list:
         """
-        Plots the final selection of quadruples.
+        For the list of quadruples, this method plots the line plots of the cumulative returns of all stocks in quadruple.
 
         :param quadruples: (list) List of quadruples.
         :return: (list) List of Axes objects.

@@ -174,14 +174,14 @@ def get_co_variance_matrix(d: int):
     args = [[1,2]] * d
 
     co_variance_matrix = np.zeros((2**d, 2**d))
-    for i, l1 in enumerate(itertools.product(*args)):
-        for j, l2 in enumerate(itertools.product(*args)):
+    for i, l_i in enumerate(itertools.product(*args)):
+        for j, l_j in enumerate(itertools.product(*args)):
             if j < i:
                 # Integrals in lower triangle are skipped.
                 continue
 
             # Numerical Integration of d dimensions.
-            co_variance_matrix[i, j] = scipy.integrate.nquad(variance_integral_func, [(0, 1)] * d, args=(l1, l2))[0]
+            co_variance_matrix[i, j] = scipy.integrate.nquad(variance_integral_func, [(0, 1)] * d, args=(l_i, l_j))[0]
 
     inds = np.tri(2**d, k=-1, dtype=bool)  # Storing the indices of elements in lower triangle.
     co_variance_matrix[inds] = co_variance_matrix.T[inds]
@@ -206,16 +206,16 @@ def t_calc(u):
         # together
         res = 1
         for ind in range(d):
-            res *= func(u[:, ind], l[ind])
+            res *= variable_form(u[:, ind], l[ind])
         output.append(res)
 
     return np.array(output)  # Shape (2**d, n)
 
 
-def func(t: np.array, value: int):
+def variable_form(t: np.array, value: int):
     """
-    Function returns equation form of respective variable after partial differentiation.
-    All variables in the differential equations are in one of two forms.
+    Function returns form of respective variable after partial differentiation in the copula density function.
+    All variables in the density function are in one of two forms.
 
     :param t: (np.array) Variable.
     :param value: (int) Flag denoting equation form of variable.
@@ -224,8 +224,10 @@ def func(t: np.array, value: int):
 
     res = None
     if value == 1:
+        # Value of 1 returns the differential of $t * (1 - t)^2$
         res =  (t - 1) * (3 * t - 1)
     if value == 2:
+        # Value of 2 returns the differential of $t^2 * (1 - t)$
         res =  t * (2 - 3 * t)
 
     return res
@@ -239,11 +241,11 @@ def variance_integral_func(*args):
     :return: (float) Integrand value.
     """
 
-    l1 = args[-2]
-    l2 = args[-1]
+    l_i = args[-2] # Tuple represents the variable forms of (u_1, u_2, ..., u_d) beside $\theta_i$ in the density function.
+    l_j = args[-1] # Tuple represents the variable forms of (u_1, u_2, ..., u_d) beside $\theta_j$ in the density function.
 
     res = 1
     for ind in range(len(args[:-2])):
-        res *= func(args[ind], l1[ind]) * func(args[ind], l2[ind])
+        res *= variable_form(args[ind], l_i[ind]) * variable_form(args[ind], l_j[ind])
 
     return res

@@ -53,6 +53,12 @@ While it is true that this aspiration for linearity excludes quadruples with com
 it also rules out nonlinear dependencies in ranks.
 On the other hand, the extremal approach tries to maximize the distance to independence with focus on the joint extreme observations.
 
+.. Note::
+    Out of the four approaches, only extremal approach takes into consideration both linear and non-linear dependencies.
+    This results in a better preselection and thus better results compared to the other routines.
+
+    So, extremal approach is generally preferred and it should be considered as default for partner selection.
+
 Traditional Approach
 ####################
 
@@ -69,6 +75,9 @@ The procedure is as follows:
 
 Implementation
 **************
+
+.. Note::
+    This approach takes around 25 ms to run for each target stock.
 
 .. automodule:: arbitragelab.copula_approach
 
@@ -125,6 +134,9 @@ We use the mean of the above three estimators as the final measure used to retur
 Implementation
 **************
 
+.. Note::
+    This approach takes around 500 ms to run for each target stock.
+
 .. automethod:: PartnerSelection.extended
 
 Geometric Approach
@@ -171,6 +183,9 @@ where :math:`u_i` represents the ranked returns of a stock :math:`i` in quadrupl
 
 Implementation
 **************
+
+.. Note::
+    This approach takes around 180 ms to run for each target stock.
 
 .. automethod:: PartnerSelection.geometric
 
@@ -271,6 +286,12 @@ where,
 
 Implementation
 **************
+
+.. Note::
+    This approach is extremely heavy compared to other approaches and takes around 15 sec to run for each target stock.
+
+    Please be aware that there is a big overhead at the start of this method which involves calculating the covariance matrix.
+    This should take around 1 to 2 minutes when d = 4 which is the default. Increasing the value of d will increase the processing time significantly.
 
 .. automethod:: PartnerSelection.extremal
 
