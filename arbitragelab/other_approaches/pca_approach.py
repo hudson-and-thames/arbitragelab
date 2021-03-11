@@ -30,7 +30,7 @@ class PCAStrategy:
     of all eigen portfolios that satisfy the required properties.
     """
 
-    def __init__(self, n_components: int = 75):
+    def __init__(self, n_components: int = 5):
         """
         Initialize PCA StatArb Strategy.
 
@@ -44,6 +44,54 @@ class PCAStrategy:
         self.n_components = n_components  # Number of PCA components
         self.pca_model = PCA(n_components)  # Model for PCA calculation
         devadarsh.track('PCAStrategy')
+
+    @staticmethod
+    def volume_modified_return(matrix: pd.DataFrame, vol_matrix: pd.DataFrame, k: int) -> pd.DataFrame:
+        """
+        A function to adjust the return dataframe with historical trading volume data.
+
+        The volume-adjusted returns is calculated as:
+
+        vol_ajust_R = R * (k-day moving average of volume) / volume_change
+
+        :param matrix: (pd.DataFrame) DataFrame with returns that need to be standardized.
+        :param vol_matrix: (pd.DataFrame) DataFrame with histoircal trading volume data.
+        :param k: (int) Look-back window used for volume moving average.
+        :return: (pd.DataFrame) a volume-adjusted returns dataFrame
+        """
+
+        # Drop rows that contain NaN
+        returns = matrix.dropna(axis=0)
+
+        # Fill missing data in the dataframe, volume with mean value and drop columns
+        # that only contains NaN
+        vol_matrix = vol_matrix.fillna(vol_matrix.mean())
+
+        # Vol change
+        volume_diff = vol_matrix.diff()
+
+        # Drop rows that contain NaN
+        volume_diff = volume_diff.dropna(axis=0)
+
+        # Find common columns between dataframe returns and dataframe volume_chg
+        common_columns = returns.columns.intersection(volume_diff.columns)
+
+        # Make sure they have the same columns since some stocks lack volume data.
+        returns = returns[common_columns]
+        volume_diff = volume_diff[common_columns]
+        volume = vol_matrix[common_columns]
+
+        # Moving Average of historical volume data
+        volume_mv = volume[1:].rolling(window=k).mean()
+        volume_mv = volume_mv.fillna(method='bfill')
+
+        # Modified returns after taking trading volume into account
+        modified_returns = returns / volume_diff * volume_mv
+
+        # Drop rows that contain NaN
+        modified_returns = modified_returns.dropna(axis=0)
+
+        return modified_returns
 
     @staticmethod
     def standardize_data(matrix: pd.DataFrame) -> (pd.DataFrame, pd.Series):
@@ -60,7 +108,7 @@ class PCAStrategy:
         """
 
         # Standardizing data
-        standardized = (matrix - matrix.mean()) / matrix.std()
+        standardized = (matrix - matrix.mean()) / (matrix.max() - matrix.min())
 
         return standardized, matrix.std()
 
@@ -98,12 +146,6 @@ class PCAStrategy:
 
         # Scaling eigen vectors to get weights for eigen portfolio creation
         weights = weights / std
-
-        # marginal explained variance percentage by each eigenvectors
-        expl_variance = pca_factors.explained_variance_ratio_
-        port_weights = np.append(expl_variance[0], np.diff(expl_variance.cumsum())) / expl_variance.cumsum()[-1]
-
-        weights = weights.mul(port_weights, axis=0)
 
         return weights
 
@@ -304,7 +346,7 @@ class PCAStrategy:
 
         return position_stock
 
-    def get_signals(self, matrix: pd.DataFrame, k: float = 8.4, corr_window: int = 252,
+    def get_signals(self, matrix: pd.DataFrame, vol_matrix: pd.DataFrame = None, k: float = 8.4, corr_window: int = 252,
                     residual_window: int = 60, sbo: float = 1.25, sso: float = 1.25,
                     ssc: float = 0.5, sbc: float = 0.75, size: float = 1, explained_var: float = None,
                     drift=False) -> pd.DataFrame:
@@ -360,6 +402,7 @@ class PCAStrategy:
         asset and buying betas of other assets.
 
         :param matrix: (pd.DataFrame) Dataframe with returns for assets.
+        :param vol_matrix: (pd.DataFrame) DataFrame with histoircal trading volume data.
         :param k: (float) Required speed of mean reversion to use the eigen portfolio in trading.
         :param corr_window: (int) Look-back window used for correlation matrix estimation.
         :param residual_window: (int) Look-back window used for residuals calculation.
@@ -380,6 +423,10 @@ class PCAStrategy:
 
         # Dataframe containing target quantities - trading signals
         target_quantities = pd.DataFrame()
+
+        if vol_matrix is not None:
+            # Volume adjusted returns DataFrame
+            matrix = self.volume_modified_return(matrix, vol_matrix, k=residual_window)
 
         # Iterating through time windows
         for t in range(corr_window - 1, len(matrix.index) - 1):
