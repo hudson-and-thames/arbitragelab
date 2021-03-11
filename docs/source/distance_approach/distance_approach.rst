@@ -108,7 +108,9 @@ within the same industry group.
 With a dictionary containing the name/ticker of the securities and each corresponding industry group,
 the securities are first separated into different industry groups. Then, by calculating the Euclidean
 square distance for each of the pair within the same group, the :math:`n` closest pairs are selected(in default,
-our function also allows skipping a number of first pairs, so one can choose pairs 10-15 to study).
+our function also allows skipping a number of first pairs, so one can choose pairs 10-15 to study). This pair
+selection criterion can be used as default before adding other methods such as zero-crossings or variance if one
+gives a dictionary of industry group as an input.
 
 2. **Pairs with a higher number of zero-crossings**
 
@@ -199,6 +201,8 @@ Functions that can be used to get data:
 
 - **get_pairs()** outputs a list of tuples, containing chosen top pairs in the pairs formation step.
 
+- **get_num_crossing()** outputs a list of tuples, containing chosen top pairs with its number of zero-crossings.
+
 Functions that can be used to plot data:
 
 - **plot_pair()** plots normalized price series for elements in a given pair and the corresponding
@@ -216,6 +220,8 @@ Implementation
 .. automethod:: DistanceStrategy.get_scaling_parameters
 
 .. automethod:: DistanceStrategy.get_pairs
+
+.. automethod:: DistanceStrategy.get_num_crossing
 
 .. automethod:: DistanceStrategy.plot_pair
 
@@ -247,12 +253,21 @@ Code Example
    strategy = DistanceStrategy()
    strategy.form_pairs(data_pairs_formation, num_top=20, skip_top=5)
 
-   # Using the number of zero-crossing for pair selection method
+   # Adding an industry-based selection criterion to The DistanceStrategy
+   strategy_industry = DistanceStrategy()
+   strategy_industry.form_pairs(data_pairs_formation, industry_dict=industry_dict,
+                                num_top=20, skip_top=5)
+
+   # Using the number of zero-crossing for pair selection after industry-based selection
    strategy_zero_crossing = DistanceStrategy()
-   strategy_zero_crossing.form_pairs(data_pairs_formation, method='zero_crossing', num_top=20, skip_top=5)
+   strategy_zero_crossing.form_pairs(data_pairs_formation, method='zero_crossing',
+                                     industry_dict=industry_dict, num_top=20, skip_top=5)
 
    # Checking a list of pairs that were created
    pairs = strategy.get_pairs()
+
+   # Checking a list of pairs with the number of zero crossings
+   num_crossing = strategy.get_num_crossing()
 
    # Now generating signals for formed pairs, using (2 * st. variation) as a threshold
    # to enter a position

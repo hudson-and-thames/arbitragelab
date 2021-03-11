@@ -77,8 +77,8 @@ class DistanceStrategy:
         :param skip_top: (int) Number of first top pairs to skip. For example, use skip_top=10
             if you'd like to take num_top pairs starting from the 10th one.
         :param list_names: (list) List containing names of elements if Numpy array is used as input.
-        :param method: (str) Methods to use for sorting pairs [``standard`` by default, ``industry``,
-                             ``zero_crossing``, ``variance``].
+        :param method: (str) Methods to use for sorting pairs [``standard`` by default, ``variance``,
+                             ``zero_crossing``].
         :param industry_dict: (dict) Dictionary matching ticker to industry group.
         """
 
@@ -92,12 +92,8 @@ class DistanceStrategy:
         # Dropping observations with missing values (for distance calculation)
         normalized = normalized.dropna(axis=0)
 
-        # If sector is set to True, pairs are matched within the same industry group
-        if method == 'industry':
-
-            # Check whether the input of industry group dictionary is well given
-            if industry_dict is None:
-                raise Exception("Industry group dictionary is not given. Please provide the input")
+        # If industry dictionary is given, pairs are matched within the same industry group
+        if industry_dict:
 
             # Finding closest pairs for each element, excluding duplicates
             all_pairs = self.find_pair(normalized, industry_dict)
@@ -127,10 +123,10 @@ class DistanceStrategy:
         Select pairs based on the method.
         """
 
-        if method not in ['standard', 'industry', 'zero_crossing', 'variance']:
+        if method not in ['standard', 'zero_crossing', 'variance']:
             # Raise an error if the given method is inappropriate.
-            raise Exception("Please give an appropriate method for sorting pairs between ‘standard’, ‘zero_crossing’, "
-                            "‘industry’, or ‘variance’.")
+            raise Exception("Please give an appropriate method for sorting pairs between ‘standard’, "
+                            "‘zero_crossing’, or 'variance'")
 
         if method == 'zero_crossing':
 
