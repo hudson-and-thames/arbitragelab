@@ -30,7 +30,7 @@ class PCAStrategy:
     of all eigen portfolios that satisfy the required properties.
     """
 
-    def __init__(self, n_components: int = 5):
+    def __init__(self, n_components: int = 15):
         """
         Initialize PCA StatArb Strategy.
 
@@ -60,36 +60,37 @@ class PCAStrategy:
         :return: (pd.DataFrame) a volume-adjusted returns dataFrame
         """
 
-        # Drop rows that contain NaN
+        # Fill missing data with preceding values
         returns = matrix.dropna(axis=0)
-
-        # Fill missing data in the dataframe, volume with mean value and drop columns
-        # that only contains NaN
-        vol_matrix = vol_matrix.fillna(vol_matrix.mean())
 
         # Vol change
         volume_diff = vol_matrix.diff()
 
-        # Drop rows that contain NaN
-        volume_diff = volume_diff.dropna(axis=0)
+        # Moving Average of historical volume data
+        volume_mv = vol_matrix.rolling(window=k).mean()
+
+        # Adjustment term
+        adjust_term = volume_mv / volume_diff
+
+        # Fill missing values in adjustment term with 1s
+        adjust_term = adjust_term.fillna(1)
 
         # Find common columns between dataframe returns and dataframe volume_chg
-        common_columns = returns.columns.intersection(volume_diff.columns)
+        common_index = returns.index.intersection(adjust_term.index)
+
+        # Make sure they have the same date indexes
+        returns = returns.loc[common_index]
+        adjust_term = adjust_term.loc[common_index]
+
+        # Find common columns between dataframe returns and dataframe volume_chg
+        common_columns = returns.columns.intersection(adjust_term.columns)
 
         # Make sure they have the same columns since some stocks lack volume data.
         returns = returns[common_columns]
-        volume_diff = volume_diff[common_columns]
-        volume = vol_matrix[common_columns]
-
-        # Moving Average of historical volume data
-        volume_mv = volume[1:].rolling(window=k).mean()
-        volume_mv = volume_mv.fillna(method='bfill')
+        adjust_term = adjust_term[common_columns]
 
         # Modified returns after taking trading volume into account
-        modified_returns = returns / volume_diff * volume_mv
-
-        # Drop rows that contain NaN
-        modified_returns = modified_returns.dropna(axis=0)
+        modified_returns = returns * adjust_term
 
         return modified_returns
 
@@ -108,7 +109,7 @@ class PCAStrategy:
         """
 
         # Standardizing data
-        standardized = (matrix - matrix.mean()) / (matrix.max() - matrix.min())
+        standardized = (matrix - matrix.mean()) / matrix.std()
 
         return standardized, matrix.std()
 
@@ -118,7 +119,7 @@ class PCAStrategy:
 
         Weights are calculated from PCA components as:
 
-        Weight = Eigen vector / st.d.(R)
+        Weight = Eigen vector / std.(R)
 
         So the output is a dataframe containing the weight for each asset in a portfolio for each eigen vector.
 
@@ -143,6 +144,48 @@ class PCAStrategy:
 
         # Output eigen vectors for weights calculation
         weights = pd.DataFrame(pca_factors.components_, columns=standardized.columns)
+
+        # Scaling eigen vectors to get weights for eigen portfolio creation
+        weights = weights / std
+
+        return weights
+
+    def get_asym_factorweights(self, matrix: pd.DataFrame, explained_var: float) -> pd.DataFrame:
+        """
+        A function to calculate weights (scaled eigen vectors) to use for factor return calculation with
+        asymptotic PCA.
+
+        Weights are calculated from PCA components as:
+
+        Weight = Eigen vector / std.(R)
+
+        So the output is a dataframe containing the weight for each asset in a portfolio for each eigen vector.
+
+        :param matrix: (pd.DataFrame) Dataframe with index and columns containing asset returns.
+        :param explained_var (float) The user-defined explained variance criteria.
+        :return: (pd.DataFrame) Weights (scaled PCA components) for each index from the matrix.
+        """
+        # Standardizing input
+        standardized, std = PCAStrategy.standardize_data(matrix)
+        n = standardized.shape[1]
+
+        # Gram Matrix
+        g_mat = standardized.T @ standardized / n
+
+        # Asymptotic PCA(Eigendecomposition of the Gram Matrix)
+        eigen_values, eigen_vectors = np.linalg.eig(g_mat)
+
+        # If a user requires a fixed explained variance
+        if explained_var is not None:
+            variance_explained = []
+            for i in eigen_values:
+                variance_explained.append((i / sum(eigen_values)))
+
+            num_pc = np.argmax(np.cumsum(variance_explained) > explained_var)
+            weights = pd.DataFrame(eigen_vectors, columns=matrix.columns)[: num_pc]
+
+        else:
+            weights = pd.DataFrame(eigen_vectors, columns=matrix.columns)[: self.n_components]
 
         # Scaling eigen vectors to get weights for eigen portfolio creation
         weights = weights / std
@@ -349,7 +392,7 @@ class PCAStrategy:
     def get_signals(self, matrix: pd.DataFrame, vol_matrix: pd.DataFrame = None, k: float = 8.4, corr_window: int = 252,
                     residual_window: int = 60, sbo: float = 1.25, sso: float = 1.25,
                     ssc: float = 0.5, sbc: float = 0.75, size: float = 1, explained_var: float = None,
-                    drift=False) -> pd.DataFrame:
+                    drift: bool = False, asym: bool = False) -> pd.DataFrame:
         """
         A function to generate trading signals for given returns matrix with parameters.
 
@@ -401,8 +444,8 @@ class PCAStrategy:
         of other assets from component2 and so on. Opening a short position means selling the corresponding
         asset and buying betas of other assets.
 
-        :param matrix: (pd.DataFrame) Dataframe with returns for assets.
-        :param vol_matrix: (pd.DataFrame) DataFrame with histoircal trading volume data.
+        :param matrix: (pd.DataFrame) DataFrame with returns for assets.
+        :param vol_matrix: (pd.DataFrame) DataFrame with historical volume data.
         :param k: (float) Required speed of mean reversion to use the eigen portfolio in trading.
         :param corr_window: (int) Look-back window used for correlation matrix estimation.
         :param residual_window: (int) Look-back window used for residuals calculation.
@@ -414,19 +457,19 @@ class PCAStrategy:
             a long position, buying (size) units of stock and selling (size) * betas units of other
             stocks.
         :param explained_var: (float) The user-defined explained variance criteria.
-        :param drift: (bool) True if the user want to take drift into consideration, Flase, otherwise.
+        :param drift: (bool) True if a user want to take drift into consideration, Flase, otherwise.
+        :param asym: (bool) True if a user want to use asymptotic PCA when calculating eigenportfolio weights.
         :return: (pd.DataFrame) DataFrame with target weights for each asset at every observation.
             It is being calculated as a combination of all eigen portfolios that are satisfying the
             mean reversion speed requirement and S-score values.
         """
         # pylint: disable=too-many-locals
 
+        if vol_matrix is not None:
+            matrix = self.volume_modified_return(matrix, vol_matrix, residual_window)
+
         # Dataframe containing target quantities - trading signals
         target_quantities = pd.DataFrame()
-
-        if vol_matrix is not None:
-            # Volume adjusted returns DataFrame
-            matrix = self.volume_modified_return(matrix, vol_matrix, k=residual_window)
 
         # Iterating through time windows
         for t in range(corr_window - 1, len(matrix.index) - 1):
@@ -436,7 +479,10 @@ class PCAStrategy:
                 # Getting a new set of observations for correlation matrix generation
                 obs_corr = matrix[(t - corr_window + 1):(t + 1)]
                 # Updating factor weights
-                weights = self.get_factorweights(obs_corr, explained_var)
+                if asym:
+                    weights = self.get_asym_factorweights(obs_corr, explained_var)
+                else:
+                    weights = self.get_factorweights(obs_corr, explained_var)
 
             # Look-back window of observations used
             obs_residual = matrix[(t - residual_window + 1):(t + 1)]
