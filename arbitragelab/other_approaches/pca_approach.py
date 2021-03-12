@@ -137,7 +137,8 @@ class PCAStrategy:
         # If a user requires a fixed explained variance
         if explained_var is not None:
             expl_variance = pca_factors.explained_variance_ratio_
-            num_pc = np.argmax(np.cumsum(expl_variance) > explained_var)
+            condition = min(np.cumsum(expl_variance), key=lambda x: abs(x - explained_var))
+            num_pc = np.where(np.cumsum(expl_variance) == condition)[0][0]
             # Fit the PCA model to standardized return data, again.
             pca_factors = PCA(n_components=num_pc)
             pca_factors.fit(standardized)
