@@ -8,9 +8,9 @@ Built on top of the :code:`pyvinecoplib` package. See https://github.com/vinecop
 """
 
 from typing import List, Union, Callable, Tuple
-from arbitragelab.copula_approach.vinecop_generate import CVineCop
 import pandas as pd
 import numpy as np
+from arbitragelab.copula_approach.vinecop_generate import CVineCop
 
 
 class CVineCopStrat:
