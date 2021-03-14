@@ -9,8 +9,8 @@ Built on top of the :code:`pyvinecoplib` package. See https://github.com/vinecop
 
 from typing import List, Union, Callable, Tuple
 from arbitragelab.copula_approach.vinecop_generate import CVineCop
-import arbitragelab.copula_approach.copula_calculation as ccalc
 import pandas as pd
+import numpy as np
 
 
 class CVineCopStrat:
@@ -27,7 +27,7 @@ class CVineCopStrat:
             based on current signal and the immediate past position. By default it uses the table described above.
         """
 
-        self.cvine_cop = cvinecop
+        self.cvinecop = cvinecop
         self.past_obs = None  # Number of past observations for Bollinger band.
         self.threshold_std = None  # Standard deviation threshold for Bollinger band.
         # Signal to position table: Row indexed by previous position, column indexed by signal.
@@ -63,7 +63,7 @@ class CVineCopStrat:
             quantiles[column_name] = returns[column_name].apply(cdfs[i])
 
         # 2. Calculate the conditional probabilities. This step is relatively slow.
-        mpis = self.cvine_cop.get_condi_probs(quantiles, pv_target_idx)
+        mpis = self.cvinecop.get_condi_probs(quantiles, pv_target_idx)
 
         if subtract_mean:
             mpis = mpis.subtract(0.5)
@@ -112,7 +112,7 @@ class CVineCopStrat:
         if mpis is None:
             cmpis = self.calc_mpi(returns, cdfs, pv_target_idx, subtract_mean=True).cumsum()
         else:
-            cmpis = mpis.cumsum()
+            cmpis = mpis.subtract(0.5).cumsum()
 
         # init_mean = cmpis.iloc[:past_obs].mean()
         # init_std = cmpis.iloc[:past_obs].std()
@@ -124,7 +124,7 @@ class CVineCopStrat:
                                        'Mean': running_avg,
                                        'UpperBound': running_avg + self.threshold_std * running_std})
         # Loop through the bollinger_band to get positions
-        positions = pd.Series(data=None, index=bollinger_band.index)
+        positions = pd.Series(data=np.nan, index=bollinger_band.index)
         positions.iloc[self.past_obs - 1] = init_pos
         for idx in range(past_obs, len(positions)):
             # Get current trading signal from Bollinger band

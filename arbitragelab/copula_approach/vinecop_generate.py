@@ -7,6 +7,7 @@ Module that generates vine copulas.
 Built on top of the :code:`pyvinecoplib` package. See https://github.com/vinecopulib/pyvinecopulib for more details.
 """
 
+# pylint: disable = invalid-name
 from typing import List, Union
 from itertools import permutations
 import numpy as np
