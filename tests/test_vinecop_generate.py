@@ -184,10 +184,9 @@ class TestVineCop(unittest.TestCase):
         u_df = pd.DataFrame([[0, 0.1, 0.4, 0.6], [0.1, 0.1, 0.4, 0.6], [0.2, 0.1, 0.4, 0.6], [0.3, 0.1, 0.4, 0.6],
                              [0.9, 0.1, 0.4, 0.6], [1, 0.1, 0.4, 0.6], [0, 0.1, 0.4, 1], [0.1, 1, 0.4, 1], [0, 0, 1, 1],
                              [1, 0, 0, 0]])
-        cop_evals = cvinecop.get_cop_densities(u_df)
-        expected_cop_evals = pd.Series([3.272297e-03, 7.724320e-01, 8.593040e-01, 9.017561e-01, 7.418892e-01,
-                                        4.308034e-01, 2.886153e-11, 6.266201e+07, 5.009017e-06, 1.229496e+15])
-        pd.testing.assert_series_equal(expected_cop_evals, cop_evals, check_dtype=False, rtol=1e-3)
+        cop_evals = cvinecop.get_cop_evals(u_df)
+        expected_cop_evals = pd.Series([0., 0.0246, 0.0373, 0.0444, 0.0673, 0.069, 0., 0.0739, 0., 0.])
+        pd.testing.assert_series_equal(expected_cop_evals, cop_evals, check_dtype=False, atol=1e-2)
 
     def test_simulate(self) -> None:
         """
