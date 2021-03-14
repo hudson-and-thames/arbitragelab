@@ -7,30 +7,29 @@ Module that generates vine copulas.
 Built on top of the :code:`pyvinecoplib` package. See https://github.com/vinecopulib/pyvinecopulib for more details.
 """
 
-from abc import ABC, abstractmethod
 from typing import List, Union
 from itertools import permutations
-import numba
 import numpy as np
 import pandas as pd
 import pyvinecopulib as pv
 import scipy.integrate as integrate
 
-class RVineCop():
+
+class RVineCop:
     """
-    R-Vine copula class, housing C-vine copula and D-vine copula as special subcases.
+    R-Vine copula class, housing C-vine copula and D-vine copula as special sub cases.
     """
-    
+
     def __init__(self):
         pass
-    
+
 
 class CVineCop(RVineCop):
     """
     Class for C-vine copulas.
-    
+
     This is a wrapper class of pv.Vinecop that provides useful methods for statistical arbitrage. One key note is
-    that, to keep the notaion consistent with literature consensus, all variables started with pv are indexed from
+    that, to keep the notation consistent with literature consensus, all variables started with pv are indexed from
     1, not 0. In this way it is easier to see the nodes of the tree.
     """
 
@@ -41,6 +40,7 @@ class CVineCop(RVineCop):
         :param cvine_cop: (pv.Vinecop) Optional. A fitted C-vine copula. Defaults to None.
         """
 
+        super().__init__()
         # All the bivariate classes used to construct the vine copula.
         self._bicop_family = [pv.BicopFamily.bb1, pv.BicopFamily.bb6, pv.BicopFamily.bb7, pv.BicopFamily.bb8,
                               pv.BicopFamily.clayton, pv.BicopFamily.student, pv.BicopFamily.frank,
@@ -61,7 +61,7 @@ class CVineCop(RVineCop):
 
         :param data: (pd.DataFrame) The quantile data to be used to fit the C-vine copula.
         :param pv_target_idx: (int) Optional. The stock to be targeted for trading. This is indexed from 1, hence
-            1 corresponds to the 0th column data in the data frame. Defalts to 1.
+            1 corresponds to the 0th column data in the data frame. Defaults to 1.
         :param if_renew: (bool) Optional. Whether to update the class attribute cvine_cop. Defaults to True.
         :return: (pv.Vinecop) The fitted pv.Vinecop object.
         """
@@ -73,9 +73,9 @@ class CVineCop(RVineCop):
         possible_cvine_structures = self._get_possible_cvine_structs(data_dim, pv_target_idx)
 
         # Fit among all possible structures.
-        controls = pv.FitControlsVinecop(family_set = self._bicop_family)  # Bivar copula constituents for the C-vine.
+        controls = pv.FitControlsVinecop(family_set=self._bicop_family)  # Bivar copula constituents for the C-vine.
         aics = dict()  # Dictionary for AIC values for all candidate C-vine copulas.
-        cvine_cops = dict()  # Dictionary for storing all candiate C-vine copulas.
+        cvine_cops = dict()  # Dictionary for storing all candidate C-vine copulas.
         for cvine_structure in possible_cvine_structures:
             temp_cvine_struct = pv.CVineStructure(order=cvine_structure)  # Specific C-vine structure
             temp_cvine_cop = pv.Vinecop(structure=temp_cvine_struct)  # Construct the C-vine copula
@@ -85,10 +85,10 @@ class CVineCop(RVineCop):
 
         # Select the structure that has the lowest aics
         aics = pd.Series(aics)
-        fitted_cvine_strcture = aics.idxmin()  # aics indexed by the structure (tuple)
+        fitted_cvine_structure = aics.idxmin()  # aics indexed by the structure (tuple)
 
         # Generate a C-vine copula for the system
-        fitted_cvine_cop = cvine_cops[fitted_cvine_strcture]
+        fitted_cvine_cop = cvine_cops[fitted_cvine_structure]
 
         if if_renew:  # Whether to renew the class C-vine copula.
             self.cvine_cop = fitted_cvine_cop
@@ -99,8 +99,8 @@ class CVineCop(RVineCop):
     def _get_possible_cvine_structs(data_dim: int, pv_target_idx: int) -> List[tuple]:
         """
         Get all possible C-vine structures specified by the dimension and the targeted node.
-        
-        A C-vine copula is uniquelly determined by an ordered tuple, listing the center of each tree at every level
+
+        A C-vine copula is uniquely determined by an ordered tuple, listing the center of each tree at every level
         read backwards. For example, for a 4-dim C-vine characterized by (4, 2, 1, 3), node 3 is the center for the
         0th tree, node 1 is the center for the 1st tree and so on. The targeted node representing the stock of
         interest, cannot be the at the center of every tree (except the last) and thus has to be the 0th element in the
@@ -114,14 +114,14 @@ class CVineCop(RVineCop):
 
         # Initiating
         all_items = list(range(1, data_dim+1))  # All the nodes, indexed from 1
-        all_structures = permutations(all_items)  # All the possible stuctures, as permutations of the nodes
+        all_structures = permutations(all_items)  # All the possible structures, as permutations of the nodes
 
-        # Loop thourgh all the structures 
+        # Loop through all the structures
         valid_structures = []
         for structure in all_structures:
-            if structure[0] == pv_target_idx: # Only keep the ones where the targeted index is the 0-th element
+            if structure[0] == pv_target_idx:  # Only keep the ones where the targeted index is the 0-th element
                 valid_structures.append(structure)
-        
+
         return valid_structures
 
     def get_condi_probs(self, u: Union[pd.DataFrame, np.array], pv_target_idx: int = 1,
@@ -152,11 +152,11 @@ class CVineCop(RVineCop):
             # The output is a float
             return condi_prob
 
-        # When tne input is a pd.Dataframe
+        # When the input is a pd.Dataframe
         condi_probs = u.apply(lambda row: self._get_condi_prob(row, pv_target_idx, eps), axis=1)
         # The result is a pd.Series with matching indices
         return condi_probs
-    
+
     def _get_condi_prob(self, u: pd.Series, pv_target_idx: int = 1, eps: float = 1e-4) -> float:
         r"""
         Get the conditional probability of the C-vine copula for a target.
@@ -180,11 +180,11 @@ class CVineCop(RVineCop):
         target_idx = pv_target_idx - 1  # Indexing from 0
         target = u[target_idx]  # Upper lim of the integration
         others = np.delete(u, target_idx)  # Those will be served as arguments in quad
-        
+
         # The integrand function is the pdf
-        def pdf_func(target, others):
+        def pdf_func(target_local: float, others_local: np.array) -> float:
             # the pv.Vinecop.pdf only takes 2D arrays as input. Here it is assembled back
-            u_vec = np.insert(arr=others, obj=target_idx, values=target).reshape((1, 4))
+            u_vec = np.insert(arr=others_local, obj=target_idx, values=target_local).reshape((1, len(u)))
             pdf = self.cvine_cop.pdf(u_vec)[0]
 
             return pdf
@@ -192,13 +192,13 @@ class CVineCop(RVineCop):
         # Integrating along the margin and normalizing the conditional probability
         sum_prob = integrate.quad(pdf_func, 0, target, args=others)[0]
         total_prob = integrate.quad(pdf_func, 0, 1, args=others)[0]
-        condi_prob =  sum_prob / total_prob
-        
+        condi_prob = sum_prob / total_prob
+
         # Map the condi prob into [eps, 1-eps]
         wrapped_condi_prob = max(min(condi_prob, 1-eps), eps)
 
         return wrapped_condi_prob
-    
+
     def get_cop_densities(self, u: Union[pd.DataFrame, np.array], num_threads: int = 1) -> Union[pd.Series, float]:
         """
         Calculate probability density of the vine copula.
@@ -228,7 +228,7 @@ class CVineCop(RVineCop):
         # The result is a pd.Series with matching indices
         return pdfs_series
 
-    def get_cop_evals(self, u: pd.DataFrame, mcn: int = 1e4, num_threads: int = 1) -> pd.Series:
+    def get_cop_evals(self, u: pd.DataFrame) -> pd.Series:
         """
         Calculate cumulative density of the vine copula.
 
@@ -238,28 +238,26 @@ class CVineCop(RVineCop):
         :param u: (Union[pd.DataFrame, np.array]) The quantiles data to be used. The input can be a pandas dataframe,
             or a numpy array vector. The formal case yields the result with in pandas series in matching indices, and
             the latter yields a single float number.
-        :param mcn: (int) Integer for the number of quasi-random numbers to draw to evaluate the distribution for the
-            Monte-Carlo integration. Defaults to 1e4.
-        :param num_threads: (int) Optional. The number of threads to use for calculation. Defaults to 1.
+
         :return: (Union[pd.Series, float]) The calculated cdf. If the input is a dataframe then the result is a series
             with matching indices. If the input is a 1D np.array then the result is a float.
         """
-        
+
         # When the input is a 1D np.array
         if isinstance(u, np.ndarray) and u.ndim == 1:
             u_np = u.reshape((1, -1))
-            cdf = self.cvine_cop.cdf(u_np, mcn, num_threads)[0]
+            cdf = self.cvine_cop.cdf(u_np)[0]
             # The output is a float
             return cdf
 
         # When tne input is a pd.Dataframe
         u_np = np.array(u)
-        cdfs = self.cvine_cop.cdf(u_np, mcn, num_threads)
+        cdfs = self.cvine_cop.cdf(u_np)
         cdfs_series = pd.Series(cdfs, index=u.index)
         # The result is a pd.Series with matching indices
         return cdfs_series
-    
-    def simulate(self, n: int, qrn: bool = False, num_threads: int = 1, seeds: List[int] = []) -> np.ndarray:
+
+    def simulate(self, n: int, qrn: bool = False, num_threads: int = 1, seeds: List[int] = None) -> np.ndarray:
         """
         Simulate from a vine copula model.
 
@@ -267,18 +265,21 @@ class CVineCop(RVineCop):
         :param qrn: (bool) Optional. Set to True for quasi-random numbers. Defaults to False.
         :param num_threads: (int) Optional. The number of threads to use for calculation. Defaults to 1.
         :param seeds: (List[int]) Optional. Seeds of the random number generator. If empty then the random generator
-            will be seeded randomly. Defaults to False.
+            will be seeded randomly. Defaults to [].
         :return: (pd.ndarray) The generated random samples from the vine copula.
         """
+
+        if seeds is None:
+            seeds = []
 
         simulated_samples = self.cvine_cop.simulate(n, qrn, num_threads, seeds)
 
         return simulated_samples
-    
+
     def aic(self, u: pd.DataFrame, num_threads: int = 1) -> float:
         """
         Evaluates the Akaike information criterion (AIC).
-        
+
         :param u: (pd.DataFrame) The quantile data used for evaluation.
         :param num_threads: (int) Optional. The number of threads to use for calculation. Defaults to 1.
         :return: (float) calculated AIC value.
@@ -292,7 +293,7 @@ class CVineCop(RVineCop):
     def bic(self, u: pd.DataFrame, num_threads: int = 1) -> float:
         """
         Evaluates the Bayesian information criterion (BIC).
-        
+
         :param u: (pd.DataFrame) The quantile data used for evaluation.
         :param num_threads: (int) Optional. The number of threads to use for calculation. Defaults to 1.
         :return: (float) calculated BIC value.
@@ -306,7 +307,7 @@ class CVineCop(RVineCop):
     def loglik(self, u: pd.DataFrame, num_threads: int = 1) -> float:
         """
         Evaluates the Sum of log-likelihood.
-        
+
         :param u: (pd.DataFrame) The quantile data used for evaluation.
         :param num_threads: (int) Optional. The number of threads to use for calculation. Defaults to 1.
         :return: (float) calculated sum of log-likelihood.
@@ -316,28 +317,3 @@ class CVineCop(RVineCop):
         loglik_value = self.cvine_cop.loglik(u_np, num_threads)
 
         return loglik_value
-
-
-
-# #%%
-# print(cvine_cop.families)
-# #%%
-# test_quantiles = np.array([[0.1, 0.2, 0.3, 0.4],
-#                             [0.5, 0.2, 0.3, 0.4],
-#                             [1, 0.2, 0.3, 0.4]])
-# lower_input = np.array([[0.099, 0.2, 0.3, 0.4],
-#                         [0.499, 0.6, 0.7, 0.8],
-#                         [0.199, 0.3, 0.4, 0.8]])
-# upper_input = np.array([[0.101, 0.2, 0.3, 0.4],
-#                         [0.501, 0.6, 0.7, 0.8],
-#                         [0.201, 0.3, 0.4, 0.8]])
-# print(cvine_cop.pdf(u=test_quantiles))
-#%%
-
-# u = np.array([0, 0.2, 0.3, 0.4])
-# print(cvinecop._get_condi_prob(u, pv_target_idx = 1, eps=1e-4))
-
-#%%
-
-#%%
-#%%
