@@ -58,10 +58,10 @@ class StochasticControlMudchanatongsuk:
             (N * np.multiply(self.spread[1:], self.spread[:-1]).sum() -
              (self.spread[N] - self.spread[0]) * np.sum(self.spread[:-1]) - self.spread[:-1].sum() ** 2)
 
-        q = (self.spread[N] - self.spread[0] + (1 - p)*self.spread[:-1].sum()) / N
+        q = (self.spread[N] - self.spread[0] + (1 - p) * self.spread[:-1].sum()) / N
 
-        V_squared = (1 / N) * (self.spread[N] ** 2 - self.spread[0] ** 2 + (1 + p ** 2)*np.power(self.spread[:-1], 2).sum()
-                               - 2 * p * np.multiply(self.spread[1:], self.spread[:-1]).sum() - N*q)
+        V_squared = (1 / N) * (self.spread[N] ** 2 - self.spread[0] ** 2 + (1 + p ** 2) * np.power(self.spread[:-1], 2).sum()
+                               - 2 * p * np.multiply(self.spread[1:], self.spread[:-1]).sum() - N * q)
 
 
         C = (1/(N * np.sqrt(V_squared * S_squared))) * (np.multiply(self.spread[1:], np.diff(self.S)).sum()
@@ -69,13 +69,13 @@ class StochasticControlMudchanatongsuk:
                                                       - m * (self.spread[N] - self.spread[0])
                                                       - m * (1 - p) * self.spread[:-1].sum())
 
-        self.sigma = np.sqrt(S_squared/self.delta_t)
+        self.sigma = np.sqrt(S_squared / self.delta_t)
 
-        self.mu = (m/self.delta_t) + (0.5 * (self.sigma ** 2))
+        self.mu = (m / self.delta_t) + (0.5 * (self.sigma ** 2))
 
-        self.k = - np.log(p)/self.delta_t
+        self.k = - np.log(p) / self.delta_t
 
-        self.theta = q/(1 - p)
+        self.theta = q / (1 - p)
 
         self.eta = np.sqrt(2 * self.k * V_squared / (1 - p ** 2))
 
@@ -85,29 +85,33 @@ class StochasticControlMudchanatongsuk:
 
         self.gamma = gamma
         t = np.arange(0, len(data)) / self.delta_t
+        tau = t[:-1] - t
         x = np.log(data.iloc[:, 0]) - np.log(data.iloc[:, 1])
 
-        alpha_t = self._alpha_calc(t)
-        beta_t = self._beta_calc(t)
+        alpha_t, beta_t = self._alpha_beta_calc(tau)
 
         h = None
         return h
 
-    def _alpha_calc(self, t):
+    def _alpha_beta_calc(self, tau):
 
         sqrt_gamma = np.sqrt(1 - self.gamma)
-        exp_calc = np.exp(2*self.k*(t[-1] - t)/sqrt_gamma)
+        exp_calc = np.exp(2 * self.k * tau / sqrt_gamma)
+
+        alpha_t = self._alpha_calc(sqrt_gamma, exp_calc)
+        beta_t = self._beta_calc(sqrt_gamma, exp_calc)
+
+        return alpha_t, beta_t
+
+    def _alpha_calc(self, sqrt_gamma, exp_calc):
 
         left_calc = self.k * (1 - sqrt_gamma) / (2 * (self.eta ** 2))
 
-        right_calc = 2 * sqrt_gamma / (1 - sqrt_gamma - (1 + sqrt_gamma)*exp_calc)
+        right_calc = 2 * sqrt_gamma / (1 - sqrt_gamma - (1 + sqrt_gamma) * exp_calc)
 
         return left_calc * (1 + right_calc)
 
-    def _beta_calc(self, t):
-
-        sqrt_gamma = np.sqrt(1 - self.gamma)
-        exp_calc = np.exp(2*self.k*(t[-1] - t)/sqrt_gamma)
+    def _beta_calc(self, sqrt_gamma, exp_calc):
 
         left_calc = 1/(2 * (self.eta ** 2) * ((1 - sqrt_gamma) - (1 + sqrt_gamma)*exp_calc))
 
