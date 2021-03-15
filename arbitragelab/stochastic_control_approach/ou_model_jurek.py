@@ -76,7 +76,13 @@ class StochasticControlJurek:
     def optimal_portfolio_weights(self, data: pd.DataFrame, utility_type = 1, r = 0.05, gamma = 1):
         """
         utility_type = 1 implies agent with utility of terminal wealth.
-        utility_type = 2 implies agent whose utility is defined over intermediate consumption.
+                        gamma = 1 implies log utility investor.
+                        gamma != 1 implies general CRRA investor.
+
+        utility_type = 2 implies agent whose utility is defined over intermediate consumption
+         with agent’s preferences described by Epstein-Zin recursive utility with phi = 1.
+                    gamma = 1 reduces to standard log utility.
+                    gamma ! = 1
         """
 
         self.r = r
@@ -87,28 +93,35 @@ class StochasticControlJurek:
         W = np.zeros(len(t)) #TODO : Need to figure out how to calculate W
         S = np.zeros(len(t)) #TODO : Calculate this spread after the spread calc in fit is finalized.
 
-        A = None
-        B = None
-        if self.gamma != 1:
+        N = None
+        # The optimal weights equation is the same for both types of utility functions.
+        # For gamma = 1, the outputs weights are identical for both types of utility functions,
+        # whereas for gamma != 1, the calculation of A and B functions are different.
+        if self.gamma == 1:
+            N = ((self.k * (self.mu - S) - self.r * S) / (self.sigma ** 2)) * W
+
+        else:
             # For the case of gamma = 1, A & B are not used in the final optimal portfolio calculation,
             # so the corresponding calculations are skipped.
+
+            A = None
+            B = None
             if utility_type == 1:
                 A, B = self._AB_calc_1(tau)
 
             elif utility_type == 2:
                 A, B = self._AB_calc_2(tau)
 
-        N = None
-        if self.gamma == 1:
-            N = ((self.k * (self.mu - S) - self.r * S) / (self.sigma ** 2)) * W
-
-        else:
             N = ((self.k * (self.mu - S) - self.r * S) / (self.sigma ** 2) + (2 * A * S + B) / self.gamma) * W
 
         return N
 
 
     def _AB_calc_1(self, tau):
+        """
+        For utility_type = 1.
+        Follows Appendix A.2 in the paper.
+        """
 
         c_1 = 2 * self.sigma ** 2 / self.gamma
         c_2 = -(self.k / self.gamma + self.r * (1 - self.gamma) / self.gamma)
@@ -144,6 +157,8 @@ class StochasticControlJurek:
 
     def _B_calc_1(self, tau, c_1, c_2, c_3, det, gamma_0):
 
+        #Note : When self.mu = 0, c_4 and c_5 become zero and consequently B becomes zero.
+
         c_4 = 2 * self.k * self.mu / self.gamma
         c_5 = -((self.k + self.r) / self.sigma ** 2) * ((1 - self.gamma) / self.gamma) * self.k * self.mu
 
@@ -168,14 +183,27 @@ class StochasticControlJurek:
 
 
     def _AB_calc_2(self, tau):
+        """
+        For utility_type = 2.
+        Follows appendix B.1 in the paper.
+        """
 
-        A = self._A_calc_2(tau)
+        c_1 = 2 * self.sigma ** 2 / self.gamma
+        #TODO : Figure out how to calculate beta and subsequently c_2, c_3, etc.
+        c_2 = 0
+        c_3 = 0
+        det = 0
+        gamma_0 = 0
+
+        A = self._A_calc_2(tau, c_1, c_2, c_3, det, gamma_0)
         B = self._B_calc_2(tau)
         return A, B
 
 
-    def _A_calc_2(self, tau):
-        pass
+    def _A_calc_2(self, tau, c_1, c_2, c_3, det, gamma_0):
+
+        # Same calculation as for general CRRA Investor.
+        return self._A_calc_1(tau, c_1, c_2, c_3, det, gamma_0)
 
 
     def _B_calc_2(self, tau):
