@@ -2,9 +2,10 @@
 # All rights reserved
 # Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 """
-Module that generates vine copulas.
+Module that houses vine copula trading strategies.
 
-Built on top of the :code:`pyvinecoplib` package. See https://github.com/vinecopulib/pyvinecopulib for more details.
+Method based on `Stübinger, J., Mangold, B. and Krauss, C., 2018. Statistical arbitrage with vine copulas.
+<https://www.iwf.rw.fau.de/files/2015/12/11-2016-1.pdf>`__
 """
 
 from typing import List, Union, Callable, Tuple
@@ -15,7 +16,7 @@ from arbitragelab.copula_approach.vinecop_generate import CVineCop
 
 class CVineCopStrat:
     """
-    Trading strategy class using vine copulas.
+    Trading strategy class using C-vine copulas.
     """
 
     def __init__(self, cvinecop: CVineCop = None, signal_to_position_table: pd.DataFrame = None):
@@ -246,7 +247,7 @@ class CVineCopStrat:
 
         The translation is conducted under a dollar-neutral strategy against an index fund (typically SP500 index). For
         example, for a long position, for each 1 dollar investment, long the target stock by 1/2 dollar, and short the
-        index fund by 1 dollar.
+        index fund by 1/2 dollar.
 
         Originally the positions calculated by this strategy is given with values in {0, 1, -1}. To be able to actually
         trade using the dollar neutral strategy as given by the authors in the paper, one needs to know at any given

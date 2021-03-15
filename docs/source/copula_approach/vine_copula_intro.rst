@@ -2,8 +2,8 @@
 
 .. Note::
 
-    We only implemented C-vine structure, since it is the only vine structure that has curated trading strategies to the best
-    of our knowledge. For general R-vine, though one can still calculate cumulative densities and generate signals, how
+    We only implemented the C-vine structure, since it is the only vine structure that has curated trading strategies to the best
+    of our knowledge. For general R-vine, though one can still calculate conditional probabilities and generate signals, how
     the R-vine structure is determined becomes less interpretable.
     But this documentation is written as a general introduction that is not limited to C-vine, in the hope that the reader
     can achieve a more thorough picture on vine copula modeling.
@@ -16,7 +16,7 @@ Copula is a great statistical tool to study the relation among multiple random v
 cumulative density of quantiles of marginals, we can bypass the idiosyncratic features of marginal distributions and
 directly look at how they are "related".
 Indeed, traders and analysts have been using copula to exploit statistical arbitrage under the pairs trading framework
-for some time, and we have implemented the most popular methods in :code:`ArbitrageLab`.
+for some time, and we have implemented some of the most popular methods in :code:`ArbitrageLab`.
 However, it is natural to expand beyond dealing with just a pair of stocks: There already exist a great amount of competing
 stat arb methods alongside with copula, thinning the potential alpha. It is also intuitive for human to think about relative
 pricing among 2 stocks, where as for higher dimensions it is not so easy, and left great chances for quantitative approaches.
@@ -170,13 +170,13 @@ They can be visualized as follows:
 
 For an R-vine, for each level of the tree, it needs to satisfy the following conditions:
 
-    1. Each layer of the tree must have :math:`N-1` edges for :math:`N` nodes, and all the nodes in this later must be
+    1. Each layer of the tree must have :math:`N-1` edges for :math:`N` nodes, and all the nodes in this layer must be
     connected (i.e., you can travel from any node to any other node via edges in finite steps).
 
     2. Proximity condition: Every edge will contribute to a joint density in the next layer. For example in Fig 1, at
     layer 1, node 1 and node 3 makes a (1,3) node in layer 2.
 
-For a C-vine, it must be an R-vine at first, but every layer of the tree there is a center component. This structure
+For a C-vine, it must be an R-vine at first, but for every layer of the tree there is a center component. This structure
 makes it possible to represend the C-vine structure using an ordered tuple: reading backwards, each number represents
 the centered component at each level of the tree.
 
@@ -186,10 +186,11 @@ For a D-vine, each tree is a *path*: there is one road that goes through all the
     :scale: 28 %
     :align: center
     
-    (Fig 3: C-vine its tuple representation.)
+    (Fig 3: C-vine and its tuple representation.)
 
 The representation of a generic R-vine is slightly more complicated, and requires a lower triangular matrix (some places
 uses an upper triangular matrix for representation, and they are indeed identical).
+Let's look at the following R-vine with 7 random variables for example:
 
 .. figure:: images/R_vine_structure.png
     :scale: 50 %
@@ -213,18 +214,20 @@ The R-vine tree in Fig 4 can be represented by the following matrix:
     6 & 3 & 3 & 2 & 2 & 2 & 2
     \end{bmatrix}
 
-The R-vine structure is read from the matrix as follows:
+The R-vine structure is mapped to the matrix as follows:
 
     1. Find a diagonal term :math:`a`. For example :math:`M_{2, 2} = 4`.
     
     2. Follow that column downwards and stop somewhere :math:`b`, say we stop at :math:`M_{4, 5} = 1`.
     
-    3. The leftover terms in that column are then conditions :math:`\{c_1, c_2, \cdots\}`. In this example
+    3. The leftover terms below :math:`b` in that column are then conditions :math:`\{c_1, c_2, \cdots\}`. In this example
        we have :math:`\{2, 3\}` left.
     
     4. The node :math:`(a, b | c_1, c_2, \cdots)` is in the R-vine. In this example, :math:`(1, 4 | 2, 3)`
        is at :math:`(T_4)`.
 
+Working from the top of the tree you can also map the matrix back to a full R-vine. (Left as an exercise to
+the reader.)
 Sometimes in literature you will see the same structure represented by the triangular matrix below:
 
 .. math::
@@ -295,7 +298,7 @@ This quantity needs to be calculated numerically by integrating the target varia
 .. math::
     
     \begin{align}
-        h(u_1 | u_2, u_3)
+        h(u_1 | u_2, u_3, u_4)
         &=  \mathbb{P}(U_1 \le u_1 | U_2=u_2, U_3=u_3, U_4=u_4) \\
         &= \left( \int_0^{u_1} f(u, u_2, u_3, u_4) du \right) / \left( \int_0^{1} f(u, u_2, u_3, u_4) du \right)
     \end{align}
@@ -320,12 +323,15 @@ Those are very interesting topics but are beyond our scope here. Interested read
 details. This is an active research field and involves a lot of heavy lifting. Luckily, a lot of great algorithms are already nicely
 blackboxed, handled automatically by softwares. Specifically, sample generation is a pretty much solved problem, whereas determine
 the best R-vine structure given data and determing all copula types and parameters are still discussed, but some algorithms are available.
-Thus, samping is very fast, and fitting can be slow.
+Thus, sampling is very fast, and fitting can be slow.
 
 .. Note::
     
-    When working with copula models, whether it is a "traditional" copula model or vine copula, we always fit the
+    1. When working with copula models, whether it is a "traditional" copula model or vine copula, we always fit the
     pseudo-observations, i.e., quanties data, instead of the real data.
+    
+    2. For fitting a vine copula, we need to determine the best tree structure that reflects the data, along with specifying
+    the type of bivariate copulas and their parameters. The amount of calculation is huge.
 
 For data specific evaluations, we can always calculate the log-likelihood, and consequently AIC, BIC, and compare those results.
 
@@ -358,7 +364,7 @@ Example
 
    # Loading stocks data
    sp500_returns = pd.read_csv('all_sp500_returns.csv', index_col='Dates', parse_dates=True)
-   subsample_returns = sp500_returns[['AAPL', 'MSFT', 'AMZN', 'GOOGL']]
+   subsample_returns = sp500_returns[['AAPL', 'MSFT', 'AMZN', 'FB']]
    subsample_rts_quantiles, _ = to_quantile(subsample_returns)
    quantiles_example = pd.DataFrame([0.1, 0.2, 0.3, 0.8],
                                     [0.5, 0.1, 0.9, 0.2])
@@ -399,7 +405,7 @@ The following research notebook can be used to better understand the vine copula
 References
 ##########
 
-* `Stübinger, J., Mangold, B. and Krauss, C., 2018. Statistical arbitrage with vine copulas. Quantitative Finance, 18(11), pp.1831-1849.. <https://www.tandfonline.com/doi/pdf/10.1080/14697688.2018.1438642?casa_token=olPBPI2bc3IAAAAA:8QViZfM9C0pbxGrarr-BU-yO2Or_wkCF_Pvk4dJFppjNtFzWjfM7W14_oc_ztl_1csHe4gFfloEWyA>`__
+* `Stübinger, J., Mangold, B. and Krauss, C., 2018. Statistical arbitrage with vine copulas. Quantitative Finance, 18(11), pp.1831-1849. <https://www.tandfonline.com/doi/pdf/10.1080/14697688.2018.1438642?casa_token=olPBPI2bc3IAAAAA:8QViZfM9C0pbxGrarr-BU-yO2Or_wkCF_Pvk4dJFppjNtFzWjfM7W14_oc_ztl_1csHe4gFfloEWyA>`__
 * `Joe, H. and Kurowicka, D. eds., 2011. Dependence modeling: vine copula handbook. World Scientific. <https://www.worldscientific.com/worldscibooks/10.1142/7699>`__
 * `Yu, R., Yang, R., Zhang, C., Špoljar, M., Kuczyńska-Kippen, N. and Sang, G., 2020. A Vine Copula-Based Modeling for Identification of Multivariate Water Pollution Risk in an Interconnected River System Network. Water, 12(10), p.2741. <https://www.mdpi.com/2073-4441/12/10/2741/pdf>`__
 * `Dissmann, J., Brechmann, E.C., Czado, C. and Kurowicka, D., 2013. Selecting and estimating regular vine copulae and application to financial returns. Computational Statistics & Data Analysis, 59, pp.52-69. <https://arxiv.org/pdf/1202.2002>`__
