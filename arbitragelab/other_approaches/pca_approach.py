@@ -15,6 +15,7 @@ from sklearn.decomposition import PCA
 from sklearn.linear_model import LinearRegression
 
 # pylint: disable=invalid-name
+# pylint: disable=R0913
 from arbitragelab.util import devadarsh
 
 
@@ -138,7 +139,7 @@ class PCAStrategy:
         if explained_var is not None:
             expl_variance = pca_factors.explained_variance_ratio_
             condition = min(np.cumsum(expl_variance), key=lambda x: abs(x - explained_var))
-            num_pc = np.where(np.cumsum(expl_variance) == condition)[0][0]
+            num_pc = np.where(np.cumsum(expl_variance) == condition)[0][0] + 1
             # Fit the PCA model to standardized return data, again.
             pca_factors = PCA(n_components=num_pc)
             pca_factors.fit(standardized)
@@ -178,11 +179,12 @@ class PCAStrategy:
 
         # If a user requires a fixed explained variance
         if explained_var is not None:
-            variance_explained = []
+            expl_variance = []
             for i in eigen_values:
-                variance_explained.append((i / sum(eigen_values)))
+                expl_variance.append((i / sum(eigen_values)))
 
-            num_pc = np.argmax(np.cumsum(variance_explained) > explained_var)
+            condition = min(np.cumsum(expl_variance), key=lambda x: abs(x - explained_var))
+            num_pc = np.where(np.cumsum(expl_variance) == condition)[0][0] + 1
             weights = pd.DataFrame(eigen_vectors, columns=matrix.columns)[: num_pc]
 
         else:
@@ -323,13 +325,11 @@ class PCAStrategy:
         # S-score calculation for each ticker
         s_score = -m / sigma_eq
 
-        if not drift:
-            return s_score
-
         if drift:
             m = -m - intercept * tau
-            mod_sscore = m / sigma_eq
-            return mod_sscore
+            s_score = m / sigma_eq
+            s_score = s_score.dropna()
+        return s_score
 
     @staticmethod
     def _generate_signals(position_stock: pd.DataFrame, s_scores: pd.Series, coeff: pd.DataFrame,
@@ -393,7 +393,7 @@ class PCAStrategy:
     def get_signals(self, matrix: pd.DataFrame, vol_matrix: pd.DataFrame = None, k: float = 8.4, corr_window: int = 252,
                     residual_window: int = 60, sbo: float = 1.25, sso: float = 1.25,
                     ssc: float = 0.5, sbc: float = 0.75, size: float = 1, explained_var: float = None,
-                    drift: bool = False, asym: bool = False) -> pd.DataFrame:
+                    drift: bool = False, asym: bool = False) -> object:
         """
         A function to generate trading signals for given returns matrix with parameters.
 

@@ -15,7 +15,7 @@ from arbitragelab.other_approaches import PCAStrategy
 
 class TestPCAStrategy(unittest.TestCase):
     """
-    Tests PCAStrategy calss.
+    Tests PCAStrategy class.
     """
 
     def setUp(self):
@@ -48,9 +48,9 @@ class TestPCAStrategy(unittest.TestCase):
         factorweights = self.pca_strategy.get_factorweights(self.data, explained_var=0.55)
 
         # Check factor weights
-        self.assertAlmostEqual(factorweights.mean()['EEM'], 0.2359, delta=1e-3)
-        self.assertAlmostEqual(factorweights.mean()['XLF'], 2.7271, delta=1e-3)
-        self.assertAlmostEqual(factorweights.mean()['SPY'], 3.3036, delta=1e-3)
+        self.assertAlmostEqual(factorweights.mean()['EEM'], 11.384, delta=1e-3)
+        self.assertAlmostEqual(factorweights.mean()['XLF'], 8.9781, delta=1e-3)
+        self.assertAlmostEqual(factorweights.mean()['SPY'], 18.425, delta=1e-3)
 
     def test_get_residuals(self):
         """
@@ -61,16 +61,16 @@ class TestPCAStrategy(unittest.TestCase):
         factorweights = self.pca_strategy.get_factorweights(self.data, explained_var=0.55)
         factorret = pd.DataFrame(np.dot(self.data, factorweights.transpose()), index=self.data.index)
 
-        residual, coefficient = self.pca_strategy.get_residuals(self.data, factorret)
+        residual, coefficient, intercept = self.pca_strategy.get_residuals(self.data, factorret)
 
         # Check residuals and coefficients
         self.assertAlmostEqual(residual.mean()['EEM'], 0, delta=1e-15)
         self.assertAlmostEqual(residual.mean()['XLF'], 0, delta=1e-15)
         self.assertAlmostEqual(residual.mean()['SPY'], 0, delta=1e-15)
 
-        self.assertAlmostEqual(coefficient.mean()['XLF'], 0.001563, delta=1e-5)
-        self.assertAlmostEqual(coefficient.mean()['XLE'], -0.000348, delta=1e-5)
-        self.assertAlmostEqual(coefficient.mean()['XLK'], 0.000903, delta=1e-5)
+        self.assertAlmostEqual(coefficient.mean()['XLF'], 0.0051443, delta=1e-5)
+        self.assertAlmostEqual(coefficient.mean()['XLE'], 0.0045190, delta=1e-5)
+        self.assertAlmostEqual(coefficient.mean()['XLK'], 0.0033304, delta=1e-5)
 
     def test_get_sscores(self):
         """
@@ -83,11 +83,11 @@ class TestPCAStrategy(unittest.TestCase):
         residual, _, intercept = self.pca_strategy.get_residuals(self.data, factorret)
 
         s_scores = self.pca_strategy.get_sscores(residual, intercept, k=4, drift=True)
-
+        print(s_scores)
         # Check S-scores
-        self.assertAlmostEqual(s_scores['EFA'], -0.371478, delta=1e-5)
-        self.assertAlmostEqual(s_scores['VPL'], 0.232437, delta=1e-5)
-        self.assertAlmostEqual(s_scores.mean(), -0.069520, delta=1e-5)
+        self.assertAlmostEqual(s_scores['CSJ'], -1.773595, delta=1e-5)
+        self.assertAlmostEqual(s_scores['VPL'], -0.739174, delta=1e-5)
+        self.assertAlmostEqual(s_scores.mean(), -0.520698, delta=1e-5)
 
     def test_get_signals(self):
         """
@@ -102,9 +102,9 @@ class TestPCAStrategy(unittest.TestCase):
                                                        sbc=0.75, size=1)
 
         # Check target weights
-        self.assertAlmostEqual(target_weights.mean()['EEM'], 0.025060, delta=1e-5)
-        self.assertAlmostEqual(target_weights.mean()['XLF'], 0.191726, delta=1e-5)
-        self.assertAlmostEqual(target_weights.mean()['SPY'], -0.141607, delta=1e-5)
+        self.assertAlmostEqual(target_weights.mean()['EEM'], 0.094400, delta=1e-5)
+        self.assertAlmostEqual(target_weights.mean()['XLF'], 0.243965, delta=1e-5)
+        self.assertAlmostEqual(target_weights.mean()['SPY'], -0.19903, delta=1e-5)
 
         # Generating weights using higher mean reversion speed threshold
 
@@ -113,6 +113,28 @@ class TestPCAStrategy(unittest.TestCase):
                                                        sbc=0.75, size=1)
 
         # Check target weights
-        self.assertAlmostEqual(target_weights.mean()['EEM'], -0.008639, delta=1e-5)
-        self.assertAlmostEqual(target_weights.mean()['XLF'], 0.213583, delta=1e-5)
-        self.assertAlmostEqual(target_weights.mean()['SPY'], -0.175306, delta=1e-5)
+        self.assertAlmostEqual(target_weights.mean()['EEM'], 0.150266, delta=1e-5)
+        self.assertAlmostEqual(target_weights.mean()['XLF'], 0.303796, delta=1e-5)
+        self.assertAlmostEqual(target_weights.mean()['SPY'], -0.28778, delta=1e-5)
+
+        # Check drift argument
+        target_weights = self.pca_strategy.get_signals(smaller_dataset, k=12, corr_window=252,
+                                                       residual_window=60, sbo=1.25, sso=1.25, ssc=0.5,
+                                                       sbc=0.75, size=1, drift=True)
+
+        # Check target weights
+        self.assertAlmostEqual(target_weights.mean()['EEM'], 0.150266, delta=1e-5)
+        self.assertAlmostEqual(target_weights.mean()['XLF'], 0.303796, delta=1e-5)
+        self.assertAlmostEqual(target_weights.mean()['SPY'], -0.28778, delta=1e-5)
+
+        # Check asymptotic PCA and explained_variance argument
+        target_weights = self.pca_strategy.get_signals(smaller_dataset, k=8.4, corr_window=252,
+                                                  residual_window=60, sbo=1.25,
+                                                  sso=1.25, ssc=0.5, sbc=0.75,
+                                                  size=1, explained_var=0.45,
+                                                  asym=True)
+
+        # Check target weights
+        self.assertAlmostEqual(target_weights.mean()['EEM'], -0.00703, delta=1e-5)
+        self.assertAlmostEqual(target_weights.mean()['XLF'], 0.010245, delta=1e-5)
+        self.assertAlmostEqual(target_weights.mean()['SPY'], -0.03177, delta=1e-5)
