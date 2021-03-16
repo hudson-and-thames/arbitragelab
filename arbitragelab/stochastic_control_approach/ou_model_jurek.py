@@ -51,7 +51,7 @@ class StochasticControlJurek:
 
     def fit(self, data: pd.DataFrame):
 
-        self.time_array = np.arange(0, len(data)) / self.delta_t
+        self.time_array = np.arange(0, len(data)) * self.delta_t
         self.ticker_A, self.ticker_B = data.columns[0], data.columns[1]
 
         total_return_indices = self._calc_total_return_indices(data)
@@ -62,6 +62,7 @@ class StochasticControlJurek:
         eg_cointegration_vectors = eg_portfolio.cointegration_vectors
 
         if eg_adf_statistics.loc['statistic_value', 0] > eg_adf_statistics.loc['95%', 0]:
+            print(eg_adf_statistics)
             raise Exception("ADF statistic test failure.")
 
         self.eg_scaled_vectors = eg_cointegration_vectors.loc[0] / abs(eg_cointegration_vectors.loc[0]).sum()
@@ -72,6 +73,9 @@ class StochasticControlJurek:
 
         self._estimate_params()
         print(self.k)
+        print(self.sigma)
+        print(self.mu)
+
         # TODO : Test the null hypothesis of no mean reversion using estimated k by running a Monte Carlo bootstrap experiment.
         #  For details look at para 3 in Section IV A of the paper.
 
@@ -85,7 +89,7 @@ class StochasticControlJurek:
         self.k = (-1 / self.delta_t) * np.log(np.multiply(self.spread[1:] - self.mu, self.spread[:-1] - self.mu).sum()
                                               / np.power(self.spread[1:] - self.mu, 2).sum())
 
-        sigma_calc_sum = np.power(self.spread[1:] - self.mu - np.exp(-self.k * self.delta_t) * (self.spread[:-1] - self.mu)
+        sigma_calc_sum = np.power((self.spread[1:] - self.mu - np.exp(-self.k * self.delta_t) * (self.spread[:-1] - self.mu))
                                   / np.exp(-self.k * self.delta_t), 2).sum()
 
         self.sigma = np.sqrt(2 * self.k * sigma_calc_sum / ((np.exp(2 * self.k * self.delta_t) - 1) * (N - 2)))
@@ -118,7 +122,7 @@ class StochasticControlJurek:
         self.r = r
         self.gamma = gamma
         self.beta = beta
-        t = np.arange(0, len(data)) / self.delta_t
+        t = np.arange(0, len(data)) * self.delta_t
         tau = t[-1] - t
 
         total_return_indices = self._calc_total_return_indices(data)

@@ -38,7 +38,7 @@ class StochasticControlMudchanatongsuk:
         #data = data.ffill()
         #TODO : Might need to normalize input, estimate params is not running properly.
 
-        self.time_array = np.arange(0, len(data)) / self.delta_t
+        self.time_array = np.arange(0, len(data)) * self.delta_t
         self.ticker_A, self.ticker_B = data.columns[0], data.columns[1]
         self.S = np.log(data.loc[:, self.ticker_B])
         self.spread = np.log(data.loc[:, self.ticker_A]) - self.S
@@ -84,7 +84,7 @@ class StochasticControlMudchanatongsuk:
     def optimal_portfolio_weights(self, data: pd.DataFrame, gamma = -100):
 
         self.gamma = gamma
-        t = np.arange(0, len(data)) / self.delta_t
+        t = np.arange(0, len(data)) * self.delta_t
         tau = t[-1] - t
         x = np.log(data.iloc[:, 0]) - np.log(data.iloc[:, 1])
 
