@@ -85,7 +85,7 @@ class StochasticControlMudchanatongsuk:
 
         self.gamma = gamma
         t = np.arange(0, len(data)) / self.delta_t
-        tau = t[:-1] - t
+        tau = t[-1] - t
         x = np.log(data.iloc[:, 0]) - np.log(data.iloc[:, 1])
 
         alpha_t, beta_t = self._alpha_beta_calc(tau)

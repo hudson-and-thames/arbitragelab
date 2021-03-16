@@ -12,6 +12,10 @@ This module is a realization of the methodology in the following paper:
 
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+
+from arbitragelab.cointegration_approach.johansen import JohansenPortfolio
+from arbitragelab.cointegration_approach.engle_granger import EngleGrangerPortfolio
 
 class StochasticControlJurek:
     def __init__(self):
@@ -33,12 +37,7 @@ class StochasticControlJurek:
         self.gamma = None
         self.beta = None
 
-
-    def fit(self, data: pd.DataFrame):
-
-        self.time_array = np.arange(0, len(data)) / self.delta_t
-        self.ticker_A, self.ticker_B = data.columns[0], data.columns[1]
-
+    def _calc_total_return_indices(self, data):
         returns_df = data.pct_change()
         returns_df = returns_df.replace([np.inf, -np.inf], np.nan).ffill().dropna()
 
@@ -46,17 +45,35 @@ class StochasticControlJurek:
         total_return_indices.iloc[0, :] = 1
         total_return_indices.iloc[1:, :] = pd.DataFrame.cumprod(1 + returns_df, axis=0)
 
-        # df = data.iloc[:round(len(data) * 0.1), :].mean(axis=0)
-        # mispricing_percent = df[self.ticker_B] / df[self.ticker_A]
-        # print(mispricing_percent)
-        # total_return_indices[self.ticker_A]  *= mispricing_percent
+        return total_return_indices
 
-        #TODO : Need to figure out weights for return indices for spread calcuation.
-        # Use Engle cointergration in arbitragelab to calculate weights.
 
-        self.spread = total_return_indices[self.ticker_A] - total_return_indices[self.ticker_B]
+
+    def fit(self, data: pd.DataFrame):
+
+        self.time_array = np.arange(0, len(data)) / self.delta_t
+        self.ticker_A, self.ticker_B = data.columns[0], data.columns[1]
+
+        total_return_indices = self._calc_total_return_indices(data)
+
+        eg_portfolio = EngleGrangerPortfolio()
+        eg_portfolio.fit(total_return_indices, add_constant=True)
+        eg_adf_statistics = eg_portfolio.adf_statistics
+        eg_cointegration_vectors = eg_portfolio.cointegration_vectors
+
+        if eg_adf_statistics.loc['statistic_value', 0] > eg_adf_statistics.loc['95%', 0]:
+            raise Exception("ADF statistic test failure.")
+
+        self.eg_scaled_vectors = eg_cointegration_vectors.loc[0] / abs(eg_cointegration_vectors.loc[0]).sum()
+
+        self.spread = (total_return_indices * self.eg_scaled_vectors).sum(axis=1)
+        self.spread.plot()
+        plt.show()
 
         self._estimate_params()
+        print(self.k)
+        # TODO : Test the null hypothesis of no mean reversion using estimated k by running a Monte Carlo bootstrap experiment.
+        #  For details look at para 3 in Section IV A of the paper.
 
 
     def _estimate_params(self):
@@ -102,10 +119,12 @@ class StochasticControlJurek:
         self.gamma = gamma
         self.beta = beta
         t = np.arange(0, len(data)) / self.delta_t
-        tau = t[:-1] - t
+        tau = t[-1] - t
 
-        W = np.zeros(len(t)) #TODO : Need to figure out how to calculate W
-        S = np.zeros(len(t)) #TODO : Calculate this spread after the spread calc in fit is finalized.
+        total_return_indices = self._calc_total_return_indices(data)
+
+        W = np.ones(len(t)) # Wealth is normalized to one. #TODO : Is this the correct way?
+        S = (total_return_indices * self.eg_scaled_vectors).sum(axis=1) #TODO : Do we use trained linear weights here ?
 
         N = None
         # The optimal weights equation is the same for both types of utility functions.
@@ -128,7 +147,7 @@ class StochasticControlJurek:
 
             N = ((self.k * (self.mu - S) - self.r * S) / (self.sigma ** 2) + (2 * A * S + B) / self.gamma) * W
 
-        return N
+        return N / W # We return the optimal allocation of spread asset scaled by wealth.
 
 
     def _AB_calc_1(self, tau):
