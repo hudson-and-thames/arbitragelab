@@ -72,6 +72,10 @@ class TestPCAStrategy(unittest.TestCase):
         self.assertAlmostEqual(coefficient.mean()['XLE'], 0.0045190, delta=1e-5)
         self.assertAlmostEqual(coefficient.mean()['XLK'], 0.0033304, delta=1e-5)
 
+        self.assertAlmostEqual(intercept['XLF'], 0.0000956, delta=1e-5)
+        self.assertAlmostEqual(intercept['XLE'], 0.0000527, delta=1e-5)
+        self.assertAlmostEqual(intercept['XLK'], 0.0002801, delta=1e-5)
+
     def test_get_sscores(self):
         """
         Tests the function to calculate S-scores.

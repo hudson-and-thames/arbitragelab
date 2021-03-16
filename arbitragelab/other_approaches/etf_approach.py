@@ -15,6 +15,7 @@ from sklearn.decomposition import PCA
 from sklearn.linear_model import LinearRegression
 
 # pylint: disable=invalid-name
+# pylint: disable=R0913
 from arbitragelab.util import devadarsh
 
 
@@ -243,13 +244,12 @@ class ETFStrategy:
         # S-score calculation for each ticker
         s_score = -m / sigma_eq
 
-        if not drift:
-            return s_score
-
         if drift:
             m = -m - intercept * tau
-            mod_sscore = m / sigma_eq
-            return mod_sscore
+            s_score = m / sigma_eq
+            s_score = s_score.dropna()
+
+        return s_score
 
     @staticmethod
     def _generate_signals(position_stock: pd.DataFrame, s_scores: pd.Series, coeff: pd.DataFrame,
