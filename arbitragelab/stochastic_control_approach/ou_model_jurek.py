@@ -31,6 +31,7 @@ class StochasticControlJurek:
         # Params inputted by user.
         self.r = None
         self.gamma = None
+        self.beta = None
 
 
     def fit(self, data: pd.DataFrame):
@@ -66,27 +67,37 @@ class StochasticControlJurek:
         self.k = (-1 / self.delta_t) * np.log(np.multiply(self.spread[1:] - self.mu, self.spread[:-1] - self.mu).sum()
                                               / np.power(self.spread[1:] - self.mu, 2).sum())
 
-        sigma_calc_sum = np.power(self.spread[1:] - self.mu - np.exp(-self.k*self.delta_t)*(self.spread[:-1] - self.mu)
-                                  / np.exp(-self.k*self.delta_t), 2).sum()
+        sigma_calc_sum = np.power(self.spread[1:] - self.mu - np.exp(-self.k * self.delta_t) * (self.spread[:-1] - self.mu)
+                                  / np.exp(-self.k * self.delta_t), 2).sum()
         #TODO : Check for error in paper for this summation?
 
-        self.sigma = np.sqrt(2*self.k*sigma_calc_sum/((np.exp(2*self.k*self.delta_t) - 1)*(N - 2)))
+        self.sigma = np.sqrt(2 * self.k * sigma_calc_sum / ((np.exp(2 * self.k * self.delta_t) - 1) * (N - 2)))
 
 
-    def optimal_portfolio_weights(self, data: pd.DataFrame, utility_type = 1, r = 0.05, gamma = 1):
+    def optimal_portfolio_weights(self, data: pd.DataFrame, beta, utility_type = 1, r = 0.05, gamma = 1):
         """
         utility_type = 1 implies agent with utility of terminal wealth.
                         gamma = 1 implies log utility investor.
                         gamma != 1 implies general CRRA investor.
 
         utility_type = 2 implies agent whose utility is defined over intermediate consumption
-         with agent’s preferences described by Epstein-Zin recursive utility with phi = 1.
+         with agent’s preferences described by Epstein-Zin recursive utility with phi(elasticity of intertemporal substitution) = 1.
                     gamma = 1 reduces to standard log utility.
-                    gamma ! = 1
+                    gamma ! = 1, gamma > 1 implies more risk averse investors, whereas gamma < 1 implies more risk tolerance.
+
+        What is beta?
+        1)subjective rate of time preference.
+
+        2)beta signifies the constant fraction of total wealth an investor chooses to consume. This is analogous to a hedge fund investor
+        who cares both about terminal wealth in some risk-averse way and consumes a constant fraction, β,
+        of assets under management (the management fee).
+
+        For utility_type = 2, C(Consumption) = beta * W
         """
 
         self.r = r
         self.gamma = gamma
+        self.beta = beta
         t = np.arange(0, len(data)) / self.delta_t
         tau = t[:-1] - t
 
@@ -124,21 +135,31 @@ class StochasticControlJurek:
         """
 
         c_1 = 2 * self.sigma ** 2 / self.gamma
-        c_2 = -(self.k / self.gamma + self.r * (1 - self.gamma) / self.gamma)
-        c_3 = 0.5 * ((1 - self.gamma) / self.gamma) * (((self.k + self.r) / self.sigma) ** 2)
-        det = 4 * (self.k ** 2 - self.r ** 2 * (1 - self.gamma)) / self.gamma
-        gamma_0 = 1 - (self.k / self.r) ** 2
 
-        A = self._A_calc_1(tau, c_1, c_2, c_3, det, gamma_0)
-        B = self._B_calc_1(tau, c_1, c_2, c_3, det, gamma_0)
+        c_2 = -(self.k / self.gamma + self.r * (1 - self.gamma) / self.gamma)
+
+        c_3 = 0.5 * ((1 - self.gamma) / self.gamma) * (((self.k + self.r) / self.sigma) ** 2)
+
+        disc = 4 * (self.k ** 2 - self.r ** 2 * (1 - self.gamma)) / self.gamma
+        #Note : discriminant is always positive for gamma > 1.
+
+        gamma_0 = 1 - (self.k / self.r) ** 2
+        #Note : gamma_0 is not always > 0.
+
+
+        A = self._A_calc_1(tau, c_1, c_2, c_3, disc, gamma_0)
+        B = self._B_calc_1(tau, c_1, c_2, c_3, disc, gamma_0)
+
         return A, B
 
 
-    def _A_calc_1(self, tau, c_1, c_2, c_3, det, gamma_0):
+    def _A_calc_1(self, tau, c_1, c_2, c_3, disc, gamma_0):
+
+        #Note : A<=0 and decreasing in tau for gamma > 1, and vice versa for gamma < 1.
 
         A = None
         if 0 < self.gamma < gamma_0:
-            A = -c_2 / c_1 + (np.sqrt(-det) / (2 * c_1)) * np.tan(np.sqrt(-det) * tau / 2 + np.arctan(2 * c_2 / np.sqrt(-det)))
+            A = -c_2 / c_1 + (np.sqrt(-disc) / (2 * c_1)) * np.tan(np.sqrt(-disc) * tau / 2 + np.arctan(2 * c_2 / np.sqrt(-disc)))
 
         elif self.gamma == gamma_0:
             A = -(c_2 / c_1) * (1 + 1 / (c_2 * tau - 1))
@@ -147,37 +168,39 @@ class StochasticControlJurek:
             # coth = 1/tanh and arccoth(x) = arctanh(1/x)
             # For reference : https://www.efunda.com/math/hyperbolic/hyperbolic.cfm
 
-            A = -c_2 / c_1 + (np.sqrt(det) / (2 * c_1)) * (1 / np.tanh(-np.sqrt(det) * tau / 2 + np.arctanh(np.sqrt(det) / (2 * c_2))))
+            A = -c_2 / c_1 + (np.sqrt(disc) / (2 * c_1)) * (1 / np.tanh(-np.sqrt(disc) * tau / 2 + np.arctanh(np.sqrt(disc) / (2 * c_2))))
 
         elif self.gamma > 1:
-            A = -c_2 / c_1 + (np.sqrt(det) / (2 * c_1)) * np.tanh(-np.sqrt(det) * tau / 2 + np.arctanh(2 * c_2 / np.sqrt(det)))
+            A = -c_2 / c_1 + (np.sqrt(disc) / (2 * c_1)) * np.tanh(-np.sqrt(disc) * tau / 2 + np.arctanh(2 * c_2 / np.sqrt(disc)))
 
         return A
 
 
-    def _B_calc_1(self, tau, c_1, c_2, c_3, det, gamma_0):
+    def _B_calc_1(self, tau, c_1, c_2, c_3, disc, gamma_0):
 
         #Note : When self.mu = 0, c_4 and c_5 become zero and consequently B becomes zero.
 
         c_4 = 2 * self.k * self.mu / self.gamma
+
         c_5 = -((self.k + self.r) / self.sigma ** 2) * ((1 - self.gamma) / self.gamma) * self.k * self.mu
 
         B = None
         if 0 < self.gamma < gamma_0:
-            phi_1 = np.sqrt(-det) * (np.cos(np.sqrt(-det) * tau / 2) - 1) + 2 * c_2 * np.sin(np.sqrt(-det) * tau / 2)
-            phi_2 = np.arctanh(np.tan(0.25 * (np.sqrt(-det) * tau - 2 * np.arctan(2 * c_2 / np.sqrt(-det))))) + \
-                    np.arctanh(np.tan(0.5 * np.arctan(2 * c_2 / np.sqrt(-det))))
+            phi_1 = np.sqrt(-disc) * (np.cos(np.sqrt(-disc) * tau / 2) - 1) + 2 * c_2 * np.sin(np.sqrt(-disc) * tau / 2)
 
-            B = c_4 * phi_1 / (c_1 * np.sqrt(-det)) + (4 * phi_2 / np.sqrt(-det)) * (c_5 - c_4 / c_1) * \
-                np.cos(np.sqrt(-det) * tau / 2 - np.arctan(c_2 / np.sqrt(-det)))
+            phi_2 = np.arctanh(np.tan(0.25 * (np.sqrt(-disc) * tau - 2 * np.arctan(2 * c_2 / np.sqrt(-disc))))) + \
+                    np.arctanh(np.tan(0.5 * np.arctan(2 * c_2 / np.sqrt(-disc))))
+
+            B = c_4 * phi_1 / (c_1 * np.sqrt(-disc)) + (4 * phi_2 / np.sqrt(-disc)) * (c_5 - c_4 / c_1) * \
+                np.cos(np.sqrt(-disc) * tau / 2 - np.arctan(c_2 / np.sqrt(-disc)))
 
         elif self.gamma == gamma_0:
             B = (c_1 * c_5 * (c_2 * tau - 2) - (c_2 ** 2) * c_4) * tau / (2 * c_1 * (c_2 * tau - 1))
 
         elif self.gamma > gamma_0:
-            B = (4 * (c_2 * c_5 - c_3 * c_4 + (c_3 * c_4 - c_2 * c_5) * np.cosh(np.sqrt(det) * tau / 2))
-                 + 2 * c_5 * np.sqrt(det) * np.sinh(np.sqrt(det) * tau / 2)) \
-                / (det * np.cosh(np.sqrt(det) * tau / 2) - 2 * c_2 * np.sqrt(det) * np.sinh(np.sqrt(det) * tau / 2))
+            B = (4 * (c_2 * c_5 - c_3 * c_4 + (c_3 * c_4 - c_2 * c_5) * np.cosh(np.sqrt(disc) * tau / 2))
+                 + 2 * c_5 * np.sqrt(disc) * np.sinh(np.sqrt(disc) * tau / 2)) \
+                / (disc * np.cosh(np.sqrt(disc) * tau / 2) - 2 * c_2 * np.sqrt(disc) * np.sinh(np.sqrt(disc) * tau / 2))
 
         return B
 
@@ -189,22 +212,50 @@ class StochasticControlJurek:
         """
 
         c_1 = 2 * self.sigma ** 2 / self.gamma
-        #TODO : Figure out how to calculate beta and subsequently c_2, c_3, etc.
-        c_2 = 0
-        c_3 = 0
-        det = 0
-        gamma_0 = 0
 
-        A = self._A_calc_2(tau, c_1, c_2, c_3, det, gamma_0)
-        B = self._B_calc_2(tau)
+        c_2 = (self.gamma * (2 * self.r - self.beta) - 2 * (self.k + self.r)) / (2 * self.gamma)
+
+        c_3 = ((self.k + self.r) ** 2) * (1 - self.gamma) / (2 * self.gamma * (self.sigma ** 2))
+
+        disc = ((2 * self.k + self.beta) ** 2 + (self.gamma - 1) * ((-2 * self.r + self.beta) ** 2)) / self.gamma
+
+        gamma_0 = 4 * (self.k + self.r) * (self.r - self.beta - self.k) / ((2 * self.r - self.beta) ** 2)
+
+
+        A = self._A_calc_2(tau, c_1, c_2, c_3, disc, gamma_0)
+        B = self._B_calc_2(tau, c_1, c_2, c_3, disc, gamma_0)
+
         return A, B
 
 
-    def _A_calc_2(self, tau, c_1, c_2, c_3, det, gamma_0):
+    def _A_calc_2(self, tau, c_1, c_2, c_3, disc, gamma_0):
 
         # Same calculation as for general CRRA Investor.
-        return self._A_calc_1(tau, c_1, c_2, c_3, det, gamma_0)
+        return self._A_calc_1(tau, c_1, c_2, c_3, disc, gamma_0)
 
 
-    def _B_calc_2(self, tau):
-        pass
+    def _B_calc_2(self, tau, c_1, c_2, c_3, disc, gamma_0):
+
+        # Note : When self.mu = 0, c_4 and c_6 become zero and consequently B becomes zero.
+
+        c_4 = 2 * self.k * self.mu / self.gamma
+
+        c_5 = -(self.k + self.r * (1 - self.gamma) + self.beta * self.gamma) / (2 * self.gamma)
+
+        c_6 = self.k * (self.k + self.r) * (self.gamma - 1) * self.mu / (self.gamma * self.sigma ** 2)
+
+        B = None
+
+        if 0 < self.gamma < gamma_0:
+            pass
+
+        elif self.gamma == gamma_0:
+            pass
+
+        elif gamma_0 < self.gamma < 1:
+            pass
+
+        elif self.gamma > 1:
+            pass
+
+        return B
