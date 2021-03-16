@@ -27,7 +27,13 @@ class TestPCAStrategy(unittest.TestCase):
         project_path = os.path.dirname(__file__)
         data_path = project_path + '/test_data/stock_prices.csv'
         self.data = pd.read_csv(data_path, parse_dates=True, index_col="Date").pct_change()[1:]
+        self.volume = pd.read_csv(data_path, parse_dates=True, index_col="Date")
         self.pca_strategy = PCAStrategy(n_components=10)
+
+    def test_volume_modified_return(self):
+
+        vol_adj_returns = self.pca_strategy.volume_modified_return(self.data, self.volume, k=60)
+        pd.testing.assert_index_equal(vol_adj_returns.columns, self.data.columns)
 
     def test_standardize_data(self):
         """
@@ -51,6 +57,17 @@ class TestPCAStrategy(unittest.TestCase):
         self.assertAlmostEqual(factorweights.mean()['EEM'], 11.384, delta=1e-3)
         self.assertAlmostEqual(factorweights.mean()['XLF'], 8.9781, delta=1e-3)
         self.assertAlmostEqual(factorweights.mean()['SPY'], 18.425, delta=1e-3)
+
+    def test_get_asym_factorweights(self):
+        """
+        Tests the function to calculate asymptotic pca factor weights.
+        """
+        factorweights = self.pca_strategy.get_asym_factorweights(self.data, explained_var=0.55)
+
+        # Check factor weights
+        self.assertAlmostEqual(factorweights.mean()['EEM'], -11.38454, delta=1e-3)
+        self.assertAlmostEqual(factorweights.mean()['XLF'], -0.536206, delta=1e-3)
+        self.assertAlmostEqual(factorweights.mean()['SPY'], 3.1678694, delta=1e-3)
 
     def test_get_residuals(self):
         """
@@ -100,6 +117,7 @@ class TestPCAStrategy(unittest.TestCase):
 
         # Taking a smaller dataset
         smaller_dataset = self.data[:270]
+        smaller_volume = self.volume[:270]
 
         target_weights = self.pca_strategy.get_signals(smaller_dataset, k=8.4, corr_window=252,
                                                        residual_window=60, sbo=1.25, sso=1.25, ssc=0.5,
@@ -133,12 +151,35 @@ class TestPCAStrategy(unittest.TestCase):
 
         # Check asymptotic PCA and explained_variance argument
         target_weights = self.pca_strategy.get_signals(smaller_dataset, k=8.4, corr_window=252,
-                                                  residual_window=60, sbo=1.25,
-                                                  sso=1.25, ssc=0.5, sbc=0.75,
-                                                  size=1, explained_var=0.45,
-                                                  asym=True)
+                                                       residual_window=60, sbo=1.25,
+                                                       sso=1.25, ssc=0.5, sbc=0.75,
+                                                       size=1, explained_var=0.45,
+                                                       asym=False)
+        # Check target weights
+        self.assertAlmostEqual(target_weights.mean()['EEM'], 0.074310, delta=1e-5)
+        self.assertAlmostEqual(target_weights.mean()['XLF'], 0.015396, delta=1e-5)
+        self.assertAlmostEqual(target_weights.mean()['SPY'], -0.30074, delta=1e-5)
+
+        # Check asymptotic PCA and explained_variance argument
+        target_weights = self.pca_strategy.get_signals(smaller_dataset, k=8.4, corr_window=252,
+                                                       residual_window=60, sbo=1.25,
+                                                       sso=1.25, ssc=0.5, sbc=0.75,
+                                                       size=1, explained_var=0.45,
+                                                       asym=True)
 
         # Check target weights
         self.assertAlmostEqual(target_weights.mean()['EEM'], -0.00703, delta=1e-5)
         self.assertAlmostEqual(target_weights.mean()['XLF'], 0.010245, delta=1e-5)
         self.assertAlmostEqual(target_weights.mean()['SPY'], -0.03177, delta=1e-5)
+
+        target_weights = self.pca_strategy.get_signals(smaller_dataset, smaller_volume, k=8.4,
+                                                       corr_window=252,
+                                                       residual_window=60, sbo=1.25,
+                                                       sso=1.25, ssc=0.5, sbc=0.75,
+                                                       size=1, explained_var=0.55,
+                                                       asym=False)
+
+        # Check target weights
+        self.assertAlmostEqual(target_weights.mean()['EEM'], 0.057751, delta=1e-5)
+        self.assertAlmostEqual(target_weights.mean()['XLF'], -0.05988, delta=1e-5)
+        self.assertAlmostEqual(target_weights.mean()['SPY'], -0.00116, delta=1e-5)
