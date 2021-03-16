@@ -218,7 +218,7 @@ class PartnerSelection:
         and this measure is just the sum of Euclidean distance for all data points to the y=x line (diagonal).
         For every target stock the quadruple with the lowest diagonal measure is returned.
 
-        :param n_targets: (int) number of target stocks to select.
+        :param n_targets: (int) Number of target stocks to select.
         :return: (list) List of all selected quadruples.
         """
 
