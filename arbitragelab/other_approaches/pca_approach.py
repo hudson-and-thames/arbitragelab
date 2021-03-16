@@ -74,6 +74,7 @@ class PCAStrategy:
         adjust_term = volume_mv / volume_diff
 
         # Fill missing values in adjustment term with 1s
+        adjust_term = adjust_term.replace([np.inf, -np.inf], np.nan)
         adjust_term = adjust_term.fillna(1)
 
         # Find common columns between dataframe returns and dataframe volume_chg
@@ -113,12 +114,10 @@ class PCAStrategy:
         standardized = (matrix - matrix.mean()) / matrix.std()
 
         # Standardized: fill nan with zero / std: fill nan with 1
-        standardized = standardized.fillna(0)
-        std = matrix.std().fillna(1)
 
-        return standardized, std
+        return standardized, matrix.std()
 
-    def get_factorweights(self, matrix: pd.DataFrame, explained_var: float) -> pd.DataFrame:
+    def get_factorweights(self, matrix: pd.DataFrame, explained_var: float = None) -> pd.DataFrame:
         """
         A function to calculate weights (scaled eigen vectors) to use for factor return calculation.
 
@@ -156,7 +155,7 @@ class PCAStrategy:
 
         return weights
 
-    def get_asym_factorweights(self, matrix: pd.DataFrame, explained_var: float) -> pd.DataFrame:
+    def get_asym_factorweights(self, matrix: pd.DataFrame, explained_var: float = None) -> pd.DataFrame:
         """
         A function to calculate weights (scaled eigen vectors) to use for factor return calculation with
         asymptotic PCA.
@@ -225,7 +224,7 @@ class PCAStrategy:
         coefficient = pd.DataFrame(columns=matrix.columns, index=range(pca_factorret.shape[1]))
 
         # And a pd.Series to store regression intercept(beta0)
-        intercept = pd.Series(index=matrix.columns)
+        intercept = pd.Series(index=matrix.columns, dtype=float)
 
         # A class for regression
         regression = LinearRegression()

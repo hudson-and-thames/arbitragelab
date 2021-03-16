@@ -32,7 +32,7 @@ class TestPCAStrategy(unittest.TestCase):
 
     def test_volume_modified_return(self):
         """
-        Tests the function for volumn modified returns.
+        Tests the function for volume modified returns.
         """
 
         vol_adj_returns = self.pca_strategy.volume_modified_return(self.data, self.volume, k=60)
@@ -65,12 +65,12 @@ class TestPCAStrategy(unittest.TestCase):
         """
         Tests the function to calculate asymptotic pca factor weights.
         """
-        factorweights = self.pca_strategy.get_asym_factorweights(self.data, explained_var=0.55)
+        factorweights = self.pca_strategy.get_asym_factorweights(self.data, explained_var=None)
 
         # Check factor weights
-        self.assertAlmostEqual(factorweights.mean()['EEM'], -11.38454, delta=1e-3)
-        self.assertAlmostEqual(factorweights.mean()['XLF'], -0.536206, delta=1e-3)
-        self.assertAlmostEqual(factorweights.mean()['SPY'], 3.1678694, delta=1e-3)
+        self.assertAlmostEqual(factorweights.mean()['EEM'], -7.966358, delta=1e-3)
+        self.assertAlmostEqual(factorweights.mean()['XLF'], 2.3900065, delta=1e-3)
+        self.assertAlmostEqual(factorweights.mean()['SPY'], 5.6288474, delta=1e-3)
 
     def test_get_residuals(self):
         """
@@ -107,7 +107,7 @@ class TestPCAStrategy(unittest.TestCase):
         residual, _, intercept = self.pca_strategy.get_residuals(self.data, factorret)
 
         s_scores = self.pca_strategy.get_sscores(residual, intercept, k=4, drift=True)
-        print(s_scores)
+
         # Check S-scores
         self.assertAlmostEqual(s_scores['CSJ'], -1.773595, delta=1e-5)
         self.assertAlmostEqual(s_scores['VPL'], -0.739174, delta=1e-5)
@@ -175,6 +175,7 @@ class TestPCAStrategy(unittest.TestCase):
         self.assertAlmostEqual(target_weights.mean()['XLF'], 0.010245, delta=1e-5)
         self.assertAlmostEqual(target_weights.mean()['SPY'], -0.03177, delta=1e-5)
 
+        # Check volume
         target_weights = self.pca_strategy.get_signals(smaller_dataset, smaller_volume, k=8.4,
                                                        corr_window=252,
                                                        residual_window=60, sbo=1.25,
@@ -183,6 +184,6 @@ class TestPCAStrategy(unittest.TestCase):
                                                        asym=False)
 
         # Check target weights
-        self.assertAlmostEqual(target_weights.mean()['EEM'], 0.057751, delta=1e-5)
-        self.assertAlmostEqual(target_weights.mean()['XLF'], -0.05988, delta=1e-5)
-        self.assertAlmostEqual(target_weights.mean()['SPY'], -0.00116, delta=1e-5)
+        self.assertAlmostEqual(target_weights.mean()['EEM'], 0.340827, delta=1e-5)
+        self.assertAlmostEqual(target_weights.mean()['XLF'], -0.12825, delta=1e-5)
+        self.assertAlmostEqual(target_weights.mean()['SPY'], -0.07829, delta=1e-5)
