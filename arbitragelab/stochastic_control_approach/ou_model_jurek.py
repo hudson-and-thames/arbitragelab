@@ -51,7 +51,8 @@ class StochasticControlJurek:
         # print(mispricing_percent)
         # total_return_indices[self.ticker_A]  *= mispricing_percent
 
-        #TODO : Need to figure out weights for return indices for spread calcuation
+        #TODO : Need to figure out weights for return indices for spread calcuation.
+        # Use Engle cointergration in arbitragelab to calculate weights.
 
         self.spread = total_return_indices[self.ticker_A] - total_return_indices[self.ticker_B]
 
@@ -69,7 +70,6 @@ class StochasticControlJurek:
 
         sigma_calc_sum = np.power(self.spread[1:] - self.mu - np.exp(-self.k * self.delta_t) * (self.spread[:-1] - self.mu)
                                   / np.exp(-self.k * self.delta_t), 2).sum()
-        #TODO : Check for error in paper for this summation?
 
         self.sigma = np.sqrt(2 * self.k * sigma_calc_sum / ((np.exp(2 * self.k * self.delta_t) - 1) * (N - 2)))
 
@@ -84,7 +84,7 @@ class StochasticControlJurek:
                         gamma != 1 implies general CRRA investor.
 
         utility_type = 2 implies agent whose utility is defined over intermediate consumption
-         with agent’s preferences described by Epstein-Zin recursive utility with phi(elasticity of intertemporal substitution) = 1.
+         with agent’s preferences described by Epstein-Zin recursive utility with psi(elasticity of intertemporal substitution) = 1.
                     gamma = 1 reduces to standard log utility.
                     gamma ! = 1, gamma > 1 implies more risk averse investors, whereas gamma < 1 implies more risk tolerance.
 
@@ -249,13 +249,50 @@ class StochasticControlJurek:
 
         B = None
 
+        rep_exp_1 = np.exp(tau * c_2)
+        rep_exp_2 = np.exp(tau * c_5)
+
         if 0 < self.gamma < gamma_0:
-            # TODO : Finish this.
-            pass
+
+            rep_phrase_1 = np.sqrt(c_1 * c_3 - c_2 ** 2)
+            rep_phrase_2 = np.sqrt(c_1 * c_3) / rep_phrase_1
+            rep_phrase_3 = rep_phrase_1 * tau + np.arctan(c_2 / rep_phrase_1)
+
+            denominator = c_1 * rep_phrase_2 * (c_1 * c_3 + c_5 * (c_5 - 2 * c_2))
+
+            term_1 = rep_exp_1 * rep_phrase_2 * c_4 * c_5 * (c_2 - rep_phrase_1 * np.tan(rep_phrase_3))
+
+            term_2 = rep_exp_1 * rep_phrase_2 - 2 * rep_exp_2 * (1 / np.cos(rep_phrase_3))
+
+            term_3 = rep_exp_2 * (1 / np.cos(rep_phrase_3)) - rep_exp_1 * rep_phrase_2
+
+            term_4 = rep_exp_1 * rep_phrase_2 * rep_phrase_1 * np.tan(rep_phrase_3)
+
+            term_5 = -term_3
+
+
+            B = np.exp(-tau * c_2) * (term_1
+                                      + c_1 * (c_6 * (c_2 * term_2
+                                                      + term_3 * c_5
+                                                      + term_4)
+                                               -c_3 * term_5 * c_4)) / denominator
+
 
         elif self.gamma == gamma_0:
-            # TODO : Finish this.
-            pass
+
+            denominator = c_1 * rep_exp_1 * (tau * c_2 - 1) * (c_2 - c_5) ** 2
+
+            term_1 = rep_exp_1 * tau * c_4 * c_2 ** 3
+
+            term_2 = (c_4 * (rep_exp_1 * (tau * c_5 + 1) - rep_exp_2) + rep_exp_1 * tau * c_1 * c_6) * c_2 ** 2
+
+            term_3 = c_1 * (rep_exp_1 * tau * c_5 + 2 * (rep_exp_1 - rep_exp_2)) * c_6 * c_2
+
+            term_4 = (rep_exp_1 - rep_exp_2) * c_1 * c_5 * c_6
+
+
+            B = (-term_1 + term_2 - term_3
+                 + term_4) / denominator
 
         elif gamma_0 < self.gamma < 1:
 
@@ -263,22 +300,20 @@ class StochasticControlJurek:
             rep_phrase_2 = np.sqrt(c_2 ** 2 - c_1 * c_3)
             rep_phrase_3 = np.arctanh(rep_phrase_2 / c_2) - tau * rep_phrase_2
             # arccoth(x) = arctanh(1/x)
-            rep_phrase_4 = np.exp(tau * c_2)
-            rep_phrase_5 = np.exp(tau * c_5)
 
             denominator = c_2 * rep_phrase_1 * (c_1 * c_3 + c_5 * (c_5 - 2 * c_2))
 
-            term_1 = rep_phrase_4 * rep_phrase_1 * c_6 * c_2 ** 2
+            term_1 = rep_exp_1 * rep_phrase_1 * c_6 * c_2 ** 2
 
-            term_2 = rep_phrase_4 * c_3 * rep_phrase_1 * c_4
+            term_2 = rep_exp_1 * c_3 * rep_phrase_1 * c_4
 
-            term_3 = 2 * rep_phrase_5 * (1 / np.sinh(rep_phrase_3)) - rep_phrase_2 * (1 / np.tanh(rep_phrase_3)) * rep_phrase_1
+            term_3 = 2 * rep_exp_2 * (1 / np.sinh(rep_phrase_3)) - rep_phrase_2 * (1 / np.tanh(rep_phrase_3)) * rep_phrase_1
             # csch = 1/sinh, coth = 1/tanh
 
-            term_4 = rep_phrase_4 * rep_phrase_1 * c_5
+            term_4 = rep_exp_1 * rep_phrase_1 * c_5
 
-            term_5 = (1 / np.sinh(rep_phrase_3)) * (c_3 * c_4 * (rep_phrase_5 * rep_phrase_2 - rep_phrase_4 * np.sinh(tau * rep_phrase_2) * c_5)
-                                          + rep_phrase_5 * rep_phrase_2 * c_5 * c_6)
+            term_5 = (1 / np.sinh(rep_phrase_3)) * (c_3 * c_4 * (rep_exp_2 * rep_phrase_2 - rep_exp_1 * np.sinh(tau * rep_phrase_2) * c_5)
+                                          + rep_exp_2 * rep_phrase_2 * c_5 * c_6)
             # csch = 1/sinh
 
 
@@ -292,16 +327,16 @@ class StochasticControlJurek:
 
             denominator = 2 * c_1 * rep_phrase_1 * (c_1 * c_3 + c_5 * (c_5 - 2 * c_2)) # Denominator
 
-            term_1 = 2 * np.exp(tau * c_2) * rep_phrase_1 * c_4 * c_5 * (c_2 + 0.5 * np.sqrt(disc) * np.tanh(rep_phrase_2))
+            term_1 = 2 * rep_exp_1 * rep_phrase_1 * c_4 * c_5 * (c_2 + 0.5 * np.sqrt(disc) * np.tanh(rep_phrase_2))
 
-            term_2 = 2 * np.exp(tau * c_2) * rep_phrase_1 - 2 * np.exp(tau * c_5) * (1 / np.cosh(rep_phrase_2))
+            term_2 = 2 * rep_exp_1 * rep_phrase_1 - 2 * rep_exp_2 * (1 / np.cosh(rep_phrase_2))
             # sech = 1 / cosh
 
-            term_3 = np.exp(tau * c_5) * (1 / np.cosh(rep_phrase_2)) - 2 * np.exp(tau * c_2) * rep_phrase_1
+            term_3 = rep_exp_2 * (1 / np.cosh(rep_phrase_2)) - 2 * rep_exp_1 * rep_phrase_1
 
-            term_4 = np.exp(tau * c_2) * np.sqrt(disc) * rep_phrase_1 * np.tanh(rep_phrase_2)
+            term_4 = rep_exp_1 * np.sqrt(disc) * rep_phrase_1 * np.tanh(rep_phrase_2)
 
-            term_5 = 2 * np.exp(tau * c_2) * rep_phrase_1 - np.exp(tau * c_5) * (1 / np.cosh(rep_phrase_2))
+            term_5 = -term_3
 
 
             B = np.exp(-tau * c_2) * (term_1

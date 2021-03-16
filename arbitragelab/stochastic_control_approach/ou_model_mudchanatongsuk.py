@@ -90,7 +90,10 @@ class StochasticControlMudchanatongsuk:
 
         alpha_t, beta_t = self._alpha_beta_calc(tau)
 
-        h = None
+        h = (1 / (1 - self.gamma)) * (beta_t + 2 * np.multiply(x, alpha_t)
+                                      - self.k * (x - self.theta) / self.eta ** 2
+                                      + self.rho * self.theta / self.eta + 0.5)
+
         return h
 
     def _alpha_beta_calc(self, tau):
