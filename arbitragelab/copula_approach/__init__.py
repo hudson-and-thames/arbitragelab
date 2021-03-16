@@ -11,5 +11,6 @@ from arbitragelab.copula_approach.copula_strategy import CopulaStrategy
 from arbitragelab.copula_approach.copula_strategy_basic import BasicCopulaStrategy
 from arbitragelab.copula_approach.copula_strategy_mpi import CopulaStrategyMPI
 from arbitragelab.copula_approach.copula_generate_mixedcopula import (MixedCopula, CFGMixCop, CTGMixCop)
+from arbitragelab.copula_approach.vine_copula_partner_selection import PartnerSelection
 from arbitragelab.copula_approach.vinecop_generate import (RVineCop, CVineCop)
 from arbitragelab.copula_approach.vinecop_strategy import CVineCopStrat
