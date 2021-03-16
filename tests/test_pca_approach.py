@@ -34,7 +34,7 @@ class TestPCAStrategy(unittest.TestCase):
         """
         Tests the function for volumn modified returns.
         """
-        
+
         vol_adj_returns = self.pca_strategy.volume_modified_return(self.data, self.volume, k=60)
         pd.testing.assert_index_equal(vol_adj_returns.columns, self.data.columns)
 
