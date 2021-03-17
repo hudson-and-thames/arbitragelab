@@ -10,8 +10,10 @@ This module is a realization of the methodology in the following paper:
 <http://folk.ntnu.no/skoge/prost/proceedings/acc08/data/papers/0479.pdf>`__
 """
 
+import math
 import numpy as np
 import pandas as pd
+import scipy.optimize as so
 
 class StochasticControlMudchanatongsuk:
     def __init__(self):
@@ -43,7 +45,8 @@ class StochasticControlMudchanatongsuk:
         self.S = np.log(data.loc[:, self.ticker_B])
         self.spread = np.log(data.loc[:, self.ticker_A]) - self.S
 
-        self._estimate_params()
+        #self._estimate_params()
+        print(self._estimate_params_log_likelihood())
 
     def _estimate_params(self):
 
@@ -124,25 +127,64 @@ class StochasticControlMudchanatongsuk:
         return left_calc * right_calc
 
 
-    # @staticmethod
-    # def _compute_log_likelihood(params, *args):
-    #     """
-    #     Computes the average Log Likelihood. (p.13)
-    #
-    #     :param params: (tuple) A tuple of three elements representing theta, mu and sigma_squared.
-    #     :param args: (tuple) All other values that to be passed to self._compute_log_likelihood()
-    #     :return: (float) The average log likelihood from given parameters.
-    #     """
-    #
-    #     # Setting given parameters
-    #     sigma, mu, k ,theta, eta, rho = params
-    #     X,S, dt = args
-    #     n = len(X)
-    #
-    #     y = np.array([X, S].T)
-    #
-    #     matrix = np.zeros((2,2))
-    #     matrix[0][0] = (eta ** 2) * (1 - np.exp(-2 * k * dt)) / (2 * k)
-    #     matrix[0][1] =
-    #
-    #     return -log_likelihood
+    def _estimate_params_log_likelihood(self):
+        """
+        """
+
+        # Setting bounds
+        # sigma, mu, k, theta, eta, rho
+        bounds = ((1e-5, None), (None, None), (1e-5, None), (None, None), (1e-5, None), (-1, 1))
+
+        theta_init = np.mean(self.spread)
+
+        # Initial guesses for sigma, mu, k, theta, eta, rho
+        initial_guess = np.array((1, 0, 1, theta_init, 1, 0.5))
+
+        result = so.minimize(self._compute_log_likelihood, initial_guess,
+                             args=(self.spread, self.S, self.delta_t), bounds=bounds)
+
+        # Unpacking optimal values
+        sigma, mu, k, theta, eta, rho = result.x
+
+        # Undo negation
+        max_log_likelihood = -result.fun
+
+        return sigma, mu, k, theta, eta, rho, max_log_likelihood
+
+
+
+    @staticmethod
+    def _compute_log_likelihood(params, *args):
+        """
+        """
+
+        # Setting given parameters
+        sigma, mu, k ,theta, eta, rho = params
+        X,S, dt = args
+
+        y = np.array([X, S])
+
+        matrix = np.zeros((2,2))
+        matrix[0, 0] = (eta ** 2) * (1 - np.exp(-2 * k * dt)) / (2 * k)
+        matrix[0, 1] = rho * eta * sigma * (1 - np.exp(k * dt)) / k
+        matrix[1, 0] = matrix[0 ,1]
+        matrix[1, 1] = rho ** 2 * dt
+
+        X = X[:-1]
+        S = S[:-1]
+        y = y[:, :-1]
+
+        E_y = np.zeros((2, len(X)))
+        E_y[0, :] = X * np.exp(-k * dt) + theta * (1 - np.exp(-k * dt))
+        E_y[1, :] = S + (mu - 0.5 * sigma ** 2) * dt
+
+        vec = y - E_y
+        f_y_denm = (2 * math.pi * np.sqrt(np.linalg.det(matrix)))
+
+        f_y = np.exp(-0.5 * np.einsum('ij,ij->j', vec, np.linalg.inv(matrix) @ vec)) / f_y_denm
+
+        print(f_y)
+        # TODO : incorrect, need to fix.
+        log_likelihood = np.log(f_y).sum()
+
+        return -log_likelihood
