@@ -122,3 +122,27 @@ class StochasticControlMudchanatongsuk:
                      self.gamma * (self.eta ** 2 + 2*self.rho*self.sigma*self.eta + 2*self.k*self.theta) * (1 - exp_calc)
 
         return left_calc * right_calc
+
+
+    # @staticmethod
+    # def _compute_log_likelihood(params, *args):
+    #     """
+    #     Computes the average Log Likelihood. (p.13)
+    #
+    #     :param params: (tuple) A tuple of three elements representing theta, mu and sigma_squared.
+    #     :param args: (tuple) All other values that to be passed to self._compute_log_likelihood()
+    #     :return: (float) The average log likelihood from given parameters.
+    #     """
+    #
+    #     # Setting given parameters
+    #     sigma, mu, k ,theta, eta, rho = params
+    #     X,S, dt = args
+    #     n = len(X)
+    #
+    #     y = np.array([X, S].T)
+    #
+    #     matrix = np.zeros((2,2))
+    #     matrix[0][0] = (eta ** 2) * (1 - np.exp(-2 * k * dt)) / (2 * k)
+    #     matrix[0][1] =
+    #
+    #     return -log_likelihood

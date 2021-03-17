@@ -71,28 +71,50 @@ class StochasticControlJurek:
         self.spread.plot()
         plt.show()
 
-        self._estimate_params()
+        # TODO : This implementation of spread is incorrect.
+
+        params = self._estimate_params(self.spread)
+        self.mu, self.k, self.sigma = params
+
+        print(self.mu)
         print(self.k)
         print(self.sigma)
-        print(self.mu)
 
-        # TODO : Test the null hypothesis of no mean reversion using estimated k by running a Monte Carlo bootstrap experiment.
-        #  For details look at para 3 in Section IV A of the paper.
+        self._check_estimations()
 
 
-    def _estimate_params(self):
+    def _estimate_params(self, spread):
 
-        N = len(self.spread)
+        N = len(spread)
 
-        self.mu = self.spread.mean()
+        mu = spread.mean()
 
-        self.k = (-1 / self.delta_t) * np.log(np.multiply(self.spread[1:] - self.mu, self.spread[:-1] - self.mu).sum()
-                                              / np.power(self.spread[1:] - self.mu, 2).sum())
+        k = (-1 / self.delta_t) * np.log(np.multiply(spread[1:] - mu, spread[:-1] - mu).sum()
+                                              / np.power(spread[1:] - mu, 2).sum())
 
-        sigma_calc_sum = np.power((self.spread[1:] - self.mu - np.exp(-self.k * self.delta_t) * (self.spread[:-1] - self.mu))
-                                  / np.exp(-self.k * self.delta_t), 2).sum()
+        sigma_calc_sum = np.power((spread[1:] - mu - np.exp(-k * self.delta_t) * (spread[:-1] - mu))
+                                  / np.exp(-k * self.delta_t), 2).sum()
 
-        self.sigma = np.sqrt(2 * self.k * sigma_calc_sum / ((np.exp(2 * self.k * self.delta_t) - 1) * (N - 2)))
+        sigma = np.sqrt(2 * k * sigma_calc_sum / ((np.exp(2 * k * self.delta_t) - 1) * (N - 2)))
+
+        return mu, k, sigma
+
+
+    def _check_estimations(self):
+        """
+        Testing against null of random walk for rate of mean reversion k.
+        """
+
+        num_paths = 100000
+
+        output_params = np.zeros((num_paths, 3))
+        for i in range(num_paths):
+            white_noise_process = self.sigma * np.random.randn(len(self.spread)) + self.mu
+            output_params[i, :] = self._estimate_params(white_noise_process)
+
+        plt.hist(output_params[:, 1], bins=20)
+        plt.show()
+        #TODO : This is incomplete.
 
 
     def optimal_portfolio_weights(self, data: pd.DataFrame, beta, utility_type = 1, r = 0.05, gamma = 1):
