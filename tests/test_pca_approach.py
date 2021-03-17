@@ -113,6 +113,14 @@ class TestPCAStrategy(unittest.TestCase):
         self.assertAlmostEqual(s_scores['VPL'], -0.739174, delta=1e-5)
         self.assertAlmostEqual(s_scores.mean(), -0.520698, delta=1e-5)
 
+        s_scores = self.pca_strategy.get_sscores(residual, intercept, k=4, drift=True, p_value=0.05)
+
+        # Check S-scores
+        self.assertAlmostEqual(s_scores['CSJ'], -1.773595, delta=1e-5)
+        self.assertAlmostEqual(s_scores['VPL'], -0.739174, delta=1e-5)
+        self.assertAlmostEqual(s_scores.mean(), -0.520698, delta=1e-5)
+
+
     def test_get_signals(self):
         """
         Tests the function to generate trading signals for given returns matrix with parameters.

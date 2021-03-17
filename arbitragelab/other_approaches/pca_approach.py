@@ -246,7 +246,7 @@ class PCAStrategy:
         return residual, coefficient, intercept
 
     @staticmethod
-    def get_sscores(residuals: pd.DataFrame, intercept: pd.Series, k: float, drift: bool) -> pd.Series:
+    def get_sscores(residuals: pd.DataFrame, intercept: pd.Series, k: float, drift: bool, p_value: float = None) -> pd.Series:
         """
         A function to calculate S-scores for asset eigen portfolios given dataframes of residuals
         and a mean reversion speed threshold.
@@ -270,13 +270,15 @@ class PCAStrategy:
         :param k: (float) Required speed of mean reversion to use the eigen portfolio in
             trading.
         :param drift: (bool) True if the user want to take drift into consideration, Flase, otherwise.
+        :param p_value (float) The p value criteria to determine whether a residual is stationary.
         :return: (pd.Series) Series of S-scores for each asset for a given residual dataframe.
         """
         # Check residual stationarity(Drop a ticker if its residual not stationary.)
-        for ticker in residuals.columns:
-            p = sm.tsa.stattools.adfuller(residuals[ticker])[1]
-            if p > 0.01:
-                residuals.drop([ticker], axis=1)
+        if p_value is not None:
+            for ticker in residuals.columns:
+                p = sm.tsa.stattools.adfuller(residuals[ticker])[1]
+                if p > p_value:
+                    residuals.drop([ticker], axis=1)
 
         # Creating the auxiliary process K_k - discrete version of X(t)
         X_k = residuals.cumsum()
@@ -397,7 +399,7 @@ class PCAStrategy:
     def get_signals(self, matrix: pd.DataFrame, vol_matrix: pd.DataFrame = None, k: float = 8.4, corr_window: int = 252,
                     residual_window: int = 60, sbo: float = 1.25, sso: float = 1.25,
                     ssc: float = 0.5, sbc: float = 0.75, size: float = 1, explained_var: float = None,
-                    drift: bool = False, asym: bool = False) -> pd.DataFrame:
+                    drift: bool = False, p_value: float = None, asym: bool = False) -> pd.DataFrame:
         """
         A function to generate trading signals for given returns matrix with parameters.
 
@@ -463,6 +465,7 @@ class PCAStrategy:
             stocks.
         :param explained_var: (float) The user-defined explained variance criteria.
         :param drift: (bool) True if a user want to take drift into consideration, Flase, otherwise.
+        :param p_value (float) The p value criteria to determine whether a residual is stationary.
         :param asym: (bool) True if a user want to use asymptotic PCA when calculating eigenportfolio weights.
         :return: (pd.DataFrame) DataFrame with target weights for each asset at every observation.
             It is being calculated as a combination of all eigen portfolios that are satisfying the
@@ -501,7 +504,7 @@ class PCAStrategy:
             resid, coeff, intercept = self.get_residuals(obs_residual, factorret_resid)
 
             # Finding the S-scores for eigen portfolios in this period
-            s_scores = self.get_sscores(resid, intercept, k, drift)
+            s_scores = self.get_sscores(resid, intercept, k, drift, p_value)
 
             # Series of current positions for assets in our portfolio
             position_stock = pd.DataFrame(0, columns=matrix.columns, index=[-1] + list(range(factorret_resid.shape[1])))
