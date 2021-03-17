@@ -500,8 +500,6 @@ class PCAStrategy:
             # PCA factor returns - a product of weights and observations
             factorret_resid = pd.DataFrame(np.dot(obs_residual, weights.transpose()), index=obs_residual.index)
 
-            print(obs_residual)
-            print(factorret_resid)
             resid, coeff, intercept = self.get_residuals(obs_residual, factorret_resid)
 
             # Finding the S-scores for eigen portfolios in this period

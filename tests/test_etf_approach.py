@@ -129,7 +129,7 @@ class TestPCAStrategy(unittest.TestCase):
         target_weights = self.etf_strategy.get_signals(smaller_etf, smaller_dataset, k=1, corr_window=252,
                                                        residual_window=60, sbo=1.25,
                                                        sso=1.25, ssc=0.5, sbc=0.75,
-                                                       size=1, p_value=0.05)
+                                                       size=1, p_value=0.2)
 
         # Check target weights
         self.assertAlmostEqual(target_weights.mean()['EEM'], 0.333333, delta=1e-5)

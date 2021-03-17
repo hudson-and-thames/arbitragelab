@@ -189,7 +189,7 @@ class TestPCAStrategy(unittest.TestCase):
                                                        residual_window=60, sbo=1.25,
                                                        sso=1.25, ssc=0.5, sbc=0.75,
                                                        size=1, explained_var=0.55,
-                                                       asym=False)
+                                                       p_value=0.01, asym=False,)
 
         # Check target weights
         self.assertAlmostEqual(target_weights.mean()['EEM'], 0.582760, delta=1e-5)
