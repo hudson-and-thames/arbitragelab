@@ -324,6 +324,7 @@ class PCAStrategy:
         # Small filtering for parameter m and sigma
         m = m.dropna()
         sigma_eq = sigma_eq.dropna()
+        tau = tau.dropna()
 
         # Original paper suggests that centered means show better results
         m = m - m.mean()

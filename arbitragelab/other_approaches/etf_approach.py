@@ -74,6 +74,7 @@ class ETFStrategy:
         adjust_term = volume_mv / volume_diff
 
         # Fill missing values in adjustment term with 1s
+        adjust_term = adjust_term.replace([np.inf, -np.inf], np.nan)
         adjust_term = adjust_term.fillna(1)
 
         # Find common columns between dataframe returns and dataframe volume_chg
@@ -139,7 +140,7 @@ class ETFStrategy:
         coefficient = pd.DataFrame(columns=matrix.columns, index=range(etf_matrix.shape[1]))
 
         # And a pd.Series to store regression intercept(beta0)
-        intercept = pd.Series(index=matrix.columns)
+        intercept = pd.Series(index=matrix.columns, dtype=float)
 
         # A class for regression
         regression = LinearRegression()
@@ -161,7 +162,8 @@ class ETFStrategy:
         return residual, coefficient, intercept
 
     @staticmethod
-    def get_sscores(residuals: pd.DataFrame, intercept: pd.Series, k: float, drift: bool) -> pd.Series:
+    def get_sscores(residuals: pd.DataFrame, intercept: pd.Series, k: float, drift: bool,
+                    p_value: float = None) -> pd.Series:
         """
         A function to calculate S-scores for asset eigen portfolios given dataframes of residuals
         and a mean reversion speed threshold.
@@ -185,13 +187,15 @@ class ETFStrategy:
         :param k: (float) Required speed of mean reversion to use the eigen portfolio in
             trading.
         :param drift: (bool) True if the user want to take drift into consideration, Flase, otherwise.
+        :param p_value (float) The p value criteria to determine whether a residual is stationary.
         :return: (pd.Series) Series of S-scores for each asset for a given residual dataframe.
         """
         # Check residual stationarity(Drop a ticker if its residual not stationary.)
-        for ticker in residuals.columns:
-            p = sm.tsa.stattools.adfuller(residuals[ticker])[1]
-            if p > 0.01:
-                residuals.drop([ticker], axis=1)
+        if p_value is not None:
+            for ticker in residuals.columns:
+                p = sm.tsa.stattools.adfuller(residuals[ticker])[1]
+                if p > p_value:
+                    residuals.drop([ticker], axis=1)
 
         # Creating the auxiliary process K_k - discrete version of X(t)
         X_k = residuals.cumsum()
@@ -237,6 +241,7 @@ class ETFStrategy:
         # Small filtering for parameter m and sigma
         m = m.dropna()
         sigma_eq = sigma_eq.dropna()
+        tau = tau.dropna()
 
         # Original paper suggests that centered means show better results
         m = m - m.mean()
@@ -315,7 +320,7 @@ class ETFStrategy:
                     corr_window: int = 252,
                     residual_window: int = 60, sbo: float = 1.25, sso: float = 1.25,
                     ssc: float = 0.5, sbc: float = 0.75, size: float = 1,
-                    drift: bool = False, ) -> pd.DataFrame:
+                    drift: bool = False, p_value: float = None) -> pd.DataFrame:
         """
         A function to generate trading signals for given returns matrix with parameters.
 
@@ -381,6 +386,7 @@ class ETFStrategy:
             a long position, buying (size) units of stock and selling (size) * betas units of other
             stocks.
         :param drift: (bool) True if a user want to take drift into consideration, Flase, otherwise.
+        :param p_value (float) The p value criteria to determine whether a residual is stationary.
         :return: (pd.DataFrame) DataFrame with target weights for each asset at every observation.
             It is being calculated as a combination of all eigen portfolios that are satisfying the
             mean reversion speed requirement and S-score values.
@@ -403,7 +409,7 @@ class ETFStrategy:
             resid, coeff, intercept = self.get_residuals(obs_residual, etf)
 
             # Finding the S-scores for eigen portfolios in this period (no change!)
-            s_scores = self.get_sscores(resid, intercept, k, drift)
+            s_scores = self.get_sscores(resid, intercept, k, drift, p_value)
 
             # Series of current positions for assets in our portfolio
             position_stock = pd.DataFrame(0, columns=matrix.columns, index=[-1] + list(range(etf_matrix.shape[1])))

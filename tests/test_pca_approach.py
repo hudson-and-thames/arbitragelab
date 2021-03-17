@@ -26,8 +26,9 @@ class TestPCAStrategy(unittest.TestCase):
         np.random.seed(0)
         project_path = os.path.dirname(__file__)
         data_path = project_path + '/test_data/stock_prices.csv'
+        volume_path = project_path + '/test_data/stock_volume.csv'
         self.data = pd.read_csv(data_path, parse_dates=True, index_col="Date").pct_change()[1:]
-        self.volume = pd.read_csv(data_path, parse_dates=True, index_col="Date")
+        self.volume = pd.read_csv(volume_path, parse_dates=True, index_col="Date")
         self.pca_strategy = PCAStrategy(n_components=10)
 
     def test_volume_modified_return(self):
@@ -120,7 +121,6 @@ class TestPCAStrategy(unittest.TestCase):
         self.assertAlmostEqual(s_scores['VPL'], -0.739174, delta=1e-5)
         self.assertAlmostEqual(s_scores.mean(), -0.520698, delta=1e-5)
 
-
     def test_get_signals(self):
         """
         Tests the function to generate trading signals for given returns matrix with parameters.
@@ -192,6 +192,6 @@ class TestPCAStrategy(unittest.TestCase):
                                                        asym=False)
 
         # Check target weights
-        self.assertAlmostEqual(target_weights.mean()['EEM'], 0.340827, delta=1e-5)
-        self.assertAlmostEqual(target_weights.mean()['XLF'], -0.12825, delta=1e-5)
-        self.assertAlmostEqual(target_weights.mean()['SPY'], -0.07829, delta=1e-5)
+        self.assertAlmostEqual(target_weights.mean()['EEM'], 0.582760, delta=1e-5)
+        self.assertAlmostEqual(target_weights.mean()['XLF'], -0.03206, delta=1e-5)
+        self.assertAlmostEqual(target_weights.mean()['SPY'], -5.09122, delta=1e-5)
