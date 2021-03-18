@@ -14,8 +14,7 @@ import statsmodels.api as sm
 from sklearn.decomposition import PCA
 from sklearn.linear_model import LinearRegression
 
-# pylint: disable=invalid-name
-# pylint: disable=R0913
+# pylint: disable=invalid-name, too-many-arguments
 from arbitragelab.util import devadarsh
 
 
@@ -58,11 +57,11 @@ class PCAStrategy:
         :param matrix: (pd.DataFrame) DataFrame with returns that need to be standardized.
         :param vol_matrix: (pd.DataFrame) DataFrame with histoircal trading volume data.
         :param k: (int) Look-back window used for volume moving average.
-        :return: (pd.DataFrame) a volume-adjusted returns dataFrame
+        :return: (pd.DataFrame) A volume-adjusted returns dataFrame
         """
 
         # Fill missing data with preceding values
-        returns = matrix.dropna(axis=0)
+        returns = matrix.fillna(method='ffill')
 
         # Vol change
         volume_diff = vol_matrix.diff()
@@ -113,8 +112,6 @@ class PCAStrategy:
         # Standardizing data
         standardized = (matrix - matrix.mean()) / matrix.std()
 
-        # Standardized: fill nan with zero / std: fill nan with 1
-
         return standardized, matrix.std()
 
     def get_factorweights(self, matrix: pd.DataFrame, explained_var: float = None) -> pd.DataFrame:
@@ -128,7 +125,10 @@ class PCAStrategy:
         So the output is a dataframe containing the weight for each asset in a portfolio for each eigen vector.
 
         :param matrix: (pd.DataFrame) Dataframe with index and columns containing asset returns.
-        :param explained_var (float) The user-defined explained variance criteria.
+        :param explained_var (float) The user-defined explained variance criteria. If a value is given, then the param
+        n_components would be replaced and determined by the least number of components satisfying the user-defined
+        explained variance. The value should range from 0 to 1.
+
         :return: (pd.DataFrame) Weights (scaled PCA components) for each index from the matrix.
         """
 
@@ -144,8 +144,8 @@ class PCAStrategy:
             condition = min(np.cumsum(expl_variance), key=lambda x: abs(x - explained_var))
             num_pc = np.where(np.cumsum(expl_variance) == condition)[0][0] + 1
             # Fit the PCA model to standardized return data, again.
-            pca_factors = PCA(n_components=num_pc)
-            pca_factors.fit(standardized)
+            self.pca_model = PCA(n_components=num_pc)
+            pca_factors = self.pca_model.fit(standardized)
 
         # Output eigen vectors for weights calculation
         weights = pd.DataFrame(pca_factors.components_, columns=standardized.columns)
@@ -167,7 +167,9 @@ class PCAStrategy:
         So the output is a dataframe containing the weight for each asset in a portfolio for each eigen vector.
 
         :param matrix: (pd.DataFrame) Dataframe with index and columns containing asset returns.
-        :param explained_var (float) The user-defined explained variance criteria.
+        :param explained_var (float) The user-defined explained variance criteria. If a value is given, then the param
+        n_components would be replaced and determined by the least number of components satisfying the user-defined
+        explained variance. The value should range from 0 to 1.
         :return: (pd.DataFrame) Weights (scaled PCA components) for each index from the matrix.
         """
         # Standardizing input
@@ -246,7 +248,8 @@ class PCAStrategy:
         return residual, coefficient, intercept
 
     @staticmethod
-    def get_sscores(residuals: pd.DataFrame, intercept: pd.Series, k: float, drift: bool, p_value: float = None) -> pd.Series:
+    def get_sscores(residuals: pd.DataFrame, intercept: pd.Series, k: float, drift: bool = False,
+                    p_value: float = None) -> pd.Series:
         """
         A function to calculate S-scores for asset eigen portfolios given dataframes of residuals
         and a mean reversion speed threshold.

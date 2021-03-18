@@ -192,6 +192,6 @@ class TestPCAStrategy(unittest.TestCase):
                                                        p_value=0.01, asym=False,)
 
         # Check target weights
-        self.assertAlmostEqual(target_weights.mean()['EEM'], 0.582760, delta=1e-5)
-        self.assertAlmostEqual(target_weights.mean()['XLF'], -0.03206, delta=1e-5)
-        self.assertAlmostEqual(target_weights.mean()['SPY'], -5.09122, delta=1e-5)
+        self.assertAlmostEqual(target_weights.mean()['EEM'], 0.156588, delta=1e-5)
+        self.assertAlmostEqual(target_weights.mean()['XLF'], 0.057624, delta=1e-5)
+        self.assertAlmostEqual(target_weights.mean()['SPY'], -0.11459, delta=1e-5)

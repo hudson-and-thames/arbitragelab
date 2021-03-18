@@ -13,9 +13,9 @@ import numpy as np
 from arbitragelab.other_approaches import ETFStrategy
 
 
-class TestPCAStrategy(unittest.TestCase):
+class TestETFStrategy(unittest.TestCase):
     """
-    Tests PCAStrategy class.
+    Tests ETFStrategy class.
     """
 
     def setUp(self):
@@ -114,6 +114,7 @@ class TestPCAStrategy(unittest.TestCase):
         self.assertAlmostEqual(target_weights.mean()['EEM'], 0.333333, delta=1e-5)
         self.assertAlmostEqual(target_weights.mean()['BND'], -0.5, delta=1e-5)
         self.assertAlmostEqual(target_weights.mean()['SPY'], -0.38888, delta=1e-5)
+        self.assertAlmostEqual(target_weights.mean().mean(), -0.08571, delta=1e-5)
 
         # Check drift argument
         target_weights = self.etf_strategy.get_signals(smaller_etf, smaller_dataset, k=1, corr_window=252,
@@ -121,9 +122,9 @@ class TestPCAStrategy(unittest.TestCase):
                                                        sbc=0.75, size=1, drift=True)
 
         # Check target weights
-        self.assertAlmostEqual(target_weights.mean()['EEM'], 0.333333, delta=1e-5)
-        self.assertAlmostEqual(target_weights.mean()['BND'], -0.5, delta=1e-5)
-        self.assertAlmostEqual(target_weights.mean()['SPY'], -0.38888, delta=1e-5)
+        self.assertAlmostEqual(target_weights.mean()['DIA'], 0.222222, delta=1e-5)
+        self.assertAlmostEqual(target_weights.mean()['TIP'], -0.55555, delta=1e-5)
+        self.assertAlmostEqual(target_weights.mean().mean(), -0.08571, delta=1e-5)
 
         # Check p_value
         target_weights = self.etf_strategy.get_signals(smaller_etf, smaller_dataset, k=1, corr_window=252,
@@ -132,9 +133,10 @@ class TestPCAStrategy(unittest.TestCase):
                                                        size=1, p_value=0.2)
 
         # Check target weights
-        self.assertAlmostEqual(target_weights.mean()['EEM'], 0.333333, delta=1e-5)
-        self.assertAlmostEqual(target_weights.mean()['BND'], -0.5, delta=1e-5)
+        self.assertAlmostEqual(target_weights.mean()['TLT'], 0.0, delta=1e-5)
+        self.assertAlmostEqual(target_weights.mean()['IEF'], 0.0, delta=1e-5)
         self.assertAlmostEqual(target_weights.mean()['SPY'], -0.38888, delta=1e-5)
+        self.assertAlmostEqual(target_weights.mean().mean(), -0.08571, delta=1e-5)
 
         # Check volume
         target_weights = self.etf_strategy.get_signals(smaller_etf, smaller_dataset, smaller_volume, k=1,

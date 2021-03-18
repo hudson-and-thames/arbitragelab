@@ -14,26 +14,22 @@ import statsmodels.api as sm
 from sklearn.decomposition import PCA
 from sklearn.linear_model import LinearRegression
 
-# pylint: disable=invalid-name
-# pylint: disable=R0913
+# pylint: disable=invalid-name, too-many-arguments
 from arbitragelab.util import devadarsh
 
 
 class ETFStrategy:
     """
-    This strategy creates mean reverting portfolios using Principal Components Analysis. The idea of the strategy
-    is to estimate PCA factors affecting the dynamics of assets in a portfolio. Thereafter, for each asset in a
-    portfolio, we define OLS residuals by regressing asset returns on PCA factors. These residuals are used to
-    calculate S-scores to generate trading signals and the regression coefficients are used to construct
-    eigen portfolios for each asset. If the eigen portfolio shows good mean-reverting properties and the S-score
-    deviates enough from its mean value, that eigen portfolio is being traded. The output trading signals of
-    this strategy are weights for each asset in a portfolio at each given time. These weights are are a composition
-    of all eigen portfolios that satisfy the required properties.
+    This strategy creates mean reverting portfolios using Principal Components Analysis. Unlike PCA approach, each
+    ETF would be treatred as a dependent variable in linear regression model and compute the residual.Similar to PCA approach,
+    these residuals are used to calculate S-scores to generate trading signals. If a ETF shows good mean-reverting properties
+    and the S-score deviates enough from its mean value, then a ETF is being traded. The output trading signals of
+    this strategy are weights for each asset in a portfolio at each given time.
     """
 
     def __init__(self, n_components: int = 15):
         """
-        Initialize PCA StatArb Strategy.
+        Initialize ETF StatArb Strategy.
 
         The original paper suggests that the number of components would be chosen to explain at least
         50% of the total variance in time. Authors also denote that for G8 economies, stock returns are explained
@@ -58,11 +54,11 @@ class ETFStrategy:
         :param matrix: (pd.DataFrame) DataFrame with returns that need to be standardized.
         :param vol_matrix: (pd.DataFrame) DataFrame with histoircal trading volume data.
         :param k: (int) Look-back window used for volume moving average.
-        :return: (pd.DataFrame) a volume-adjusted returns dataFrame
+        :return: (pd.DataFrame) A volume-adjusted returns dataFrame
         """
 
         # Fill missing data with preceding values
-        returns = matrix.dropna(axis=0)
+        returns = matrix.fillna(method='ffill')
 
         # Vol change
         volume_diff = vol_matrix.diff()
@@ -99,7 +95,7 @@ class ETFStrategy:
     @staticmethod
     def standardize_data(matrix: pd.DataFrame) -> (pd.DataFrame, pd.Series):
         """
-        A function to standardize data (returns) that is being fed into the PCA.
+        A function to standardize data (returns).
 
         The standardized returns (R)are calculated as:
 
@@ -120,12 +116,12 @@ class ETFStrategy:
         """
         A function to calculate residuals given matrix of returns and factor returns.
 
-        First, for each asset in a portfolio, we fit its returns to PCA factor returns as:
+        First, for each asset in a portfolio, we fit its returns to dependent variables(ETFs) returns as:
 
-        Returns = beta_0 + beta * PCA_factor_return + residual
+        Returns = beta_0 + betas * ETF_returns + residual
 
         Residuals are used to generate trading signals and beta coefficients are used as
-        weights to later construct eigenportfolios for each asset.
+        weights for each ETF.
 
         :param matrix: (pd.DataFrame) Dataframe with index and columns containing asset returns.
         :param etf_matrix: (pd.DataFrame) DataFrame with index an columns containing ETF returns.
@@ -145,12 +141,12 @@ class ETFStrategy:
         # A class for regression
         regression = LinearRegression()
 
-        # Iterating through all tickers - to create residuals for every eigen portfolio
+        # Iterating through all tickers - to create residuals for every ETF
         for ticker in matrix.columns:
             # Fitting a regression
             regression.fit(etf_matrix, matrix[ticker])
 
-            # Calculating residual for eigen portfolio
+            # Calculating residual for ETFs
             residual[ticker] = matrix[ticker] - regression.intercept_ - np.dot(etf_matrix, regression.coef_)
 
             # Writing down the regression coefficient
@@ -162,30 +158,28 @@ class ETFStrategy:
         return residual, coefficient, intercept
 
     @staticmethod
-    def get_sscores(residuals: pd.DataFrame, intercept: pd.Series, k: float, drift: bool,
+    def get_sscores(residuals: pd.DataFrame, intercept: pd.Series, k: float, drift: bool = False,
                     p_value: float = None) -> pd.Series:
         """
-        A function to calculate S-scores for asset eigen portfolios given dataframes of residuals
+        A function to calculate S-scores for ETFs given dataframes of residuals
         and a mean reversion speed threshold.
 
-        From residuals, a discrete version of the OU process is created for each asset eigen portfolio.
+        From residuals, a discrete version of the OU process is created for each ETF.
 
         If the OU process of the asset shows a mean reversion speed above the given
         threshold k, it can be traded and the S-score is being calculated for it.
 
         The output of this function is a dataframe with S-scores that are directly used
-        to determine if the eigen portfolio of a given asset should be traded at this period.
+        to determine if the ETFs of a given asset should be traded at this period.
 
         In the original paper, it is advised to choose k being less than half of a
         window for residual estimation. If this window is 60 days, half of it is 30 days.
         So k > 252/30 = 8.4. (Assuming 252 trading days in a year)
 
-        :param residuals: (pd.DataFrame) Dataframe with residuals after fitting returns to
-            PCA factor returns.
-        :param intercept: (pd.Series) Pandas Series containining intercept(beta0) of each
-            stocks.
-        :param k: (float) Required speed of mean reversion to use the eigen portfolio in
-            trading.
+        :param residuals: (pd.DataFrame) Dataframe with residuals after fitting returns to PCA
+                          factor returns.
+        :param intercept: (pd.Series) Pandas Series containining intercept(beta0) of each stocks.
+        :param k: (float) Required speed of mean reversion to use the ETFs in trading.
         :param drift: (bool) True if the user want to take drift into consideration, Flase, otherwise.
         :param p_value (float) The p value criteria to determine whether a residual is stationary.
         :return: (pd.Series) Series of S-scores for each asset for a given residual dataframe.
@@ -269,10 +263,9 @@ class ETFStrategy:
         Enter a short position if s-score > +sso
         Close a short position if s-score < +sbc
 
-        :param position_stock: (pd.DataFrame) Dataframe with current positions for each asset in each
-            eigen portfolio.
+        :param position_stock: (pd.DataFrame) Dataframe with current positions for each ETF.
         :param s_scores: (pd.Series) Series with S-scores used to generate trading signals.
-        :param coeff: (pd.DataFrame) Dataframe with regression coefficients used to create eigen portfolios.
+        :param coeff: (pd.DataFrame) Dataframe with regression coefficients od ETFs.
         :param sbo: (float) Parameter for signal generation for the S-score.
         :param sso: (float) Parameter for signal generation for the S-score.
         :param ssc: (float) Parameter for signal generation for the S-score.
@@ -280,7 +273,7 @@ class ETFStrategy:
         :param size: (float) Number of units invested in assets when opening trades. So when opening
             a long position, buying (size) units of stock and selling (size) * betas units of other
             stocks.
-        :return: (pd.DataFrame) Updated dataframe with positions for each asset in each eigen portfolio.
+        :return: (pd.DataFrame) Updated dataframe with positions of each asset for each ETF.
         """
 
         # Generating signals using obtained s-scores
@@ -344,17 +337,17 @@ class ETFStrategy:
         Where X_i(t) is the OU process generated from the residuals, m_i and sigma_i are the
         calculated properties of this process.
 
-        The S-score is being calculated only for eigen portfolios that show mean reversion speed
+        The S-score is being calculated only for ETFs that show mean reversion speed
         above the given threshold k.
 
         In the original paper, it is advised to choose k being less than half of a
         window for residual estimation. If this window is 60 days, half of it is 30 days.
         So k > 252/30 = 8.4. (Assuming 252 trading days in a year)
 
-        So, we can have mean-reverting eigen portfolios for each asset in our portfolio. But this
+        So, we can have mean-reverting ETFs for each asset in our portfolio. But this
         portfolio is worth investing in only if it shows good mean reversion speed and the S-score
-        has deviated enough from its mean value. Based on this logic we pick promising eigen portfolios
-        and invest in them. The trading signals we get are the target weights for each of the assets
+        has deviated enough from its mean value. Based on this logic we pick promising ETFs and invest
+        in them. The trading signals we get are the target weights for each of the assets
         in our portfolio at any given time.
 
         Trading rules to enter a mean-reverting portfolio based on the S-score are:
@@ -367,15 +360,14 @@ class ETFStrategy:
         The authors empirically chose the optimal values for the above parameters based on stock
         prices for years 2000-2004 as: sbo = sso = 1.25; sbc = 0.75; ssc = 0.5.
 
-        Opening a long position on an eigne portfolio means buying one dollar of the corresponding asset
-        and selling beta_i1 dollars of weights of other assets from component1, beta_i2 dollars of weights
-        of other assets from component2 and so on. Opening a short position means selling the corresponding
-        asset and buying betas of other assets.
+        Opening a long position on a ETF means buying one dollar of the corresponding asset
+        and selling beta_i1 dollars of ETF1, beta_i2 dollars of ETF2 and so on. Opening a short position means selling the
+        corresponding asset and buying betas of ETFs.
 
         :param etf_matrix: (pd.DataFrame) DataFrame with index an columns containing ETF returns.
         :param matrix: (pd.DataFrame) DataFrame with returns for assets.
         :param vol_matrix: (pd.DataFrame) DataFrame with historical volume data.
-        :param k: (float) Required speed of mean reversion to use the eigen portfolio in trading.
+        :param k: (float) Required speed of mean reversion to use the ETFs in trading.
         :param corr_window: (int) Look-back window used for correlation matrix estimation.
         :param residual_window: (int) Look-back window used for residuals calculation.
         :param sbo: (float) Parameter for signal generation for the S-score.
@@ -388,8 +380,8 @@ class ETFStrategy:
         :param drift: (bool) True if a user want to take drift into consideration, Flase, otherwise.
         :param p_value (float) The p value criteria to determine whether a residual is stationary.
         :return: (pd.DataFrame) DataFrame with target weights for each asset at every observation.
-            It is being calculated as a combination of all eigen portfolios that are satisfying the
-            mean reversion speed requirement and S-score values.
+            It is being calculated as a combination of ETFs that are satisfying the mean reversion
+            speed requirement and S-score values.
         """
         # pylint: disable=too-many-locals
 
@@ -408,7 +400,7 @@ class ETFStrategy:
             # Calculating residuals for this window
             resid, coeff, intercept = self.get_residuals(obs_residual, etf)
 
-            # Finding the S-scores for eigen portfolios in this period (no change!)
+            # Finding the S-scores for ETFs in this period (no change!)
             s_scores = self.get_sscores(resid, intercept, k, drift, p_value)
 
             # Series of current positions for assets in our portfolio
@@ -424,7 +416,7 @@ class ETFStrategy:
             # Temporary series to store all weights
             position_stock_temp = pd.Series(0, index=tol_col, dtype=np.float64)
 
-            # Adding also first stocks from all eigen portfolios
+            # Adding also first stocks from all ETFs
             position_stock_temp = position_stock_temp + position_stock.iloc[0]
             position_stock_temp = position_stock_temp.fillna(0.0)
 
