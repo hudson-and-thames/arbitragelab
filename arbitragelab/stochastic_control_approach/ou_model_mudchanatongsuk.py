@@ -37,15 +37,15 @@ class StochasticControlMudchanatongsuk:
     def fit(self, data: pd.DataFrame):
 
         # Preprocessing
-        #data = data.ffill()
-        #TODO : Might need to normalize input, estimate params is not running properly.
+        data = data.ffill()
 
         self.time_array = np.arange(0, len(data)) * self.delta_t
         self.ticker_A, self.ticker_B = data.columns[0], data.columns[1]
         self.S = np.log(data.loc[:, self.ticker_B])
         self.spread = np.log(data.loc[:, self.ticker_A]) - self.S
 
-        #self._estimate_params()
+        #self._estimate_params() #TODO : V_squared estimator is returning a negative value which is incorrect. Need to check why?
+
         params = self._estimate_params_log_likelihood()
         print(params)
         self.sigma, self.mu, self.k,self.theta, self.eta, self.rho = params[:-1]
@@ -192,7 +192,7 @@ class StochasticControlMudchanatongsuk:
 
         vec = y - E_y
 
-        with np.errstate(all='raise'): # This was done due to np.nan's in final result.
+        with np.errstate(all='raise'): # This was done due to np.nan's outputted in final result of scipy minimize.
             try:
                 f_y_denm = (2 * math.pi * np.sqrt(np.linalg.det(matrix)))
 

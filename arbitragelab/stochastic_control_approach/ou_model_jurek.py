@@ -14,7 +14,6 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from arbitragelab.cointegration_approach.johansen import JohansenPortfolio
 from arbitragelab.cointegration_approach.engle_granger import EngleGrangerPortfolio
 
 class StochasticControlJurek:
@@ -25,8 +24,8 @@ class StochasticControlJurek:
         self.ticker_B = None
         self.spread = None
         self.time_array = None
+        self.delta_t = None
 
-        self.delta_t = 1 / 251   #TODO : Is this value correct for this paper?
         # Estimated params from training data.
         self.sigma = None
         self.mu = None
@@ -37,7 +36,12 @@ class StochasticControlJurek:
         self.gamma = None
         self.beta = None
 
-    def _calc_total_return_indices(self, data):
+    @staticmethod
+    def _calc_total_return_indices(data):
+        """
+        The total return indices calculation follows Section IV A in Jurek (2007).
+        """
+
         returns_df = data.pct_change()
         returns_df = returns_df.replace([np.inf, -np.inf], np.nan).ffill().dropna()
 
@@ -48,9 +52,12 @@ class StochasticControlJurek:
         return total_return_indices
 
 
+    def fit(self, data: pd.DataFrame, delta_t = 1 / 252, significance_level = 0.95):
+        """
+        The spread construction follows Section IV A in Jurek (2007).
+        """
 
-    def fit(self, data: pd.DataFrame):
-
+        self.delta_t = delta_t
         self.time_array = np.arange(0, len(data)) * self.delta_t
         self.ticker_A, self.ticker_B = data.columns[0], data.columns[1]
 
@@ -61,7 +68,7 @@ class StochasticControlJurek:
         eg_adf_statistics = eg_portfolio.adf_statistics
         eg_cointegration_vectors = eg_portfolio.cointegration_vectors
 
-        if eg_adf_statistics.loc['statistic_value', 0] > eg_adf_statistics.loc['95%', 0]:
+        if eg_adf_statistics.loc['statistic_value', 0] > eg_adf_statistics.loc[f'{int(significance_level * 100)}%', 0]:
             print(eg_adf_statistics)
             raise Exception("ADF statistic test failure.")
 
@@ -71,7 +78,8 @@ class StochasticControlJurek:
         self.spread.plot()
         plt.show()
 
-        # TODO : This implementation of spread is incorrect.
+        # TODO : This implementation of spread might be incorrect.
+        #  The values of estimators calculated do not match what is expected.
 
         params = self._estimate_params(self.spread)
         self.mu, self.k, self.sigma = params
@@ -84,6 +92,9 @@ class StochasticControlJurek:
 
 
     def _estimate_params(self, spread):
+        """
+        These formulas for the estimators are given in Appendix E of Jurek (2007).
+        """
 
         N = len(spread)
 
@@ -149,8 +160,8 @@ class StochasticControlJurek:
 
         total_return_indices = self._calc_total_return_indices(data)
 
-        W = np.ones(len(t)) # Wealth is normalized to one. #TODO : Is this the correct way?
-        S = (total_return_indices * self.eg_scaled_vectors).sum(axis=1) #TODO : Do we use trained linear weights here ?
+        W = np.ones(len(t)) # Wealth is normalized to one.
+        S = (total_return_indices * self.eg_scaled_vectors).sum(axis=1)
 
         N = None
         # The optimal weights equation is the same for both types of utility functions.
@@ -171,7 +182,7 @@ class StochasticControlJurek:
             elif utility_type == 2:
                 A, B = self._AB_calc_2(tau)
 
-            N = ((self.k * (self.mu - S) - self.r * S) / (self.sigma ** 2) + (2 * A * S + B) / self.gamma) * W
+            N = ((self.k * (self.mu - S) - self.r * S) / (self.gamma * self.sigma ** 2) + (2 * A * S + B) / self.gamma) * W
 
         return N / W # We return the optimal allocation of spread asset scaled by wealth.
 
@@ -206,13 +217,14 @@ class StochasticControlJurek:
         #Note : A<=0 and decreasing in tau for gamma > 1, and vice versa for gamma < 1.
 
         A = None
-        if 0 < self.gamma < gamma_0:
+        error_margin = 1e-4
+        if 0 < self.gamma < gamma_0 - error_margin:
             A = -c_2 / c_1 + (np.sqrt(-disc) / (2 * c_1)) * np.tan(np.sqrt(-disc) * tau / 2 + np.arctan(2 * c_2 / np.sqrt(-disc)))
 
-        elif self.gamma == gamma_0:
+        elif gamma_0 - error_margin <= self.gamma <= gamma_0 + error_margin:
             A = -(c_2 / c_1) * (1 + 1 / (c_2 * tau - 1))
 
-        elif gamma_0 < self.gamma < 1:
+        elif gamma_0 + error_margin < self.gamma < 1:
             # coth = 1/tanh and arccoth(x) = arctanh(1/x)
             # For reference : https://www.efunda.com/math/hyperbolic/hyperbolic.cfm
 
@@ -233,7 +245,8 @@ class StochasticControlJurek:
         c_5 = -((self.k + self.r) / self.sigma ** 2) * ((1 - self.gamma) / self.gamma) * self.k * self.mu
 
         B = None
-        if 0 < self.gamma < gamma_0:
+        error_margin = 1e-4
+        if 0 < self.gamma < gamma_0 - error_margin:
             phi_1 = np.sqrt(-disc) * (np.cos(np.sqrt(-disc) * tau / 2) - 1) + 2 * c_2 * np.sin(np.sqrt(-disc) * tau / 2)
 
             phi_2 = np.arctanh(np.tan(0.25 * (np.sqrt(-disc) * tau - 2 * np.arctan(2 * c_2 / np.sqrt(-disc))))) + \
@@ -242,10 +255,10 @@ class StochasticControlJurek:
             B = c_4 * phi_1 / (c_1 * np.sqrt(-disc)) + (4 * phi_2 / np.sqrt(-disc)) * (c_5 - c_4 / c_1) * \
                 np.cos(np.sqrt(-disc) * tau / 2 - np.arctan(c_2 / np.sqrt(-disc)))
 
-        elif self.gamma == gamma_0:
+        elif gamma_0 - error_margin <= self.gamma <= gamma_0 + error_margin:
             B = (c_1 * c_5 * (c_2 * tau - 2) - (c_2 ** 2) * c_4) * tau / (2 * c_1 * (c_2 * tau - 1))
 
-        elif self.gamma > gamma_0:
+        elif self.gamma > gamma_0 + error_margin:
             B = (4 * (c_2 * c_5 - c_3 * c_4 + (c_3 * c_4 - c_2 * c_5) * np.cosh(np.sqrt(disc) * tau / 2))
                  + 2 * c_5 * np.sqrt(disc) * np.sinh(np.sqrt(disc) * tau / 2)) \
                 / (disc * np.cosh(np.sqrt(disc) * tau / 2) - 2 * c_2 * np.sqrt(disc) * np.sinh(np.sqrt(disc) * tau / 2))
@@ -293,11 +306,12 @@ class StochasticControlJurek:
         c_6 = self.k * (self.k + self.r) * (self.gamma - 1) * self.mu / (self.gamma * self.sigma ** 2)
 
         B = None
+        error_margin = 1e-4
 
         rep_exp_1 = np.exp(tau * c_2)
         rep_exp_2 = np.exp(tau * c_5)
 
-        if 0 < self.gamma < gamma_0:
+        if 0 < self.gamma < gamma_0 - error_margin:
 
             rep_phrase_1 = np.sqrt(c_1 * c_3 - c_2 ** 2)
             rep_phrase_2 = np.sqrt(c_1 * c_3) / rep_phrase_1
@@ -323,7 +337,7 @@ class StochasticControlJurek:
                                                -c_3 * term_5 * c_4)) / denominator
 
 
-        elif self.gamma == gamma_0:
+        elif gamma_0 - error_margin <= self.gamma <= gamma_0 + error_margin:
 
             denominator = c_1 * rep_exp_1 * (tau * c_2 - 1) * (c_2 - c_5) ** 2
 
@@ -339,7 +353,7 @@ class StochasticControlJurek:
             B = (-term_1 + term_2 - term_3
                  + term_4) / denominator
 
-        elif gamma_0 < self.gamma < 1:
+        elif gamma_0 + error_margin < self.gamma < 1:
 
             rep_phrase_1 = np.sqrt(c_1 * c_3 / c_2 ** 2)
             rep_phrase_2 = np.sqrt(c_2 ** 2 - c_1 * c_3)
