@@ -16,32 +16,51 @@ import matplotlib.pyplot as plt
 
 from arbitragelab.cointegration_approach.engle_granger import EngleGrangerPortfolio
 
+
 class StochasticControlJurek:
+    """
+    This class derives the optimal dynamic strategy for arbitrageurs with a finite horizon
+    and non-myopic preferences facing a mean-reverting arbitrage opportunity (e.g. an equity pairs trade).
+
+    To capture the presence of horizon and divergence risk, we model the dynamics of the mispricing
+    using a mean-reverting OU process. Under this process, although the mispricing is guaranteed
+    to be eliminated at some future date, the timing of convergence, as well as the maximum magnitude
+    of the mispricing prior to convergence, are uncertain. With this assumption, we are able to derive
+    the arbitrageur's optimal dynamic portfolio policy for a set of general, non-myopic preference
+    specifications, including CRRA utility defined over wealth at a finite horizon and Epstein-Zin
+    utility defined over intermediate cash flows (e.g. fees).
+    """
+
     def __init__(self):
 
-        #Training Data.
-        self.ticker_A = None
-        self.ticker_B = None
-        self.spread = None
-        self.time_array = None
-        self.delta_t = None
+        #Characteristics of Training Data.
+        self.ticker_A = None  # Ticker Symbol of first stock.
+        self.ticker_B = None  # Ticker Symbol of second stock.
+        self.spread = None # Constructed spread from training data.
+        self.time_array = None # Time indices of training data.
+        self.delta_t = None # Time difference between each index in data, calculated in years.
 
         # Estimated params from training data.
-        self.sigma = None
-        self.mu = None
-        self.k = None
+        self.sigma = None # Standard deviation of spread.
+        self.mu = None # Long run mean of spread.
+        self.k = None # Rate of mean reversion.
 
         # Params inputted by user.
-        self.r = None
-        self.gamma = None
-        self.beta = None
+        self.r = None # Rate of returns.
+        self.gamma = None #  Coefficient of relative risk aversion.
+        self.beta = None # Rate of time preference.
+
 
     @staticmethod
-    def _calc_total_return_indices(data):
+    def _calc_total_return_indices(data : pd.DataFrame) -> pd.DataFrame:
         """
-        The total return indices calculation follows Section IV A in Jurek (2007).
+        This method calculates the total return indices from pricing data.
+        This calculation follows Section IV A in Jurek (2007).
+
+        :param data: (pd.DataFrame) Contains price series of both stocks in spread.
         """
 
+        #Calculating the daily returns.
         returns_df = data.pct_change()
         returns_df = returns_df.replace([np.inf, -np.inf], np.nan).ffill().dropna()
 
@@ -52,26 +71,39 @@ class StochasticControlJurek:
         return total_return_indices
 
 
-    def fit(self, data: pd.DataFrame, delta_t = 1 / 252, significance_level = 0.95):
+    def fit(self, data: pd.DataFrame, delta_t: float = 1 / 252, significance_level: float = 0.95):
         """
-        The spread construction follows Section IV A in Jurek (2007).
+        This method uses inputted training data to calculate the spread and
+        estimate the parameters of the corresponding OU process.
+
+        The spread construction implementation follows Section IV A in Jurek (2007).
+
+        :param data: (pd.DataFrame) Contains price series of both stocks in spread.
+        :param delta_t: (float) Time difference between each index of data, calculated in years.
+        :param significance_level: (float) This significance level is used in the ADF statistic test.
+            Value can be one of the following: (0.90, 0.95, 0.99).
         """
 
+        # Setting instance attributes.
         self.delta_t = delta_t
         self.ticker_A, self.ticker_B = data.columns[0], data.columns[1]
 
+        #Calculating the total return indices from pricing data.
         total_return_indices = self._calc_total_return_indices(data)
         self.time_array = np.arange(0, len(total_return_indices)) * self.delta_t
 
+        # As mentioned in the paper, the vector of linear weights are calculated using co-integrating regression.
         eg_portfolio = EngleGrangerPortfolio()
-        eg_portfolio.fit(total_return_indices, add_constant=True)
-        eg_adf_statistics = eg_portfolio.adf_statistics
-        eg_cointegration_vectors = eg_portfolio.cointegration_vectors
+        eg_portfolio.fit(total_return_indices, add_constant=True)  # Fitting the total return indices.
+        eg_adf_statistics = eg_portfolio.adf_statistics  # Stores the results of the ADF statistic test.
+        eg_cointegration_vectors = eg_portfolio.cointegration_vectors # Stores the calculated weights for the pair o stocks in the spread.
 
         if eg_adf_statistics.loc['statistic_value', 0] > eg_adf_statistics.loc[f'{int(significance_level * 100)}%', 0]:
+            # Making sure that the data passes the ADF statistic test.
             print(eg_adf_statistics)
             raise Exception("ADF statistic test failure.")
 
+        # Scaling the weights such that they sum to 1.
         self.eg_scaled_vectors = eg_cointegration_vectors.loc[0] / abs(eg_cointegration_vectors.loc[0]).sum()
 
         self.spread = (total_return_indices * self.eg_scaled_vectors).sum(axis=1)
@@ -91,21 +123,27 @@ class StochasticControlJurek:
         self._check_estimations()
 
 
-    def _estimate_params(self, spread):
+    def _estimate_params(self, spread: pd.DataFrame):
         """
+        This method implements the closed form solutions for estimators of the model parameters.
         These formulas for the estimators are given in Appendix E of Jurek (2007).
+
+        :param: (pd.DataFrame) Price series of the constructed spread.
         """
 
         N = len(spread)
 
+        # Mean estimator.
         mu = spread.mean()
 
+        # Estimator for rate of mean reversion.
         k = (-1 / self.delta_t) * np.log(np.multiply(spread[1:] - mu, spread[:-1] - mu).sum()
                                               / np.power(spread[1:] - mu, 2).sum())
 
         sigma_calc_sum = np.power((spread[1:] - mu - np.exp(-k * self.delta_t) * (spread[:-1] - mu))
                                   / np.exp(-k * self.delta_t), 2).sum()
 
+        #Estimator for standard deviation.
         sigma = np.sqrt(2 * k * sigma_calc_sum / ((np.exp(2 * k * self.delta_t) - 1) * (N - 2)))
 
         return mu, k, sigma
@@ -128,45 +166,55 @@ class StochasticControlJurek:
         #TODO : This is incomplete.
 
 
-    def optimal_portfolio_weights(self, data: pd.DataFrame, beta, utility_type = 1, r = 0.05, gamma = 1):
+    def optimal_portfolio_weights(self, data: pd.DataFrame, utility_type: int = 1, gamma: float = 1, beta: float = 0.1, r: float = 0.05):
         """
-
         Implementation of Theorem 1 and Theorem 2 in Jurek (2007).
 
-        utility_type = 1 implies agent with utility of terminal wealth.
-                        gamma = 1 implies log utility investor.
-                        gamma != 1 implies general CRRA investor.
+        This method implements the optimal portfolio strategy for two types of investors with varying utility functions.
 
-        utility_type = 2 implies agent whose utility is defined over intermediate consumption
-         with agent’s preferences described by Epstein-Zin recursive utility with psi(elasticity of intertemporal substitution) = 1.
-                    gamma = 1 reduces to standard log utility.
-                    gamma ! = 1, gamma > 1 implies more risk averse investors, whereas gamma < 1 implies more risk tolerance.
+        The first type of investor is represented by utility_type = 1.
+        This agent has constant relative risk aversion preferences(CRRA investor) with utility defined over terminal wealth.
+        For this type of investor,  gamma = 1 implies log utility investor, and
+                                    gamma != 1 implies general CRRA investor.
+
+        The second type of investor is represented by utility_type = 2.
+        This agent has utility defined over intermediate consumption,
+        with agent’s preferences described by Epstein-Zin recursive utility with psi(elasticity of intertemporal substitution) = 1.
+        For this type of investor,  gamma = 1 reduces to standard log utility investor, and
+                                    gamma > 1 implies more risk averse investors,
+                                    whereas gamma < 1 implies more risk tolerance in comparison to investor with log utility.
 
         What is beta?
-        1)subjective rate of time preference.
-
-        2)beta signifies the constant fraction of total wealth an investor chooses to consume. This is analogous to a hedge fund investor
+        Beta signifies the constant fraction of total wealth an investor chooses to consume. This is analogous to a hedge fund investor
         who cares both about terminal wealth in some risk-averse way and consumes a constant fraction, β,
         of assets under management (the management fee).
+        For utility_type = 2, C(Consumption) = beta * W.
 
-        For utility_type = 2, C(Consumption) = beta * W
+        :param data: Contains price series of both stocks in spread.
+        :param utility_type: Flag signifies type of investor preferences.
+        :param gamma: coefficient of relative risk aversion.
+        :param beta: Subjective rate of time preference. (Only required for utility_type = 2).
+        :param r: Rate of Returns.
         """
 
+        # Setting instance attributes.
         self.r = r
         self.gamma = gamma
         self.beta = beta
 
+        #Calculating the total return indices from pricing data.
         total_return_indices = self._calc_total_return_indices(data)
         t = np.arange(0, len(total_return_indices)) * self.delta_t
-        tau = t[-1] - t
+        tau = t[-1] - t  # Stores time remaining till closure. (In years)
 
-        W = np.ones(len(t)) # Wealth is normalized to one.
+        W = np.ones(len(t))  # Wealth is normalized to one.
+        # Calculating the spread with weights calculated from training data.
         S = (total_return_indices * self.eg_scaled_vectors).sum(axis=1)
 
         N = None
         # The optimal weights equation is the same for both types of utility functions.
         # For gamma = 1, the outputs weights are identical for both types of utility functions,
-        # whereas for gamma != 1, the calculation of A and B functions are different.
+        # whereas for gamma != 1, the calculation of A and B functions in the equation are different.
         if self.gamma == 1:
             N = ((self.k * (self.mu - S) - self.r * S) / (self.sigma ** 2)) * W
 
