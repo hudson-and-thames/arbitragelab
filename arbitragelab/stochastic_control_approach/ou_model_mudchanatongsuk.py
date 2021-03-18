@@ -34,10 +34,15 @@ class StochasticControlMudchanatongsuk:
 
         self.gamma = None
 
+    @staticmethod
+    def _data_preprocessing(data):
+
+        return data.ffill()
+
     def fit(self, data: pd.DataFrame):
 
         # Preprocessing
-        data = data.ffill()
+        data = self._data_preprocessing(data)
 
         self.time_array = np.arange(0, len(data)) * self.delta_t
         self.ticker_A, self.ticker_B = data.columns[0], data.columns[1]
@@ -92,6 +97,9 @@ class StochasticControlMudchanatongsuk:
 
 
     def optimal_portfolio_weights(self, data: pd.DataFrame, gamma = -100):
+
+        # Preprocessing
+        data = self._data_preprocessing(data)
 
         self.gamma = gamma
         t = np.arange(0, len(data)) * self.delta_t

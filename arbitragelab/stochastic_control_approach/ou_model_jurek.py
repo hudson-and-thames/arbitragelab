@@ -58,10 +58,10 @@ class StochasticControlJurek:
         """
 
         self.delta_t = delta_t
-        self.time_array = np.arange(0, len(data)) * self.delta_t
         self.ticker_A, self.ticker_B = data.columns[0], data.columns[1]
 
         total_return_indices = self._calc_total_return_indices(data)
+        self.time_array = np.arange(0, len(total_return_indices)) * self.delta_t
 
         eg_portfolio = EngleGrangerPortfolio()
         eg_portfolio.fit(total_return_indices, add_constant=True)
@@ -155,10 +155,10 @@ class StochasticControlJurek:
         self.r = r
         self.gamma = gamma
         self.beta = beta
-        t = np.arange(0, len(data)) * self.delta_t
-        tau = t[-1] - t
 
         total_return_indices = self._calc_total_return_indices(data)
+        t = np.arange(0, len(total_return_indices)) * self.delta_t
+        tau = t[-1] - t
 
         W = np.ones(len(t)) # Wealth is normalized to one.
         S = (total_return_indices * self.eg_scaled_vectors).sum(axis=1)
