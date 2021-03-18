@@ -46,9 +46,15 @@ class StochasticControlMudchanatongsuk:
         self.spread = np.log(data.loc[:, self.ticker_A]) - self.S
 
         #self._estimate_params()
-        print(self._estimate_params_log_likelihood())
+        params = self._estimate_params_log_likelihood()
+        print(params)
+        self.sigma, self.mu, self.k,self.theta, self.eta, self.rho = params[:-1]
+
 
     def _estimate_params(self):
+        """
+        Closed Form Estimators of params.
+        """
 
         N = len(self.spread) - 1
 
@@ -84,6 +90,7 @@ class StochasticControlMudchanatongsuk:
 
         self.rho = self.k * C * np.sqrt(V_squared * S_squared) / (self.eta * self.sigma * (1 - p))
 
+
     def optimal_portfolio_weights(self, data: pd.DataFrame, gamma = -100):
 
         self.gamma = gamma
@@ -99,6 +106,7 @@ class StochasticControlMudchanatongsuk:
 
         return h
 
+
     def _alpha_beta_calc(self, tau):
 
         sqrt_gamma = np.sqrt(1 - self.gamma)
@@ -109,6 +117,7 @@ class StochasticControlMudchanatongsuk:
 
         return alpha_t, beta_t
 
+
     def _alpha_calc(self, sqrt_gamma, exp_calc):
 
         left_calc = self.k * (1 - sqrt_gamma) / (2 * (self.eta ** 2))
@@ -116,6 +125,7 @@ class StochasticControlMudchanatongsuk:
         right_calc = 2 * sqrt_gamma / (1 - sqrt_gamma - (1 + sqrt_gamma) * exp_calc)
 
         return left_calc * (1 + right_calc)
+
 
     def _beta_calc(self, sqrt_gamma, exp_calc):
 
@@ -129,11 +139,12 @@ class StochasticControlMudchanatongsuk:
 
     def _estimate_params_log_likelihood(self):
         """
+        Estimates parameters of model based on log likelihood maximization.
         """
 
         # Setting bounds
         # sigma, mu, k, theta, eta, rho
-        bounds = ((1e-5, None), (None, None), (1e-5, None), (None, None), (1e-5, None), (-1, 1))
+        bounds = ((1e-5, None), (None, None), (1e-5, None), (None, None), (1e-5, None), (-1 + 1e-5, 1 - 1e-5))
 
         theta_init = np.mean(self.spread)
 
@@ -141,7 +152,7 @@ class StochasticControlMudchanatongsuk:
         initial_guess = np.array((1, 0, 1, theta_init, 1, 0.5))
 
         result = so.minimize(self._compute_log_likelihood, initial_guess,
-                             args=(self.spread, self.S, self.delta_t), bounds=bounds)
+                             args=(self.spread, self.S, self.delta_t), bounds=bounds, options={'maxiter': 100000})
 
         # Unpacking optimal values
         sigma, mu, k, theta, eta, rho = result.x
@@ -156,6 +167,7 @@ class StochasticControlMudchanatongsuk:
     @staticmethod
     def _compute_log_likelihood(params, *args):
         """
+        Helper function computes log likelihood function for a set of params.
         """
 
         # Setting given parameters
@@ -168,23 +180,27 @@ class StochasticControlMudchanatongsuk:
         matrix[0, 0] = (eta ** 2) * (1 - np.exp(-2 * k * dt)) / (2 * k)
         matrix[0, 1] = rho * eta * sigma * (1 - np.exp(k * dt)) / k
         matrix[1, 0] = matrix[0 ,1]
-        matrix[1, 1] = rho ** 2 * dt
+        matrix[1, 1] = sigma ** 2 * dt
 
         X = X[:-1]
         S = S[:-1]
-        y = y[:, :-1]
+        y = y[:, 1:]
 
         E_y = np.zeros((2, len(X)))
         E_y[0, :] = X * np.exp(-k * dt) + theta * (1 - np.exp(-k * dt))
         E_y[1, :] = S + (mu - 0.5 * sigma ** 2) * dt
 
         vec = y - E_y
-        f_y_denm = (2 * math.pi * np.sqrt(np.linalg.det(matrix)))
 
-        f_y = np.exp(-0.5 * np.einsum('ij,ij->j', vec, np.linalg.inv(matrix) @ vec)) / f_y_denm
+        with np.errstate(all='raise'): # This was done due to np.nan's in final result.
+            try:
+                f_y_denm = (2 * math.pi * np.sqrt(np.linalg.det(matrix)))
 
-        print(f_y)
-        # TODO : incorrect, need to fix.
+                f_y = np.exp(-0.5 * np.einsum('ij,ij->j', vec, np.linalg.inv(matrix) @ vec)) / f_y_denm
+            except FloatingPointError as r:
+                return 0
+
+
         log_likelihood = np.log(f_y).sum()
 
         return -log_likelihood
