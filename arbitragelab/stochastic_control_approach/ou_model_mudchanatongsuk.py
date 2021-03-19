@@ -49,6 +49,8 @@ class StochasticControlMudchanatongsuk:
         self.S = np.log(data.loc[:, self.ticker_B])
         self.spread = np.log(data.loc[:, self.ticker_A]) - self.S
 
+        self.spread = self.spread.to_numpy()  # Converting from pd.Series to numpy array.
+        self.S = self.S.to_numpy()  # Converting from pd.Series to numpy array.
         #self._estimate_params() #TODO : V_squared estimator is returning a negative value which is incorrect. Need to check why?
 
         params = self._estimate_params_log_likelihood()
@@ -105,6 +107,7 @@ class StochasticControlMudchanatongsuk:
         t = np.arange(0, len(data)) * self.delta_t
         tau = t[-1] - t
         x = np.log(data.iloc[:, 0]) - np.log(data.iloc[:, 1])
+        x = x.to_numpy()  # Converting from pd.Series to numpy array.
 
         alpha_t, beta_t = self._alpha_beta_calc(tau)
 

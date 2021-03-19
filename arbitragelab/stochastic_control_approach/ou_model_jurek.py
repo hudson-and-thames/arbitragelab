@@ -17,6 +17,7 @@ import matplotlib.pyplot as plt
 from arbitragelab.cointegration_approach.engle_granger import EngleGrangerPortfolio
 
 
+
 class StochasticControlJurek:
     """
     This class derives the optimal dynamic strategy for arbitrageurs with a finite horizon
@@ -113,6 +114,10 @@ class StochasticControlJurek:
         # TODO : This implementation of spread might be incorrect.
         #  The values of estimators calculated do not match what is expected.
 
+
+        self.spread = self.spread.to_numpy() # TODO : This conversion seems to have changed the estimated values. Not sure why?
+
+
         params = self._estimate_params(self.spread)
         self.mu, self.k, self.sigma = params
 
@@ -190,11 +195,11 @@ class StochasticControlJurek:
         of assets under management (the management fee).
         For utility_type = 2, C(Consumption) = beta * W.
 
-        :param data: Contains price series of both stocks in spread.
-        :param utility_type: Flag signifies type of investor preferences.
-        :param gamma: coefficient of relative risk aversion.
-        :param beta: Subjective rate of time preference. (Only required for utility_type = 2).
-        :param r: Rate of Returns.
+        :param data: (pd.DataFrame) Contains price series of both stocks in spread.
+        :param utility_type: (int) Flag signifies type of investor preferences.
+        :param gamma: (float) coefficient of relative risk aversion.
+        :param beta: (float) Subjective rate of time preference. (Only required for utility_type = 2).
+        :param r: (float) Rate of Returns.
         """
 
         # Setting instance attributes.
@@ -210,6 +215,8 @@ class StochasticControlJurek:
         W = np.ones(len(t))  # Wealth is normalized to one.
         # Calculating the spread with weights calculated from training data.
         S = (total_return_indices * self.eg_scaled_vectors).sum(axis=1)
+
+        S = S.to_numpy() # TODO : This conversion in fit seems to have changed the estimated values.
 
         N = None
         # The optimal weights equation is the same for both types of utility functions.
@@ -237,8 +244,10 @@ class StochasticControlJurek:
 
     def _AB_calc_1(self, tau):
         """
-        For utility_type = 1.
-        Follows Appendix A.2 in the paper.
+        This helper function computes the A and B functions for investors with utility_type = 1.
+        The implementation follows Appendix A.2 in the paper.
+
+        :param: tau
         """
 
         c_1 = 2 * self.sigma ** 2 / self.gamma
