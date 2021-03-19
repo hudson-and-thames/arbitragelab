@@ -8,15 +8,14 @@ This module implements the PCA approach described by by Marco Avellaneda and Jeo
 <https://math.nyu.edu/faculty/avellane/AvellanedaLeeStatArb20090616.pdf>`_.
 """
 
+# pylint: disable=invalid-name, too-many-arguments
 import numpy as np
 import pandas as pd
 import statsmodels.api as sm
 from sklearn.decomposition import PCA
 from sklearn.linear_model import LinearRegression
 
-# pylint: disable=invalid-name, too-many-arguments
 from arbitragelab.util import devadarsh
-
 
 class PCAStrategy:
     """
@@ -46,13 +45,15 @@ class PCAStrategy:
         devadarsh.track('PCAStrategy')
 
     @staticmethod
-    def volume_modified_return(matrix: pd.DataFrame, vol_matrix: pd.DataFrame, k: int) -> pd.DataFrame:
+    def volume_modified_return(matrix: pd.DataFrame, vol_matrix: pd.DataFrame, k: int = 60) -> pd.DataFrame:
         """
         A function to adjust the return dataframe with historical trading volume data.
 
         The volume-adjusted returns is calculated as:
 
-        vol_ajust_R = R * (k-day moving average of volume) / volume_change
+        vol_ajust_R = R * (k-day moving average of volume) / volume
+
+        In case when volume data is missing, the respective return value will not be changed.
 
         :param matrix: (pd.DataFrame) DataFrame with returns that need to be standardized.
         :param vol_matrix: (pd.DataFrame) DataFrame with histoircal trading volume data.
@@ -63,35 +64,21 @@ class PCAStrategy:
         # Fill missing data with preceding values
         returns = matrix.fillna(method='ffill')
 
-        # Vol change
-        volume_diff = vol_matrix.diff()
-
         # Moving Average of historical volume data
         volume_mv = vol_matrix.rolling(window=k).mean()
 
         # Adjustment term
-        adjust_term = volume_mv / volume_diff
+        adjust_term = volume_mv / vol_matrix
 
         # Fill missing values in adjustment term with 1s
         adjust_term = adjust_term.replace([np.inf, -np.inf], np.nan)
         adjust_term = adjust_term.fillna(1)
 
-        # Find common columns between dataframe returns and dataframe volume_chg
-        common_index = returns.index.intersection(adjust_term.index)
-
-        # Make sure they have the same date indexes
-        returns = returns.loc[common_index]
-        adjust_term = adjust_term.loc[common_index]
-
-        # Find common columns between dataframe returns and dataframe volume_chg
-        common_columns = returns.columns.intersection(adjust_term.columns)
-
-        # Make sure they have the same columns since some stocks lack volume data.
-        returns = returns[common_columns]
-        adjust_term = adjust_term[common_columns]
-
         # Modified returns after taking trading volume into account
-        modified_returns = returns * adjust_term
+        modified_returns = returns.mul(adjust_term, fill_value=1)
+
+        # Restoring original columns order
+        modified_returns = modified_returns[returns.columns]
 
         return modified_returns
 
@@ -120,15 +107,14 @@ class PCAStrategy:
 
         Weights are calculated from PCA components as:
 
-        Weight = Eigen vector / std.(R)
+        Weight = Eigen vector / st.d.(R)
 
         So the output is a dataframe containing the weight for each asset in a portfolio for each eigen vector.
 
         :param matrix: (pd.DataFrame) Dataframe with index and columns containing asset returns.
         :param explained_var (float) The user-defined explained variance criteria. If a value is given, then the param
-        n_components would be replaced and determined by the least number of components satisfying the user-defined
-        explained variance. The value should range from 0 to 1.
-
+            n_components would be replaced and determined by the least number of components satisfying the user-defined
+            explained variance. Value range is [0, 1].
         :return: (pd.DataFrame) Weights (scaled PCA components) for each index from the matrix.
         """
 
@@ -140,8 +126,11 @@ class PCAStrategy:
 
         # If a user requires a fixed explained variance
         if explained_var is not None:
+            # Getting the explained variance values
             expl_variance = pca_factors.explained_variance_ratio_
+            # Finding the closest explained value
             condition = min(np.cumsum(expl_variance), key=lambda x: abs(x - explained_var))
+            # The number of components to use
             num_pc = np.where(np.cumsum(expl_variance) == condition)[0][0] + 1
             # Fit the PCA model to standardized return data, again.
             self.pca_model = PCA(n_components=num_pc)
@@ -174,10 +163,12 @@ class PCAStrategy:
         """
         # Standardizing input
         standardized, std = PCAStrategy.standardize_data(matrix)
-        n = standardized.shape[1]
+
+        # Number of elements
+        num_elem = standardized.shape[1]
 
         # Gram Matrix
-        g_mat = standardized.T @ standardized / n
+        g_mat = standardized.T @ standardized / num_elem
 
         # Asymptotic PCA(Eigendecomposition of the Gram Matrix)
         eigen_values, eigen_vectors = np.linalg.eig(g_mat)
