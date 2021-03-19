@@ -10,7 +10,7 @@ import unittest
 import os
 import pandas as pd
 import numpy as np
-from arbitragelab.other_approaches import ETFStrategy
+from arbitragelab.pca_approach import ETFStrategy
 
 
 class TestETFStrategy(unittest.TestCase):

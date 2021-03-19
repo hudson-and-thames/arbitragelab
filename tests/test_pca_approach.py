@@ -10,7 +10,7 @@ import unittest
 import os
 import pandas as pd
 import numpy as np
-from arbitragelab.other_approaches import PCAStrategy
+from arbitragelab.pca_approach import PCAStrategy
 
 
 class TestPCAStrategy(unittest.TestCase):
@@ -192,6 +192,6 @@ class TestPCAStrategy(unittest.TestCase):
                                                        p_value=0.01, asym=False,)
 
         # Check target weights
-        self.assertAlmostEqual(target_weights.mean()['EEM'], 0.156588, delta=1e-5)
-        self.assertAlmostEqual(target_weights.mean()['XLF'], 0.057624, delta=1e-5)
-        self.assertAlmostEqual(target_weights.mean()['SPY'], -0.11459, delta=1e-5)
+        self.assertAlmostEqual(target_weights.mean()['EEM'], -0.029292, delta=1e-5)
+        self.assertAlmostEqual(target_weights.mean()['XLF'], 0.018840, delta=1e-5)
+        self.assertAlmostEqual(target_weights.mean()['SPY'], 0.025427, delta=1e-5)
