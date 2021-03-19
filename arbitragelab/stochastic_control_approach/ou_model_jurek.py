@@ -17,7 +17,6 @@ import matplotlib.pyplot as plt
 from arbitragelab.cointegration_approach.engle_granger import EngleGrangerPortfolio
 
 
-
 class StochasticControlJurek:
     """
     This class derives the optimal dynamic strategy for arbitrageurs with a finite horizon
@@ -128,12 +127,12 @@ class StochasticControlJurek:
         self._check_estimations()
 
 
-    def _estimate_params(self, spread: pd.DataFrame):
+    def _estimate_params(self, spread: np.array):
         """
         This method implements the closed form solutions for estimators of the model parameters.
         These formulas for the estimators are given in Appendix E of Jurek (2007).
 
-        :param: (pd.DataFrame) Price series of the constructed spread.
+        :param: (np.array) Price series of the constructed spread.
         """
 
         N = len(spread)
@@ -247,38 +246,57 @@ class StochasticControlJurek:
         This helper function computes the A and B functions for investors with utility_type = 1.
         The implementation follows Appendix A.2 in the paper.
 
-        :param: tau
+        :param tau: (np.array) Array with time till completion in years.
         """
 
+        # Calculating value of variable c_1 in Appendix A.2.1.
         c_1 = 2 * self.sigma ** 2 / self.gamma
 
+        # Calculating value of variable c_2 in Appendix A.2.1.
         c_2 = -(self.k / self.gamma + self.r * (1 - self.gamma) / self.gamma)
 
+        # Calculating value of variable c_3 in Appendix A.2.1.
         c_3 = 0.5 * ((1 - self.gamma) / self.gamma) * (((self.k + self.r) / self.sigma) ** 2)
 
+        # Calculating value of discriminant in Appendix A.2.1.
         disc = 4 * (self.k ** 2 - self.r ** 2 * (1 - self.gamma)) / self.gamma
-        #Note : discriminant is always positive for gamma > 1.
+        # Note: discriminant is always positive for gamma > 1.
 
+        # Calculating value of variable gamma_0 in Appendix A.2.1.
         gamma_0 = 1 - (self.k / self.r) ** 2
-        #Note : gamma_0 is not always > 0.
+        # Note: gamma_0 is not always > 0.
 
 
-        A = self._A_calc_1(tau, c_1, c_2, c_3, disc, gamma_0)
-        B = self._B_calc_1(tau, c_1, c_2, c_3, disc, gamma_0)
+        A = self._A_calc_1(tau, c_1, c_2, c_3, disc, gamma_0)  # Calculating value of function A.
+        B = self._B_calc_1(tau, c_1, c_2, c_3, disc, gamma_0)  # Calculating value of function B.
 
         return A, B
 
 
     def _A_calc_1(self, tau, c_1, c_2, c_3, disc, gamma_0):
+        """
+        This method calculates the value of function A as described in the paper for investor with utility_type = 1.
+        The implementation follows Appendix A.2.1 in the paper.
 
-        #Note : A<=0 and decreasing in tau for gamma > 1, and vice versa for gamma < 1.
+        Value of function A <= 0 and decreasing in tau for gamma > 1, and vice versa for gamma < 1.
+
+        :param tau: (np.array) Array with time till completion in years.
+        :param c_1: (float) Value of variable c_1 in Appendix A.2.1.
+        :param c_2: (float) Value of variable c_2 in Appendix A.2.1.
+        :param c_3: (float) Value of variable c_3 in Appendix A.2.1.
+        :param disc: (float) Value of discriminant in Appendix A.2.1.
+        :param gamma_0: (float) Value of variable gamma_0 in Appendix A.2.1.
+        """
 
         A = None
-        error_margin = 1e-4
+        error_margin = 1e-4  # Error margin around gamma_0.
+
         if 0 < self.gamma < gamma_0 - error_margin:
+
             A = -c_2 / c_1 + (np.sqrt(-disc) / (2 * c_1)) * np.tan(np.sqrt(-disc) * tau / 2 + np.arctan(2 * c_2 / np.sqrt(-disc)))
 
         elif gamma_0 - error_margin <= self.gamma <= gamma_0 + error_margin:
+
             A = -(c_2 / c_1) * (1 + 1 / (c_2 * tau - 1))
 
         elif gamma_0 + error_margin < self.gamma < 1:
@@ -288,24 +306,42 @@ class StochasticControlJurek:
             A = -c_2 / c_1 + (np.sqrt(disc) / (2 * c_1)) * (1 / np.tanh(-np.sqrt(disc) * tau / 2 + np.arctanh(np.sqrt(disc) / (2 * c_2))))
 
         elif self.gamma > 1:
+
             A = -c_2 / c_1 + (np.sqrt(disc) / (2 * c_1)) * np.tanh(-np.sqrt(disc) * tau / 2 + np.arctanh(2 * c_2 / np.sqrt(disc)))
 
         return A
 
 
     def _B_calc_1(self, tau, c_1, c_2, c_3, disc, gamma_0):
+        """
+        This method calculates the value of function B as described in the paper for investor with utility_type = 1.
+        The implementation follows Appendix A.2.2 in the paper.
 
-        #Note : When self.mu = 0, c_4 and c_5 become zero and consequently B becomes zero.
+        When self.mu = 0, c_4 and c_5 become zero and consequently B becomes zero.
 
+        :param tau: (np.array) Array with time till completion in years.
+        :param c_1: (float) Value of variable c_1 in Appendix A.2.1.
+        :param c_2: (float) Value of variable c_2 in Appendix A.2.1.
+        :param c_3: (float) Value of variable c_3 in Appendix A.2.1.
+        :param disc: (float) Value of discriminant in Appendix A.2.1.
+        :param gamma_0: (float) Value of variable gamma_0 in Appendix A.2.1.
+        """
+
+        # Calculating value of variable c_4 in Appendix A.2.2.
         c_4 = 2 * self.k * self.mu / self.gamma
 
+        # Calculating value of variable c_5 in Appendix A.2.2.
         c_5 = -((self.k + self.r) / self.sigma ** 2) * ((1 - self.gamma) / self.gamma) * self.k * self.mu
 
         B = None
-        error_margin = 1e-4
+        error_margin = 1e-4  # Error margin around gamma_0.
+
         if 0 < self.gamma < gamma_0 - error_margin:
+
+            # Calculating value of function phi_1 in Appendix A.2.2.
             phi_1 = np.sqrt(-disc) * (np.cos(np.sqrt(-disc) * tau / 2) - 1) + 2 * c_2 * np.sin(np.sqrt(-disc) * tau / 2)
 
+            # Calculating value of function phi_2 in Appendix A.2.2.
             phi_2 = np.arctanh(np.tan(0.25 * (np.sqrt(-disc) * tau - 2 * np.arctan(2 * c_2 / np.sqrt(-disc))))) + \
                     np.arctanh(np.tan(0.5 * np.arctan(2 * c_2 / np.sqrt(-disc))))
 
@@ -313,9 +349,11 @@ class StochasticControlJurek:
                 np.cos(np.sqrt(-disc) * tau / 2 - np.arctan(c_2 / np.sqrt(-disc)))
 
         elif gamma_0 - error_margin <= self.gamma <= gamma_0 + error_margin:
+
             B = (c_1 * c_5 * (c_2 * tau - 2) - (c_2 ** 2) * c_4) * tau / (2 * c_1 * (c_2 * tau - 1))
 
         elif self.gamma > gamma_0 + error_margin:
+
             B = (4 * (c_2 * c_5 - c_3 * c_4 + (c_3 * c_4 - c_2 * c_5) * np.cosh(np.sqrt(disc) * tau / 2))
                  + 2 * c_5 * np.sqrt(disc) * np.sinh(np.sqrt(disc) * tau / 2)) \
                 / (disc * np.cosh(np.sqrt(disc) * tau / 2) - 2 * c_2 * np.sqrt(disc) * np.sinh(np.sqrt(disc) * tau / 2))
@@ -325,56 +363,94 @@ class StochasticControlJurek:
 
     def _AB_calc_2(self, tau):
         """
-        For utility_type = 2.
-        Follows appendix B.1 in the paper.
+        This helper function computes the A and B functions for investors with utility_type = 2.
+        The implementation follows Appendix B.1 in the paper.
+
+        :param tau: (np.array) Array with time till completion in years.
         """
 
+        # Calculating value of variable c_1 in Appendix B.1.1.
         c_1 = 2 * self.sigma ** 2 / self.gamma
 
+        # Calculating value of variable c_2 in Appendix B.1.1.
         c_2 = (self.gamma * (2 * self.r - self.beta) - 2 * (self.k + self.r)) / (2 * self.gamma)
 
+        # Calculating value of variable c_3 in Appendix B.1.1.
         c_3 = ((self.k + self.r) ** 2) * (1 - self.gamma) / (2 * self.gamma * (self.sigma ** 2))
 
+        # Calculating value of discriminant in Appendix B.1.1.
         disc = ((2 * self.k + self.beta) ** 2 + (self.gamma - 1) * ((-2 * self.r + self.beta) ** 2)) / self.gamma
 
+        # Calculating value of variable gamma_0 in Appendix B.1.1.
         gamma_0 = 4 * (self.k + self.r) * (self.r - self.beta - self.k) / ((2 * self.r - self.beta) ** 2)
 
 
-        A = self._A_calc_2(tau, c_1, c_2, c_3, disc, gamma_0)
-        B = self._B_calc_2(tau, c_1, c_2, c_3, disc, gamma_0)
+        A = self._A_calc_2(tau, c_1, c_2, c_3, disc, gamma_0)  # Calculating value of function A.
+        B = self._B_calc_2(tau, c_1, c_2, c_3, disc, gamma_0)  # Calculating value of function B.
 
         return A, B
 
 
     def _A_calc_2(self, tau, c_1, c_2, c_3, disc, gamma_0):
+        """
+        This method calculates the value of function A as described in the paper for investor with utility_type = 2.
+        The implementation follows Appendix B.1.1 in the paper.
+
+        The formulas for calculating function A given in Appendix B.1.1 are the same as those in Appendix A.2.1,
+        with the values of variables differing.
+
+        :param tau: (np.array) Array with time till completion in years.
+        :param c_1: (float) Value of variable c_1 in Appendix B.1.1.
+        :param c_2: (float) Value of variable c_2 in Appendix B.1.1.
+        :param c_3: (float) Value of variable c_3 in Appendix B.1.1.
+        :param disc: (float) Value of discriminant in Appendix B.1.1.
+        :param gamma_0: (float) Value of variable gamma_0 in Appendix B.1.1.
+        """
 
         # Same calculation as for general CRRA Investor.
         return self._A_calc_1(tau, c_1, c_2, c_3, disc, gamma_0)
 
 
     def _B_calc_2(self, tau, c_1, c_2, c_3, disc, gamma_0):
+        """
+        This method calculates the value of function B as described in the paper for investor with utility_type = 2.
+        The implementation follows Appendix B.1.2 in the paper.
 
-        # Note : When self.mu = 0, c_4 and c_6 become zero and consequently B becomes zero.
+        When self.mu = 0, c_4 and c_6 become zero and consequently B becomes zero.
 
+        :param tau: (np.array) Array with time till completion in years.
+        :param c_1: (float) Value of variable c_1 in Appendix B.1.1.
+        :param c_2: (float) Value of variable c_2 in Appendix B.1.1.
+        :param c_3: (float) Value of variable c_3 in Appendix B.1.1.
+        :param disc: (float) Value of discriminant in Appendix B.1.1.
+        :param gamma_0: (float) Value of variable gamma_0 in Appendix B.1.1.
+        """
+
+        # Calculating value of variable c_4 in Appendix B.1.2.
         c_4 = 2 * self.k * self.mu / self.gamma
 
+        # Calculating value of variable c_5 in Appendix B.1.2.
         c_5 = -(self.k + self.r * (1 - self.gamma) + self.beta * self.gamma) / (2 * self.gamma)
 
+        # Calculating value of variable c_6 in Appendix B.1.2.
         c_6 = self.k * (self.k + self.r) * (self.gamma - 1) * self.mu / (self.gamma * self.sigma ** 2)
 
         B = None
-        error_margin = 1e-4
+        error_margin = 1e-4  # Error margin around gamma_0.
 
-        rep_exp_1 = np.exp(tau * c_2)
-        rep_exp_2 = np.exp(tau * c_5)
+        rep_exp_1 = np.exp(tau * c_2)  # Repeating Exponential Form with variable c_2.
+        rep_exp_2 = np.exp(tau * c_5)  # Repeating Exponential Form with variable c_5.
 
         if 0 < self.gamma < gamma_0 - error_margin:
+            # Implementation of Case I in Appendix B.1.2.
 
-            rep_phrase_1 = np.sqrt(c_1 * c_3 - c_2 ** 2)
-            rep_phrase_2 = np.sqrt(c_1 * c_3) / rep_phrase_1
-            rep_phrase_3 = rep_phrase_1 * tau + np.arctan(c_2 / rep_phrase_1)
+            rep_phrase_1 = np.sqrt(c_1 * c_3 - c_2 ** 2)  # Repeating Phrase 1.
+            rep_phrase_2 = np.sqrt(c_1 * c_3) / rep_phrase_1  # Repeating Phrase 2.
+            rep_phrase_3 = rep_phrase_1 * tau + np.arctan(c_2 / rep_phrase_1)  # Repeating Phrase 3.
 
-            denominator = c_1 * rep_phrase_2 * (c_1 * c_3 + c_5 * (c_5 - 2 * c_2))
+            denominator = c_1 * rep_phrase_2 * (c_1 * c_3 + c_5 * (c_5 - 2 * c_2))  # Denominator in final equation.
+
+            # The final equation for B is split into 5 terms.
 
             term_1 = rep_exp_1 * rep_phrase_2 * c_4 * c_5 * (c_2 - rep_phrase_1 * np.tan(rep_phrase_3))
 
@@ -395,8 +471,11 @@ class StochasticControlJurek:
 
 
         elif gamma_0 - error_margin <= self.gamma <= gamma_0 + error_margin:
+            # Implementation of Case II in Appendix B.1.2.
 
-            denominator = c_1 * rep_exp_1 * (tau * c_2 - 1) * (c_2 - c_5) ** 2
+            denominator = c_1 * rep_exp_1 * (tau * c_2 - 1) * (c_2 - c_5) ** 2  # Denominator in final equation.
+
+            # The final equation for B is split into 4 terms.
 
             term_1 = rep_exp_1 * tau * c_4 * c_2 ** 3
 
@@ -410,14 +489,18 @@ class StochasticControlJurek:
             B = (-term_1 + term_2 - term_3
                  + term_4) / denominator
 
-        elif gamma_0 + error_margin < self.gamma < 1:
 
-            rep_phrase_1 = np.sqrt(c_1 * c_3 / c_2 ** 2)
-            rep_phrase_2 = np.sqrt(c_2 ** 2 - c_1 * c_3)
-            rep_phrase_3 = np.arctanh(rep_phrase_2 / c_2) - tau * rep_phrase_2
+        elif gamma_0 + error_margin < self.gamma < 1:
+            # Implementation of Case III in Appendix B.1.2.
+
+            rep_phrase_1 = np.sqrt(c_1 * c_3 / c_2 ** 2)  # Repeated Phrase 1.
+            rep_phrase_2 = np.sqrt(c_2 ** 2 - c_1 * c_3)  # Repeated Phrase 2.
+            rep_phrase_3 = np.arctanh(rep_phrase_2 / c_2) - tau * rep_phrase_2  # Repeated Phrase 3.
             # arccoth(x) = arctanh(1/x)
 
-            denominator = c_2 * rep_phrase_1 * (c_1 * c_3 + c_5 * (c_5 - 2 * c_2))
+            denominator = c_2 * rep_phrase_1 * (c_1 * c_3 + c_5 * (c_5 - 2 * c_2))  # Denominator in final equation.
+
+            # The final equation for B is split into 5 terms.
 
             term_1 = rep_exp_1 * rep_phrase_1 * c_6 * c_2 ** 2
 
@@ -436,12 +519,16 @@ class StochasticControlJurek:
             B = np.exp(-tau * c_2) * (term_1 - (term_2 + (rep_phrase_2 * term_3 + term_4) * c_6) * c_2
                                       + term_5) / denominator
 
+
         elif self.gamma > 1:
+            # Implementation of Case IV in Appendix B.1.2.
 
-            rep_phrase_1 = np.sqrt(-c_1 * c_3 / disc) # Repeated Phrase 1
-            rep_phrase_2 = 0.5 * np.sqrt(disc) * tau - np.arctanh(2 * c_2 / np.sqrt(disc)) # Repeated Phrase 2
+            rep_phrase_1 = np.sqrt(-c_1 * c_3 / disc)  # Repeated Phrase 1.
+            rep_phrase_2 = 0.5 * np.sqrt(disc) * tau - np.arctanh(2 * c_2 / np.sqrt(disc))  # Repeated Phrase 2.
 
-            denominator = 2 * c_1 * rep_phrase_1 * (c_1 * c_3 + c_5 * (c_5 - 2 * c_2)) # Denominator
+            denominator = 2 * c_1 * rep_phrase_1 * (c_1 * c_3 + c_5 * (c_5 - 2 * c_2))  # Denominator in final equation.
+
+            # The final equation for B is split into 5 terms.
 
             term_1 = 2 * rep_exp_1 * rep_phrase_1 * c_4 * c_5 * (c_2 + 0.5 * np.sqrt(disc) * np.tanh(rep_phrase_2))
 
