@@ -33,9 +33,9 @@ class StochasticControlJurek:
 
     def __init__(self):
 
-        #Characteristics of Training Data.
-        self.ticker_A = None  # Ticker Symbol of first stock.
-        self.ticker_B = None  # Ticker Symbol of second stock.
+        # Characteristics of Training Data.
+        self.ticker_A = None # Ticker Symbol of first stock.
+        self.ticker_B = None # Ticker Symbol of second stock.
         self.spread = None # Constructed spread from training data.
         self.time_array = None # Time indices of training data.
         self.delta_t = None # Time difference between each index in data, calculated in years.
@@ -47,7 +47,7 @@ class StochasticControlJurek:
 
         # Params inputted by user.
         self.r = None # Rate of returns.
-        self.gamma = None #  Coefficient of relative risk aversion.
+        self.gamma = None # Coefficient of relative risk aversion.
         self.beta = None # Rate of time preference.
 
 

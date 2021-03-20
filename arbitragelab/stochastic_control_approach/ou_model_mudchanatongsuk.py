@@ -15,37 +15,68 @@ import numpy as np
 import pandas as pd
 import scipy.optimize as so
 
+
 class StochasticControlMudchanatongsuk:
+    """
+    This class implements a stochastic control approach to the problem of pairs trading.
+
+    We model the log-relationship between a pair of stock prices as an OrnsteinUhlenbeck process,
+    and use this to formulate a portfolio optimization based stochastic control problem.
+    We are able to obtain the optimal solution to this control problem in closed
+    form via the corresponding Hamilton-Jacobi-Bellman equation. This closed form solution
+    is calculated under a power utility on terminal wealth.
+    The parameters in the model are calculated using closed form maximum-likelihood estimation formulas.
+    """
+
     def __init__(self):
 
-        self.ticker_A = None
-        self.ticker_B = None
-        self.S = None
-        self.spread = None
-        self.time_array = None
+        # Characteristics of Training Data.
+        self.ticker_A = None # Ticker Symbol of first stock.
+        self.ticker_B = None # Ticker Symbol of second stock.
+        self.S = None # Log price of stock B in spread.
+        self.spread = None # Constructed spread from training data.
+        self.time_array = None # Time indices of training data.
+        self.delta_t = 1 / 251 # Time difference between each index in data, calculated in years.
 
-        self.delta_t = 1 / 251
-        self.sigma = None
-        self.mu = None
-        self.k = None
-        self.theta = None
-        self.eta = None
-        self.rho = None
+        # Estimated params from training data.
+        self.sigma = None # Standard deviation of stock B.
+        self.mu = None # Drift of stock B.
+        self.k = None # Rate of mean reversion of spread.
+        self.theta = None # Long run mean of spread.
+        self.eta = None # Standard deviation of spread.
+        self.rho = None # Instantaneous correlation coefficient between two standard brownian motions.
 
-        self.gamma = None
+        # Params inputted by user.
+        self.gamma = None # Parameter of utility function (self.gamma < 1)
+
 
     @staticmethod
     def _data_preprocessing(data):
+        """
+        Helper function for input data preprocessing.
+
+        :param data: (pd.DataFrame) Pricing data of both stocks in spread.
+        """
 
         return data.ffill()
 
+
     def fit(self, data: pd.DataFrame):
+        """
+        This method uses inputted training data to calculate the spread and
+        estimate the parameters of the corresponding OU process.
+
+        The spread construction implementation follows Section II A in Mudchanatongsuk (2008).
+
+        :param data: (pd.DataFrame) Contains price series of both stocks in spread.
+        """
 
         # Preprocessing
         data = self._data_preprocessing(data)
 
         self.time_array = np.arange(0, len(data)) * self.delta_t
         self.ticker_A, self.ticker_B = data.columns[0], data.columns[1]
+
         self.S = np.log(data.loc[:, self.ticker_B])
         self.spread = np.log(data.loc[:, self.ticker_A]) - self.S
 
@@ -172,7 +203,6 @@ class StochasticControlMudchanatongsuk:
         max_log_likelihood = -result.fun
 
         return sigma, mu, k, theta, eta, rho, max_log_likelihood
-
 
 
     @staticmethod
