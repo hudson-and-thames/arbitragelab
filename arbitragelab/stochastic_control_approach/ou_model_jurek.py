@@ -10,6 +10,7 @@ This module is a realization of the methodology in the following paper:
 <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=882536>`__
 """
 
+# pylint: disable=invalid-name, too-many-instance-attributes, too-many-locals
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -37,6 +38,7 @@ class StochasticControlJurek:
         self.ticker_A = None # Ticker Symbol of first stock.
         self.ticker_B = None # Ticker Symbol of second stock.
         self.spread = None # Constructed spread from training data.
+        self.scaled_spread_weights = None # Scaled weights for the prices in spread.
         self.time_array = None # Time indices of training data.
         self.delta_t = None # Time difference between each index in data, calculated in years.
 
@@ -104,9 +106,9 @@ class StochasticControlJurek:
             raise Exception("ADF statistic test failure.")
 
         # Scaling the weights such that they sum to 1.
-        self.eg_scaled_vectors = eg_cointegration_vectors.loc[0] / abs(eg_cointegration_vectors.loc[0]).sum()
+        self.scaled_spread_weights = eg_cointegration_vectors.loc[0] / abs(eg_cointegration_vectors.loc[0]).sum()
 
-        self.spread = (total_return_indices * self.eg_scaled_vectors).sum(axis=1)
+        self.spread = (total_return_indices * self.scaled_spread_weights).sum(axis=1)
         self.spread.plot()
         plt.show()
 
@@ -213,7 +215,7 @@ class StochasticControlJurek:
 
         W = np.ones(len(t))  # Wealth is normalized to one.
         # Calculating the spread with weights calculated from training data.
-        S = (total_return_indices * self.eg_scaled_vectors).sum(axis=1)
+        S = (total_return_indices * self.scaled_spread_weights).sum(axis=1)
 
         S = S.to_numpy() # TODO : This conversion in fit seems to have changed the estimated values.
 
@@ -267,13 +269,13 @@ class StochasticControlJurek:
         # Note: gamma_0 is not always > 0.
 
 
-        A = self._A_calc_1(tau, c_1, c_2, c_3, disc, gamma_0)  # Calculating value of function A.
+        A = self._A_calc_1(tau, c_1, c_2, disc, gamma_0)  # Calculating value of function A.
         B = self._B_calc_1(tau, c_1, c_2, c_3, disc, gamma_0)  # Calculating value of function B.
 
         return A, B
 
 
-    def _A_calc_1(self, tau, c_1, c_2, c_3, disc, gamma_0):
+    def _A_calc_1(self, tau, c_1, c_2, disc, gamma_0):
         """
         This method calculates the value of function A as described in the paper for investor with utility_type = 1.
         The implementation follows Appendix A.2.1 in the paper.
@@ -283,7 +285,6 @@ class StochasticControlJurek:
         :param tau: (np.array) Array with time till completion in years.
         :param c_1: (float) Value of variable c_1 in Appendix A.2.1.
         :param c_2: (float) Value of variable c_2 in Appendix A.2.1.
-        :param c_3: (float) Value of variable c_3 in Appendix A.2.1.
         :param disc: (float) Value of discriminant in Appendix A.2.1.
         :param gamma_0: (float) Value of variable gamma_0 in Appendix A.2.1.
         """
@@ -385,13 +386,13 @@ class StochasticControlJurek:
         gamma_0 = 4 * (self.k + self.r) * (self.r - self.beta - self.k) / ((2 * self.r - self.beta) ** 2)
 
 
-        A = self._A_calc_2(tau, c_1, c_2, c_3, disc, gamma_0)  # Calculating value of function A.
+        A = self._A_calc_2(tau, c_1, c_2, disc, gamma_0)  # Calculating value of function A.
         B = self._B_calc_2(tau, c_1, c_2, c_3, disc, gamma_0)  # Calculating value of function B.
 
         return A, B
 
 
-    def _A_calc_2(self, tau, c_1, c_2, c_3, disc, gamma_0):
+    def _A_calc_2(self, tau, c_1, c_2, disc, gamma_0):
         """
         This method calculates the value of function A as described in the paper for investor with utility_type = 2.
         The implementation follows Appendix B.1.1 in the paper.
@@ -402,13 +403,12 @@ class StochasticControlJurek:
         :param tau: (np.array) Array with time till completion in years.
         :param c_1: (float) Value of variable c_1 in Appendix B.1.1.
         :param c_2: (float) Value of variable c_2 in Appendix B.1.1.
-        :param c_3: (float) Value of variable c_3 in Appendix B.1.1.
         :param disc: (float) Value of discriminant in Appendix B.1.1.
         :param gamma_0: (float) Value of variable gamma_0 in Appendix B.1.1.
         """
 
         # Same calculation as for general CRRA Investor.
-        return self._A_calc_1(tau, c_1, c_2, c_3, disc, gamma_0)
+        return self._A_calc_1(tau, c_1, c_2, disc, gamma_0)
 
 
     def _B_calc_2(self, tau, c_1, c_2, c_3, disc, gamma_0):

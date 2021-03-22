@@ -10,6 +10,7 @@ This module is a realization of the methodology in the following paper:
 <http://folk.ntnu.no/skoge/prost/proceedings/acc08/data/papers/0479.pdf>`__
 """
 
+# pylint: disable=invalid-name, too-many-instance-attributes
 import math
 import numpy as np
 import pandas as pd
@@ -74,9 +75,11 @@ class StochasticControlMudchanatongsuk:
         # Preprocessing
         data = self._data_preprocessing(data)
 
+        # Setting instance attributes.
         self.time_array = np.arange(0, len(data)) * self.delta_t
         self.ticker_A, self.ticker_B = data.columns[0], data.columns[1]
 
+        # Calculating the spread.
         self.S = np.log(data.loc[:, self.ticker_B])
         self.spread = np.log(data.loc[:, self.ticker_A]) - self.S
 
@@ -91,7 +94,8 @@ class StochasticControlMudchanatongsuk:
 
     def _estimate_params(self):
         """
-        Closed Form Estimators of params.
+        This method implements the closed form solutions for estimators of the model parameters.
+        These formulas for the estimators are given in Appendix of Mudchanatongsuk (2007).
         """
 
         N = len(self.spread) - 1
@@ -130,18 +134,31 @@ class StochasticControlMudchanatongsuk:
 
 
     def optimal_portfolio_weights(self, data: pd.DataFrame, gamma = -100):
+        """
+        This method calculates the final optimal portfolio weights for the calculated spread.
+
+        The calculation of weights follows Section III in Mudchanatongsuk (2008), specifically equation 28.
+
+        :param data: (pd.DataFrame) Contains price series of both stocks in spread.
+        :param gamma: (float) Parameter of utility function (gamma < 1)
+        """
 
         # Preprocessing
         data = self._data_preprocessing(data)
 
+        # Setting instance attributes.
         self.gamma = gamma
         t = np.arange(0, len(data)) * self.delta_t
         tau = t[-1] - t
+
+        # Calculating spread.
         x = np.log(data.iloc[:, 0]) - np.log(data.iloc[:, 1])
         x = x.to_numpy()  # Converting from pd.Series to numpy array.
 
+        # Calculating the alpha and beta functions.
         alpha_t, beta_t = self._alpha_beta_calc(tau)
 
+        # Calculating the final optimal portfolio weights.
         h = (1 / (1 - self.gamma)) * (beta_t + 2 * np.multiply(x, alpha_t)
                                       - self.k * (x - self.theta) / self.eta ** 2
                                       + self.rho * self.theta / self.eta + 0.5)
@@ -150,9 +167,15 @@ class StochasticControlMudchanatongsuk:
 
 
     def _alpha_beta_calc(self, tau):
+        """
+        This helper function computes the alpha and beta functions
+        as given in equation 24 and 25 of Mudchanatongsuk (2008).
 
-        sqrt_gamma = np.sqrt(1 - self.gamma)
-        exp_calc = np.exp(2 * self.k * tau / sqrt_gamma)
+        :param tau: (np.array) Array with time till completion in years.
+        """
+
+        sqrt_gamma = np.sqrt(1 - self.gamma) # Repeating Calculation involving gamma.
+        exp_calc = np.exp(2 * self.k * tau / sqrt_gamma) # Repeating Calculation involving gamma and tau series.
 
         alpha_t = self._alpha_calc(sqrt_gamma, exp_calc)
         beta_t = self._beta_calc(sqrt_gamma, exp_calc)
@@ -161,7 +184,14 @@ class StochasticControlMudchanatongsuk:
 
 
     def _alpha_calc(self, sqrt_gamma, exp_calc):
+        """
+        This helper function computes the alpha function in equation 24.
 
+        :param sqrt_gamma: (float) Repeating value.
+        :param exp_calc: (np.array) Repeating series of values.
+        """
+
+        # The equation for calculation of alpha is split into two parts.
         left_calc = self.k * (1 - sqrt_gamma) / (2 * (self.eta ** 2))
 
         right_calc = 2 * sqrt_gamma / (1 - sqrt_gamma - (1 + sqrt_gamma) * exp_calc)
@@ -170,11 +200,18 @@ class StochasticControlMudchanatongsuk:
 
 
     def _beta_calc(self, sqrt_gamma, exp_calc):
+        """
+        This helper function computes the beta function in equation 25.
 
-        left_calc = 1/(2 * (self.eta ** 2) * ((1 - sqrt_gamma) - (1 + sqrt_gamma)*exp_calc))
+        :param sqrt_gamma: (float) Repeating value.
+        :param exp_calc: (np.array) Repeating series of values.
+        """
 
-        right_calc = self.gamma * sqrt_gamma * (self.eta ** 2 + 2*self.rho*self.sigma*self.eta) * ((1 - exp_calc) ** 2) - \
-                     self.gamma * (self.eta ** 2 + 2*self.rho*self.sigma*self.eta + 2*self.k*self.theta) * (1 - exp_calc)
+        # The equation for calculation of beta is split into two parts.
+        left_calc = 1/(2 * (self.eta ** 2) * ((1 - sqrt_gamma) - (1 + sqrt_gamma) * exp_calc))
+
+        right_calc = self.gamma * sqrt_gamma * (self.eta ** 2 + 2 * self.rho * self.sigma * self.eta) * ((1 - exp_calc) ** 2) - \
+                     self.gamma * (self.eta ** 2 + 2 * self.rho * self.sigma * self.eta + 2 * self.k * self.theta) * (1 - exp_calc)
 
         return left_calc * right_calc
 
@@ -209,6 +246,9 @@ class StochasticControlMudchanatongsuk:
     def _compute_log_likelihood(params, *args):
         """
         Helper function computes log likelihood function for a set of params.
+        This implementation follows Appendix of Mudchanatongsuk (2008).
+
+        param params: (tuple) Contains values of set params.
         """
 
         # Setting given parameters
@@ -238,7 +278,7 @@ class StochasticControlMudchanatongsuk:
                 f_y_denm = (2 * math.pi * np.sqrt(np.linalg.det(matrix)))
 
                 f_y = np.exp(-0.5 * np.einsum('ij,ij->j', vec, np.linalg.inv(matrix) @ vec)) / f_y_denm
-            except FloatingPointError as r:
+            except FloatingPointError:
                 return 0
 
 
