@@ -11,6 +11,7 @@ This module is a realization of the methodology in the following paper:
 """
 
 # pylint: disable=invalid-name, too-many-instance-attributes, too-many-locals
+import cvxpy as cp
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -241,6 +242,83 @@ class StochasticControlJurek:
             N = ((self.k * (self.mu - S) - self.r * S) / (self.gamma * self.sigma ** 2) + (2 * A * S + B) / self.gamma) * W
 
         return N / W # We return the optimal allocation of spread asset scaled by wealth.
+
+
+    def optimal_portfolio_weights_fund_flows(self, data: pd.DataFrame, f: float, gamma: float = 1, r: float = 0.05):
+        """
+        Implementation of Theorem 4 in Jurek (2007).
+
+        This method calculates the optimal portfolio allocation of an agent with
+        constant relative risk aversion with utility defined over terminal wealth,
+        (utility_type = 1) , in the presence of fund flows.
+
+        Note: For all values of gamma, the presence of fund flows affect the general portfolio rule
+        only by introducing a coefficient of proportionality.
+
+        Also note, this method is only applicable for investors with utility defined over terminal wealth.
+
+        What is f?
+
+        f is the coefficient of proportionality for fund flows and is the drift term in the
+        stochastic process equation for fund flows. (Refer Appendix C)
+
+        :param data: (pd.DataFrame) Contains price series of both stocks in spread.
+        :param gamma: (float) coefficient of relative risk aversion.
+        :param f: (float) coefficient of proportionality (assumed to be positive).
+        :param r: (float) Rate of Returns.
+        """
+
+        N = self.optimal_portfolio_weights(data, utility_type=1, gamma=gamma, r=r)
+
+        return (1 / (1 + f)) * N
+
+
+    def _stabilization_region_calc(self, S, tau, utility_type = 1):
+        """
+        Implementation of Theorem 3 in Jurek (2007).
+
+        :param S: (np.array) spread.
+        :param tau: (np.array) Array with time till completion in years.
+        :param utility_type: (int) Flag signifies type of investor preferences.
+        """
+
+        if self.gamma == 1:
+            # TODO : Is the region defined at gamma = 1?
+            #  Calculation of A and B functions are not done in case of gamma = 1. (Need to implement Appendix A.1 and B.2).
+
+            raise NotImplementedError("Calculation of stabilization region is not implemented for gamma = 1.")
+
+        A = None
+        B = None
+        if utility_type == 1:
+            A, B = self._AB_calc_1(tau)
+
+        elif utility_type == 2:
+            A, B = self._AB_calc_2(tau)
+
+        # Calculating phi (Refer Equation 17 in Jurek (2007)).
+        phi = (2 * A / self.gamma) - ((self.k + self.r) / (self.gamma * self.sigma ** 2))
+        # Note : phi < 0.
+
+        term_1 = (self.k * self.mu + self.sigma ** 2 * B) / (self.gamma * self.sigma ** 2)
+        term_2 = np.sqrt(-phi)
+
+        max_bound = np.zeros(len(tau))
+        min_bound = np.zeros(len(tau))
+
+        for ind in range(len(tau)):
+            S = cp.Variable()
+            constraint = abs(phi[ind] * S + term_1[ind]) <= term_2[ind] - 1e-6
+
+            prob_max = cp.Problem(cp.Maximize(S), constraint)
+            prob_max.solve()
+            max_bound[ind] = prob_max.value
+
+            prob_min = cp.Problem(cp.Minimize(S), constraint)
+            prob_min.solve()
+            min_bound[ind] = prob_min.value
+
+        return min_bound, max_bound
 
 
     def _AB_calc_1(self, tau):
