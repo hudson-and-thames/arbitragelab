@@ -41,7 +41,8 @@ class DistanceStrategy:
 
         devadarsh.track('DistanceStrategy')
 
-    def form_pairs(self, train_data, method='standard', industry_dict=None, num_top=5, skip_top=0, list_names=None):
+    def form_pairs(self, train_data, method='standard', industry_dict=None, num_top=5, skip_top=0, selection_pool=50,
+                   list_names=None):
         """
         Forms pairs based on input training data.
 
@@ -79,6 +80,7 @@ class DistanceStrategy:
         :param list_names: (list) List containing names of elements if Numpy array is used as input.
         :param method: (str) Methods to use for sorting pairs [``standard`` by default, ``variance``,
                              ``zero_crossing``].
+        :param selection_pool: (int) Number of pairs to use before sorting them with the selection method
         :param industry_dict: (dict) Dictionary matching ticker to industry group.
         """
 
@@ -93,17 +95,11 @@ class DistanceStrategy:
         normalized = normalized.dropna(axis=0)
 
         # If industry dictionary is given, pairs are matched within the same industry group
-        if industry_dict:
 
-            # Finding closest pairs for each element, excluding duplicates
-            all_pairs = self.find_pair(normalized, industry_dict)
-
-        else:
-            # Finding closest pairs for each element, excluding duplicates
-            all_pairs = self.find_pair(normalized)
+        all_pairs = self.find_pair(normalized, industry_dict)
 
         # Choosing needed pairs to construct a portfolio
-        self.pairs = self.sort_pairs(all_pairs, num_top, skip_top)
+        self.pairs = self.sort_pairs(all_pairs, selection_pool)
 
         # Calculating historical volatility of pair portfolios (diffs of normalized prices)
         self.train_std = self.find_volatility(normalized, self.pairs)
@@ -118,17 +114,38 @@ class DistanceStrategy:
         # based on the method
         self.selection_method(method, num_top, skip_top)
 
+        # Storing only the necessary values for pairs selected in the above
+        self.num_crossing = {pair: self.num_crossing[pair] for pair in self.pairs}
+        self.train_std = {pair: self.train_std[pair] for pair in self.pairs}
+        self.train_portfolio = self.train_portfolio[self.train_portfolio.columns
+                                                        .intersection([str(pair) for pair in self.pairs])]
+
     def selection_method(self, method, num_top, skip_top):
         """
-        Select pairs based on the method.
+        Select pairs based on the method. This module helps sorting selected pairs for the given method
+        in the formation period.
+
+        :param method: (str) Methods to use for sorting pairs [``standard`` by default, ``variance``,
+                             ``zero_crossing``].
+        :param num_top: (int) Number of top pairs to use for portfolio formation.
+        :param skip_top:(int) Number of first top pairs to skip. For example, use skip_top=10
+            if you'd like to take num_top pairs starting from the 10th one.
         """
 
-        if method not in ['standard', 'zero_crossing', 'variance']:
+        if method not in ['standard', 'industry', 'zero_crossing', 'variance']:
             # Raise an error if the given method is inappropriate.
             raise Exception("Please give an appropriate method for sorting pairs between ‘standard’, "
-                            "‘zero_crossing’, or 'variance'")
+                            "'industry', ‘zero_crossing’, or 'variance'")
 
-        if method == 'zero_crossing':
+        if method == 'standard':
+
+            self.pairs = self.pairs[skip_top:(skip_top + num_top)]
+
+        elif method == 'industry':
+
+            self.pairs = self.pairs[skip_top:(skip_top + num_top)]
+
+        elif method == 'zero_crossing':
 
             # Sorting pairs from the dictionary by the number of zero crossings in a descending order
             sorted_pairs = sorted(self.num_crossing.items(), key=lambda x: x[1], reverse=True)
@@ -141,7 +158,7 @@ class DistanceStrategy:
 
             self.pairs = pairs_selected
 
-        elif method == 'variance':
+        else:
 
             # Sorting pairs from the dictionary by the size of variance in a descending order
             sorted_pairs = sorted(self.train_std.items(), key=lambda x: x[1], reverse=True)

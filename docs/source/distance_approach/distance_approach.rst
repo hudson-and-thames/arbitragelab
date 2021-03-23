@@ -96,9 +96,10 @@ As basic pairs formation confirms declining profitability in pairs trading, some
 selection criteria have emerged. Here, we describe three different methods from the basic approach in
 selecting pairs for trading.
 
-First is only allowing for matching securities within the same industry group. The second is sorting
+First is only allowing for matching securities within the same industry group . The second is sorting
 selected pairs based on the number of zero-crossings in the formation period and the third is sorting
 selected pairs based on the historical standard deviation where pairs with high standard deviation are selected.
+These selection methods are inspired by the work by Do and Faff (2010, 2012).
 
 1. **Pairs within the same industry group**
 
@@ -125,7 +126,8 @@ form of the number of zero crossings.
 3. **Pairs with a higher historical standard deviation**
 
 The historical standard deviation calculated in the formation period can also be a criterion to sort
-selected pairs.
+selected pairs. According to the work of Do and Faff(2010), as having a small SSD decreases the variance
+of the spread, this approach could increase the expected profitability of the method.
 
 After pairs were matched, by sorting the pairs based on their historical standard deviation in the
 formation period, we can select top :math:`n` pairs that have the highest standard deviation.

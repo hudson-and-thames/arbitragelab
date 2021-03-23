@@ -62,8 +62,8 @@ class TestDistanceStrategy(unittest.TestCase):
         strategy_variance = DistanceStrategy()
 
         # Performing the pairs formation step
-        strategy.form_pairs(self.train_data, num_top=5, skip_top=0)
-        strategy_industry.form_pairs(self.train_data, method='standard',
+        strategy.form_pairs(self.train_data, method = 'standard', num_top=5, skip_top=0)
+        strategy_industry.form_pairs(self.train_data, method='industry',
                                      industry_dict=self.industry_dict, num_top=5, skip_top=0)
         strategy_zero_crossing.form_pairs(self.train_data, method='zero_crossing', num_top=5, skip_top=0)
         strategy_variance.form_pairs(self.train_data, method='variance', num_top=5, skip_top=0)
@@ -86,10 +86,10 @@ class TestDistanceStrategy(unittest.TestCase):
                           ('EFA', 'EWQ'), ('EPP', 'SPY')]
         expected_pairs_industry = [('EFA', 'EWQ'), ('EFA', 'EWU'), ('SPY', 'VPL'),
                                    ('EEM', 'EWU'), ('DIA', 'SPY')]
-        expected_pairs_zero_crossing = [('EPP', 'SPY'), ('EFA', 'VGK'), ('EPP', 'VPL'),
-                                        ('EWQ', 'VGK'), ('EFA', 'EWQ')]
-        expected_pairs_variance = [('EPP', 'SPY'), ('EPP', 'VPL'), ('EFA', 'EWQ'),
-                                   ('EWQ', 'VGK'), ('EFA', 'VGK')]
+        expected_pairs_zero_crossing = [('EPP', 'SPY'), ('DIA', 'EWJ'), ('EEM', 'EWJ'),
+                                        ('EEM', 'EFA'), ('EWU', 'VPL')]
+        expected_pairs_variance = [('IEF', 'TIP'), ('EWU', 'FXI'), ('SPY', 'VGK'),
+                                   ('EWJ', 'EWQ'), ('EEM', 'EWQ')]
 
         self.assertCountEqual(strategy.pairs, expected_pairs)
         self.assertCountEqual(strategy_industry.pairs, expected_pairs_industry)
