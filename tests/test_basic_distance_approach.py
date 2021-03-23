@@ -63,7 +63,7 @@ class TestDistanceStrategy(unittest.TestCase):
 
         # Performing the pairs formation step
         strategy.form_pairs(self.train_data, method = 'standard', num_top=5, skip_top=0)
-        strategy_industry.form_pairs(self.train_data, method='industry',
+        strategy_industry.form_pairs(self.train_data, method='standard',
                                      industry_dict=self.industry_dict, num_top=5, skip_top=0)
         strategy_zero_crossing.form_pairs(self.train_data, method='zero_crossing', num_top=5, skip_top=0)
         strategy_variance.form_pairs(self.train_data, method='variance', num_top=5, skip_top=0)
@@ -249,4 +249,4 @@ class TestDistanceStrategy(unittest.TestCase):
 
         # When trying to get pairs with inappropriate method
         with self.assertRaises(Exception):
-            strategy.selection_method(method='wrong input',num_top=5,skip_top=0)
+            strategy.selection_method(method='wrong input', num_top=5, skip_top=0)

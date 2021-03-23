@@ -80,7 +80,7 @@ class DistanceStrategy:
         :param list_names: (list) List containing names of elements if Numpy array is used as input.
         :param method: (str) Methods to use for sorting pairs [``standard`` by default, ``variance``,
                              ``zero_crossing``].
-        :param selection_pool: (int) Number of pairs to use before sorting them with the selection method
+        :param selection_pool: (int) Number of pairs to use before sorting them with the selection method.
         :param industry_dict: (dict) Dictionary matching ticker to industry group.
         """
 
@@ -95,7 +95,6 @@ class DistanceStrategy:
         normalized = normalized.dropna(axis=0)
 
         # If industry dictionary is given, pairs are matched within the same industry group
-
         all_pairs = self.find_pair(normalized, industry_dict)
 
         # Choosing needed pairs to construct a portfolio
@@ -132,16 +131,12 @@ class DistanceStrategy:
             if you'd like to take num_top pairs starting from the 10th one.
         """
 
-        if method not in ['standard', 'industry', 'zero_crossing', 'variance']:
+        if method not in ['standard', 'zero_crossing', 'variance']:
             # Raise an error if the given method is inappropriate.
             raise Exception("Please give an appropriate method for sorting pairs between ‘standard’, "
-                            "'industry', ‘zero_crossing’, or 'variance'")
+                            "‘zero_crossing’, or 'variance'")
 
         if method == 'standard':
-
-            self.pairs = self.pairs[skip_top:(skip_top + num_top)]
-
-        elif method == 'industry':
 
             self.pairs = self.pairs[skip_top:(skip_top + num_top)]
 
@@ -270,11 +265,12 @@ class DistanceStrategy:
 
     def get_num_crossing(self):
         """
-        Outputs pairs that were created in the pairs formation step with its number of zero crossing
+        Outputs pairs that were created in the pairs formation step with its number of zero crossing.
 
-        :return: (dictionary) Dictionary with keys as pairs and values as the number of zero
+        :return: (dict) Dictionary with keys as pairs and values as the number of zero
             crossings for pairs.
         """
+
         return self.num_crossing
 
     def count_number_crossing(self):
@@ -285,7 +281,7 @@ class DistanceStrategy:
         future convergence, this method calculates the number of times the normalized spread crosses the
         value zero which measures the frequency of divergence and convergence between two securities.
 
-        :return: (dictionary) Dictionary with keys as pairs and values as the number of zero
+        :return: (dict) Dictionary with keys as pairs and values as the number of zero
             crossings for pairs.
         """
 
