@@ -220,6 +220,13 @@ class StochasticControlJurek:
 
         S = S.to_numpy() # TODO : This conversion in fit seems to have changed the estimated values.
 
+        min_bound, max_bound = self._stabilization_region_calc(S, tau, utility_type)
+
+        plt.plot(S)
+        plt.plot(min_bound)
+        plt.plot(max_bound)
+        plt.show()
+
         N = None
         # The optimal weights equation is the same for both types of utility functions.
         # For gamma = 1, the outputs weights are identical for both types of utility functions,
@@ -300,7 +307,7 @@ class StochasticControlJurek:
         phi = (2 * A / self.gamma) - ((self.k + self.r) / (self.gamma * self.sigma ** 2))
         # Note : phi < 0.
 
-        term_1 = (self.k * self.mu + self.sigma ** 2 * B) / (self.gamma * self.sigma ** 2)
+        term_1 = (self.k * self.mu + (self.sigma ** 2) * B) / (self.gamma * self.sigma ** 2)
         term_2 = np.sqrt(-phi)
 
         max_bound = np.zeros(len(tau))
@@ -308,7 +315,7 @@ class StochasticControlJurek:
 
         for ind in range(len(tau)):
             S = cp.Variable()
-            constraint = abs(phi[ind] * S + term_1[ind]) <= term_2[ind] - 1e-6
+            constraint = [cp.abs(phi[ind] * S + term_1[ind]) <= term_2[ind] - 1e-6]
 
             prob_max = cp.Problem(cp.Maximize(S), constraint)
             prob_max.solve()
