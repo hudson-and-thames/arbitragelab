@@ -85,10 +85,10 @@ class StochasticControlMudchanatongsuk:
 
         self.spread = self.spread.to_numpy()  # Converting from pd.Series to numpy array.
         self.S = self.S.to_numpy()  # Converting from pd.Series to numpy array.
-        #self._estimate_params() #TODO : V_squared estimator is returning a negative value which is incorrect. Need to check why?
+        self._estimate_params()
 
         params = self._estimate_params_log_likelihood()
-        print(params)
+        print(f"Params from likelihood : {params[:-1]}")
         self.sigma, self.mu, self.k,self.theta, self.eta, self.rho = params[:-1]
 
 
@@ -108,17 +108,18 @@ class StochasticControlMudchanatongsuk:
         p = (1 / (N * np.power(self.spread[:-1], 2).sum() - self.spread[:-1].sum() ** 2)) * \
             (N * np.multiply(self.spread[1:], self.spread[:-1]).sum() -
              (self.spread[N] - self.spread[0]) * np.sum(self.spread[:-1]) - self.spread[:-1].sum() ** 2)
+        # TODO : This calculation of p is incorrect. Calculation of q is correct.
+
+        p = np.exp(-0.18565618 * self.delta_t) # Correct value of p calculated from likelihood params.
+        print(p)
 
         q = (self.spread[N] - self.spread[0] + (1 - p) * self.spread[:-1].sum()) / N
 
         V_squared = (1 / N) * (self.spread[N] ** 2 - self.spread[0] ** 2 + (1 + p ** 2) * np.power(self.spread[:-1], 2).sum()
                                - 2 * p * np.multiply(self.spread[1:], self.spread[:-1]).sum() - N * q)
+        # TODO : This calculation of V_squared is incorrect.
 
-
-        C = (1/(N * np.sqrt(V_squared * S_squared))) * (np.multiply(self.spread[1:], np.diff(self.S)).sum()
-                                                      - p * np.multiply(self.spread[:-1], np.diff(self.S)).sum()
-                                                      - m * (self.spread[N] - self.spread[0])
-                                                      - m * (1 - p) * self.spread[:-1].sum())
+        print(V_squared)
 
         self.sigma = np.sqrt(S_squared / self.delta_t)
 
@@ -128,9 +129,23 @@ class StochasticControlMudchanatongsuk:
 
         self.theta = q / (1 - p)
 
+        V_squared = (0.3038416 ** 2) * (1 - p ** 2) / (2 * self.k) # Correct value of V_squared calculated from likelihood params.
+
+        print(V_squared)
+
+
+        C = (1/(N * np.sqrt(V_squared * S_squared))) * (np.multiply(self.spread[1:], np.diff(self.S)).sum()
+                                                      - p * np.multiply(self.spread[:-1], np.diff(self.S)).sum()
+                                                      - m * (self.spread[N] - self.spread[0])
+                                                      - m * (1 - p) * self.spread[:-1].sum())
+
+
+
         self.eta = np.sqrt(2 * self.k * V_squared / (1 - p ** 2))
 
         self.rho = self.k * C * np.sqrt(V_squared * S_squared) / (self.eta * self.sigma * (1 - p))
+
+        print(f"Params from closed form : {(self.sigma, self.mu, self.k, self.theta, self.eta, self.rho)}")
 
 
     def optimal_portfolio_weights(self, data: pd.DataFrame, gamma = -100):
