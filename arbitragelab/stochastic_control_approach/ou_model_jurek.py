@@ -11,6 +11,7 @@ This module is a realization of the methodology in the following paper:
 """
 
 # pylint: disable=invalid-name, too-many-instance-attributes, too-many-locals
+import warnings
 import cvxpy as cp
 import numpy as np
 import pandas as pd
@@ -87,6 +88,9 @@ class StochasticControlJurek:
             Value can be one of the following: (0.90, 0.95, 0.99).
         """
 
+        if len(data) < (10 / delta_t):
+            warnings.warn("Please make sure length of training data is greater than 10 years.")
+
         # Setting instance attributes.
         self.delta_t = delta_t
         self.ticker_A, self.ticker_B = data.columns[0], data.columns[1]
@@ -104,7 +108,7 @@ class StochasticControlJurek:
         if eg_adf_statistics.loc['statistic_value', 0] > eg_adf_statistics.loc[f'{int(significance_level * 100)}%', 0]:
             # Making sure that the data passes the ADF statistic test.
             print(eg_adf_statistics)
-            raise Exception("ADF statistic test failure.")
+            warnings.warn("ADF statistic test failure.")
 
         # Scaling the weights such that they sum to 1.
         self.scaled_spread_weights = eg_cointegration_vectors.loc[0] / abs(eg_cointegration_vectors.loc[0]).sum()
@@ -113,12 +117,7 @@ class StochasticControlJurek:
         self.spread.plot()
         plt.show()
 
-        # TODO : This implementation of spread might be incorrect.
-        #  The values of estimators calculated do not match what is expected.
-
-
         self.spread = self.spread.to_numpy() # TODO : This conversion seems to have changed the estimated values. Not sure why?
-
 
         params = self._estimate_params(self.spread)
         self.mu, self.k, self.sigma = params
@@ -220,12 +219,7 @@ class StochasticControlJurek:
 
         S = S.to_numpy() # TODO : This conversion in fit seems to have changed the estimated values.
 
-        min_bound, max_bound = self._stabilization_region_calc(S, tau, utility_type)
-
-        plt.plot(S)
-        plt.plot(min_bound)
-        plt.plot(max_bound)
-        plt.show()
+        self._stabilization_region_calc(S, tau, utility_type)
 
         N = None
         # The optimal weights equation is the same for both types of utility functions.
@@ -290,10 +284,10 @@ class StochasticControlJurek:
         """
 
         if self.gamma == 1:
-            # TODO : Is the region defined at gamma = 1?
-            #  Calculation of A and B functions are not done in case of gamma = 1. (Need to implement Appendix A.1 and B.2).
+            #  Calculation of A and B functions are not done in case of gamma = 1. (Refer Appendix A.1 and B.2).
 
-            raise NotImplementedError("Calculation of stabilization region is not implemented for gamma = 1.")
+            warnings.warn("Calculation of stabilization region is not implemented for gamma = 1.")
+            return
 
         A = None
         B = None
@@ -325,7 +319,10 @@ class StochasticControlJurek:
             prob_min.solve()
             min_bound[ind] = prob_min.value
 
-        return min_bound, max_bound
+        plt.plot(S)
+        plt.plot(min_bound)
+        plt.plot(max_bound)
+        plt.show()
 
 
     def _AB_calc_1(self, tau):
