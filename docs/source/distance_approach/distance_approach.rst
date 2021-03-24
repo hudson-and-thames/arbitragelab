@@ -115,11 +115,11 @@ gives a dictionary of industry group as an input.
 
 2. **Pairs with a higher number of zero-crossings**
 
-The number of zero crossings in the formation period does have some usefulness in predicting the future
-convergence according to the work of Do and Faff (2010).
+The number of zero crossings in the formation period has a positive relation to the future spread
+convergence according to the work by Do and Faff (2010).
 
 After pairs were matched either within the same industry group or every industry, the top :math:`n` pairs
-that had the highest number of zero crossings during the 12-month formation period are admitted to the
+that had the highest number of zero crossings during the formation period are admitted to the
 portfolio we select. This method incorporates the time-series dimension of the historical data in the
 form of the number of zero crossings.
 
@@ -129,8 +129,8 @@ The historical standard deviation calculated in the formation period can also be
 selected pairs. According to the work of Do and Faff(2010), as having a small SSD decreases the variance
 of the spread, this approach could increase the expected profitability of the method.
 
-After pairs were matched, by sorting the pairs based on their historical standard deviation in the
-formation period, we can select top :math:`n` pairs that have the highest standard deviation.
+After pairs were matched, we can sort them based on their historical standard deviation in the formation period
+to select top :math:`n` pairs with the highest variance of the spread.
 
 Implementation
 **************
@@ -290,8 +290,11 @@ The following research notebook can be used to better understand the distance ap
 
 * `Basic Distance Approach`_
 
+* `Basic Distance Approach Comparison`_
+
 .. _`Basic Distance Approach`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Distance%20Approach/basic_distance_approach.ipynb
 
+.. _`Basic Distance Approach Comparison`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Distance%20Approach/basic_distance_approach_comparison.ipynb
 
 References
 ##########
@@ -300,4 +303,3 @@ References
 * `Do, B., and Faff, R. (2012). Are pairs trading profits robust to trading costs? Journal of Financial Research, 35(2):261–287. <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1707125>`_
 * `Gatev, E., Goetzmann, W.N. and Rouwenhorst, K.G., 2006. Pairs trading: Performance of a relative-value arbitrage rule. The Review of Financial Studies, 19(3), pp.797-827. <https://www.nber.org/system/files/working_papers/w7032/w7032.pdf>`_
 * `Krauss, C., 2017. Statistical arbitrage pairs trading strategies: Review and outlook. Journal of Economic Surveys, 31(2), pp.513-545. <https://www.econstor.eu/bitstream/10419/116783/1/833997289.pdf>`_
-
