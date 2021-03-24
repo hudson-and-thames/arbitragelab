@@ -3,7 +3,7 @@
 .. note::
    The following implementations and documentation closely following work:
 
-    `Jurek, J.W. and Yang, H., 2007, April. Dynamic portfolio selection in arbitrage. <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=882536>`__.
+    `Jurek, J.W. and Yang, H., 2007, April. Dynamic portfolio selection in arbitrage. <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=882536>`__
 
 
 ==============

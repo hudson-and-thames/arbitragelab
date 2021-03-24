@@ -75,7 +75,7 @@ class StochasticControlJurek:
         return total_return_indices
 
 
-    def fit(self, data: pd.DataFrame, delta_t: float = 1 / 252, significance_level: float = 0.95):
+    def fit(self, data: pd.DataFrame, delta_t: float = 1 / 252, adf_test: bool = False, significance_level: float = 0.95):
         """
         This method uses inputted training data to calculate the spread and
         estimate the parameters of the corresponding OU process.
@@ -84,6 +84,7 @@ class StochasticControlJurek:
 
         :param data: (pd.DataFrame) Contains price series of both stocks in spread.
         :param delta_t: (float) Time difference between each index of data, calculated in years.
+        :param adf_test: (bool) Flag which defines whether the adf statistic test should be conducted.
         :param significance_level: (float) This significance level is used in the ADF statistic test.
             Value can be one of the following: (0.90, 0.95, 0.99).
         """
@@ -105,7 +106,7 @@ class StochasticControlJurek:
         eg_adf_statistics = eg_portfolio.adf_statistics  # Stores the results of the ADF statistic test.
         eg_cointegration_vectors = eg_portfolio.cointegration_vectors # Stores the calculated weights for the pair o stocks in the spread.
 
-        if eg_adf_statistics.loc['statistic_value', 0] > eg_adf_statistics.loc[f'{int(significance_level * 100)}%', 0]:
+        if adf_test is True and eg_adf_statistics.loc['statistic_value', 0] > eg_adf_statistics.loc[f'{int(significance_level * 100)}%', 0]:
             # Making sure that the data passes the ADF statistic test.
             print(eg_adf_statistics)
             warnings.warn("ADF statistic test failure.")
@@ -308,14 +309,14 @@ class StochasticControlJurek:
         min_bound = np.zeros(len(tau))
 
         for ind in range(len(tau)):
-            S = cp.Variable()
-            constraint = [cp.abs(phi[ind] * S + term_1[ind]) <= term_2[ind] - 1e-6]
+            s = cp.Variable()
+            constraint = [cp.abs(phi[ind] * s + term_1[ind]) <= term_2[ind] - 1e-6]
 
-            prob_max = cp.Problem(cp.Maximize(S), constraint)
+            prob_max = cp.Problem(cp.Maximize(s), constraint)
             prob_max.solve()
             max_bound[ind] = prob_max.value
 
-            prob_min = cp.Problem(cp.Minimize(S), constraint)
+            prob_min = cp.Problem(cp.Minimize(s), constraint)
             prob_min.solve()
             min_bound[ind] = prob_min.value
 
