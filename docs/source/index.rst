@@ -113,6 +113,8 @@ This project is licensed under an all rights reserved licence.
     :hidden:
 
     stochastic_control_approach/introduction
+    stochastic_control_approach/ou_model_jurek
+    stochastic_control_approach/ou_model_mudchanatongsuk
 
 .. toctree::
     :maxdepth: 2
