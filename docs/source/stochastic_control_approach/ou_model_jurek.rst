@@ -99,4 +99,191 @@ where :math:`f\left(C_{s}, J_{s}\right)` is the normalized aggregator for the co
 
 Here we consider the special case of a unit elasticity of intertemporal substitution (:math:`\psi = 1`).
 
+.. note::
+
+    In this paper, the choice of preference structures is driven by economic intuition regarding the incentives
+    of real-life arbitrageurs. In particular, it can be assumed that the arbitrageur
+    is a proprietary trading desk or delegated money manager with a fixed investment horizon. It
+    seems likely that such investors would only be interested in the distribution of wealth at a finite
+    horizon, e.g. at the end of the fiscal year, rather than the value of a long-dated consumption
+    stream.
+
+    However, the decision to model arbitrageurs as finite-horizon CRRA investors neglects
+    the role of management fees, which are often collected by arbitrageurs. To capture this feature,
+    we also consider the Epstein-Zin model specialized to the case of a unit elasticity of inter-temporal
+    substitution. In this case the agent's consumption to wealth ratio is constant,
+    which we exploit as a model of a flat management fee, collected (and consumed) as a continuous
+    stream rather than as a lump-sum payment.
+
+
+Spread Construction
+*******************
+
+To construct the spread for the portfolio, firstly we calculate the total return index for each asset :math:`i` in the spread.
+
+.. math::
+    P_{i, t}=\left(\frac{1}{P_{i, 1}}\right) \cdot\left(P_{i, 1} \cdot \prod_{j=1}^{t-1}\left(1+R_{i, j+1}\right)\right)
+
+The price spread is then constructed by taking a linear combination of the total return indices.
+These weights are estimated by using a co-integrating regression technique such as Engle Granger.
+
+
+Optimal Portfolio Strategy
+**************************
+
+The portfolio consists of a riskless asset and the mean reverting spread. We denote
+the prices of the two assets by :math:`B_t` and :math:`S_t`, respectively. Their dynamics are given by,
+
+.. math::
+
+    \begin{aligned}
+    d B_{t} &=r B_{t} d t \\
+    d S_{t} &=\kappa\left(\bar{S}-S_{t}\right) d t+\sigma d Z
+    \end{aligned}
+
+.. note::
+
+    We assume that there are no margin constraints, no transaction costs and a frictionless, continuous-time setting.
+
+The evolution of wealth which determines the budget constraints is written as,
+
+.. math::
+
+    d W_{t}=N_{t} d S_{t}+M_{t} d B_{t}-C_{t} 1\left[C_{t}>0\right] d t
+
+where :math:`N_t` denotes the number of units of spread and :math:`M_t` denotes the number of riskless assets.
+
+For the terminal wealth problem, the optimal portfolio allocation is given by:
+
+.. math::
+
+    N(W, S, \tau)=\left\{\begin{array}{cc}
+    \left(\frac{\kappa(\bar{S}-S)-r S}{\sigma^{2}}\right) W & \gamma=1 \\
+    \left(\frac{\kappa(\bar{S}-S)-r S}{\gamma \sigma^{2}}+\frac{2 A(\tau) S+B(\tau)}{\gamma}\right) W & \gamma \neq 1
+    \end{array}\right.
+
+The functions :math:`A(\tau)` and :math:`B(\tau)` depend on the time remaining to the horizon and the parameters of the underlying model.
+
+For the intermediate consumption problem, the optimal portfolio allocation has the same form as the corresponding equation for terminal wealth problem.
+
+Obviously, the functional form of the coefficient functions :math:`A(\tau)` and :math:`B(\tau)` are different.
+
+
+Stabilization Region
+********************
+
+In this section, We are interested in determining the direction in which an arbitrageur trades in response
+to a shock to the value of the spread asset. If an arbitrageur increases his position in the spread asset
+in response to an adverse shock, his trading is likely to have a stabilizing effect on the mispricing,
+contributing to its elimination in equilibrium. Conversely, if the arbitrageur decreases his position
+in response to the adverse shock, his trading will tend to exacerbate the mispricing.
+
+Sometimes arbitrageurs do not arbitrage. For instance, if the mispricing is sufficiently wide, a divergence
+in the mispricing can result in the decline of the total allocation, as the wealth effect dominates
+the improvement in the investment opportunity set. To characterize the conditions under which arbitrageurs cease
+to trade against the mispricing, we derive precise, analytical conditions for the time-varying envelope within which
+arbitrageurs trade against the mispricing.
+
+In the general case when :math:`\bar{S} \neq 0` the range of values of :math:`S`
+for which the arbitrageur's response to an adverse shock is stabilizing - i.e. the agent trades against
+the spread, increasing his position as the spread widens - is determined by a time-varying envelope
+determined by both :math:`A(\tau)` and :math:`B(\tau)`. The boundary of the stabilization region is determined by the
+following inequality:
+
+.. math::
+
+    \left| \phi(\tau) S+\frac{\kappa \bar{S}+\sigma^{2} B(\tau)}{\gamma \sigma^{2}}\right |<\sqrt{-\phi(\tau)}
+
+where,
+
+.. math::
+
+    \phi(\tau) = \left(\frac{2 A(\tau)}{\gamma}-\frac{\kappa+r}{\gamma \sigma^{2}}\right)
+
+As long as the spread is within the stabilization region, the improvement in investment opportunities
+from a divergence of the spread away from its long-run mean outweighs the negative
+wealth effect and the arbitrageur increases his position, :math:`N`, in the mean-reverting asset. When
+the spread is outside of the stabilization region, the wealth effect dominates, leading the agent to
+curb his position despite an improvement in investment opportunities.
+
+
+Fund Flows
+**********
+
+This section deals with the inclusion of fund flows. Delegated managers are not only exposed to the
+financial fluctuations of asset prices but also to their client's desires to contribute or withdraw funds.
+Paradoxically, clients are most likely to withdraw funds after performance has been poor
+(i.e. spreads have been widening) and investment opportunities are the best.
+
+In the presence of fund flows the evolution of wealth under management will depend not only
+on performance, denoted by :math:`\Pi_t`, but also on fund flows, :math:`F_t`.We therefore have:
+
+.. math::
+
+    \begin{aligned}
+    d \Pi &=\tilde{N} d S+(W-\tilde{N} S) r d t \\
+    d F &=f d \Pi+\sigma_{f} W d Z_{f} \\
+    d W &=d \Pi+d F=(1+f) d \Pi+\sigma_{f} W d Z_{f}
+    \end{aligned}
+
+where :math:`\tilde{N}` is the optimal policy rule chosen by a fund manager facing fund flows of the type described
+above, and :math:`E[d Z_{f} dZ] = 0`. The fund flow magnifies the effect of performance on wealth
+under management, with each dollar in performance generating a fund flow of :math:`f` dollars.
+
+
+The optimal portfolio allocation of an agent with constant relative risk aversion with utility
+defined over terminal wealth, in the presence of fund flows is given by:
+
+.. math::
+
+    \tilde{N}(S, \tau)=\left(\frac{1}{1+f}\right) \cdot N(S, \tau)
+
+where :math:`N(S, \tau)` is the optimal policy function in the problem without fund flows
+and :math:`f` denotes the proportionality coefficient.
+
+The intuition behind this elegant solution is simple. The performance-chasing component of
+fund flows increases the volatility of wealth by a factor of :math:`(1 + f)`, causing a manager who anticipates
+this flow to commensurately decrease the amount of risk taken on by the underlying strategy.
+
+
+How to use this submodule
+#########################
+
+
+Step 1: Model fitting
+*********************
+
+
+Implementation
+==============
+
+.. automodule:: arbitragelab.stochastic_control_approach.ou_model_jurek
+
+.. autoclass:: StochasticControlJurek
+   :members: __init__
+
+.. automethod:: StochasticControlJurek.fit
+
+
+Step 2: Getting the Optimal Portfolio Weights
+*********************************************
+
+
+Implementation
+==============
+
+.. automethod:: StochasticControlJurek.optimal_portfolio_weights
+
+
+Example
+#######
+
+
+Research Notebook
+#################
+
+
+
+References
+##########
 
