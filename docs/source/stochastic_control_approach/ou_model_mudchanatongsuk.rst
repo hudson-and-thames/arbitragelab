@@ -95,10 +95,14 @@ Finally, the optimal weights are given by,
 How to use this submodule
 #########################
 
+This submodule contains two public methods. One for estimating the parameters of the model using training data,
+and the second method is for calculating the final optimal portfolio weights using evaluation data.
 
 Step 1: Model fitting
 *********************
 
+We input the training data to the fit method which calculates the spread
+and the estimators of the parameters of the model.
 
 Implementation
 ==============
@@ -114,6 +118,7 @@ Implementation
 Step 2: Getting the Optimal Portfolio Weights
 *********************************************
 
+In this step we input the evaluation data and specify the utility function parameter :math:`\gamma`.
 
 Implementation
 ==============
@@ -128,10 +133,16 @@ Example
 Research Notebook
 #################
 
+The following research notebook can be used to better understand the approach described above.
+
+* `Optimal Pairs Trading A Stochastic Control Approach`_
+
+.. _`Optimal Pairs Trading A Stochastic Control Approach`:
+
 
 
 References
 ##########
 
-
+*     `Mudchanatongsuk, S., Primbs, J.A. and Wong, W., 2008, June. Optimal pairs trading: A stochastic control approach. <http://folk.ntnu.no/skoge/prost/proceedings/acc08/data/papers/0479.pdf>`__
 

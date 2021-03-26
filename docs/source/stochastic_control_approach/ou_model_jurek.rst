@@ -250,10 +250,17 @@ this flow to commensurately decrease the amount of risk taken on by the underlyi
 How to use this submodule
 #########################
 
+This submodule contains two public methods. One for estimating the parameters of the model using training data,
+and the second method is for calculating the final optimal portfolio weights using evaluation data.
 
 Step 1: Model fitting
 *********************
 
+We input the training data to the fit method which calculates the spread
+and the closed form estimators of the parameters of the model.
+
+We can also specify the time period between steps(delta_t) in the data
+and whether we want to run the ADF statistic test to evaluate the spread.
 
 Implementation
 ==============
@@ -269,6 +276,11 @@ Implementation
 Step 2: Getting the Optimal Portfolio Weights
 *********************************************
 
+In this step we input the evaluation data and specify the type of investor we are looking for.
+We also need to specify the utility function parameter :math:`\gamma` and the risk free rate of return :math:`r`.
+
+If we choose the investor with intermediate consumption, we also need to specify the parameter :math:`\beta`.
+
 
 Implementation
 ==============
@@ -283,8 +295,13 @@ Example
 Research Notebook
 #################
 
+The following research notebook can be used to better understand the approach described above.
 
+* `Dynamic Portfolio Selection in Arbitrage`_
+
+.. _`Dynamic Portfolio Selection in Arbitrage`:
 
 References
 ##########
 
+*   `Jurek, J.W. and Yang, H., 2007, April. Dynamic portfolio selection in arbitrage. <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=882536>`__
