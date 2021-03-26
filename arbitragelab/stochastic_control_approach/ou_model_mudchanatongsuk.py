@@ -5,8 +5,8 @@
 Module implements the optimal pairs trading strategy using Stochastic Control Approach.
 
 This module is a realization of the methodology in the following paper:
+
 `Mudchanatongsuk, S., Primbs, J.A. and Wong, W., 2008, June. Optimal pairs trading: A stochastic control approach.
- In 2008 American control conference (pp. 1035-1039). IEEE.
 <http://folk.ntnu.no/skoge/prost/proceedings/acc08/data/papers/0479.pdf>`__
 """
 
