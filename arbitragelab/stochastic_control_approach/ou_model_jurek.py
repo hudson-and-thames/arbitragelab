@@ -123,11 +123,7 @@ class StochasticControlJurek:
         params = self._estimate_params(self.spread)
         self.mu, self.k, self.sigma = params
 
-        print(self.mu)
-        print(self.k)
-        print(self.sigma)
-
-        self._check_estimations()
+        #self._check_estimations()
 
 
     def _estimate_params(self, spread: np.array):
@@ -633,3 +629,31 @@ class StochasticControlJurek:
 
 
         return B
+
+    @staticmethod
+    def _calc_half_life(k: float) -> float:
+        """
+        Function returns half life of mean reverting spread from rate of mean reversion.
+        """
+
+        return np.log(2) / k # Half life of shocks.
+
+
+    def describe(self) -> pd.Series:
+        """
+        Method returns values of instance attributes calculated from training data.
+        """
+
+        if self.sigma is None:
+            raise Exception("Please run the fit method before calling describe.")
+
+        index = ['Ticker of first stock', 'Ticker of second stock', 'Scaled Spread weights',
+                 'long-term mean', 'rate of mean reversion', 'standard deviation', 'half-life']
+
+        data = [self.ticker_A, self.ticker_B, np.round(self.scaled_spread_weights.values, 3),
+                self.mu, self.k, self.sigma, self._calc_half_life(self.k)]
+
+        # Combine data and indexes into the pandas Series
+        output = pd.Series(data=data, index=index)
+
+        return output

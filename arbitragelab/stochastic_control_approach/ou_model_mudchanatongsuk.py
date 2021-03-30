@@ -85,10 +85,10 @@ class StochasticControlMudchanatongsuk:
 
         self.spread = self.spread.to_numpy()  # Converting from pd.Series to numpy array.
         self.S = self.S.to_numpy()  # Converting from pd.Series to numpy array.
-        self._estimate_params()
+        #self._estimate_params()
 
         params = self._estimate_params_log_likelihood()
-        print(f"Params from likelihood : {params[:-1]}")
+        #print(f"Params from likelihood : {params[:-1]}")
         self.sigma, self.mu, self.k,self.theta, self.eta, self.rho = params[:-1]
 
 
@@ -300,3 +300,35 @@ class StochasticControlMudchanatongsuk:
         log_likelihood = np.log(f_y).sum()
 
         return -log_likelihood
+
+
+    @staticmethod
+    def _calc_half_life(k: float) -> float:
+        """
+        Function returns half life of mean reverting spread from rate of mean reversion.
+        """
+
+        return np.log(2) / k # Half life of shocks.
+
+
+    def describe(self) -> pd.Series:
+        """
+        Method returns values of instance attributes calculated from training data.
+        """
+
+        if self.sigma is None:
+            raise Exception("Please run the fit method before calling describe.")
+
+        index = ['Ticker of first stock', 'Ticker of second stock',
+                 'long-term mean of spread', 'rate of mean reversion of spread', 'standard deviation of spread', 'half-life of spread',
+                 'Drift of stock B', 'standard deviation of stock B']
+
+        data = [self.ticker_A, self.ticker_B,
+                self.theta, self.k, self.eta, self._calc_half_life(self.k),
+                self.mu, self.sigma]
+
+        # Combine data and indexes into the pandas Series
+        output = pd.Series(data=data, index=index)
+
+        return output
+

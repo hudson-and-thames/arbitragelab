@@ -15,7 +15,7 @@ OU Model Mudchanatongsuk
 Introduction
 ############
 
-In this module, we implement a stochastic control based approach to the problem of pairs trading.
+In the paper corresponding to this module, the authors implement a stochastic control based approach to the problem of pairs trading.
 The paper models the log-relationship between a pair of stock prices as an Ornstein-Uhlenbeck process
 and use this to formulate a portfolio optimization based stochastic control problem.
 This problem is constructed in such a way that one may either
@@ -27,7 +27,7 @@ Modelling
 #########
 
 Let :math:`A(t)` and :math:`B(t)` denote respectively the prices of the
-pair of stocks :math:`A` and :math:`B` at time :math:`t`. We assume that stock :math:`B`
+pair of stocks :math:`A` and :math:`B` at time :math:`t`. The authors assume that stock :math:`B`
 follows a geometric Brownian motion,
 
 .. math::
@@ -44,7 +44,7 @@ defined as
 
     X(t) = \ln(A(t)) − \ln(B(t))
 
-We assume that the spread follows an Ornstein-Uhlenbeck process
+The authors assume that the spread follows an Ornstein-Uhlenbeck process
 
 .. math::
 
@@ -69,10 +69,10 @@ The wealth dynamics of the portfolio value is given by,
 
 
 Given below is the formulation of the portfolio optimization pair-trading problem
-as a stochastic optimal control problem. We assume that an investor’s preference
+as a stochastic optimal control problem. The authors assume that an investor’s preference
 can be represented by the utility function :math:`U(x) = \frac{1}{\gamma} x^\gamma`
 with :math:`x ≥ 0` and :math:`\gamma < 1`. In this formulation, our objective is to maximize expected utility at
-the final time :math:`T`. Thus, we seek to solve
+the final time :math:`T`. Thus, the authors seek to solve
 
 
 .. math::
@@ -107,12 +107,21 @@ and the estimators of the parameters of the model.
 Implementation
 ==============
 
+
 .. automodule:: arbitragelab.stochastic_control_approach.ou_model_mudchanatongsuk
+
 
 .. autoclass:: StochasticControlMudchanatongsuk
    :members: __init__
 
+
 .. automethod:: StochasticControlMudchanatongsuk.fit
+
+
+.. tip::
+    To view the estimated model parameters from training data, call the ``describe`` function.
+
+    .. automethod:: StochasticControlMudchanatongsuk.describe
 
 
 Step 2: Getting the Optimal Portfolio Weights
@@ -128,6 +137,35 @@ Implementation
 
 Example
 #######
+
+We use GLD and GDX tickers from Yahoo Finance as the dataset for this example.
+
+.. code-block::
+
+    data1 =  yf.download("GLD GDX", start="2012-03-25", end="2016-01-09")
+    data2 =  yf.download("GLD GDX", start="2016-02-21", end="2020-08-15")
+
+    data_train_dataframe = data1["Adj Close"][["GLD", "GDX"]]
+    data_test_dataframe = data2["Adj Close"][["GLD", "GDX"]]
+
+
+In the following code block, we are initializing the class and firstly,
+we use the fit method to generate the parameters of the model.
+Then, we call ``describe`` to view the estimated parameters.
+Finally, we use the out-of-sample test data to calculate the optimal portfolio weights using the fitted model.
+
+.. code-block::
+
+    from arbitragelab.stochastic_control_approach.ou_model_mudchanatongsuk import StochasticControlMudchanatongsuk
+
+    sc = StochasticControlMudchanatongsuk()
+
+    sc.fit(data_train_dataframe)
+
+    print(sc.describe())
+
+    plt.plot(sc.optimal_portfolio_weights(data_test_dataframe))
+    plt.show()
 
 
 Research Notebook

@@ -3,8 +3,7 @@
 .. note::
    The following implementations and documentation closely following work:
 
-    `Jurek, J.W. and Yang, H., 2007, April. Dynamic portfolio selection in arbitrage.
-     <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=882536>`__
+    `Jurek, J.W. and Yang, H., 2007, April. Dynamic portfolio selection in arbitrage. <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=882536>`__
 
 
 ==============
@@ -14,7 +13,7 @@ OU Model Jurek
 Introduction
 ############
 
-In this module, we derive the optimal dynamic strategy for arbitrageurs with a finite horizon and
+In the paper corresponding to this module, the authors derive the optimal dynamic strategy for arbitrageurs with a finite horizon and
 non-myopic preferences facing a mean-reverting arbitrage opportunity (e.g. an equity pairs
 trade).
 
@@ -38,17 +37,17 @@ partial equilibrium.
 Modelling
 #########
 
-To capture the presence of horizon and divergence risk, we model the dynamics of the mispricing
+To capture the presence of horizon and divergence risk, the authors model the dynamics of the mispricing
 using a mean-reverting stochastic process. Under this process, although the mispricing is guaranteed
 to be eliminated at some future date, the timing of convergence, as well as the maximum magnitude
-of the mispricing prior to convergence, are uncertain. With this assumption, we are able to derive
+of the mispricing prior to convergence, are uncertain. With this assumption, the authors are able to derive
 the arbitrageur's optimal dynamic portfolio policy for a set of general, non-myopic preference
 specifications, including CRRA utility defined over wealth at a finite horizon and Epstein-Zin
 utility defined over intermediate cash flows (e.g. fees). This allows us to analytically examine the
 role of intertemporal hedging demands in arbitrage activities and represents a novel contribution
 relative to the commonly assumed log utility specification, under which hedging demands are absent.
 
-We find that, in the presence of horizon and divergence risk, there is a critical level of the mispricing
+It was observed that, in the presence of horizon and divergence risk, there is a critical level of the mispricing
 beyond which further divergence in the mispricing precipitates a reduction in the allocation.
 Although a divergence in the mispricing results in an improvement in the instantaneous investment
 opportunity set and should induce added participation by rational arbitrageurs, this effect can be
@@ -63,7 +62,7 @@ Ornstein-Uhlenbeck process (henceforth OU). The OU process captures the two key 
 real-world mispricing: the convergence times are uncertain and the mispricing can diverge arbitrarily far
 from its mean prior to convergence.
 
-The optimal trading strategies we derive are self-financing and can be interpreted as the optimal
+The optimal trading strategies derived are self-financing and can be interpreted as the optimal
 trading rules for a fund which is not subject to withdrawals but also cannot raise additional assets
 (i.e. a closed-end fund). The dynamics of the optimal allocation to the arbitrage opportunity are
 driven by two factors: the necessity of maintaining wealth (equity) above zero and the proximity
@@ -73,8 +72,8 @@ of the arbitrageur's terminal evaluation date, which affects his appetite for ri
 Investor Preferences
 ********************
 
-We consider two alternative preferences structures for the arbitrageur in our continuous-time
-model. In the first, we assume that the agent has constant relative risk aversion and maximizes
+The authors considerd two alternative preferences structures for the arbitrageur in our continuous-time
+model. In the first, the authors assumed that the agent has constant relative risk aversion and maximizes
 the discounted utility of terminal wealth. The arbitrageur's value function at time :math:`t` - denoted by
 :math:`V_t` - takes the form:
 
@@ -82,7 +81,7 @@ the discounted utility of terminal wealth. The arbitrageur's value function at t
 
     V_{t}=\sup E_{t}\left[e^{-\beta(T-t)} \frac{W_{T}^{1-\gamma}}{1-\gamma}\right]
 
-The second preference structure we consider is the recursive utility of Epstein and Zin (1989, 1991),
+The second preference structure they considered is the recursive utility of Epstein and Zin (1989, 1991),
 which allows the elasticity of intertemporal substitution and the coefficient of relative risk aversion
 to vary independently. Under this preference specification, the value function of the arbitrageur is
 given by:
@@ -98,7 +97,7 @@ where :math:`f\left(C_{s}, J_{s}\right)` is the normalized aggregator for the co
     f\left(C_{t}, J_{t}\right)=\beta(1-\gamma) \cdot J_{t} \cdot\left[\log C_{t}-\frac{1}{1-\gamma} \log \left((1-\gamma) J_{t}\right)\right]
 
 
-Here we consider the special case of a unit elasticity of intertemporal substitution (:math:`\psi = 1`).
+Here the authors considered the special case of a unit elasticity of intertemporal substitution (:math:`\psi = 1`).
 
 .. note::
 
@@ -111,16 +110,16 @@ Here we consider the special case of a unit elasticity of intertemporal substitu
 
     However, the decision to model arbitrageurs as finite-horizon CRRA investors neglects
     the role of management fees, which are often collected by arbitrageurs. To capture this feature,
-    we also consider the Epstein-Zin model specialized to the case of a unit elasticity of inter-temporal
+    the authors also consider the Epstein-Zin model specialized to the case of a unit elasticity of inter-temporal
     substitution. In this case the agent's consumption to wealth ratio is constant,
-    which we exploit as a model of a flat management fee, collected (and consumed) as a continuous
+    which can be exploited as a model of a flat management fee, collected (and consumed) as a continuous
     stream rather than as a lump-sum payment.
 
 
 Spread Construction
 *******************
 
-To construct the spread for the portfolio, firstly we calculate the total return index for each asset :math:`i` in the spread.
+To construct the spread for the portfolio, firstly the authors calculated the total return index for each asset :math:`i` in the spread.
 
 .. math::
     P_{i, t}=\left(\frac{1}{P_{i, 1}}\right) \cdot\left(P_{i, 1} \cdot \prod_{j=1}^{t-1}\left(1+R_{i, j+1}\right)\right)
@@ -132,7 +131,7 @@ These weights are estimated by using a co-integrating regression technique such 
 Optimal Portfolio Strategy
 **************************
 
-The portfolio consists of a riskless asset and the mean reverting spread. We denote
+The portfolio consists of a riskless asset and the mean reverting spread. The authors denote
 the prices of the two assets by :math:`B_t` and :math:`S_t`, respectively. Their dynamics are given by,
 
 .. math::
@@ -144,7 +143,7 @@ the prices of the two assets by :math:`B_t` and :math:`S_t`, respectively. Their
 
 .. note::
 
-    We assume that there are no margin constraints, no transaction costs and a frictionless, continuous-time setting.
+    The authors assumed that there are no margin constraints, no transaction costs and there is a frictionless, continuous-time setting.
 
 The evolution of wealth which determines the budget constraints is written as,
 
@@ -173,7 +172,7 @@ Obviously, the functional form of the coefficient functions :math:`A(\tau)` and 
 Stabilization Region
 ********************
 
-In this section, We are interested in determining the direction in which an arbitrageur trades in response
+In this section, the authors are interested in determining the direction in which an arbitrageur trades in response
 to a shock to the value of the spread asset. If an arbitrageur increases his position in the spread asset
 in response to an adverse shock, his trading is likely to have a stabilizing effect on the mispricing,
 contributing to its elimination in equilibrium. Conversely, if the arbitrageur decreases his position
@@ -182,7 +181,7 @@ in response to the adverse shock, his trading will tend to exacerbate the mispri
 Sometimes arbitrageurs do not arbitrage. For instance, if the mispricing is sufficiently wide, a divergence
 in the mispricing can result in the decline of the total allocation, as the wealth effect dominates
 the improvement in the investment opportunity set. To characterize the conditions under which arbitrageurs cease
-to trade against the mispricing, we derive precise, analytical conditions for the time-varying envelope within which
+to trade against the mispricing, the authors derived precise, analytical conditions for the time-varying envelope within which
 arbitrageurs trade against the mispricing.
 
 In the general case when :math:`\bar{S} \neq 0` the range of values of :math:`S`
@@ -217,7 +216,7 @@ Paradoxically, clients are most likely to withdraw funds after performance has b
 (i.e. spreads have been widening) and investment opportunities are the best.
 
 In the presence of fund flows the evolution of wealth under management will depend not only
-on performance, denoted by :math:`\Pi_t`, but also on fund flows, :math:`F_t`.We therefore have:
+on performance, denoted by :math:`\Pi_t`, but also on fund flows, :math:`F_t`.Consequently:
 
 .. math::
 
@@ -262,15 +261,24 @@ and the closed form estimators of the parameters of the model.
 We can also specify the time period between steps(delta_t) in the data
 and whether we want to run the ADF statistic test to evaluate the spread.
 
+
 Implementation
 ==============
 
 .. automodule:: arbitragelab.stochastic_control_approach.ou_model_jurek
 
+
 .. autoclass:: StochasticControlJurek
    :members: __init__
 
+
 .. automethod:: StochasticControlJurek.fit
+
+
+.. tip::
+    To view the estimated model parameters from training data, call the ``describe`` function.
+
+    .. automethod:: StochasticControlJurek.describe
 
 
 Step 2: Getting the Optimal Portfolio Weights
@@ -290,6 +298,41 @@ Implementation
 
 Example
 #######
+
+We use GLD and GDX tickers from Yahoo Finance as the dataset for this example.
+
+.. code-block::
+
+    data1 =  yf.download("GLD GDX", start="2009-03-25", end="2019-03-25")
+    data2 =  yf.download("GLD GDX", start="2019-03-27", end="2020-03-27")
+
+    data_train_dataframe = data1["Adj Close"][["GLD", "GDX"]]
+    data_test_dataframe = data2["Adj Close"][["GLD", "GDX"]]
+
+.. Note::
+    To get good results for the estimated parameters, using atleast 10 years of training data is recommended.
+
+In the following code block, we are initializing the class and firstly,
+we use the fit method to generate the parameters of the model.
+Then, we call ``describe`` to view the estimated parameters.
+Finally, we use the out-of-sample test data to calculate the optimal portfolio weights using the fitted model.
+
+.. code-block::
+
+    from arbitragelab.stochastic_control_approach.ou_model_jurek import StochasticControlJurek
+
+    sc = StochasticControlJurek()
+
+    sc.fit(data_train_dataframe)
+
+    print(sc.describe())
+
+    plt.plot(sc.optimal_portfolio_weights(data_test_dataframe, beta = 0.01, gamma = 0.5, utility_type=1))
+    plt.show()
+
+
+.. Note::
+    For utility_type = 2 and low values of :math:`\gamma (< 1)`, the model becomes unstable with respect to the value of :math:`k`.
 
 
 Research Notebook
