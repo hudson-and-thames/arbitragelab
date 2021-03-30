@@ -295,6 +295,27 @@ Implementation
 
 .. automethod:: StochasticControlJurek.optimal_portfolio_weights
 
+Step 3: Stabilization Region
+****************************
+
+In this optional step, we can calculate the boundaries of the stabilization region for the spread calculated from the data.
+
+Implementation
+==============
+
+.. automethod:: StochasticControlJurek.stabilization_region_calc
+
+
+Step 4: Optimal Portfolio Weights with Fund Flows
+*************************************************
+
+In this optional step, we calculate the optimal portfolio weights with the inclusion of fund flows for the CRRA investor.
+
+Implementation
+==============
+
+.. automethod:: StochasticControlJurek.optimal_portfolio_weights_fund_flows
+
 
 Example
 #######
@@ -312,7 +333,10 @@ We use GLD and GDX tickers from Yahoo Finance as the dataset for this example.
 .. Note::
     To get good results for the estimated parameters, using atleast 10 years of training data is recommended.
 
-In the following code block, we are initializing the class and firstly,
+Example 1
+*********
+
+In the following code block, after initializing the class firstly,
 we use the fit method to generate the parameters of the model.
 Then, we call ``describe`` to view the estimated parameters.
 Finally, we use the out-of-sample test data to calculate the optimal portfolio weights using the fitted model.
@@ -334,6 +358,15 @@ Finally, we use the out-of-sample test data to calculate the optimal portfolio w
 .. Note::
     For utility_type = 2 and low values of :math:`\gamma (< 1)`, the model becomes unstable with respect to the value of :math:`k`.
 
+Example 2
+*********
+
+For stabilization region
+
+Example 3
+*********
+
+For fund flows
 
 Research Notebook
 #################

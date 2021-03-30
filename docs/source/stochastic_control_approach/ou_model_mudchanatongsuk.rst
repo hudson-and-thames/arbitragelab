@@ -129,6 +129,10 @@ Step 2: Getting the Optimal Portfolio Weights
 
 In this step we input the evaluation data and specify the utility function parameter :math:`\gamma`.
 
+.. note::
+    As noted in the paper, please make sure the value of gamma is less than 1.
+
+
 Implementation
 ==============
 

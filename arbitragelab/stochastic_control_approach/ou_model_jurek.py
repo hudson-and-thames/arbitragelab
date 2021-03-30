@@ -15,7 +15,6 @@ import warnings
 import cvxpy as cp
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 
 from arbitragelab.cointegration_approach.engle_granger import EngleGrangerPortfolio
 
@@ -115,8 +114,6 @@ class StochasticControlJurek:
         self.scaled_spread_weights = eg_cointegration_vectors.loc[0] / abs(eg_cointegration_vectors.loc[0]).sum()
 
         self.spread = (total_return_indices * self.scaled_spread_weights).sum(axis=1)
-        self.spread.plot()
-        plt.show()
 
         self.spread = self.spread.to_numpy() # TODO : This conversion seems to have changed the estimated values. Not sure why?
 
@@ -152,21 +149,41 @@ class StochasticControlJurek:
         return mu, k, sigma
 
 
-    def _check_estimations(self):
+    # def _check_estimations(self):
+    #     """
+    #     Testing against null of random walk for rate of mean reversion k.
+    #     """
+    #
+    #     num_paths = 100000
+    #
+    #     output_params = np.zeros((num_paths, 3))
+    #     for i in range(num_paths):
+    #         white_noise_process = self.sigma * np.random.randn(len(self.spread)) + self.mu
+    #         output_params[i, :] = self._estimate_params(white_noise_process)
+    #
+    #     plt.hist(output_params[:, 1], bins=20)
+    #     plt.show()
+    #     #TODO : This is incomplete.
+
+
+    def _spread_calc(self, data: pd.DataFrame):
         """
-        Testing against null of random walk for rate of mean reversion k.
+        This method calculates the spread on test data using the scaled weights from training data.
+
+        :param data: (pd.DataFrame) Contains price series of both stocks in spread.
         """
 
-        num_paths = 100000
+        #Calculating the total return indices from pricing data.
+        total_return_indices = self._calc_total_return_indices(data)
+        t = np.arange(0, len(total_return_indices)) * self.delta_t
+        tau = t[-1] - t  # Stores time remaining till closure. (In years)
 
-        output_params = np.zeros((num_paths, 3))
-        for i in range(num_paths):
-            white_noise_process = self.sigma * np.random.randn(len(self.spread)) + self.mu
-            output_params[i, :] = self._estimate_params(white_noise_process)
+        # Calculating the spread with weights calculated from training data.
+        S = (total_return_indices * self.scaled_spread_weights).sum(axis=1)
 
-        plt.hist(output_params[:, 1], bins=20)
-        plt.show()
-        #TODO : This is incomplete.
+        S = S.to_numpy() # TODO : This conversion in fit seems to have changed the estimated values.
+
+        return tau, S
 
 
     def optimal_portfolio_weights(self, data: pd.DataFrame, utility_type: int = 1, gamma: float = 1, beta: float = 0.1, r: float = 0.05):
@@ -205,18 +222,9 @@ class StochasticControlJurek:
         self.gamma = gamma
         self.beta = beta
 
-        #Calculating the total return indices from pricing data.
-        total_return_indices = self._calc_total_return_indices(data)
-        t = np.arange(0, len(total_return_indices)) * self.delta_t
-        tau = t[-1] - t  # Stores time remaining till closure. (In years)
+        tau, S = self._spread_calc(data)
 
-        W = np.ones(len(t))  # Wealth is normalized to one.
-        # Calculating the spread with weights calculated from training data.
-        S = (total_return_indices * self.scaled_spread_weights).sum(axis=1)
-
-        S = S.to_numpy() # TODO : This conversion in fit seems to have changed the estimated values.
-
-        self._stabilization_region_calc(S, tau, utility_type)
+        W = np.ones(len(tau))  # Wealth is normalized to one.
 
         N = None
         # The optimal weights equation is the same for both types of utility functions.
@@ -271,20 +279,29 @@ class StochasticControlJurek:
         return (1 / (1 + f)) * N
 
 
-    def _stabilization_region_calc(self, S, tau, utility_type = 1):
+    def stabilization_region_calc(self, data: pd.DataFrame, utility_type: int = 1, gamma: float = 1, beta: float = 0.1, r: float = 0.05):
         """
         Implementation of Theorem 3 in Jurek (2007).
 
-        :param S: (np.array) spread.
-        :param tau: (np.array) Array with time till completion in years.
+        :param data: (pd.DataFrame) Contains price series of both stocks in spread.
         :param utility_type: (int) Flag signifies type of investor preferences.
+        :param gamma: (float) coefficient of relative risk aversion.
+        :param beta: (float) Subjective rate of time preference. (Only required for utility_type = 2).
+        :param r: (float) Rate of Returns.
         """
+
+        # Setting instance attributes.
+        self.r = r
+        self.gamma = gamma
+        self.beta = beta
+
+        tau, S = self._spread_calc(data)
 
         if self.gamma == 1:
             #  Calculation of A and B functions are not done in case of gamma = 1. (Refer Appendix A.1 and B.2).
 
             warnings.warn("Calculation of stabilization region is not implemented for gamma = 1.")
-            return
+            return None
 
         A = None
         B = None
@@ -316,10 +333,7 @@ class StochasticControlJurek:
             prob_min.solve()
             min_bound[ind] = prob_min.value
 
-        plt.plot(S)
-        plt.plot(min_bound)
-        plt.plot(max_bound)
-        plt.show()
+        return S, min_bound, max_bound
 
 
     def _AB_calc_1(self, tau):

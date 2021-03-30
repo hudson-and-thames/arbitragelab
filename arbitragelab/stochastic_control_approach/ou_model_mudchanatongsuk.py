@@ -92,60 +92,60 @@ class StochasticControlMudchanatongsuk:
         self.sigma, self.mu, self.k,self.theta, self.eta, self.rho = params[:-1]
 
 
-    def _estimate_params(self):
-        """
-        This method implements the closed form solutions for estimators of the model parameters.
-        These formulas for the estimators are given in Appendix of Mudchanatongsuk (2007).
-        """
-
-        N = len(self.spread) - 1
-
-        m = (self.S[N] - self.S[0]) / N
-
-        S_squared = (np.power(np.diff(self.S), 2).sum() - 2 * m * (self.S[N] - self.S[0]) + N*m*m) / N
-
-
-        p = (1 / (N * np.power(self.spread[:-1], 2).sum() - self.spread[:-1].sum() ** 2)) * \
-            (N * np.multiply(self.spread[1:], self.spread[:-1]).sum() -
-             (self.spread[N] - self.spread[0]) * np.sum(self.spread[:-1]) - self.spread[:-1].sum() ** 2)
-        # TODO : This calculation of p is incorrect. Calculation of q is correct.
-
-        p = np.exp(-0.18565618 * self.delta_t) # Correct value of p calculated from likelihood params.
-        print(p)
-
-        q = (self.spread[N] - self.spread[0] + (1 - p) * self.spread[:-1].sum()) / N
-
-        V_squared = (1 / N) * (self.spread[N] ** 2 - self.spread[0] ** 2 + (1 + p ** 2) * np.power(self.spread[:-1], 2).sum()
-                               - 2 * p * np.multiply(self.spread[1:], self.spread[:-1]).sum() - N * q)
-        # TODO : This calculation of V_squared is incorrect.
-
-        print(V_squared)
-
-        self.sigma = np.sqrt(S_squared / self.delta_t)
-
-        self.mu = (m / self.delta_t) + (0.5 * (self.sigma ** 2))
-
-        self.k = - np.log(p) / self.delta_t
-
-        self.theta = q / (1 - p)
-
-        V_squared = (0.3038416 ** 2) * (1 - p ** 2) / (2 * self.k) # Correct value of V_squared calculated from likelihood params.
-
-        print(V_squared)
-
-
-        C = (1/(N * np.sqrt(V_squared * S_squared))) * (np.multiply(self.spread[1:], np.diff(self.S)).sum()
-                                                      - p * np.multiply(self.spread[:-1], np.diff(self.S)).sum()
-                                                      - m * (self.spread[N] - self.spread[0])
-                                                      - m * (1 - p) * self.spread[:-1].sum())
-
-
-
-        self.eta = np.sqrt(2 * self.k * V_squared / (1 - p ** 2))
-
-        self.rho = self.k * C * np.sqrt(V_squared * S_squared) / (self.eta * self.sigma * (1 - p))
-
-        print(f"Params from closed form : {(self.sigma, self.mu, self.k, self.theta, self.eta, self.rho)}")
+    # def _estimate_params(self):
+    #     """
+    #     This method implements the closed form solutions for estimators of the model parameters.
+    #     These formulas for the estimators are given in Appendix of Mudchanatongsuk (2007).
+    #     """
+    #
+    #     N = len(self.spread) - 1
+    #
+    #     m = (self.S[N] - self.S[0]) / N
+    #
+    #     S_squared = (np.power(np.diff(self.S), 2).sum() - 2 * m * (self.S[N] - self.S[0]) + N*m*m) / N
+    #
+    #
+    #     p = (1 / (N * np.power(self.spread[:-1], 2).sum() - self.spread[:-1].sum() ** 2)) * \
+    #         (N * np.multiply(self.spread[1:], self.spread[:-1]).sum() -
+    #          (self.spread[N] - self.spread[0]) * np.sum(self.spread[:-1]) - self.spread[:-1].sum() ** 2)
+    #     # TODO : This calculation of p is incorrect. Calculation of q is correct.
+    #
+    #     p = np.exp(-0.18565618 * self.delta_t) # Correct value of p calculated from likelihood params.
+    #     print(p)
+    #
+    #     q = (self.spread[N] - self.spread[0] + (1 - p) * self.spread[:-1].sum()) / N
+    #
+    #     V_squared = (1 / N) * (self.spread[N] ** 2 - self.spread[0] ** 2 + (1 + p ** 2) * np.power(self.spread[:-1], 2).sum()
+    #                            - 2 * p * np.multiply(self.spread[1:], self.spread[:-1]).sum() - N * q)
+    #     # TODO : This calculation of V_squared is incorrect.
+    #
+    #     print(V_squared)
+    #
+    #     self.sigma = np.sqrt(S_squared / self.delta_t)
+    #
+    #     self.mu = (m / self.delta_t) + (0.5 * (self.sigma ** 2))
+    #
+    #     self.k = - np.log(p) / self.delta_t
+    #
+    #     self.theta = q / (1 - p)
+    #
+    #     V_squared = (0.3038416 ** 2) * (1 - p ** 2) / (2 * self.k) # Correct value of V_squared calculated from likelihood params.
+    #
+    #     print(V_squared)
+    #
+    #
+    #     C = (1/(N * np.sqrt(V_squared * S_squared))) * (np.multiply(self.spread[1:], np.diff(self.S)).sum()
+    #                                                   - p * np.multiply(self.spread[:-1], np.diff(self.S)).sum()
+    #                                                   - m * (self.spread[N] - self.spread[0])
+    #                                                   - m * (1 - p) * self.spread[:-1].sum())
+    #
+    #
+    #
+    #     self.eta = np.sqrt(2 * self.k * V_squared / (1 - p ** 2))
+    #
+    #     self.rho = self.k * C * np.sqrt(V_squared * S_squared) / (self.eta * self.sigma * (1 - p))
+    #
+    #     print(f"Params from closed form : {(self.sigma, self.mu, self.k, self.theta, self.eta, self.rho)}")
 
 
     def optimal_portfolio_weights(self, data: pd.DataFrame, gamma = -100):
@@ -157,6 +157,9 @@ class StochasticControlMudchanatongsuk:
         :param data: (pd.DataFrame) Contains price series of both stocks in spread.
         :param gamma: (float) Parameter of utility function (gamma < 1)
         """
+
+        if gamma >= 1:
+            raise Exception("Please make sure value of gamma is less than 1.")
 
         # Preprocessing
         data = self._data_preprocessing(data)
@@ -331,4 +334,3 @@ class StochasticControlMudchanatongsuk:
         output = pd.Series(data=data, index=index)
 
         return output
-
