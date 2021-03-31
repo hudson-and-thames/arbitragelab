@@ -290,6 +290,12 @@ We also need to specify the utility function parameter :math:`\gamma` and the ri
 If we choose the investor with intermediate consumption, we also need to specify the parameter :math:`\beta`.
 
 
+.. figure:: images/optimal_weights.png
+       :scale: 100 %
+       :align: center
+       :figclass: align-center
+
+
 Implementation
 ==============
 
@@ -306,6 +312,12 @@ Implementation
 .. automethod:: StochasticControlJurek.stabilization_region_calc
 
 
+.. figure:: images/stabilization_bound.png
+       :scale: 100 %
+       :align: center
+       :figclass: align-center
+
+
 Step 4: Optimal Portfolio Weights with Fund Flows
 *************************************************
 
@@ -317,7 +329,13 @@ Implementation
 .. automethod:: StochasticControlJurek.optimal_portfolio_weights_fund_flows
 
 
-Example
+.. figure:: images/optimal_weights_fund_flows.png
+       :scale: 100 %
+       :align: center
+       :figclass: align-center
+
+
+Examples
 #######
 
 We use GLD and GDX tickers from Yahoo Finance as the dataset for this example.
@@ -361,12 +379,54 @@ Finally, we use the out-of-sample test data to calculate the optimal portfolio w
 Example 2
 *********
 
-For stabilization region
+In the following code block, after initializing the class firstly,
+we use the fit method to generate the parameters of the model.
+Then, we call ``describe`` to view the estimated parameters.
+Finally, on the out-of-sample test data we calculate the stabilization region for the spread calculated from test data.
+
+.. code-block::
+
+    from arbitragelab.stochastic_control_approach.ou_model_jurek import StochasticControlJurek
+
+    sc = StochasticControlJurek()
+
+    sc.fit(data_train_dataframe)
+
+    print(sc.describe())
+
+    S, min_bound, max_bound = sc.stabilization_region_calc(data_test_dataframe, beta = 0.01, gamma = 0.5, utility_type=1)
+
+    plt.plot(S, label='Spread')
+    plt.plot(min_bound, color='red', linestyle='dashed')
+    plt.plot(max_bound, color='red', linestyle='dashed')
+    plt.legend()
+    plt.show()
+
+
 
 Example 3
 *********
 
-For fund flows
+In the following code block, after initializing the class firstly,
+we use the fit method to generate the parameters of the model.
+Then, we call ``describe`` to view the estimated parameters.
+Finally, we use the out-of-sample test data to calculate the optimal portfolio weights with fund flows
+using the fitted model.
+
+.. code-block::
+
+    from arbitragelab.stochastic_control_approach.ou_model_jurek import StochasticControlJurek
+
+    sc = StochasticControlJurek()
+
+    sc.fit(data_train_dataframe)
+
+    print(sc.describe())
+
+    plt.plot(sc.optimal_portfolio_weights_fund_flows(data_test_dataframe, f=0.05, gamma = 0.5))
+    plt.show()
+
+
 
 Research Notebook
 #################
