@@ -60,6 +60,13 @@ class TestOUModelJurek(unittest.TestCase):
         self.assertAlmostEqual(sc.k, 10.2728, delta=1e-4)
         self.assertAlmostEqual(sc.sigma, 0.0743999, delta=1e-4)
 
+        project_path = os.path.dirname(__file__)
+        path = project_path + '/test_data/shell-rdp-close_USD.csv'
+        data = pd.read_csv(path, index_col='Date').ffill()
+        data.index = pd.to_datetime(data.index, format="%d/%m/%Y")
+        sc.fit(data, delta_t=1 / 252, adf_test=False)
+
+
 
     def test_describe(self):
         sc = StochasticControlJurek()
@@ -86,6 +93,12 @@ class TestOUModelJurek(unittest.TestCase):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", UserWarning)
             sc.fit(self.dataframe, delta_t=1/252, adf_test=False)
+
+        with self.assertRaises(Exception):
+            sc.optimal_portfolio_weights(self.dataframe, beta = 0.01, gamma = 0.5, utility_type=10)
+
+        with self.assertRaises(Exception):
+            sc.optimal_portfolio_weights(self.dataframe, beta = 0.01, gamma = -1)
 
         weights = sc.optimal_portfolio_weights(self.dataframe, beta = 0.01, gamma = 0.5, utility_type=1)
 
@@ -114,6 +127,11 @@ class TestOUModelJurek(unittest.TestCase):
         # TODO: Add checks for other cases of gamma and utility type for 100% code coverage.
         #  What about gamma = 0.5 and utility_type=2?
 
+        sc.optimal_portfolio_weights(self.dataframe, beta = 0.01, gamma = 1, utility_type=1)
+        sc.optimal_portfolio_weights(self.dataframe, beta = 0.01, gamma = 0.5, utility_type=2)
+        sc.optimal_portfolio_weights(self.dataframe, beta = 0.01, gamma = 2, utility_type=1)
+        sc.optimal_portfolio_weights(self.dataframe, beta = 0.01, gamma = 2, utility_type=2)
+
 
     def test_stabilization_region(self):
 
@@ -122,6 +140,12 @@ class TestOUModelJurek(unittest.TestCase):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", UserWarning)
             sc.fit(self.dataframe, delta_t=1/252, adf_test=False)
+
+        with self.assertRaises(Exception):
+            sc.stabilization_region_calc(self.dataframe, beta=0.01, gamma=0.5, utility_type=10)
+
+        with self.assertRaises(Exception):
+            sc.stabilization_region_calc(self.dataframe, beta = 0.01, gamma = -1)
 
         S, min_bound, max_bound = sc.stabilization_region_calc(self.dataframe, beta = 0.01, gamma = 0.5, utility_type=1)
 
@@ -189,6 +213,10 @@ class TestOUModelJurek(unittest.TestCase):
         np.testing.assert_array_equal(S, S_value)
         np.testing.assert_array_equal(min_bound, min_bound_value)
         np.testing.assert_array_equal(max_bound, max_bound_value)
+
+        sc.stabilization_region_calc(self.dataframe, gamma=1, utility_type=1)
+        sc.stabilization_region_calc(self.dataframe, beta=0.01, gamma=0.5, utility_type=1)
+        sc.stabilization_region_calc(self.dataframe, beta=0.01, gamma=2, utility_type=2)
 
 
     def test_optimal_weights_fund_flows(self):

@@ -217,6 +217,12 @@ class StochasticControlJurek:
         :param r: (float) Rate of Returns.
         """
 
+        if gamma <= 0:
+            raise Exception("The value of gamma should be positive.")
+
+        if utility_type not in [1, 2]:
+            raise Exception("Please make sure utility_type is either 1 or 2.")
+
         # Setting instance attributes.
         self.r = r
         self.gamma = gamma
@@ -242,7 +248,7 @@ class StochasticControlJurek:
             if utility_type == 1:
                 A, B = self._AB_calc_1(tau)
 
-            elif utility_type == 2:
+            else:
                 A, B = self._AB_calc_2(tau)
 
             N = ((self.k * (self.mu - S) - self.r * S) / (self.gamma * self.sigma ** 2) + (2 * A * S + B) / self.gamma) * W
@@ -290,6 +296,12 @@ class StochasticControlJurek:
         :param r: (float) Rate of Returns.
         """
 
+        if gamma <= 0:
+            raise Exception("The value of gamma should be positive.")
+
+        if utility_type not in [1, 2]:
+            raise Exception("Please make sure utility_type is either 1 or 2.")
+
         # Setting instance attributes.
         self.r = r
         self.gamma = gamma
@@ -308,7 +320,7 @@ class StochasticControlJurek:
         if utility_type == 1:
             A, B = self._AB_calc_1(tau)
 
-        elif utility_type == 2:
+        else:
             A, B = self._AB_calc_2(tau)
 
         # Calculating phi (Refer Equation 17 in Jurek (2007)).
