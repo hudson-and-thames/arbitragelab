@@ -72,7 +72,7 @@ of the arbitrageur's terminal evaluation date, which affects his appetite for ri
 Investor Preferences
 ********************
 
-The authors considerd two alternative preferences structures for the arbitrageur in our continuous-time
+The authors considered two alternative preferences structures for the arbitrageur in our continuous-time
 model. In the first, the authors assumed that the agent has constant relative risk aversion and maximizes
 the discounted utility of terminal wealth. The arbitrageur's value function at time :math:`t` - denoted by
 :math:`V_t` - takes the form:

@@ -411,7 +411,8 @@ class StochasticControlJurek:
 
             A = -c_2 / c_1 + (np.sqrt(disc) / (2 * c_1)) * (1 / np.tanh(-np.sqrt(disc) * tau / 2 + np.arctanh(np.sqrt(disc) / (2 * c_2))))
 
-        elif self.gamma > 1:
+        else:
+            # Case when self.gamma > 1.
 
             A = -c_2 / c_1 + (np.sqrt(disc) / (2 * c_1)) * np.tanh(-np.sqrt(disc) * tau / 2 + np.arctanh(2 * c_2 / np.sqrt(disc)))
 
@@ -458,7 +459,8 @@ class StochasticControlJurek:
 
             B = (c_1 * c_5 * (c_2 * tau - 2) - (c_2 ** 2) * c_4) * tau / (2 * c_1 * (c_2 * tau - 1))
 
-        elif self.gamma > gamma_0 + error_margin:
+        else:
+            # Case when self.gamma > gamma_0 + error_margin.
 
             B = (4 * (c_2 * c_5 - c_3 * c_4 + (c_3 * c_4 - c_2 * c_5) * np.cosh(np.sqrt(disc) * tau / 2))
                  + 2 * c_5 * np.sqrt(disc) * np.sinh(np.sqrt(disc) * tau / 2)) \
@@ -625,7 +627,8 @@ class StochasticControlJurek:
                                       + term_5) / denominator
 
 
-        elif self.gamma > 1:
+        else:
+            # Case when self.gamma > 1.
             # Implementation of Case IV in Appendix B.1.2.
 
             rep_phrase_1 = np.sqrt(-c_1 * c_3 / disc)  # Repeated Phrase 1.

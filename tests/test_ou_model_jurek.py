@@ -27,6 +27,7 @@ class TestOUModelJurek(unittest.TestCase):
 
         cls.dataframe = data[['GLD', 'GDX']]
 
+
     def test_fit(self):
         sc = StochasticControlJurek()
 
@@ -65,7 +66,6 @@ class TestOUModelJurek(unittest.TestCase):
         data = pd.read_csv(path, index_col='Date').ffill()
         data.index = pd.to_datetime(data.index, format="%d/%m/%Y")
         sc.fit(data, delta_t=1 / 252, adf_test=False)
-
 
 
     def test_describe(self):
@@ -251,3 +251,37 @@ class TestOUModelJurek(unittest.TestCase):
 
 
         np.testing.assert_array_equal(weights, weights_value)
+
+    def test_private_methods(self):
+        """
+        Function tests special cases for code coverage.
+        """
+        sc = StochasticControlJurek()
+
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", UserWarning)
+            sc.fit(self.dataframe, delta_t=1/252, adf_test=False)
+
+        sc.optimal_portfolio_weights(self.dataframe, beta=0.01, gamma=0.5, utility_type=1)
+
+        t = np.arange(0, len(self.dataframe)) * (1/252)
+        tau = t[-1] - t
+        c_1 = 0.0221413
+        c_2 = -20.59561
+        c_3 = 9625.4458424
+        disc = -844.234913
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            sc._A_calc_1(tau, c_1, c_2, disc, 0.5)
+            sc._A_calc_1(tau, c_1, c_2, disc, 0.9)
+            sc._B_calc_1(tau, c_1, c_2, c_3, disc, 0.5)
+            sc._B_calc_1(tau, c_1, c_2, c_3, disc, 0.9)
+
+        sc.optimal_portfolio_weights(self.dataframe, beta=0.01, gamma=0.5, utility_type=2)
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            sc._B_calc_2(tau, c_1, c_2, c_3, disc, 0.5)
+            sc._B_calc_2(tau, c_1, c_2, c_3, disc, 0.9)
