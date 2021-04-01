@@ -120,8 +120,6 @@ class StochasticControlJurek:
         params = self._estimate_params(self.spread)
         self.mu, self.k, self.sigma = params
 
-        #self._check_estimations()
-
 
     def _estimate_params(self, spread: np.array):
         """
@@ -147,23 +145,6 @@ class StochasticControlJurek:
         sigma = np.sqrt(2 * k * sigma_calc_sum / ((np.exp(2 * k * self.delta_t) - 1) * (N - 2)))
 
         return mu, k, sigma
-
-
-    # def _check_estimations(self):
-    #     """
-    #     Testing against null of random walk for rate of mean reversion k.
-    #     """
-    #
-    #     num_paths = 100000
-    #
-    #     output_params = np.zeros((num_paths, 3))
-    #     for i in range(num_paths):
-    #         white_noise_process = self.sigma * np.random.randn(len(self.spread)) + self.mu
-    #         output_params[i, :] = self._estimate_params(white_noise_process)
-    #
-    #     plt.hist(output_params[:, 1], bins=20)
-    #     plt.show()
-    #     #TODO : This is incomplete.
 
 
     def _spread_calc(self, data: pd.DataFrame):
