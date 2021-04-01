@@ -89,7 +89,7 @@ class TestOUModelMudchanatongsuk(unittest.TestCase):
 
         data = ['GLD', 'GDX', 1.98816, 3.99205, 0.404292, 0.173632, 0.114877, 0.503695]
 
-        pd.testing.assert_series_equal(pd.Series(index=index,data=data), sc_mudchana.describe(), check_exact=False, rtol=1e-4)
+        pd.testing.assert_series_equal(pd.Series(index=index,data=data), sc_mudchana.describe(), check_exact=False, atol=1e-3)
 
 
     def test_optimal_weights(self):
