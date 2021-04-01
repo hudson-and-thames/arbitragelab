@@ -117,6 +117,9 @@ Implementation
 
 .. automethod:: StochasticControlMudchanatongsuk.fit
 
+.. note::
+    Although the paper provides closed form solutions for parameter estimation,
+    this module uses log-likelihood maximization to estimate the parameters as we found the closed form solutions provided to be unstable.
 
 .. tip::
     To view the estimated model parameters from training data, call the ``describe`` function.

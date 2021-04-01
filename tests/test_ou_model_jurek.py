@@ -11,6 +11,7 @@ import os
 import numpy as np
 import pandas as pd
 
+from unittest import mock
 from arbitragelab.stochastic_control_approach.ou_model_jurek import StochasticControlJurek
 
 
@@ -29,6 +30,9 @@ class TestOUModelJurek(unittest.TestCase):
 
 
     def test_fit(self):
+        """
+
+        """
         sc = StochasticControlJurek()
 
         with warnings.catch_warnings():
@@ -69,6 +73,9 @@ class TestOUModelJurek(unittest.TestCase):
 
 
     def test_describe(self):
+        """
+
+        """
         sc = StochasticControlJurek()
 
         with self.assertRaises(Exception):
@@ -87,6 +94,9 @@ class TestOUModelJurek(unittest.TestCase):
 
 
     def test_optimal_weights(self):
+        """
+
+        """
 
         sc = StochasticControlJurek()
 
@@ -124,9 +134,6 @@ class TestOUModelJurek(unittest.TestCase):
 
         np.testing.assert_array_equal(weights, weights_value)
 
-        # TODO: Add checks for other cases of gamma and utility type for 100% code coverage.
-        #  What about gamma = 0.5 and utility_type=2?
-
         sc.optimal_portfolio_weights(self.dataframe, beta = 0.01, gamma = 1, utility_type=1)
         sc.optimal_portfolio_weights(self.dataframe, beta = 0.01, gamma = 0.5, utility_type=2)
         sc.optimal_portfolio_weights(self.dataframe, beta = 0.01, gamma = 2, utility_type=1)
@@ -134,6 +141,9 @@ class TestOUModelJurek(unittest.TestCase):
 
 
     def test_stabilization_region(self):
+        """
+
+        """
 
         sc = StochasticControlJurek()
 
@@ -214,12 +224,18 @@ class TestOUModelJurek(unittest.TestCase):
         np.testing.assert_array_equal(min_bound, min_bound_value)
         np.testing.assert_array_equal(max_bound, max_bound_value)
 
-        sc.stabilization_region_calc(self.dataframe, gamma=1, utility_type=1)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", UserWarning)
+            sc.stabilization_region_calc(self.dataframe, gamma=1, utility_type=1)
+
         sc.stabilization_region_calc(self.dataframe, beta=0.01, gamma=0.5, utility_type=1)
         sc.stabilization_region_calc(self.dataframe, beta=0.01, gamma=2, utility_type=2)
 
 
     def test_optimal_weights_fund_flows(self):
+        """
+
+        """
 
         sc = StochasticControlJurek()
 
@@ -285,3 +301,32 @@ class TestOUModelJurek(unittest.TestCase):
             warnings.simplefilter("ignore")
             sc._B_calc_2(tau, c_1, c_2, c_3, disc, 0.5)
             sc._B_calc_2(tau, c_1, c_2, c_3, disc, 0.9)
+
+
+
+    @mock.patch("arbitragelab.stochastic_control_approach.ou_model_jurek.plt")
+    def test_plotting(self, mock_plt):
+        """
+
+        """
+
+        sc = StochasticControlJurek()
+
+        with self.assertRaises(Exception):
+            sc.plotting(self.dataframe)
+
+        self.dataframe.index = pd.to_datetime(self.dataframe.index)
+
+        with self.assertRaises(Exception):
+            sc.plotting(self.dataframe)
+
+        project_path = os.path.dirname(__file__)
+        path = project_path + '/test_data/shell-rdp-close_USD.csv'
+        data = pd.read_csv(path, index_col='Date').ffill()
+
+        data.index = pd.to_datetime(data.index, format="%d/%m/%Y")
+
+        sc.plotting(data)
+
+        # Assert plt.figure got called
+        assert mock_plt.show.called

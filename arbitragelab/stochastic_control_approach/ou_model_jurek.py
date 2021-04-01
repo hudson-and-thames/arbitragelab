@@ -15,6 +15,7 @@ import warnings
 import cvxpy as cp
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
 from arbitragelab.cointegration_approach.engle_granger import EngleGrangerPortfolio
 
@@ -667,3 +668,81 @@ class StochasticControlJurek:
         output = pd.Series(data=data, index=index)
 
         return output
+
+
+    def plotting(self, data:pd.DataFrame, num_test_windows = 5, delta_t = 1/252, utility_type = 1,gamma = 10, beta = 0.1, r = 0.05 , f = 0.1):
+        """
+        Method plots out of sample performance of the model on specified number of test windows.
+        We use a backward looking rolling window as training data and its size depends on the number of test windows chosen.
+        The length of training data is fixed for all test windows.
+
+        For example, if the total data is of length 16 years, with the number of test windows set to 5,
+        the length of training data would be 16 - (5 + 1) = 10. (The last year is not considered for testing).
+
+        :param data: (pd.DataFrame) Contains price series of both stocks in spread with dates as index.
+        :param num_test_windows: (int) Number of out of sample testing windows to plot.
+        :param delta_t: (float) Time difference between each index of data, calculated in years.
+        :param gamma: (float) coefficient of relative risk aversion.
+        :param f: (float) coefficient of proportionality (assumed to be positive).
+        :param r: (float) Rate of Returns.
+        :param utility_type: (int) Flag signifies type of investor preferences.
+        :param beta: (float) Subjective rate of time preference. (Only required for utility_type = 2).
+        """
+
+
+        plt.rcParams.update({'font.size': 8})
+
+        data = data.ffill()
+
+        if not np.issubdtype(data.index.dtype, np.datetime64):
+            raise Exception("Please make sure index of dataframe is datetime type.")
+
+        if len(data) < (10 / delta_t):
+            raise Exception("Please make sure length of input data is greater than 10 years.")
+
+        years = data.index.year.unique()
+
+        stab_result_dataframe = pd.DataFrame(index=data.loc[str(years[-(num_test_windows + 1)]):str(years[-1])].index,
+                                             columns=['Spread', 'lower bound', 'upper bound'])
+        optimal_result_dataframe = pd.DataFrame(index=data.loc[str(years[-(num_test_windows + 1)]):str(years[-1])].index,
+                                                columns=['Weights'])
+        optimal_fund_flows_result_dataframe = pd.DataFrame(index=data.loc[str(years[-(num_test_windows + 1)]):
+                                                                          str(years[-1])].index, columns=['Weights'])
+
+        ind = 0
+        for year in np.arange(years[-(num_test_windows + 1)], years[-1], 1):
+
+            data_train_dataframe = data.loc[str(year - (len(years) - (num_test_windows + 1))):str(year - 1)]
+            data_test_dataframe = data.loc[str(year)]
+
+            self.fit(data_train_dataframe, delta_t=delta_t)
+
+            optimal_weights = self.optimal_portfolio_weights(data_test_dataframe, gamma=gamma,
+                                                             utility_type=utility_type, beta=beta, r=r)
+            optimal_fund_flow_weights = self.optimal_portfolio_weights_fund_flows(data_test_dataframe, gamma=gamma,
+                                                                                  f=f, r=r)
+            S, min_bound, max_bound = self.stabilization_region_calc(data_test_dataframe, gamma=gamma,
+                                                                     utility_type=utility_type, beta=beta, r=r)
+
+            stab_result_dataframe.iloc[ind:ind + len(S), :] = np.array([S, min_bound, max_bound]).T
+            optimal_result_dataframe.iloc[ind:ind + len(S), :] = np.array([optimal_weights]).T
+            optimal_fund_flows_result_dataframe.iloc[ind:ind + len(S), :] = np.array([optimal_fund_flow_weights]).T
+            ind += len(S)
+
+        ax = stab_result_dataframe.plot(style=['c-', 'r:', 'r:'], legend=False, linewidth=1.0, figsize=(8, 4))
+        ax.xaxis.grid(color='grey', linestyle=':', linewidth=0.6)
+        ax.set_ylabel('Spread')
+        ax.set_title("Evolution of spread with stabilization bound")
+        plt.show()
+
+        ax = optimal_result_dataframe.plot(style=['c-'], legend=False, linewidth=1.0, figsize=(8, 4))
+        ax.xaxis.grid(color='grey', linestyle=':', linewidth=0.6)
+        ax.set_ylabel('Optimal Weights')
+        ax.set_title('Optimal allocation to the spread asset scaled by wealth')
+        plt.show()
+
+        ax = optimal_fund_flows_result_dataframe.plot(style=['c-'], legend=False, linewidth=1.0, figsize=(8, 4))
+        ax.xaxis.grid(color='grey', linestyle=':', linewidth=0.6)
+        ax.set_ylabel('Optimal Weights with fund flows')
+        ax.set_title('Optimal allocation to the spread asset with fund flows scaled by wealth')
+        plt.show()

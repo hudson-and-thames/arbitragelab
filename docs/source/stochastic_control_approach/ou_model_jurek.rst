@@ -335,8 +335,19 @@ Implementation
        :figclass: align-center
 
 
+Step 5: Plotting
+****************
+
+In this optional step, we can plot the stabilization regions and optimal portfolio weights.
+
+Implementation
+==============
+
+.. automethod:: StochasticControlJurek.plotting
+
+
 Examples
-#######
+########
 
 We use GLD and GDX tickers from Yahoo Finance as the dataset for this example.
 
