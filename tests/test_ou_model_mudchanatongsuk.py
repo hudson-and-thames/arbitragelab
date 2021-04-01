@@ -15,9 +15,15 @@ from arbitragelab.stochastic_control_approach.ou_model_mudchanatongsuk import St
 
 
 class TestOUModelMudchanatongsuk(unittest.TestCase):
+    """
+    Tests the Mudchanatongsuk OU model in the Stochastic Control Approach module.
+    """
 
     @classmethod
     def setUpClass(cls) -> None:
+        """
+        Setup data and params.
+        """
 
         np.random.seed(0)
 
@@ -28,13 +34,17 @@ class TestOUModelMudchanatongsuk(unittest.TestCase):
 
         cls.dataframe = data[['GLD', 'GDX']]
 
-        cls.sc = StochasticControlMudchanatongsuk()
+        cls.sc_mudchana = StochasticControlMudchanatongsuk()
 
 
     def test_fit(self):
-        sc = StochasticControlMudchanatongsuk()
+        """
+        Tests the fit method in the class.
+        """
 
-        sc.fit(self.dataframe)
+        sc_mudchana = StochasticControlMudchanatongsuk()
+
+        sc_mudchana.fit(self.dataframe)
 
         spread_value = [2.0887923929288523, 2.1094166241052568, 2.142854916105869, 2.0874899841437258, 2.063640345328846,
          2.0746168560671223, 2.1097829292924457, 2.1073878043606307, 2.1186930608205428, 2.114695107155425,
@@ -52,22 +62,26 @@ class TestOUModelMudchanatongsuk(unittest.TestCase):
          2.0383888802559467, 2.043152450272762, 2.0504190679184715, 2.034227852538867, 2.0090985697450647,
          2.019908369440301, 2.009667357261374, 1.9797365648180438, 2.01008349909157, 2.0202245834522397]
 
-        np.testing.assert_array_equal(sc.spread, spread_value)
-        self.assertAlmostEqual(sc.sigma, 0.503695, delta=1e-4)
-        self.assertAlmostEqual(sc.mu, 0.114877, delta=1e-4)
-        self.assertAlmostEqual(sc.k, 3.99205, delta=1e-4)
-        self.assertAlmostEqual(sc.theta, 1.98816, delta=1e-4)
-        self.assertAlmostEqual(sc.eta, 0.404292, delta=1e-4)
-        self.assertAlmostEqual(sc.rho, 0.96202, delta=1e-4)
+        np.testing.assert_array_equal(sc_mudchana.spread, spread_value)
+        self.assertAlmostEqual(sc_mudchana.sigma, 0.503695, delta=1e-4)
+        self.assertAlmostEqual(sc_mudchana.mu, 0.114877, delta=1e-4)
+        self.assertAlmostEqual(sc_mudchana.k, 3.99205, delta=1e-4)
+        self.assertAlmostEqual(sc_mudchana.theta, 1.98816, delta=1e-4)
+        self.assertAlmostEqual(sc_mudchana.eta, 0.404292, delta=1e-4)
+        self.assertAlmostEqual(sc_mudchana.rho, 0.96202, delta=1e-4)
 
 
     def test_describe(self):
-        sc = StochasticControlMudchanatongsuk()
+        """
+        Tests the describe method in the class.
+        """
+
+        sc_mudchana = StochasticControlMudchanatongsuk()
 
         with self.assertRaises(Exception):
-            sc.describe()
+            sc_mudchana.describe()
 
-        sc.fit(self.dataframe)
+        sc_mudchana.fit(self.dataframe)
 
         index = ['Ticker of first stock', 'Ticker of second stock',
                  'long-term mean of spread', 'rate of mean reversion of spread', 'standard deviation of spread', 'half-life of spread',
@@ -75,18 +89,22 @@ class TestOUModelMudchanatongsuk(unittest.TestCase):
 
         data = ['GLD', 'GDX', 1.98816, 3.99205, 0.404292, 0.173632, 0.114877, 0.503695]
 
-        pd.testing.assert_series_equal(pd.Series(index=index,data=data), sc.describe(), check_exact=False, atol=1e-4)
+        pd.testing.assert_series_equal(pd.Series(index=index,data=data), sc_mudchana.describe(), check_exact=False, atol=1e-4)
 
 
     def test_optimal_weights(self):
-        sc = StochasticControlMudchanatongsuk()
+        """
+        Tests the optimal portfolio weights method in the class.
+        """
 
-        sc.fit(self.dataframe)
+        sc_mudchana = StochasticControlMudchanatongsuk()
+
+        sc_mudchana.fit(self.dataframe)
 
         with self.assertRaises(Exception):
-            sc.optimal_portfolio_weights(self.dataframe, gamma = 10)
+            sc_mudchana.optimal_portfolio_weights(self.dataframe, gamma = 10)
 
-        weights = sc.optimal_portfolio_weights(self.dataframe, gamma = -10)
+        weights = sc_mudchana.optimal_portfolio_weights(self.dataframe, gamma = -10)
 
         weights_value = [0.6807970425341383, 0.5788270189292528, 0.4237456386361687, 0.6450834372737371,
                          0.7318800196910422, 0.6725665016257416, 0.5137455982771261, 0.5117099817524071,

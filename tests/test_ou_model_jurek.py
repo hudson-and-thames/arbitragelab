@@ -8,17 +8,25 @@ Test functions for the Jurek OU model in the Stochastic Control Approach module.
 import warnings
 import unittest
 import os
+from unittest import mock
 import numpy as np
 import pandas as pd
 
-from unittest import mock
 from arbitragelab.stochastic_control_approach.ou_model_jurek import StochasticControlJurek
 
+# pylint: disable=protected-access
 
 class TestOUModelJurek(unittest.TestCase):
+    """
+    Test Jurek OU model in Stochastic Control Approach module.
+    """
 
     @classmethod
     def setUpClass(cls) -> None:
+        """
+        Set up data and parameters.
+        """
+
         np.random.seed(0)
 
         project_path = os.path.dirname(__file__)
@@ -31,13 +39,14 @@ class TestOUModelJurek(unittest.TestCase):
 
     def test_fit(self):
         """
-
+        Tests the fit method in the class.
         """
-        sc = StochasticControlJurek()
+
+        sc_jurek = StochasticControlJurek()
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", UserWarning)
-            sc.fit(self.dataframe, delta_t=1/252, adf_test=True, significance_level=0.95)
+            sc_jurek.fit(self.dataframe, delta_t=1/252, adf_test=True, significance_level=0.95)
 
         spread_value = [0.5588694237684244, 0.556388954154023, 0.5557158550545369, 0.5444317219668442,
                         0.5440914321753456, 0.5471230270552558, 0.5566709779363245, 0.5532053519529174,
@@ -59,58 +68,59 @@ class TestOUModelJurek(unittest.TestCase):
                         0.5039290495180081, 0.5002238140944849, 0.4947870896437365, 0.49780569727511526,
                         0.5020354188220554, 0.5023496206998971, 0.5054215932061087]
 
-        np.testing.assert_array_equal(sc.spread, spread_value)
+        np.testing.assert_array_equal(sc_jurek.spread, spread_value)
 
-        self.assertAlmostEqual(sc.mu, 0.532823, delta=1e-4)
-        self.assertAlmostEqual(sc.k, 10.2728, delta=1e-4)
-        self.assertAlmostEqual(sc.sigma, 0.0743999, delta=1e-4)
+        self.assertAlmostEqual(sc_jurek.mu, 0.532823, delta=1e-4)
+        self.assertAlmostEqual(sc_jurek.k, 10.2728, delta=1e-4)
+        self.assertAlmostEqual(sc_jurek.sigma, 0.0743999, delta=1e-4)
 
         project_path = os.path.dirname(__file__)
         path = project_path + '/test_data/shell-rdp-close_USD.csv'
         data = pd.read_csv(path, index_col='Date').ffill()
         data.index = pd.to_datetime(data.index, format="%d/%m/%Y")
-        sc.fit(data, delta_t=1 / 252, adf_test=False)
+        sc_jurek.fit(data, delta_t=1 / 252, adf_test=False)
 
 
     def test_describe(self):
         """
-
+        Tests the describe method in the class.
         """
-        sc = StochasticControlJurek()
+
+        sc_jurek = StochasticControlJurek()
 
         with self.assertRaises(Exception):
-            sc.describe()
+            sc_jurek.describe()
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", UserWarning)
-            sc.fit(self.dataframe, delta_t=1/252, adf_test=False)
+            sc_jurek.fit(self.dataframe, delta_t=1/252, adf_test=False)
 
         index = ['Ticker of first stock', 'Ticker of second stock', 'Scaled Spread weights',
                  'long-term mean', 'rate of mean reversion', 'standard deviation', 'half-life']
 
         data = ['GLD', 'GDX', [0.779, -0.221], 0.532823, 10.2728, 0.0743999, 0.067474]
 
-        pd.testing.assert_series_equal(pd.Series(index=index,data=data), sc.describe(), check_exact=False, atol=1e-4)
+        pd.testing.assert_series_equal(pd.Series(index=index,data=data), sc_jurek.describe(), check_exact=False, atol=1e-4)
 
 
     def test_optimal_weights(self):
         """
-
+        Tests the optimal portfolio weights method in the class.
         """
 
-        sc = StochasticControlJurek()
+        sc_jurek = StochasticControlJurek()
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", UserWarning)
-            sc.fit(self.dataframe, delta_t=1/252, adf_test=False)
+            sc_jurek.fit(self.dataframe, delta_t=1/252, adf_test=False)
 
         with self.assertRaises(Exception):
-            sc.optimal_portfolio_weights(self.dataframe, beta = 0.01, gamma = 0.5, utility_type=10)
+            sc_jurek.optimal_portfolio_weights(self.dataframe, beta = 0.01, gamma = 0.5, utility_type=10)
 
         with self.assertRaises(Exception):
-            sc.optimal_portfolio_weights(self.dataframe, beta = 0.01, gamma = -1)
+            sc_jurek.optimal_portfolio_weights(self.dataframe, beta = 0.01, gamma = -1)
 
-        weights = sc.optimal_portfolio_weights(self.dataframe, beta = 0.01, gamma = 0.5, utility_type=1)
+        weights = sc_jurek.optimal_portfolio_weights(self.dataframe, beta = 0.01, gamma = 0.5, utility_type=1)
 
         weights_value = [-73.45194149467186, -66.92279595239394, -65.15408289280388, -35.43777877275913,
                          -34.545817687919545, -42.535359317812855, -67.68919459098552, -58.56650579922123,
@@ -134,32 +144,32 @@ class TestOUModelJurek(unittest.TestCase):
 
         np.testing.assert_array_equal(weights, weights_value)
 
-        sc.optimal_portfolio_weights(self.dataframe, beta = 0.01, gamma = 1, utility_type=1)
-        sc.optimal_portfolio_weights(self.dataframe, beta = 0.01, gamma = 0.5, utility_type=2)
-        sc.optimal_portfolio_weights(self.dataframe, beta = 0.01, gamma = 2, utility_type=1)
-        sc.optimal_portfolio_weights(self.dataframe, beta = 0.01, gamma = 2, utility_type=2)
+        sc_jurek.optimal_portfolio_weights(self.dataframe, beta = 0.01, gamma = 1, utility_type=1)
+        sc_jurek.optimal_portfolio_weights(self.dataframe, beta = 0.01, gamma = 0.5, utility_type=2)
+        sc_jurek.optimal_portfolio_weights(self.dataframe, beta = 0.01, gamma = 2, utility_type=1)
+        sc_jurek.optimal_portfolio_weights(self.dataframe, beta = 0.01, gamma = 2, utility_type=2)
 
 
     def test_stabilization_region(self):
         """
-
+        Tests the stabilization region method in the class.
         """
 
-        sc = StochasticControlJurek()
+        sc_jurek = StochasticControlJurek()
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", UserWarning)
-            sc.fit(self.dataframe, delta_t=1/252, adf_test=False)
+            sc_jurek.fit(self.dataframe, delta_t=1/252, adf_test=False)
 
         with self.assertRaises(Exception):
-            sc.stabilization_region_calc(self.dataframe, beta=0.01, gamma=0.5, utility_type=10)
+            sc_jurek.stabilization_region_calc(self.dataframe, beta=0.01, gamma=0.5, utility_type=10)
 
         with self.assertRaises(Exception):
-            sc.stabilization_region_calc(self.dataframe, beta = 0.01, gamma = -1)
+            sc_jurek.stabilization_region_calc(self.dataframe, beta = 0.01, gamma = -1)
 
-        S, min_bound, max_bound = sc.stabilization_region_calc(self.dataframe, beta = 0.01, gamma = 0.5, utility_type=1)
+        spread, min_bound, max_bound = sc_jurek.stabilization_region_calc(self.dataframe, beta = 0.01, gamma = 0.5, utility_type=1)
 
-        S_value = [0.5588694237684244, 0.556388954154023, 0.5557158550545369, 0.5444317219668442,
+        spread_value = [0.5588694237684244, 0.556388954154023, 0.5557158550545369, 0.5444317219668442,
                    0.5440914321753456, 0.5471230270552558, 0.5566709779363245, 0.5532053519529174,
                    0.5516073438832347, 0.5489831227316044, 0.5466971132268911, 0.5434512050224662,
                    0.5453702735903314, 0.5424140575831877, 0.5450224920172433, 0.5421415318431051,
@@ -220,30 +230,30 @@ class TestOUModelJurek(unittest.TestCase):
                            0.5472310358926771, 0.5469375435302057, 0.5466166863794518]
 
 
-        np.testing.assert_array_equal(S, S_value)
+        np.testing.assert_array_equal(spread, spread_value)
         np.testing.assert_array_equal(min_bound, min_bound_value)
         np.testing.assert_array_equal(max_bound, max_bound_value)
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", UserWarning)
-            sc.stabilization_region_calc(self.dataframe, gamma=1, utility_type=1)
+            sc_jurek.stabilization_region_calc(self.dataframe, gamma=1, utility_type=1)
 
-        sc.stabilization_region_calc(self.dataframe, beta=0.01, gamma=0.5, utility_type=1)
-        sc.stabilization_region_calc(self.dataframe, beta=0.01, gamma=2, utility_type=2)
+        sc_jurek.stabilization_region_calc(self.dataframe, beta=0.01, gamma=0.5, utility_type=1)
+        sc_jurek.stabilization_region_calc(self.dataframe, beta=0.01, gamma=2, utility_type=2)
 
 
     def test_optimal_weights_fund_flows(self):
         """
-
+        Tests the optimal weights with fund flows method in the class.
         """
 
-        sc = StochasticControlJurek()
+        sc_jurek = StochasticControlJurek()
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", UserWarning)
-            sc.fit(self.dataframe, delta_t=1/252, adf_test=False)
+            sc_jurek.fit(self.dataframe, delta_t=1/252, adf_test=False)
 
-        weights = sc.optimal_portfolio_weights_fund_flows(self.dataframe, f=0.2, gamma = 0.5)
+        weights = sc_jurek.optimal_portfolio_weights_fund_flows(self.dataframe, f=0.2, gamma = 0.5)
 
         weights_value = [-61.209951245559886, -55.768996626994955, -54.29506907733657, -29.53148231063261,
                          -28.788181406599623, -35.446132764844045, -56.407662159154604, -48.80542149935103,
@@ -272,17 +282,18 @@ class TestOUModelJurek(unittest.TestCase):
         """
         Function tests special cases for code coverage.
         """
-        sc = StochasticControlJurek()
+
+        sc_jurek = StochasticControlJurek()
 
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", UserWarning)
-            sc.fit(self.dataframe, delta_t=1/252, adf_test=False)
+            sc_jurek.fit(self.dataframe, delta_t=1/252, adf_test=False)
 
-        sc.optimal_portfolio_weights(self.dataframe, beta=0.01, gamma=0.5, utility_type=1)
+        sc_jurek.optimal_portfolio_weights(self.dataframe, beta=0.01, gamma=0.5, utility_type=1)
 
-        t = np.arange(0, len(self.dataframe)) * (1/252)
-        tau = t[-1] - t
+        time_array = np.arange(0, len(self.dataframe)) * (1/252)
+        tau = time_array[-1] - time_array
         c_1 = 0.0221413
         c_2 = -20.59561
         c_3 = 9625.4458424
@@ -290,35 +301,35 @@ class TestOUModelJurek(unittest.TestCase):
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            sc._A_calc_1(tau, c_1, c_2, disc, 0.5)
-            sc._A_calc_1(tau, c_1, c_2, disc, 0.9)
-            sc._B_calc_1(tau, c_1, c_2, c_3, disc, 0.5)
-            sc._B_calc_1(tau, c_1, c_2, c_3, disc, 0.9)
+            sc_jurek._A_calc_1(tau, c_1, c_2, disc, 0.5)
+            sc_jurek._A_calc_1(tau, c_1, c_2, disc, 0.9)
+            sc_jurek._B_calc_1(tau, c_1, c_2, c_3, disc, 0.5)
+            sc_jurek._B_calc_1(tau, c_1, c_2, c_3, disc, 0.9)
 
-        sc.optimal_portfolio_weights(self.dataframe, beta=0.01, gamma=0.5, utility_type=2)
+        sc_jurek.optimal_portfolio_weights(self.dataframe, beta=0.01, gamma=0.5, utility_type=2)
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            sc._B_calc_2(tau, c_1, c_2, c_3, disc, 0.5)
-            sc._B_calc_2(tau, c_1, c_2, c_3, disc, 0.9)
+            sc_jurek._B_calc_2(tau, c_1, c_2, c_3, disc, 0.5)
+            sc_jurek._B_calc_2(tau, c_1, c_2, c_3, disc, 0.9)
 
 
 
     @mock.patch("arbitragelab.stochastic_control_approach.ou_model_jurek.plt")
     def test_plotting(self, mock_plt):
         """
-
+        Tests the plotting method in the class.
         """
 
-        sc = StochasticControlJurek()
+        sc_jurek = StochasticControlJurek()
 
         with self.assertRaises(Exception):
-            sc.plotting(self.dataframe)
+            sc_jurek.plotting(self.dataframe)
 
         self.dataframe.index = pd.to_datetime(self.dataframe.index)
 
         with self.assertRaises(Exception):
-            sc.plotting(self.dataframe)
+            sc_jurek.plotting(self.dataframe)
 
         project_path = os.path.dirname(__file__)
         path = project_path + '/test_data/shell-rdp-close_USD.csv'
@@ -326,7 +337,7 @@ class TestOUModelJurek(unittest.TestCase):
 
         data.index = pd.to_datetime(data.index, format="%d/%m/%Y")
 
-        sc.plotting(data)
+        sc_jurek.plotting(data)
 
         # Assert plt.figure got called
         assert mock_plt.show.called
