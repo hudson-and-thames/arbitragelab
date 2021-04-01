@@ -68,7 +68,7 @@ class TestOUModelJurek(unittest.TestCase):
                         0.5039290495180081, 0.5002238140944849, 0.4947870896437365, 0.49780569727511526,
                         0.5020354188220554, 0.5023496206998971, 0.5054215932061087]
 
-        np.testing.assert_array_equal(sc_jurek.spread, spread_value)
+        np.testing.assert_array_almost_equal(sc_jurek.spread, spread_value, decimal=4)
 
         self.assertAlmostEqual(sc_jurek.mu, 0.532823, delta=1e-4)
         self.assertAlmostEqual(sc_jurek.k, 10.2728, delta=1e-4)
@@ -142,7 +142,7 @@ class TestOUModelJurek(unittest.TestCase):
                          82.56422216475477, 96.13482957606092, 116.22091468441988, 109.1943316005652,
                          97.8535878146283, 100.10622031248108, 92.57663162301588]
 
-        np.testing.assert_array_equal(weights, weights_value)
+        np.testing.assert_array_almost_equal(weights, weights_value, decimal=4)
 
         sc_jurek.optimal_portfolio_weights(self.dataframe, beta = 0.01, gamma = 1, utility_type=1)
         sc_jurek.optimal_portfolio_weights(self.dataframe, beta = 0.01, gamma = 0.5, utility_type=2)
@@ -230,9 +230,9 @@ class TestOUModelJurek(unittest.TestCase):
                            0.5472310358926771, 0.5469375435302057, 0.5466166863794518]
 
 
-        np.testing.assert_array_equal(spread, spread_value)
-        np.testing.assert_array_equal(min_bound, min_bound_value)
-        np.testing.assert_array_equal(max_bound, max_bound_value)
+        np.testing.assert_array_almost_equal(spread, spread_value, decimal=4)
+        np.testing.assert_array_almost_equal(min_bound, min_bound_value, decimal=4)
+        np.testing.assert_array_almost_equal(max_bound, max_bound_value, decimal=4)
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", UserWarning)
@@ -276,7 +276,7 @@ class TestOUModelJurek(unittest.TestCase):
                          81.54465651219026, 83.4218502604009, 77.14719301917991]
 
 
-        np.testing.assert_array_equal(weights, weights_value)
+        np.testing.assert_array_almost_equal(weights, weights_value, decimal=4)
 
     def test_private_methods(self):
         """
