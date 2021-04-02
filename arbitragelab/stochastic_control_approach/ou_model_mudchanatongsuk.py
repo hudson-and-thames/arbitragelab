@@ -17,7 +17,7 @@ import pandas as pd
 import scipy.optimize as so
 
 
-class StochasticControlMudchanatongsuk:
+class OUModelMudchanatongsuk:
     """
     This class implements a stochastic control approach to the problem of pairs trading.
 
@@ -30,6 +30,9 @@ class StochasticControlMudchanatongsuk:
     """
 
     def __init__(self):
+        """
+        Initializes the parameters of the module.
+        """
 
         # Characteristics of Training Data.
         self.ticker_A = None # Ticker Symbol of first stock.
@@ -52,68 +55,69 @@ class StochasticControlMudchanatongsuk:
 
 
     @staticmethod
-    def _data_preprocessing(data):
+    def _data_preprocessing(prices) -> pd.DataFrame:
         """
         Helper function for input data preprocessing.
 
-        :param data: (pd.DataFrame) Pricing data of both stocks in spread.
+        :param prices: (pd.DataFrame) Pricing data of both stocks in spread.
+        :return: (pd.DataFrame) processed dataframe.
         """
 
-        return data.ffill()
+        return prices.ffill()
 
 
-    def fit(self, data: pd.DataFrame):
+    def fit(self, prices: pd.DataFrame):
         """
         This method uses inputted training data to calculate the spread and
         estimate the parameters of the corresponding OU process.
 
         The spread construction implementation follows Section II A in Mudchanatongsuk (2008).
 
-        :param data: (pd.DataFrame) Contains price series of both stocks in spread.
+        :param prices: (pd.DataFrame) Contains price series of both stocks in spread.
         """
 
         # Preprocessing
-        data = self._data_preprocessing(data)
+        prices = self._data_preprocessing(prices)
 
         # Setting instance attributes.
-        self.time_array = np.arange(0, len(data)) * self.delta_t
-        self.ticker_A, self.ticker_B = data.columns[0], data.columns[1]
+        self.time_array = np.arange(0, len(prices)) * self.delta_t
+        self.ticker_A, self.ticker_B = prices.columns[0], prices.columns[1]
 
         # Calculating the spread.
-        self.S = np.log(data.loc[:, self.ticker_B])
-        self.spread = np.log(data.loc[:, self.ticker_A]) - self.S
+        self.S = np.log(prices.loc[:, self.ticker_B])
+        self.spread = np.log(prices.loc[:, self.ticker_A]) - self.S
 
         self.spread = self.spread.to_numpy()  # Converting from pd.Series to numpy array.
         self.S = self.S.to_numpy()  # Converting from pd.Series to numpy array.
 
         params = self._estimate_params_log_likelihood()
-        #print(f"Params from likelihood : {params[:-1]}")
         self.sigma, self.mu, self.k,self.theta, self.eta, self.rho = params[:-1]
 
 
-    def optimal_portfolio_weights(self, data: pd.DataFrame, gamma = -100):
+    def optimal_portfolio_weights(self, prices: pd.DataFrame, gamma = -100) -> np.array:
         """
         This method calculates the final optimal portfolio weights for the calculated spread.
 
         The calculation of weights follows Section III in Mudchanatongsuk (2008), specifically equation 28.
 
-        :param data: (pd.DataFrame) Contains price series of both stocks in spread.
-        :param gamma: (float) Parameter of utility function (gamma < 1)
+        :param prices: (pd.DataFrame) Contains price series of both stocks in spread.
+        :param gamma: (float) Parameter of utility function (gamma < 1).
+        :return: (np.array) Optimal weights array.
         """
 
         if gamma >= 1:
             raise Exception("Please make sure value of gamma is less than 1.")
 
         # Preprocessing
-        data = self._data_preprocessing(data)
+        prices = self._data_preprocessing(prices)
 
         # Setting instance attributes.
         self.gamma = gamma
-        t = np.arange(0, len(data)) * self.delta_t
+        t = np.arange(0, len(prices)) * self.delta_t
         tau = t[-1] - t
 
         # Calculating spread.
-        x = np.log(data.iloc[:, 0]) - np.log(data.iloc[:, 1])
+        x = np.log(prices.iloc[:, 0]) - np.log(prices.iloc[:, 1])
         x = x.to_numpy()  # Converting from pd.Series to numpy array.
 
         # Calculating the alpha and beta functions.
@@ -127,12 +131,13 @@ class StochasticControlMudchanatongsuk:
         return h
 
 
-    def _alpha_beta_calc(self, tau):
+    def _alpha_beta_calc(self, tau) -> tuple:
         """
         This helper function computes the alpha and beta functions
         as given in equation 24 and 25 of Mudchanatongsuk (2008).
 
         :param tau: (np.array) Array with time till completion in years.
+        :return: (tuple) alpha and beta arrays.
         """
 
         sqrt_gamma = np.sqrt(1 - self.gamma) # Repeating Calculation involving gamma.
@@ -144,12 +149,13 @@ class StochasticControlMudchanatongsuk:
         return alpha_t, beta_t
 
 
-    def _alpha_calc(self, sqrt_gamma, exp_calc):
+    def _alpha_calc(self, sqrt_gamma, exp_calc) -> np.array:
         """
         This helper function computes the alpha function in equation 24.
 
         :param sqrt_gamma: (float) Repeating value.
         :param exp_calc: (np.array) Repeating series of values.
+        :return: (np.array) alpha array.
         """
 
         # The equation for calculation of alpha is split into two parts.
@@ -160,12 +166,13 @@ class StochasticControlMudchanatongsuk:
         return left_calc * (1 + right_calc)
 
 
-    def _beta_calc(self, sqrt_gamma, exp_calc):
+    def _beta_calc(self, sqrt_gamma, exp_calc) -> np.array:
         """
         This helper function computes the beta function in equation 25.
 
         :param sqrt_gamma: (float) Repeating value.
         :param exp_calc: (np.array) Repeating series of values.
+        :return: (np.array) beta array.
         """
 
         # The equation for calculation of beta is split into two parts.
@@ -177,9 +184,10 @@ class StochasticControlMudchanatongsuk:
         return left_calc * right_calc
 
 
-    def _estimate_params_log_likelihood(self):
+    def _estimate_params_log_likelihood(self) -> tuple:
         """
         Estimates parameters of model based on log likelihood maximization.
+        :return: (tuple) Consists of final estimated params.
         """
 
         # Setting bounds
@@ -204,12 +212,13 @@ class StochasticControlMudchanatongsuk:
 
 
     @staticmethod
-    def _compute_log_likelihood(params, *args):
+    def _compute_log_likelihood(params, *args) -> float:
         """
         Helper function computes log likelihood function for a set of params.
         This implementation follows Appendix of Mudchanatongsuk (2008).
 
         param params: (tuple) Contains values of set params.
+        :return: (float) negation of log likelihood.
         """
 
         # Setting given parameters
@@ -252,6 +261,7 @@ class StochasticControlMudchanatongsuk:
     def _calc_half_life(k: float) -> float:
         """
         Function returns half life of mean reverting spread from rate of mean reversion.
+        :return: (float) Half life.
         """
 
         return np.log(2) / k # Half life of shocks.
@@ -260,6 +270,7 @@ class StochasticControlMudchanatongsuk:
     def describe(self) -> pd.Series:
         """
         Method returns values of instance attributes calculated from training data.
+        :return: (pd.Series) series describing parameter values.
         """
 
         if self.sigma is None:

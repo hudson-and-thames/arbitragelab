@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 from arbitragelab.cointegration_approach.engle_granger import EngleGrangerPortfolio
 
 
-class StochasticControlJurek:
+class OUModelJurek:
     """
     This class derives the optimal dynamic strategy for arbitrageurs with a finite horizon
     and non-myopic preferences facing a mean-reverting arbitrage opportunity (e.g. an equity pairs trade).
@@ -35,6 +35,9 @@ class StochasticControlJurek:
     """
 
     def __init__(self):
+        """
+        Initializes the parameters of the module.
+        """
 
         # Characteristics of Training Data.
         self.ticker_A = None # Ticker Symbol of first stock.
@@ -56,48 +59,50 @@ class StochasticControlJurek:
 
 
     @staticmethod
-    def _calc_total_return_indices(data : pd.DataFrame) -> pd.DataFrame:
+    def _calc_total_return_indices(prices : pd.DataFrame) -> pd.DataFrame:
         """
         This method calculates the total return indices from pricing data.
         This calculation follows Section IV A in Jurek (2007).
 
-        :param data: (pd.DataFrame) Contains price series of both stocks in spread.
+        :param prices: (pd.DataFrame) Contains price series of both stocks in spread.
+        :return: (pd.DataFrame) Total return indices.
         """
 
         #Calculating the daily returns.
-        returns_df = data.pct_change()
+        returns_df = prices.pct_change()
         returns_df = returns_df.replace([np.inf, -np.inf], np.nan).ffill().dropna()
 
-        total_return_indices = data.copy()
+        total_return_indices = prices.copy()
         total_return_indices.iloc[0, :] = 1
         total_return_indices.iloc[1:, :] = pd.DataFrame.cumprod(1 + returns_df, axis=0)
 
         return total_return_indices
 
 
-    def fit(self, data: pd.DataFrame, delta_t: float = 1 / 252, adf_test: bool = False, significance_level: float = 0.95):
+    def fit(self, prices: pd.DataFrame, delta_t: float = 1 / 252, adf_test: bool = False, significance_level: float = 0.95):
         """
         This method uses inputted training data to calculate the spread and
         estimate the parameters of the corresponding OU process.
 
         The spread construction implementation follows Section IV A in Jurek (2007).
 
-        :param data: (pd.DataFrame) Contains price series of both stocks in spread.
+        :param prices: (pd.DataFrame) Contains price series of both stocks in spread.
         :param delta_t: (float) Time difference between each index of data, calculated in years.
         :param adf_test: (bool) Flag which defines whether the adf statistic test should be conducted.
         :param significance_level: (float) This significance level is used in the ADF statistic test.
             Value can be one of the following: (0.90, 0.95, 0.99).
         """
 
-        if len(data) < (10 / delta_t):
-            warnings.warn("Please make sure length of training data is greater than 10 years.")
+        if len(prices) < (10 / delta_t):
+            warnings.warn("Please make sure length of training data is greater than 10 years. "
+                          "This is the time period used to fit the model in the original paper.")
 
         # Setting instance attributes.
         self.delta_t = delta_t
-        self.ticker_A, self.ticker_B = data.columns[0], data.columns[1]
+        self.ticker_A, self.ticker_B = prices.columns[0], prices.columns[1]
 
         #Calculating the total return indices from pricing data.
-        total_return_indices = self._calc_total_return_indices(data)
+        total_return_indices = self._calc_total_return_indices(prices)
         self.time_array = np.arange(0, len(total_return_indices)) * self.delta_t
 
         # As mentioned in the paper, the vector of linear weights are calculated using co-integrating regression.
@@ -116,18 +121,19 @@ class StochasticControlJurek:
 
         self.spread = (total_return_indices * self.scaled_spread_weights).sum(axis=1)
 
-        self.spread = self.spread.to_numpy() # TODO : This conversion seems to have changed the estimated values. Not sure why?
+        self.spread = self.spread.to_numpy() # This conversion seems to have changed the estimated values.
 
         params = self._estimate_params(self.spread)
         self.mu, self.k, self.sigma = params
 
 
-    def _estimate_params(self, spread: np.array):
+    def _estimate_params(self, spread: np.array) -> tuple:
         """
         This method implements the closed form solutions for estimators of the model parameters.
         These formulas for the estimators are given in Appendix E of Jurek (2007).
 
-        :param: (np.array) Price series of the constructed spread.
+        :param spread: (np.array) Price series of the constructed spread.
+        :return: (tuple) Consists of estimated params.
         """
 
         N = len(spread)
@@ -148,27 +154,29 @@ class StochasticControlJurek:
         return mu, k, sigma
 
 
-    def _spread_calc(self, data: pd.DataFrame):
+    def _spread_calc(self, prices: pd.DataFrame) -> tuple:
         """
         This method calculates the spread on test data using the scaled weights from training data.
 
-        :param data: (pd.DataFrame) Contains price series of both stocks in spread.
+        :param prices: (pd.DataFrame) Contains price series of both stocks in spread.
+        :return: (tuple) Consists of time remaining array and spread numpy array.
         """
 
         #Calculating the total return indices from pricing data.
-        total_return_indices = self._calc_total_return_indices(data)
+        total_return_indices = self._calc_total_return_indices(prices)
         t = np.arange(0, len(total_return_indices)) * self.delta_t
         tau = t[-1] - t  # Stores time remaining till closure. (In years)
 
         # Calculating the spread with weights calculated from training data.
         S = (total_return_indices * self.scaled_spread_weights).sum(axis=1)
 
-        S = S.to_numpy() # TODO : This conversion in fit seems to have changed the estimated values.
+        S = S.to_numpy()
 
         return tau, S
 
 
-    def optimal_portfolio_weights(self, data: pd.DataFrame, utility_type: int = 1, gamma: float = 1, beta: float = 0.1, r: float = 0.05):
+    def optimal_portfolio_weights(self, prices: pd.DataFrame, utility_type: int = 1, gamma: float = 1,
+                                  beta: float = 0.1, r: float = 0.05) -> np.array:
         """
         Implementation of Theorem 1 and Theorem 2 in Jurek (2007).
 
@@ -192,11 +200,12 @@ class StochasticControlJurek:
         of assets under management (the management fee).
         For utility_type = 2, C(Consumption) = beta * W.
 
-        :param data: (pd.DataFrame) Contains price series of both stocks in spread.
-        :param utility_type: (int) Flag signifies type of investor preferences.
-        :param gamma: (float) coefficient of relative risk aversion.
+        :param prices: (pd.DataFrame) Contains price series of both stocks in spread.
+        :param utility_type: (int) Flag signifies type of investor preferences. (Either 1 or 2).
+        :param gamma: (float) coefficient of relative risk aversion. (gamma > 0).
         :param beta: (float) Subjective rate of time preference. (Only required for utility_type = 2).
-        :param r: (float) Rate of Returns.
+        :param r: (float) Rate of Returns. (r > 0).
+        :return: (np.array) Scaled optimal portfolio weights.
         """
 
         if gamma <= 0:
@@ -210,7 +219,7 @@ class StochasticControlJurek:
         self.gamma = gamma
         self.beta = beta
 
-        tau, S = self._spread_calc(data)
+        tau, S = self._spread_calc(prices)
 
         W = np.ones(len(tau))  # Wealth is normalized to one.
 
@@ -238,7 +247,7 @@ class StochasticControlJurek:
         return N / W # We return the optimal allocation of spread asset scaled by wealth.
 
 
-    def optimal_portfolio_weights_fund_flows(self, data: pd.DataFrame, f: float, gamma: float = 1, r: float = 0.05):
+    def optimal_portfolio_weights_fund_flows(self, prices: pd.DataFrame, f: float, gamma: float = 1, r: float = 0.05) -> np.array:
         """
         Implementation of Theorem 4 in Jurek (2007).
 
@@ -256,26 +265,28 @@ class StochasticControlJurek:
         f is the coefficient of proportionality for fund flows and is the drift term in the
         stochastic process equation for fund flows. (Refer Appendix C)
 
-        :param data: (pd.DataFrame) Contains price series of both stocks in spread.
-        :param gamma: (float) coefficient of relative risk aversion.
-        :param f: (float) coefficient of proportionality (assumed to be positive).
-        :param r: (float) Rate of Returns.
+        :param prices: (pd.DataFrame) Contains price series of both stocks in spread.
+        :param gamma: (float) coefficient of relative risk aversion. (gamma > 0).
+        :param f: (float) coefficient of proportionality (f > 0).
+        :param r: (float) Rate of Returns. (r > 0).
+        :return: (np.array) Optimal weights with fund flows.
         """
 
-        N = self.optimal_portfolio_weights(data, utility_type=1, gamma=gamma, r=r)
+        N = self.optimal_portfolio_weights(prices, utility_type=1, gamma=gamma, r=r)
 
         return (1 / (1 + f)) * N
 
 
-    def stabilization_region_calc(self, data: pd.DataFrame, utility_type: int = 1, gamma: float = 1, beta: float = 0.1, r: float = 0.05):
+    def stabilization_region(self, prices: pd.DataFrame, utility_type: int = 1, gamma: float = 1, beta: float = 0.1, r: float = 0.05) -> tuple:
         """
         Implementation of Theorem 3 in Jurek (2007).
 
-        :param data: (pd.DataFrame) Contains price series of both stocks in spread.
+        :param prices: (pd.DataFrame) Contains price series of both stocks in spread.
         :param utility_type: (int) Flag signifies type of investor preferences.
         :param gamma: (float) coefficient of relative risk aversion.
         :param beta: (float) Subjective rate of time preference. (Only required for utility_type = 2).
         :param r: (float) Rate of Returns.
+        :return: (tuple) Tuple of numpy arrays for spread, min bound and max bound.
         """
 
         if gamma <= 0:
@@ -289,7 +300,7 @@ class StochasticControlJurek:
         self.gamma = gamma
         self.beta = beta
 
-        tau, S = self._spread_calc(data)
+        tau, S = self._spread_calc(prices)
 
         if self.gamma == 1:
             #  Calculation of A and B functions are not done in case of gamma = 1. (Refer Appendix A.1 and B.2).
@@ -330,12 +341,13 @@ class StochasticControlJurek:
         return S, min_bound, max_bound
 
 
-    def _AB_calc_1(self, tau):
+    def _AB_calc_1(self, tau) -> tuple:
         """
         This helper function computes the A and B functions for investors with utility_type = 1.
         The implementation follows Appendix A.2 in the paper.
 
         :param tau: (np.array) Array with time till completion in years.
+        :return: (tuple) A and B arrays.
         """
 
         # Calculating value of variable c_1 in Appendix A.2.1.
@@ -362,7 +374,7 @@ class StochasticControlJurek:
         return A, B
 
 
-    def _A_calc_1(self, tau, c_1, c_2, disc, gamma_0):
+    def _A_calc_1(self, tau, c_1, c_2, disc, gamma_0) -> np.array:
         """
         This method calculates the value of function A as described in the paper for investor with utility_type = 1.
         The implementation follows Appendix A.2.1 in the paper.
@@ -374,6 +386,7 @@ class StochasticControlJurek:
         :param c_2: (float) Value of variable c_2 in Appendix A.2.1.
         :param disc: (float) Value of discriminant in Appendix A.2.1.
         :param gamma_0: (float) Value of variable gamma_0 in Appendix A.2.1.
+        :return: (np.array) A array.
         """
 
         A = None
@@ -401,7 +414,7 @@ class StochasticControlJurek:
         return A
 
 
-    def _B_calc_1(self, tau, c_1, c_2, c_3, disc, gamma_0):
+    def _B_calc_1(self, tau, c_1, c_2, c_3, disc, gamma_0) -> np.array:
         """
         This method calculates the value of function B as described in the paper for investor with utility_type = 1.
         The implementation follows Appendix A.2.2 in the paper.
@@ -414,6 +427,7 @@ class StochasticControlJurek:
         :param c_3: (float) Value of variable c_3 in Appendix A.2.1.
         :param disc: (float) Value of discriminant in Appendix A.2.1.
         :param gamma_0: (float) Value of variable gamma_0 in Appendix A.2.1.
+        :return: (np.array) B array.
         """
 
         # Calculating value of variable c_4 in Appendix A.2.2.
@@ -451,12 +465,13 @@ class StochasticControlJurek:
         return B
 
 
-    def _AB_calc_2(self, tau):
+    def _AB_calc_2(self, tau) -> tuple:
         """
         This helper function computes the A and B functions for investors with utility_type = 2.
         The implementation follows Appendix B.1 in the paper.
 
         :param tau: (np.array) Array with time till completion in years.
+        :return: (tuple) A and B arrays.
         """
 
         # Calculating value of variable c_1 in Appendix B.1.1.
@@ -481,7 +496,7 @@ class StochasticControlJurek:
         return A, B
 
 
-    def _A_calc_2(self, tau, c_1, c_2, disc, gamma_0):
+    def _A_calc_2(self, tau, c_1, c_2, disc, gamma_0) -> np.array:
         """
         This method calculates the value of function A as described in the paper for investor with utility_type = 2.
         The implementation follows Appendix B.1.1 in the paper.
@@ -494,13 +509,14 @@ class StochasticControlJurek:
         :param c_2: (float) Value of variable c_2 in Appendix B.1.1.
         :param disc: (float) Value of discriminant in Appendix B.1.1.
         :param gamma_0: (float) Value of variable gamma_0 in Appendix B.1.1.
+        :return: (np.array) A array.
         """
 
         # Same calculation as for general CRRA Investor.
         return self._A_calc_1(tau, c_1, c_2, disc, gamma_0)
 
 
-    def _B_calc_2(self, tau, c_1, c_2, c_3, disc, gamma_0):
+    def _B_calc_2(self, tau, c_1, c_2, c_3, disc, gamma_0) -> np.array:
         """
         This method calculates the value of function B as described in the paper for investor with utility_type = 2.
         The implementation follows Appendix B.1.2 in the paper.
@@ -513,6 +529,7 @@ class StochasticControlJurek:
         :param c_3: (float) Value of variable c_3 in Appendix B.1.1.
         :param disc: (float) Value of discriminant in Appendix B.1.1.
         :param gamma_0: (float) Value of variable gamma_0 in Appendix B.1.1.
+        :return: (np.array) B array.
         """
 
         # Calculating value of variable c_4 in Appendix B.1.2.
@@ -533,118 +550,135 @@ class StochasticControlJurek:
         if 0 < self.gamma < gamma_0 - error_margin:
             # Implementation of Case I in Appendix B.1.2.
 
-            rep_phrase_1 = np.sqrt(c_1 * c_3 - c_2 ** 2)  # Repeating Phrase 1.
-            rep_phrase_2 = np.sqrt(c_1 * c_3) / rep_phrase_1  # Repeating Phrase 2.
-            rep_phrase_3 = rep_phrase_1 * tau + np.arctan(c_2 / rep_phrase_1)  # Repeating Phrase 3.
-
-            denominator = c_1 * rep_phrase_2 * (c_1 * c_3 + c_5 * (c_5 - 2 * c_2))  # Denominator in final equation.
-
-            # The final equation for B is split into 5 terms.
-
-            term_1 = rep_exp_1 * rep_phrase_2 * c_4 * c_5 * (c_2 - rep_phrase_1 * np.tan(rep_phrase_3))
-
-            term_2 = rep_exp_1 * rep_phrase_2 - 2 * rep_exp_2 * (1 / np.cos(rep_phrase_3))
-
-            term_3 = rep_exp_2 * (1 / np.cos(rep_phrase_3)) - rep_exp_1 * rep_phrase_2
-
-            term_4 = rep_exp_1 * rep_phrase_2 * rep_phrase_1 * np.tan(rep_phrase_3)
-
-            term_5 = -term_3
-
-
-            B = np.exp(-tau * c_2) * (term_1
-                                      + c_1 * (c_6 * (c_2 * term_2
-                                                      + term_3 * c_5
-                                                      + term_4)
-                                               -c_3 * term_5 * c_4)) / denominator
-
+            B = self._B_calc_2_I(c_1, c_2, c_3, c_4, c_5, c_6, rep_exp_1, rep_exp_2, tau)
 
         elif gamma_0 - error_margin <= self.gamma <= gamma_0 + error_margin:
             # Implementation of Case II in Appendix B.1.2.
 
-            denominator = c_1 * rep_exp_1 * (tau * c_2 - 1) * (c_2 - c_5) ** 2  # Denominator in final equation.
-
-            # The final equation for B is split into 4 terms.
-
-            term_1 = rep_exp_1 * tau * c_4 * c_2 ** 3
-
-            term_2 = (c_4 * (rep_exp_1 * (tau * c_5 + 1) - rep_exp_2) + rep_exp_1 * tau * c_1 * c_6) * c_2 ** 2
-
-            term_3 = c_1 * (rep_exp_1 * tau * c_5 + 2 * (rep_exp_1 - rep_exp_2)) * c_6 * c_2
-
-            term_4 = (rep_exp_1 - rep_exp_2) * c_1 * c_5 * c_6
-
-
-            B = (-term_1 + term_2 - term_3
-                 + term_4) / denominator
-
+            B = self._B_calc_2_II(c_1, c_2, c_4, c_5, c_6, rep_exp_1, rep_exp_2, tau)
 
         elif gamma_0 + error_margin < self.gamma < 1:
             # Implementation of Case III in Appendix B.1.2.
 
-            rep_phrase_1 = np.sqrt(c_1 * c_3 / c_2 ** 2)  # Repeated Phrase 1.
-            rep_phrase_2 = np.sqrt(c_2 ** 2 - c_1 * c_3)  # Repeated Phrase 2.
-            rep_phrase_3 = np.arctanh(rep_phrase_2 / c_2) - tau * rep_phrase_2  # Repeated Phrase 3.
-            # arccoth(x) = arctanh(1/x)
-
-            denominator = c_2 * rep_phrase_1 * (c_1 * c_3 + c_5 * (c_5 - 2 * c_2))  # Denominator in final equation.
-
-            # The final equation for B is split into 5 terms.
-
-            term_1 = rep_exp_1 * rep_phrase_1 * c_6 * c_2 ** 2
-
-            term_2 = rep_exp_1 * c_3 * rep_phrase_1 * c_4
-
-            term_3 = 2 * rep_exp_2 * (1 / np.sinh(rep_phrase_3)) - rep_phrase_2 * (1 / np.tanh(rep_phrase_3)) * rep_phrase_1
-            # csch = 1/sinh, coth = 1/tanh
-
-            term_4 = rep_exp_1 * rep_phrase_1 * c_5
-
-            term_5 = (1 / np.sinh(rep_phrase_3)) * (c_3 * c_4 * (rep_exp_2 * rep_phrase_2 - rep_exp_1 * np.sinh(tau * rep_phrase_2) * c_5)
-                                          + rep_exp_2 * rep_phrase_2 * c_5 * c_6)
-            # csch = 1/sinh
-
-
-            B = np.exp(-tau * c_2) * (term_1 - (term_2 + (rep_phrase_2 * term_3 + term_4) * c_6) * c_2
-                                      + term_5) / denominator
-
+            B = self._B_calc_2_III(c_1, c_2, c_3, c_4, c_5, c_6, rep_exp_1, rep_exp_2, tau)
 
         else:
             # Case when self.gamma > 1.
             # Implementation of Case IV in Appendix B.1.2.
 
-            rep_phrase_1 = np.sqrt(-c_1 * c_3 / disc)  # Repeated Phrase 1.
-            rep_phrase_2 = 0.5 * np.sqrt(disc) * tau - np.arctanh(2 * c_2 / np.sqrt(disc))  # Repeated Phrase 2.
-
-            denominator = 2 * c_1 * rep_phrase_1 * (c_1 * c_3 + c_5 * (c_5 - 2 * c_2))  # Denominator in final equation.
-
-            # The final equation for B is split into 5 terms.
-
-            term_1 = 2 * rep_exp_1 * rep_phrase_1 * c_4 * c_5 * (c_2 + 0.5 * np.sqrt(disc) * np.tanh(rep_phrase_2))
-
-            term_2 = 2 * rep_exp_1 * rep_phrase_1 - 2 * rep_exp_2 * (1 / np.cosh(rep_phrase_2))
-            # sech = 1 / cosh
-
-            term_3 = rep_exp_2 * (1 / np.cosh(rep_phrase_2)) - 2 * rep_exp_1 * rep_phrase_1
-
-            term_4 = rep_exp_1 * np.sqrt(disc) * rep_phrase_1 * np.tanh(rep_phrase_2)
-
-            term_5 = -term_3
-
-
-            B = np.exp(-tau * c_2) * (term_1
-                                      + c_1 * ( c_6 * (c_2 * term_2
-                                                       + term_3 * c_5
-                                                       - term_4)
-                                                - c_3 * term_5 * c_4)) / denominator
-
+            B = self._B_calc_2_IV(c_1, c_2, c_3, c_4, c_5, c_6, disc, rep_exp_1, rep_exp_2, tau)
 
         return B
+
+
+    @staticmethod
+    def _B_calc_2_IV(c_1, c_2, c_3, c_4, c_5, c_6, disc, rep_exp_1, rep_exp_2, tau):
+        """
+        Implementation of Case IV in Appendix B.1.2.
+        """
+
+        rep_phrase_1 = np.sqrt(-c_1 * c_3 / disc)  # Repeated Phrase 1.
+        rep_phrase_2 = 0.5 * np.sqrt(disc) * tau - np.arctanh(2 * c_2 / np.sqrt(disc))  # Repeated Phrase 2.
+        denominator = 2 * c_1 * rep_phrase_1 * (c_1 * c_3 + c_5 * (c_5 - 2 * c_2))  # Denominator in final equation.
+
+        # The final equation for B is split into 5 terms.
+        term_1 = 2 * rep_exp_1 * rep_phrase_1 * c_4 * c_5 * (c_2 + 0.5 * np.sqrt(disc) * np.tanh(rep_phrase_2))
+        term_2 = 2 * rep_exp_1 * rep_phrase_1 - 2 * rep_exp_2 * (1 / np.cosh(rep_phrase_2))
+        # sech = 1 / cosh
+        term_3 = rep_exp_2 * (1 / np.cosh(rep_phrase_2)) - 2 * rep_exp_1 * rep_phrase_1
+        term_4 = rep_exp_1 * np.sqrt(disc) * rep_phrase_1 * np.tanh(rep_phrase_2)
+        term_5 = -term_3
+
+        B = np.exp(-tau * c_2) * (term_1
+                                  + c_1 * (c_6 * (c_2 * term_2
+                                                  + term_3 * c_5
+                                                  - term_4)
+                                           - c_3 * term_5 * c_4)) / denominator
+
+        return B
+
+
+    @staticmethod
+    def _B_calc_2_III(c_1, c_2, c_3, c_4, c_5, c_6, rep_exp_1, rep_exp_2, tau):
+        """
+        Implementation of Case III in Appendix B.1.2.
+        """
+
+        rep_phrase_1 = np.sqrt(c_1 * c_3 / c_2 ** 2)  # Repeated Phrase 1.
+        rep_phrase_2 = np.sqrt(c_2 ** 2 - c_1 * c_3)  # Repeated Phrase 2.
+        rep_phrase_3 = np.arctanh(rep_phrase_2 / c_2) - tau * rep_phrase_2  # Repeated Phrase 3.
+        # arccoth(x) = arctanh(1/x)
+        denominator = c_2 * rep_phrase_1 * (c_1 * c_3 + c_5 * (c_5 - 2 * c_2))  # Denominator in final equation.
+
+        # The final equation for B is split into 5 terms.
+        term_1 = rep_exp_1 * rep_phrase_1 * c_6 * c_2 ** 2
+        term_2 = rep_exp_1 * c_3 * rep_phrase_1 * c_4
+        term_3 = 2 * rep_exp_2 * (1 / np.sinh(rep_phrase_3)) - rep_phrase_2 * (1 / np.tanh(rep_phrase_3)) * rep_phrase_1
+        # csch = 1/sinh, coth = 1/tanh
+        term_4 = rep_exp_1 * rep_phrase_1 * c_5
+        term_5 = (1 / np.sinh(rep_phrase_3)) * (
+                    c_3 * c_4 * (rep_exp_2 * rep_phrase_2 - rep_exp_1 * np.sinh(tau * rep_phrase_2) * c_5)
+                    + rep_exp_2 * rep_phrase_2 * c_5 * c_6)
+        # csch = 1/sinh
+
+        B = np.exp(-tau * c_2) * (term_1 - (term_2 + (rep_phrase_2 * term_3 + term_4) * c_6) * c_2
+                                  + term_5) / denominator
+
+        return B
+
+
+    @staticmethod
+    def _B_calc_2_II(c_1, c_2, c_4, c_5, c_6, rep_exp_1, rep_exp_2, tau):
+        """
+        Implementation of Case II in Appendix B.1.2.
+        """
+
+        denominator = c_1 * rep_exp_1 * (tau * c_2 - 1) * (c_2 - c_5) ** 2  # Denominator in final equation.
+
+        # The final equation for B is split into 4 terms.
+        term_1 = rep_exp_1 * tau * c_4 * c_2 ** 3
+        term_2 = (c_4 * (rep_exp_1 * (tau * c_5 + 1) - rep_exp_2) + rep_exp_1 * tau * c_1 * c_6) * c_2 ** 2
+        term_3 = c_1 * (rep_exp_1 * tau * c_5 + 2 * (rep_exp_1 - rep_exp_2)) * c_6 * c_2
+        term_4 = (rep_exp_1 - rep_exp_2) * c_1 * c_5 * c_6
+
+        B = (-term_1 + term_2 - term_3
+             + term_4) / denominator
+
+        return B
+
+
+    @staticmethod
+    def _B_calc_2_I(c_1, c_2, c_3, c_4, c_5, c_6, rep_exp_1, rep_exp_2, tau):
+        """
+        Implementation of Case I in Appendix B.1.2.
+        """
+
+        rep_phrase_1 = np.sqrt(c_1 * c_3 - c_2 ** 2)  # Repeating Phrase 1.
+        rep_phrase_2 = np.sqrt(c_1 * c_3) / rep_phrase_1  # Repeating Phrase 2.
+        rep_phrase_3 = rep_phrase_1 * tau + np.arctan(c_2 / rep_phrase_1)  # Repeating Phrase 3.
+        denominator = c_1 * rep_phrase_2 * (c_1 * c_3 + c_5 * (c_5 - 2 * c_2))  # Denominator in final equation.
+
+        # The final equation for B is split into 5 terms.
+        term_1 = rep_exp_1 * rep_phrase_2 * c_4 * c_5 * (c_2 - rep_phrase_1 * np.tan(rep_phrase_3))
+        term_2 = rep_exp_1 * rep_phrase_2 - 2 * rep_exp_2 * (1 / np.cos(rep_phrase_3))
+        term_3 = rep_exp_2 * (1 / np.cos(rep_phrase_3)) - rep_exp_1 * rep_phrase_2
+        term_4 = rep_exp_1 * rep_phrase_2 * rep_phrase_1 * np.tan(rep_phrase_3)
+        term_5 = -term_3
+
+        B = np.exp(-tau * c_2) * (term_1
+                                  + c_1 * (c_6 * (c_2 * term_2
+                                                  + term_3 * c_5
+                                                  + term_4)
+                                           - c_3 * term_5 * c_4)) / denominator
+
+        return B
+
 
     @staticmethod
     def _calc_half_life(k: float) -> float:
         """
         Function returns half life of mean reverting spread from rate of mean reversion.
+        :return: (float) half life.
         """
 
         return np.log(2) / k # Half life of shocks.
@@ -653,6 +687,7 @@ class StochasticControlJurek:
     def describe(self) -> pd.Series:
         """
         Method returns values of instance attributes calculated from training data.
+        :return: (pd.Series) series describing parameter values.
         """
 
         if self.sigma is None:
@@ -670,7 +705,8 @@ class StochasticControlJurek:
         return output
 
 
-    def plotting(self, data:pd.DataFrame, num_test_windows = 5, delta_t = 1/252, utility_type = 1,gamma = 10, beta = 0.1, r = 0.05 , f = 0.1):
+    def plot_results(self, prices:pd.DataFrame, num_test_windows = 5, delta_t =1 / 252, utility_type = 1, gamma = 10,
+                     beta = 0.1, r = 0.05, f = 0.1):
         """
         Method plots out of sample performance of the model on specified number of test windows.
         We use a backward looking rolling window as training data and its size depends on the number of test windows chosen.
@@ -679,9 +715,9 @@ class StochasticControlJurek:
         For example, if the total data is of length 16 years, with the number of test windows set to 5,
         the length of training data would be 16 - (5 + 1) = 10. (The last year is not considered for testing).
 
-        :param data: (pd.DataFrame) Contains price series of both stocks in spread with dates as index.
+        :param prices: (pd.DataFrame) Contains price series of both stocks in spread with dates as index.
         :param num_test_windows: (int) Number of out of sample testing windows to plot.
-        :param delta_t: (float) Time difference between each index of data, calculated in years.
+        :param delta_t: (float) Time difference between each index of prices, calculated in years.
         :param gamma: (float) coefficient of relative risk aversion.
         :param f: (float) coefficient of proportionality (assumed to be positive).
         :param r: (float) Rate of Returns.
@@ -692,28 +728,29 @@ class StochasticControlJurek:
 
         plt.rcParams.update({'font.size': 8})
 
-        data = data.ffill()
+        prices = prices.ffill()
 
-        if not np.issubdtype(data.index.dtype, np.datetime64):
+        if not np.issubdtype(prices.index.dtype, np.datetime64):
             raise Exception("Please make sure index of dataframe is datetime type.")
 
-        if len(data) < (10 / delta_t):
-            raise Exception("Please make sure length of input data is greater than 10 years.")
+        if len(prices) < (10 / delta_t):
+            raise Exception("Please make sure length of input data is greater than 10 years. "
+                            "This is the time period used to fit the model in the paper.")
 
-        years = data.index.year.unique()
+        years = prices.index.year.unique()
 
-        stab_result_dataframe = pd.DataFrame(index=data.loc[str(years[-(num_test_windows + 1)]):str(years[-1])].index,
+        stab_result_dataframe = pd.DataFrame(index=prices.loc[str(years[-(num_test_windows + 1)]):str(years[-1])].index,
                                              columns=['Spread', 'lower bound', 'upper bound'])
-        optimal_result_dataframe = pd.DataFrame(index=data.loc[str(years[-(num_test_windows + 1)]):str(years[-1])].index,
+        optimal_result_dataframe = pd.DataFrame(index=prices.loc[str(years[-(num_test_windows + 1)]):str(years[-1])].index,
                                                 columns=['Weights'])
-        optimal_fund_flows_result_dataframe = pd.DataFrame(index=data.loc[str(years[-(num_test_windows + 1)]):
+        optimal_fund_flows_result_dataframe = pd.DataFrame(index=prices.loc[str(years[-(num_test_windows + 1)]):
                                                                           str(years[-1])].index, columns=['Weights'])
 
         ind = 0
         for year in np.arange(years[-(num_test_windows + 1)], years[-1], 1):
 
-            data_train_dataframe = data.loc[str(year - (len(years) - (num_test_windows + 1))):str(year - 1)]
-            data_test_dataframe = data.loc[str(year)]
+            data_train_dataframe = prices.loc[str(year - (len(years) - (num_test_windows + 1))):str(year - 1)]
+            data_test_dataframe = prices.loc[str(year)]
 
             self.fit(data_train_dataframe, delta_t=delta_t)
 
@@ -721,8 +758,8 @@ class StochasticControlJurek:
                                                              utility_type=utility_type, beta=beta, r=r)
             optimal_fund_flow_weights = self.optimal_portfolio_weights_fund_flows(data_test_dataframe, gamma=gamma,
                                                                                   f=f, r=r)
-            S, min_bound, max_bound = self.stabilization_region_calc(data_test_dataframe, gamma=gamma,
-                                                                     utility_type=utility_type, beta=beta, r=r)
+            S, min_bound, max_bound = self.stabilization_region(data_test_dataframe, gamma=gamma,
+                                                                utility_type=utility_type, beta=beta, r=r)
 
             stab_result_dataframe.iloc[ind:ind + len(S), :] = np.array([S, min_bound, max_bound]).T
             optimal_result_dataframe.iloc[ind:ind + len(S), :] = np.array([optimal_weights]).T

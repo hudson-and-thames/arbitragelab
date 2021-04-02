@@ -12,7 +12,7 @@ from unittest import mock
 import numpy as np
 import pandas as pd
 
-from arbitragelab.stochastic_control_approach.ou_model_jurek import StochasticControlJurek
+from arbitragelab.stochastic_control_approach.ou_model_jurek import OUModelJurek
 
 # pylint: disable=protected-access
 
@@ -42,7 +42,7 @@ class TestOUModelJurek(unittest.TestCase):
         Tests the fit method in the class.
         """
 
-        sc_jurek = StochasticControlJurek()
+        sc_jurek = OUModelJurek()
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", UserWarning)
@@ -86,7 +86,7 @@ class TestOUModelJurek(unittest.TestCase):
         Tests the describe method in the class.
         """
 
-        sc_jurek = StochasticControlJurek()
+        sc_jurek = OUModelJurek()
 
         with self.assertRaises(Exception):
             sc_jurek.describe()
@@ -108,7 +108,7 @@ class TestOUModelJurek(unittest.TestCase):
         Tests the optimal portfolio weights method in the class.
         """
 
-        sc_jurek = StochasticControlJurek()
+        sc_jurek = OUModelJurek()
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", UserWarning)
@@ -155,19 +155,19 @@ class TestOUModelJurek(unittest.TestCase):
         Tests the stabilization region method in the class.
         """
 
-        sc_jurek = StochasticControlJurek()
+        sc_jurek = OUModelJurek()
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", UserWarning)
             sc_jurek.fit(self.dataframe, delta_t=1/252, adf_test=False)
 
         with self.assertRaises(Exception):
-            sc_jurek.stabilization_region_calc(self.dataframe, beta=0.01, gamma=0.5, utility_type=10)
+            sc_jurek.stabilization_region(self.dataframe, beta=0.01, gamma=0.5, utility_type=10)
 
         with self.assertRaises(Exception):
-            sc_jurek.stabilization_region_calc(self.dataframe, beta = 0.01, gamma = -1)
+            sc_jurek.stabilization_region(self.dataframe, beta = 0.01, gamma = -1)
 
-        spread, min_bound, max_bound = sc_jurek.stabilization_region_calc(self.dataframe, beta = 0.01, gamma = 0.5, utility_type=1)
+        spread, min_bound, max_bound = sc_jurek.stabilization_region(self.dataframe, beta = 0.01, gamma = 0.5, utility_type=1)
 
         spread_value = [0.5588694237684244, 0.556388954154023, 0.5557158550545369, 0.5444317219668442,
                    0.5440914321753456, 0.5471230270552558, 0.5566709779363245, 0.5532053519529174,
@@ -236,10 +236,10 @@ class TestOUModelJurek(unittest.TestCase):
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", UserWarning)
-            sc_jurek.stabilization_region_calc(self.dataframe, gamma=1, utility_type=1)
+            sc_jurek.stabilization_region(self.dataframe, gamma=1, utility_type=1)
 
-        sc_jurek.stabilization_region_calc(self.dataframe, beta=0.01, gamma=0.5, utility_type=1)
-        sc_jurek.stabilization_region_calc(self.dataframe, beta=0.01, gamma=2, utility_type=2)
+        sc_jurek.stabilization_region(self.dataframe, beta=0.01, gamma=0.5, utility_type=1)
+        sc_jurek.stabilization_region(self.dataframe, beta=0.01, gamma=2, utility_type=2)
 
 
     def test_optimal_weights_fund_flows(self):
@@ -247,7 +247,7 @@ class TestOUModelJurek(unittest.TestCase):
         Tests the optimal weights with fund flows method in the class.
         """
 
-        sc_jurek = StochasticControlJurek()
+        sc_jurek = OUModelJurek()
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", UserWarning)
@@ -283,7 +283,7 @@ class TestOUModelJurek(unittest.TestCase):
         Function tests special cases for code coverage.
         """
 
-        sc_jurek = StochasticControlJurek()
+        sc_jurek = OUModelJurek()
 
 
         with warnings.catch_warnings():
@@ -318,18 +318,18 @@ class TestOUModelJurek(unittest.TestCase):
     @mock.patch("arbitragelab.stochastic_control_approach.ou_model_jurek.plt")
     def test_plotting(self, mock_plt):
         """
-        Tests the plotting method in the class.
+        Tests the plot_results method in the class.
         """
 
-        sc_jurek = StochasticControlJurek()
+        sc_jurek = OUModelJurek()
 
         with self.assertRaises(Exception):
-            sc_jurek.plotting(self.dataframe)
+            sc_jurek.plot_results(self.dataframe)
 
         self.dataframe.index = pd.to_datetime(self.dataframe.index)
 
         with self.assertRaises(Exception):
-            sc_jurek.plotting(self.dataframe)
+            sc_jurek.plot_results(self.dataframe)
 
         project_path = os.path.dirname(__file__)
         path = project_path + '/test_data/shell-rdp-close_USD.csv'
@@ -337,7 +337,7 @@ class TestOUModelJurek(unittest.TestCase):
 
         data.index = pd.to_datetime(data.index, format="%d/%m/%Y")
 
-        sc_jurek.plotting(data)
+        sc_jurek.plot_results(data)
 
         # Assert plt.figure got called
         assert mock_plt.show.called

@@ -268,17 +268,17 @@ Implementation
 .. automodule:: arbitragelab.stochastic_control_approach.ou_model_jurek
 
 
-.. autoclass:: StochasticControlJurek
+.. autoclass:: OUModelJurek
    :members: __init__
 
 
-.. automethod:: StochasticControlJurek.fit
+.. automethod:: OUModelJurek.fit
 
 
 .. tip::
     To view the estimated model parameters from training data, call the ``describe`` function.
 
-    .. automethod:: StochasticControlJurek.describe
+    .. automethod:: OUModelJurek.describe
 
 
 Step 2: Getting the Optimal Portfolio Weights
@@ -299,7 +299,7 @@ If we choose the investor with intermediate consumption, we also need to specify
 Implementation
 ==============
 
-.. automethod:: StochasticControlJurek.optimal_portfolio_weights
+.. automethod:: OUModelJurek.optimal_portfolio_weights
 
 Step 3: Stabilization Region
 ****************************
@@ -309,7 +309,7 @@ In this optional step, we can calculate the boundaries of the stabilization regi
 Implementation
 ==============
 
-.. automethod:: StochasticControlJurek.stabilization_region_calc
+.. automethod:: OUModelJurek.stabilization_region
 
 
 .. figure:: images/stabilization_bound.png
@@ -326,7 +326,7 @@ In this optional step, we calculate the optimal portfolio weights with the inclu
 Implementation
 ==============
 
-.. automethod:: StochasticControlJurek.optimal_portfolio_weights_fund_flows
+.. automethod:: OUModelJurek.optimal_portfolio_weights_fund_flows
 
 
 .. figure:: images/optimal_weights_fund_flows.png
@@ -343,7 +343,7 @@ In this optional step, we can plot the stabilization regions and optimal portfol
 Implementation
 ==============
 
-.. automethod:: StochasticControlJurek.plotting
+.. automethod:: OUModelJurek.plot_results
 
 
 Examples
@@ -372,9 +372,9 @@ Finally, we use the out-of-sample test data to calculate the optimal portfolio w
 
 .. code-block::
 
-    from arbitragelab.stochastic_control_approach.ou_model_jurek import StochasticControlJurek
+    from arbitragelab.stochastic_control_approach.ou_model_jurek import OUModelJurek
 
-    sc = StochasticControlJurek()
+    sc = OUModelJurek()
 
     sc.fit(data_train_dataframe)
 
@@ -397,15 +397,15 @@ Finally, on the out-of-sample test data we calculate the stabilization region fo
 
 .. code-block::
 
-    from arbitragelab.stochastic_control_approach.ou_model_jurek import StochasticControlJurek
+    from arbitragelab.stochastic_control_approach.ou_model_jurek import OUModelJurek
 
-    sc = StochasticControlJurek()
+    sc = OUModelJurek()
 
     sc.fit(data_train_dataframe)
 
     print(sc.describe())
 
-    S, min_bound, max_bound = sc.stabilization_region_calc(data_test_dataframe, beta = 0.01, gamma = 0.5, utility_type=1)
+    S, min_bound, max_bound = sc.stabilization_region(data_test_dataframe, beta = 0.01, gamma = 0.5, utility_type=1)
 
     plt.plot(S, label='Spread')
     plt.plot(min_bound, color='red', linestyle='dashed')
@@ -426,9 +426,9 @@ using the fitted model.
 
 .. code-block::
 
-    from arbitragelab.stochastic_control_approach.ou_model_jurek import StochasticControlJurek
+    from arbitragelab.stochastic_control_approach.ou_model_jurek import OUModelJurek
 
-    sc = StochasticControlJurek()
+    sc = OUModelJurek()
 
     sc.fit(data_train_dataframe)
 

@@ -111,11 +111,11 @@ Implementation
 .. automodule:: arbitragelab.stochastic_control_approach.ou_model_mudchanatongsuk
 
 
-.. autoclass:: StochasticControlMudchanatongsuk
+.. autoclass:: OUModelMudchanatongsuk
    :members: __init__
 
 
-.. automethod:: StochasticControlMudchanatongsuk.fit
+.. automethod:: OUModelMudchanatongsuk.fit
 
 .. note::
     Although the paper provides closed form solutions for parameter estimation,
@@ -124,7 +124,7 @@ Implementation
 .. tip::
     To view the estimated model parameters from training data, call the ``describe`` function.
 
-    .. automethod:: StochasticControlMudchanatongsuk.describe
+    .. automethod:: OUModelMudchanatongsuk.describe
 
 
 Step 2: Getting the Optimal Portfolio Weights
@@ -139,7 +139,7 @@ In this step we input the evaluation data and specify the utility function param
 Implementation
 ==============
 
-.. automethod:: StochasticControlMudchanatongsuk.optimal_portfolio_weights
+.. automethod:: OUModelMudchanatongsuk.optimal_portfolio_weights
 
 
 Example
@@ -163,9 +163,9 @@ Finally, we use the out-of-sample test data to calculate the optimal portfolio w
 
 .. code-block::
 
-    from arbitragelab.stochastic_control_approach.ou_model_mudchanatongsuk import StochasticControlMudchanatongsuk
+    from arbitragelab.stochastic_control_approach.ou_model_mudchanatongsuk import OUModelMudchanatongsuk
 
-    sc = StochasticControlMudchanatongsuk()
+    sc = OUModelMudchanatongsuk()
 
     sc.fit(data_train_dataframe)
 

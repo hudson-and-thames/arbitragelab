@@ -11,7 +11,7 @@ import os
 import numpy as np
 import pandas as pd
 
-from arbitragelab.stochastic_control_approach.ou_model_mudchanatongsuk import StochasticControlMudchanatongsuk
+from arbitragelab.stochastic_control_approach.ou_model_mudchanatongsuk import OUModelMudchanatongsuk
 
 
 class TestOUModelMudchanatongsuk(unittest.TestCase):
@@ -34,7 +34,7 @@ class TestOUModelMudchanatongsuk(unittest.TestCase):
 
         cls.dataframe = data[['GLD', 'GDX']]
 
-        cls.sc_mudchana = StochasticControlMudchanatongsuk()
+        cls.sc_mudchana = OUModelMudchanatongsuk()
 
 
     def test_fit(self):
@@ -42,7 +42,7 @@ class TestOUModelMudchanatongsuk(unittest.TestCase):
         Tests the fit method in the class.
         """
 
-        sc_mudchana = StochasticControlMudchanatongsuk()
+        sc_mudchana = OUModelMudchanatongsuk()
 
         sc_mudchana.fit(self.dataframe)
 
@@ -76,7 +76,7 @@ class TestOUModelMudchanatongsuk(unittest.TestCase):
         Tests the describe method in the class.
         """
 
-        sc_mudchana = StochasticControlMudchanatongsuk()
+        sc_mudchana = OUModelMudchanatongsuk()
 
         with self.assertRaises(Exception):
             sc_mudchana.describe()
@@ -97,7 +97,7 @@ class TestOUModelMudchanatongsuk(unittest.TestCase):
         Tests the optimal portfolio weights method in the class.
         """
 
-        sc_mudchana = StochasticControlMudchanatongsuk()
+        sc_mudchana = OUModelMudchanatongsuk()
 
         sc_mudchana.fit(self.dataframe)
 
