@@ -26,6 +26,14 @@ is obtained in closed form via the corresponding Hamilton-Jacobi-Bellman equatio
 Modelling
 #########
 
+.. note::
+    In this module and the corresponding paper,
+
+    :math:`k` denotes the rate of mean reversion of the spread,
+    :math:`\theta` denotes the long run mean and,
+    :math:`\eta` denotes the standard deviation of the spread.
+
+
 Let :math:`A(t)` and :math:`B(t)` denote respectively the prices of the
 pair of stocks :math:`A` and :math:`B` at time :math:`t`. The authors assume that stock :math:`B`
 follows a geometric Brownian motion,
@@ -125,6 +133,11 @@ Implementation
     To view the estimated model parameters from training data, call the ``describe`` function.
 
     .. automethod:: OUModelMudchanatongsuk.describe
+
+    .. figure:: images/mudchana_describe.png
+        :scale: 100 %
+        :align: center
+        :figclass: align-center
 
 
 Step 2: Getting the Optimal Portfolio Weights

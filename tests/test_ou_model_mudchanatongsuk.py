@@ -94,7 +94,7 @@ class TestOUModelMudchanatongsuk(unittest.TestCase):
 
         weights = sc_mudchana.optimal_portfolio_weights(self.dataframe, gamma = -10)
 
-        self.assertAlmostEqual(np.mean(weights), 0.4986890920, delta=1e-7)
+        self.assertAlmostEqual(np.mean(weights), 0.4986890920, delta=1e-5)
         self.assertAlmostEqual(weights[7], 0.5117099817, delta=1e-7)
         self.assertAlmostEqual(weights[28], 0.5246204647, delta=1e-7)
         self.assertAlmostEqual(weights[-1], 0.4043368460, delta=1e-7)

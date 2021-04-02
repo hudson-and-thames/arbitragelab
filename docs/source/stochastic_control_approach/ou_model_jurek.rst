@@ -37,6 +37,14 @@ partial equilibrium.
 Modelling
 #########
 
+.. note::
+    In this module and the corresponding paper,
+
+    :math:`\kappa` denotes the rate of mean reversion of the spread,
+    :math:`\mu` denotes the long run mean and,
+    :math:`\sigma` denotes the standard deviation of the spread.
+
+
 To capture the presence of horizon and divergence risk, the authors model the dynamics of the mispricing
 using a mean-reverting stochastic process. Under this process, although the mispricing is guaranteed
 to be eliminated at some future date, the timing of convergence, as well as the maximum magnitude
@@ -99,6 +107,11 @@ where :math:`f\left(C_{s}, J_{s}\right)` is the normalized aggregator for the co
 
 Here the authors considered the special case of a unit elasticity of intertemporal substitution (:math:`\psi = 1`).
 
+
+Here :math:`C_t` denotes the instantaneous consumption (e.g. cash flow). :math:`\beta` is the rate of time preference, and
+:math:`\gamma` is the coefficient of relative risk aversion.
+
+
 .. note::
 
     In this paper, the choice of preference structures is driven by economic intuition regarding the incentives
@@ -151,7 +164,8 @@ The evolution of wealth which determines the budget constraints is written as,
 
     d W_{t}=N_{t} d S_{t}+M_{t} d B_{t}-C_{t} 1\left[C_{t}>0\right] d t
 
-where :math:`N_t` denotes the number of units of spread and :math:`M_t` denotes the number of riskless assets.
+where :math:`N_t` denotes the number of units of spread, :math:`M_t` denotes the number of riskless assets and,
+:math:`1[C_{t}>0]` is an indicator variable for whether intermediate consumption is taking place.
 
 For the terminal wealth problem, the optimal portfolio allocation is given by:
 
@@ -216,7 +230,7 @@ Paradoxically, clients are most likely to withdraw funds after performance has b
 (i.e. spreads have been widening) and investment opportunities are the best.
 
 In the presence of fund flows the evolution of wealth under management will depend not only
-on performance, denoted by :math:`\Pi_t`, but also on fund flows, :math:`F_t`.Consequently:
+on performance, denoted by :math:`\Pi_t`, but also on fund flows, :math:`F_t`. Consequently:
 
 .. math::
 
@@ -249,8 +263,10 @@ this flow to commensurately decrease the amount of risk taken on by the underlyi
 How to use this submodule
 #########################
 
-This submodule contains two public methods. One for estimating the parameters of the model using training data,
-and the second method is for calculating the final optimal portfolio weights using evaluation data.
+This submodule contains five public methods, of which two methods are necessary to calculate the optimal weights.
+The first method is for estimating the parameters of the model
+using training data, and the second method is for calculating the final optimal portfolio weights using evaluation data.
+
 
 Step 1: Model fitting
 *********************
@@ -280,6 +296,11 @@ Implementation
 
     .. automethod:: OUModelJurek.describe
 
+    .. figure:: images/jurek_describe.png
+        :scale: 100 %
+        :align: center
+        :figclass: align-center
+
 
 Step 2: Getting the Optimal Portfolio Weights
 *********************************************
@@ -291,9 +312,14 @@ If we choose the investor with intermediate consumption, we also need to specify
 
 
 .. figure:: images/optimal_weights.png
-       :scale: 100 %
-       :align: center
-       :figclass: align-center
+    :scale: 100 %
+    :align: center
+    :figclass: align-center
+
+    An example showcasing the optimal allocation to the spread asset (in cyan) scaled by wealth, :math:`N_t/W_t`.
+    In the out-of-sample trading simulation the agent uses a fixed length backward-looking window
+    to estimate the parameters of the model, and uses those estimates to trade in the test window.
+    For the plots in this doc, five test windows are shown.
 
 
 Implementation
@@ -313,9 +339,12 @@ Implementation
 
 
 .. figure:: images/stabilization_bound.png
-       :scale: 100 %
-       :align: center
-       :figclass: align-center
+    :scale: 100 %
+    :align: center
+    :figclass: align-center
+
+    An example showcasing the evolution of the Royal Dutch - Shell spread asset (in cyan), :math:`S_t`,
+    within each trading period, and the corresponding stabilization bound (in red).
 
 
 Step 4: Optimal Portfolio Weights with Fund Flows
@@ -330,9 +359,12 @@ Implementation
 
 
 .. figure:: images/optimal_weights_fund_flows.png
-       :scale: 100 %
-       :align: center
-       :figclass: align-center
+    :scale: 100 %
+    :align: center
+    :figclass: align-center
+
+    An example showcasing the optimal allocation to the spread asset (in cyan) scaled by wealth, :math:`N_t/W_t`,
+    for the case with fund flows.
 
 
 Step 5: Plotting
