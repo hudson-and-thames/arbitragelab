@@ -119,6 +119,7 @@ class OUModelJurek:
         # Scaling the weights such that they sum to 1.
         self.scaled_spread_weights = eg_cointegration_vectors.loc[0] / abs(eg_cointegration_vectors.loc[0]).sum()
 
+        # Calculating the final spread value from the scaled weights.
         self.spread = (total_return_indices * self.scaled_spread_weights).sum(axis=1)
 
         self.spread = self.spread.to_numpy() # This conversion seems to have changed the estimated values.
@@ -145,6 +146,7 @@ class OUModelJurek:
         k = (-1 / self.delta_t) * np.log(np.multiply(spread[1:] - mu, spread[:-1] - mu).sum()
                                               / np.power(spread[1:] - mu, 2).sum())
 
+        # Part of sigma estimation formula.
         sigma_calc_sum = np.power((spread[1:] - mu - np.exp(-k * self.delta_t) * (spread[:-1] - mu))
                                   / np.exp(-k * self.delta_t), 2).sum()
 
@@ -208,6 +210,9 @@ class OUModelJurek:
         :return: (np.array) Scaled optimal portfolio weights.
         """
 
+        if self.sigma is None:
+            raise Exception("Please run the fit method before calling this method.")
+
         if gamma <= 0:
             raise Exception("The value of gamma should be positive.")
 
@@ -236,6 +241,7 @@ class OUModelJurek:
 
             A = None
             B = None
+            # A and B functions are used in the final weights calculation.
             if utility_type == 1:
                 A, B = self._AB_calc_1(tau)
 
@@ -272,6 +278,7 @@ class OUModelJurek:
         :return: (np.array) Optimal weights with fund flows.
         """
 
+        # Calculating the scaled optimal portfolio weights.
         N = self.optimal_portfolio_weights(prices, utility_type=1, gamma=gamma, r=r)
 
         return (1 / (1 + f)) * N
@@ -289,6 +296,9 @@ class OUModelJurek:
         :return: (tuple) Tuple of numpy arrays for spread, min bound and max bound.
         """
 
+        if self.sigma is None:
+            raise Exception("Please run the fit method before calling this method.")
+
         if gamma <= 0:
             raise Exception("The value of gamma should be positive.")
 
@@ -300,6 +310,7 @@ class OUModelJurek:
         self.gamma = gamma
         self.beta = beta
 
+        # Calculating the time left array and the spread.
         tau, S = self._spread_calc(prices)
 
         if self.gamma == 1:
@@ -310,6 +321,7 @@ class OUModelJurek:
 
         A = None
         B = None
+        # A and B functions are used in the final weights calculation.
         if utility_type == 1:
             A, B = self._AB_calc_1(tau)
 
@@ -320,20 +332,26 @@ class OUModelJurek:
         phi = (2 * A / self.gamma) - ((self.k + self.r) / (self.gamma * self.sigma ** 2))
         # Note : phi < 0.
 
+        # term_1 and term_2 calculations are part of the constraint equation calculation below.
         term_1 = (self.k * self.mu + (self.sigma ** 2) * B) / (self.gamma * self.sigma ** 2)
         term_2 = np.sqrt(-phi)
 
+        # Initializing the upper bound and lower bound arrays.
         max_bound = np.zeros(len(tau))
         min_bound = np.zeros(len(tau))
 
+        # Iterating over each time step in the array.
         for ind in range(len(tau)):
-            s = cp.Variable()
+            s = cp.Variable() # Setting an optimization variable for spread.
+            # Defining the constraint equation involving spread.
             constraint = [cp.abs(phi[ind] * s + term_1[ind]) <= term_2[ind] - 1e-6]
 
+            # Solving the maximization problem to calculate the upper bound.
             prob_max = cp.Problem(cp.Maximize(s), constraint)
             prob_max.solve()
             max_bound[ind] = prob_max.value
 
+            # Solving the minimization problem to calculate the lower bound.
             prob_min = cp.Problem(cp.Minimize(s), constraint)
             prob_min.solve()
             min_bound[ind] = prob_min.value
@@ -574,7 +592,19 @@ class OUModelJurek:
     @staticmethod
     def _B_calc_2_IV(c_1, c_2, c_3, c_4, c_5, c_6, disc, rep_exp_1, rep_exp_2, tau):
         """
-        Implementation of Case IV in Appendix B.1.2.
+        Method calculates value of function B according to Case IV in Appendix B.1.2.
+
+        :param c_1: (float) Value of variable c_1 in Appendix B.1.1.
+        :param c_2: (float) Value of variable c_2 in Appendix B.1.1.
+        :param c_3: (float) Value of variable c_3 in Appendix B.1.1.
+        :param c_4: (float) Value of variable c_4 in Appendix B.1.2.
+        :param c_5: (float) Value of variable c_5 in Appendix B.1.2.
+        :param c_6: (float) Value of variable c_6 in Appendix B.1.2.
+        :param disc: (float) Value of discriminant in Appendix B.1.1.
+        :param rep_exp_1: (np.array) Repeating Exponential Form with variable c_2.
+        :param rep_exp_2: (np.array) Repeating Exponential Form with variable c_5.
+        :param tau: (np.array) Array with time till completion in years.
+        :return: (np.array) Final value of B.
         """
 
         rep_phrase_1 = np.sqrt(-c_1 * c_3 / disc)  # Repeated Phrase 1.
@@ -583,12 +613,17 @@ class OUModelJurek:
 
         # The final equation for B is split into 5 terms.
         term_1 = 2 * rep_exp_1 * rep_phrase_1 * c_4 * c_5 * (c_2 + 0.5 * np.sqrt(disc) * np.tanh(rep_phrase_2))
+
         term_2 = 2 * rep_exp_1 * rep_phrase_1 - 2 * rep_exp_2 * (1 / np.cosh(rep_phrase_2))
         # sech = 1 / cosh
+
         term_3 = rep_exp_2 * (1 / np.cosh(rep_phrase_2)) - 2 * rep_exp_1 * rep_phrase_1
+
         term_4 = rep_exp_1 * np.sqrt(disc) * rep_phrase_1 * np.tanh(rep_phrase_2)
+
         term_5 = -term_3
 
+        # Calculating the final value of function B.
         B = np.exp(-tau * c_2) * (term_1
                                   + c_1 * (c_6 * (c_2 * term_2
                                                   + term_3 * c_5
@@ -601,7 +636,18 @@ class OUModelJurek:
     @staticmethod
     def _B_calc_2_III(c_1, c_2, c_3, c_4, c_5, c_6, rep_exp_1, rep_exp_2, tau):
         """
-        Implementation of Case III in Appendix B.1.2.
+        Method calculates value of function B according to Case III in Appendix B.1.2.
+
+        :param c_1: (float) Value of variable c_1 in Appendix B.1.1.
+        :param c_2: (float) Value of variable c_2 in Appendix B.1.1.
+        :param c_3: (float) Value of variable c_3 in Appendix B.1.1.
+        :param c_4: (float) Value of variable c_4 in Appendix B.1.2.
+        :param c_5: (float) Value of variable c_5 in Appendix B.1.2.
+        :param c_6: (float) Value of variable c_6 in Appendix B.1.2.
+        :param rep_exp_1: (np.array) Repeating Exponential Form with variable c_2.
+        :param rep_exp_2: (np.array) Repeating Exponential Form with variable c_5.
+        :param tau: (np.array) Array with time till completion in years.
+        :return: (np.array) Final value of B.
         """
 
         rep_phrase_1 = np.sqrt(c_1 * c_3 / c_2 ** 2)  # Repeated Phrase 1.
@@ -612,15 +658,20 @@ class OUModelJurek:
 
         # The final equation for B is split into 5 terms.
         term_1 = rep_exp_1 * rep_phrase_1 * c_6 * c_2 ** 2
+
         term_2 = rep_exp_1 * c_3 * rep_phrase_1 * c_4
+
         term_3 = 2 * rep_exp_2 * (1 / np.sinh(rep_phrase_3)) - rep_phrase_2 * (1 / np.tanh(rep_phrase_3)) * rep_phrase_1
         # csch = 1/sinh, coth = 1/tanh
+
         term_4 = rep_exp_1 * rep_phrase_1 * c_5
+
         term_5 = (1 / np.sinh(rep_phrase_3)) * (
                     c_3 * c_4 * (rep_exp_2 * rep_phrase_2 - rep_exp_1 * np.sinh(tau * rep_phrase_2) * c_5)
                     + rep_exp_2 * rep_phrase_2 * c_5 * c_6)
         # csch = 1/sinh
 
+        # Calculating the final value of function B.
         B = np.exp(-tau * c_2) * (term_1 - (term_2 + (rep_phrase_2 * term_3 + term_4) * c_6) * c_2
                                   + term_5) / denominator
 
@@ -630,17 +681,31 @@ class OUModelJurek:
     @staticmethod
     def _B_calc_2_II(c_1, c_2, c_4, c_5, c_6, rep_exp_1, rep_exp_2, tau):
         """
-        Implementation of Case II in Appendix B.1.2.
+        Method calculates value of function B according to Case II in Appendix B.1.2.
+
+        :param c_1: (float) Value of variable c_1 in Appendix B.1.1.
+        :param c_2: (float) Value of variable c_2 in Appendix B.1.1.
+        :param c_4: (float) Value of variable c_4 in Appendix B.1.2.
+        :param c_5: (float) Value of variable c_5 in Appendix B.1.2.
+        :param c_6: (float) Value of variable c_6 in Appendix B.1.2.
+        :param rep_exp_1: (np.array) Repeating Exponential Form with variable c_2.
+        :param rep_exp_2: (np.array) Repeating Exponential Form with variable c_5.
+        :param tau: (np.array) Array with time till completion in years.
+        :return: (np.array) Final value of B.
         """
 
         denominator = c_1 * rep_exp_1 * (tau * c_2 - 1) * (c_2 - c_5) ** 2  # Denominator in final equation.
 
         # The final equation for B is split into 4 terms.
         term_1 = rep_exp_1 * tau * c_4 * c_2 ** 3
+
         term_2 = (c_4 * (rep_exp_1 * (tau * c_5 + 1) - rep_exp_2) + rep_exp_1 * tau * c_1 * c_6) * c_2 ** 2
+
         term_3 = c_1 * (rep_exp_1 * tau * c_5 + 2 * (rep_exp_1 - rep_exp_2)) * c_6 * c_2
+
         term_4 = (rep_exp_1 - rep_exp_2) * c_1 * c_5 * c_6
 
+        # Calculating the final value of function B.
         B = (-term_1 + term_2 - term_3
              + term_4) / denominator
 
@@ -650,7 +715,18 @@ class OUModelJurek:
     @staticmethod
     def _B_calc_2_I(c_1, c_2, c_3, c_4, c_5, c_6, rep_exp_1, rep_exp_2, tau):
         """
-        Implementation of Case I in Appendix B.1.2.
+        Method calculates value of function B according to Case I in Appendix B.1.2.
+
+        :param c_1: (float) Value of variable c_1 in Appendix B.1.1.
+        :param c_2: (float) Value of variable c_2 in Appendix B.1.1.
+        :param c_3: (float) Value of variable c_3 in Appendix B.1.1.
+        :param c_4: (float) Value of variable c_4 in Appendix B.1.2.
+        :param c_5: (float) Value of variable c_5 in Appendix B.1.2.
+        :param c_6: (float) Value of variable c_6 in Appendix B.1.2.
+        :param rep_exp_1: (np.array) Repeating Exponential Form with variable c_2.
+        :param rep_exp_2: (np.array) Repeating Exponential Form with variable c_5.
+        :param tau: (np.array) Array with time till completion in years.
+        :return: (np.array) Final value of B.
         """
 
         rep_phrase_1 = np.sqrt(c_1 * c_3 - c_2 ** 2)  # Repeating Phrase 1.
@@ -660,11 +736,16 @@ class OUModelJurek:
 
         # The final equation for B is split into 5 terms.
         term_1 = rep_exp_1 * rep_phrase_2 * c_4 * c_5 * (c_2 - rep_phrase_1 * np.tan(rep_phrase_3))
+
         term_2 = rep_exp_1 * rep_phrase_2 - 2 * rep_exp_2 * (1 / np.cos(rep_phrase_3))
+
         term_3 = rep_exp_2 * (1 / np.cos(rep_phrase_3)) - rep_exp_1 * rep_phrase_2
+
         term_4 = rep_exp_1 * rep_phrase_2 * rep_phrase_1 * np.tan(rep_phrase_3)
+
         term_5 = -term_3
 
+        # Calculating the final value of function B.
         B = np.exp(-tau * c_2) * (term_1
                                   + c_1 * (c_6 * (c_2 * term_2
                                                   + term_3 * c_5
@@ -693,13 +774,15 @@ class OUModelJurek:
         if self.sigma is None:
             raise Exception("Please run the fit method before calling describe.")
 
+        # List defines the indexes of the final pandas object.
         index = ['Ticker of first stock', 'Ticker of second stock', 'Scaled Spread weights',
                  'long-term mean', 'rate of mean reversion', 'standard deviation', 'half-life']
 
+        # List defines the values of the final pandas object.
         data = [self.ticker_A, self.ticker_B, np.round(self.scaled_spread_weights.values, 3),
                 self.mu, self.k, self.sigma, self._calc_half_life(self.k)]
 
-        # Combine data and indexes into the pandas Series
+        # Combine data and indexes into the pandas Series.
         output = pd.Series(data=data, index=index)
 
         return output
@@ -725,9 +808,10 @@ class OUModelJurek:
         :param beta: (float) Subjective rate of time preference. (Only required for utility_type = 2).
         """
 
-
+        # Setting font size of plots.
         plt.rcParams.update({'font.size': 8})
 
+        # Price series preprocessing.
         prices = prices.ffill()
 
         if not np.issubdtype(prices.index.dtype, np.datetime64):
@@ -737,18 +821,24 @@ class OUModelJurek:
             raise Exception("Please make sure length of input data is greater than 10 years. "
                             "This is the time period used to fit the model in the paper.")
 
+        # Getting the list of years in input data.
         years = prices.index.year.unique()
 
+        # Initializing a dataframe which stores stabilization region results.
         stab_result_dataframe = pd.DataFrame(index=prices.loc[str(years[-(num_test_windows + 1)]):str(years[-1])].index,
                                              columns=['Spread', 'lower bound', 'upper bound'])
+        # Initializing a dataframe which stores optimal weights.
         optimal_result_dataframe = pd.DataFrame(index=prices.loc[str(years[-(num_test_windows + 1)]):str(years[-1])].index,
                                                 columns=['Weights'])
+        # Initializing a dataframe which stores optimal weights in the case with fund flows.
         optimal_fund_flows_result_dataframe = pd.DataFrame(index=prices.loc[str(years[-(num_test_windows + 1)]):
                                                                           str(years[-1])].index, columns=['Weights'])
 
         ind = 0
+        # Iterating over the test windows.
         for year in np.arange(years[-(num_test_windows + 1)], years[-1], 1):
 
+            # Setting the train and test data.
             data_train_dataframe = prices.loc[str(year - (len(years) - (num_test_windows + 1))):str(year - 1)]
             data_test_dataframe = prices.loc[str(year)]
 
@@ -761,23 +851,27 @@ class OUModelJurek:
             S, min_bound, max_bound = self.stabilization_region(data_test_dataframe, gamma=gamma,
                                                                 utility_type=utility_type, beta=beta, r=r)
 
+            # Adding the final results to their corresponding dataframes for each test window.
             stab_result_dataframe.iloc[ind:ind + len(S), :] = np.array([S, min_bound, max_bound]).T
             optimal_result_dataframe.iloc[ind:ind + len(S), :] = np.array([optimal_weights]).T
             optimal_fund_flows_result_dataframe.iloc[ind:ind + len(S), :] = np.array([optimal_fund_flow_weights]).T
             ind += len(S)
 
+        # Plotting the stabilization bound plot.
         ax = stab_result_dataframe.plot(style=['c-', 'r:', 'r:'], legend=False, linewidth=1.0, figsize=(8, 4))
         ax.xaxis.grid(color='grey', linestyle=':', linewidth=0.6)
         ax.set_ylabel('Spread')
         ax.set_title("Evolution of spread with stabilization bound")
         plt.show()
 
+        # Plotting the optimal weights allocation plot.
         ax = optimal_result_dataframe.plot(style=['c-'], legend=False, linewidth=1.0, figsize=(8, 4))
         ax.xaxis.grid(color='grey', linestyle=':', linewidth=0.6)
         ax.set_ylabel('Optimal Weights')
         ax.set_title('Optimal allocation to the spread asset scaled by wealth')
         plt.show()
 
+        # Plotting the optimal weights allocation plot in the case with fund flows.
         ax = optimal_fund_flows_result_dataframe.plot(style=['c-'], legend=False, linewidth=1.0, figsize=(8, 4))
         ax.xaxis.grid(color='grey', linestyle=':', linewidth=0.6)
         ax.set_ylabel('Optimal Weights with fund flows')

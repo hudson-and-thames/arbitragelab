@@ -40,17 +40,19 @@ class TestOUModelMudchanatongsuk(unittest.TestCase):
         Tests the fit method in the class.
         """
 
+        # Creating an object of the class.
         sc_mudchana = OUModelMudchanatongsuk()
 
         sc_mudchana.fit(self.dataframe)
 
-        # Checking values for spread calc.
+        # Checking parameter values for spread calculation.
         self.assertAlmostEqual(np.mean(sc_mudchana.spread), 2.0465361303, delta=1e-7)
         # TODO : Why is the mean value of spread not equal to the estimated theta param below?
         self.assertAlmostEqual(sc_mudchana.spread[7], 2.1073878043, delta=1e-7)
         self.assertAlmostEqual(sc_mudchana.spread[28], 2.0496029865, delta=1e-7)
         self.assertAlmostEqual(sc_mudchana.spread[-1], 2.0202245834, delta=1e-7)
 
+        # Checking other parameter values.
         self.assertAlmostEqual(sc_mudchana.sigma, 0.503695, delta=1e-4)
         self.assertAlmostEqual(sc_mudchana.mu, 0.114877, delta=1e-4)
         self.assertAlmostEqual(sc_mudchana.k, 3.99205, delta=1e-3)
@@ -64,8 +66,10 @@ class TestOUModelMudchanatongsuk(unittest.TestCase):
         Tests the describe method in the class.
         """
 
+        # Creating an object of the class.
         sc_mudchana = OUModelMudchanatongsuk()
 
+        # Testing for the run fit before this method exception.
         with self.assertRaises(Exception):
             sc_mudchana.describe()
 
@@ -77,6 +81,7 @@ class TestOUModelMudchanatongsuk(unittest.TestCase):
 
         data = ['GLD', 'GDX', 1.98816, 3.99205, 0.404292, 0.173632, 0.114877, 0.503695]
 
+        # Testing the output of describe method.
         pd.testing.assert_series_equal(pd.Series(index=index,data=data), sc_mudchana.describe(), check_exact=False, atol=1e-3)
 
 
@@ -85,15 +90,21 @@ class TestOUModelMudchanatongsuk(unittest.TestCase):
         Tests the optimal portfolio weights method in the class.
         """
 
+        # Creating an object of the class.
         sc_mudchana = OUModelMudchanatongsuk()
+
+        # Testing for the run fit before this method exception.
+        with self.assertRaises(Exception):
+            sc_mudchana.optimal_portfolio_weights(self.dataframe, gamma = -10)
 
         sc_mudchana.fit(self.dataframe)
 
+        # Testing for invalid value of gamma exception.
         with self.assertRaises(Exception):
             sc_mudchana.optimal_portfolio_weights(self.dataframe, gamma = 10)
 
         weights = sc_mudchana.optimal_portfolio_weights(self.dataframe, gamma = -10)
-
+        # Checking the values of weights.
         self.assertAlmostEqual(np.mean(weights), 0.4986890920, delta=1e-5)
         self.assertAlmostEqual(weights[7], 0.5117099817, delta=1e-4)
         self.assertAlmostEqual(weights[28], 0.5246204647, delta=1e-4)

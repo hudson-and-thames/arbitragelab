@@ -105,6 +105,9 @@ class OUModelMudchanatongsuk:
         :return: (np.array) Optimal weights array.
         """
 
+        if self.sigma is None:
+            raise Exception("Please run the fit method before calling this method.")
+
         if gamma >= 1:
             raise Exception("Please make sure value of gamma is less than 1.")
 
@@ -143,7 +146,9 @@ class OUModelMudchanatongsuk:
         sqrt_gamma = np.sqrt(1 - self.gamma) # Repeating Calculation involving gamma.
         exp_calc = np.exp(2 * self.k * tau / sqrt_gamma) # Repeating Calculation involving gamma and tau series.
 
+        # Calculating the alpha function output.
         alpha_t = self._alpha_calc(sqrt_gamma, exp_calc)
+        # Calculating the beta function output.
         beta_t = self._beta_calc(sqrt_gamma, exp_calc)
 
         return alpha_t, beta_t
@@ -194,11 +199,13 @@ class OUModelMudchanatongsuk:
         # sigma, mu, k, theta, eta, rho
         bounds = ((1e-5, None), (None, None), (1e-5, None), (None, None), (1e-5, None), (-1 + 1e-5, 1 - 1e-5))
 
+        # Setting initial value of theta to the mean of the spread.
         theta_init = np.mean(self.spread)
 
         # Initial guesses for sigma, mu, k, theta, eta, rho
         initial_guess = np.array((1, 0, 1, theta_init, 1, 0.5))
 
+        # Using scipy minimize to calculate the max log likelihood.
         result = so.minimize(self._compute_log_likelihood, initial_guess,
                              args=(self.spread, self.S, self.delta_t), bounds=bounds, options={'maxiter': 100000})
 
@@ -225,8 +232,10 @@ class OUModelMudchanatongsuk:
         sigma, mu, k ,theta, eta, rho = params
         X,S, dt = args
 
+        # Setting y as given in Appendix.
         y = np.array([X, S])
 
+        # Calculating matrix as given in equation (41) in the paper.
         matrix = np.zeros((2,2))
         matrix[0, 0] = (eta ** 2) * (1 - np.exp(-2 * k * dt)) / (2 * k)
         matrix[0, 1] = rho * eta * sigma * (1 - np.exp(k * dt)) / k
@@ -237,12 +246,14 @@ class OUModelMudchanatongsuk:
         S = S[:-1]
         y = y[:, 1:]
 
+        # Calculation follows equation (40) in the paper.
         E_y = np.zeros((2, len(X)))
         E_y[0, :] = X * np.exp(-k * dt) + theta * (1 - np.exp(-k * dt))
         E_y[1, :] = S + (mu - 0.5 * sigma ** 2) * dt
 
         vec = y - E_y
 
+        # Calculating the joint density function given in equation (39) in the paper.
         with np.errstate(all='raise'): # This was done due to np.nan's outputted in final result of scipy minimize.
             try:
                 f_y_denm = (2 * math.pi * np.sqrt(np.linalg.det(matrix)))
@@ -251,9 +262,10 @@ class OUModelMudchanatongsuk:
             except FloatingPointError:
                 return 0
 
-
+        # Calculating the final log likelihood given in equation (38) in the paper.
         log_likelihood = np.log(f_y).sum()
 
+        # Returning the negation as we are using scipy minimize.
         return -log_likelihood
 
 
@@ -276,10 +288,12 @@ class OUModelMudchanatongsuk:
         if self.sigma is None:
             raise Exception("Please run the fit method before calling describe.")
 
+        # List defines the indexes of the final pandas object.
         index = ['Ticker of first stock', 'Ticker of second stock',
                  'long-term mean of spread', 'rate of mean reversion of spread', 'standard deviation of spread', 'half-life of spread',
                  'Drift of stock B', 'standard deviation of stock B']
 
+        # List defines the values of the final pandas object.
         data = [self.ticker_A, self.ticker_B,
                 self.theta, self.k, self.eta, self._calc_half_life(self.k),
                 self.mu, self.sigma]
