@@ -49,14 +49,21 @@ class CVineCop(RVineCop):
         # The pv.Vinecop being wrapped
         self.cvine_cop = cvine_cop
 
-    def fit_auto(self, data: pd.DataFrame, pv_target_idx: int = 1, if_renew: bool = True):
+    def fit_auto(self, data: pd.DataFrame, pv_target_idx: int = 1, if_renew: bool = True, alt_cvine_structure=False):
         """
         Auto fit data to the C-vine copula by selecting the center stock.
 
         The method will loop through all possible C-vine structures and choose the best fit by AIC. The targeted
         stock will never show up in the center of the tree, thus some C-vine structures need not be included. This
-        method is relatively slow, and the complexity is O(n!) with n being the number of stocks. Hence please keep
-        n <= 7.
+        method is relatively slow, and the complexity is O(n!) with n being the number of stocks and there is no way
+        to work around this. Hence please keep n <= 7.
+
+        The original method suggested in [Stubinger et al. 2016] says the target stock should not be at the center of
+        each level of the C-vine tree, due to the way conditional probabilities are calculated. However the C-vine
+        structure effectively orders the variables by their importance of dependency, the target stock makes sense to
+        be the most important node. I.e, for the C-vine structure (4, 2, 1, 3), variable 3 should be the target stock,
+        in contrast to variable 4 as suggested in [Stubinger et al. 2016]. Therefore we provide both options by toggling
+        the alt_cvine_structure variable.
 
         The original pv.Vinecop will be returned just in case there is some usage not covered by this class.
 
@@ -64,6 +71,8 @@ class CVineCop(RVineCop):
         :param pv_target_idx: (int) Optional. The stock to be targeted for trading. This is indexed from 1, hence
             1 corresponds to the 0th column data in the data frame. Defaults to 1.
         :param if_renew: (bool) Optional. Whether to update the class attribute cvine_cop. Defaults to True.
+        :param alt_cvine_structure: (bool) Optional. Whether to use the alternative method to generate possible C-vines.
+            Defaults to False.
         :return: (pv.Vinecop) The fitted pv.Vinecop object.
         """
 
@@ -71,7 +80,10 @@ class CVineCop(RVineCop):
         data_np = data.to_numpy()  # pyvinecopulib uses numpy arrays for fitting.
         data_dim = len(data.columns)  # Number of stocks.
         # List of all possible C-vine structures, a list of tuples.
-        possible_cvine_structures = self._get_possible_cvine_structs(data_dim, pv_target_idx)
+        if alt_cvine_structure:  # Alternative method to generate C-vine structures.
+            possible_cvine_structures = self._get_possible_cvine_structs_alt(data_dim, pv_target_idx)
+        else:  # The original method to generate C-vine structures.
+            possible_cvine_structures = self._get_possible_cvine_structs(data_dim, pv_target_idx)
 
         # Fit among all possible structures.
         controls = pv.FitControlsVinecop(family_set=self._bicop_family)  # Bivar copula constituents for the C-vine.
@@ -95,6 +107,36 @@ class CVineCop(RVineCop):
             self.cvine_cop = fitted_cvine_cop
 
         return fitted_cvine_cop
+
+    @staticmethod
+    def _get_possible_cvine_structs_alt(data_dim: int, pv_target_idx: int) -> List[tuple]:
+        """
+        Get all possible C-vine structures specified by the dimension and the targeted node, alternative method.
+
+        A C-vine copula is uniquely determined by an ordered tuple, listing the center of each tree at every level
+        read backwards. For example, for a 4-dim C-vine characterized by (4, 2, 1, 3), node 3 is the center for the
+        0th tree, node 1 is the center for the 1st tree and so on. Because the C-vine effectively orders the variables
+        by their importance of dependency, the target stock makes sense to be the most important node. I.e, for the
+        C-vine structure (4, 2, 1, 3), variable 3 should be the target stock, in contrast to variable 4 as suggested
+        in [Stubinger et al. 2016].
+
+        :param data_dim: (int) The number of stocks.
+        :param pv_target_idx: (int). The stock to be targeted for trading. This is indexed from 1, hence 1 corresponds
+            to the 0th column data in a pandas data frame.
+        :return: (List[tuple]) The list of all possible C-vine structures stored as tuples.
+        """
+
+        # Initiating
+        all_items = list(range(1, data_dim + 1))  # All the nodes, indexed from 1
+        all_structures = permutations(all_items)  # All the possible structures, as permutations of the nodes
+
+        # Loop through all the structures
+        valid_structures = []
+        for structure in all_structures:
+            if structure[-1] == pv_target_idx:  # Only keep the ones where the targeted index is the last element
+                valid_structures.append(structure)
+
+        return valid_structures
 
     @staticmethod
     def _get_possible_cvine_structs(data_dim: int, pv_target_idx: int) -> List[tuple]:

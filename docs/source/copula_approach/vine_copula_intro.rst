@@ -28,7 +28,7 @@ In reality, when there are only 2 dimensions, under most cases you can still mod
 with the existing bivariate copulas. However when it goes to higher dimensions, the copula model becomes quite rigid and loses
 a lot of details in the model.
 
-Therefore, vine copula is invented exactly to address this high dimensional probablistic modeling problem. Instead of using an
+Therefore, vine copula is invented exactly to address this high dimensional probabilistic modeling problem. Instead of using an
 N-dimensional copula directly, it decomposes the probability density into conditional probabilities, and further decomposes
 conditional probabilities into bivariate copulas. To sum up, 
 **the idea is that we decompose the high dimensional pdf into bivariate copulas and marginal densities**.

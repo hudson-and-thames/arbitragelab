@@ -101,6 +101,27 @@ class TestVineCop(unittest.TestCase):
         structures_3_set = set(structures_3)
         self.assertEqual(structures_3_set, expected_structures_3)
 
+    def test_get_possible_cvine_structs_alt(self) -> None:
+        """
+        Test CVineCop._get_possible_cvine_structs_alt.
+        """
+
+        cvinecop = vg.CVineCop()
+        structures_5 = cvinecop._get_possible_cvine_structs_alt(data_dim=5, pv_target_idx=2)
+        self.assertTrue(isinstance(structures_5, list))
+        expected_structures_5 = {(1, 3, 4, 5, 2), (1, 3, 5, 4, 2), (1, 4, 3, 5, 2), (1, 4, 5, 3, 2), (1, 5, 3, 4, 2),
+                                 (1, 5, 4, 3, 2), (3, 1, 4, 5, 2), (3, 1, 5, 4, 2), (3, 4, 1, 5, 2), (3, 4, 5, 1, 2),
+                                 (3, 5, 1, 4, 2), (3, 5, 4, 1, 2), (4, 1, 3, 5, 2), (4, 1, 5, 3, 2), (4, 3, 1, 5, 2),
+                                 (4, 3, 5, 1, 2), (4, 5, 1, 3, 2), (4, 5, 3, 1, 2), (5, 1, 3, 4, 2), (5, 1, 4, 3, 2),
+                                 (5, 3, 1, 4, 2), (5, 3, 4, 1, 2), (5, 4, 1, 3, 2), (5, 4, 3, 1, 2)}
+        structures_5_set = set(structures_5)
+        self.assertEqual(structures_5_set, expected_structures_5)
+
+        structures_3 = cvinecop._get_possible_cvine_structs_alt(data_dim=3, pv_target_idx=1)
+        expected_structures_3 = {(2, 3, 1), (3, 2, 1)}
+        structures_3_set = set(structures_3)
+        self.assertEqual(structures_3_set, expected_structures_3)
+
     def test_get_condi_probs_priv(self) -> None:
         """
         Test the _get_condi_probs function from CVineCop.
@@ -259,6 +280,27 @@ class TestVineCop(unittest.TestCase):
         # Check its aic value on the training data. Should still get the same result.
         aic_2 = cvinecop.aic(u=self.quantiles_data_train, num_threads=1)
         expected_aic_2 = -382.98496652926514
+        self.assertAlmostEqual(aic_2, expected_aic_2, places=3)
+
+    def test_fit_auto_alt(self) -> None:
+        """
+        Test the fit_auto function in CVinecop class using the alternative method.
+        """
+
+        cvinecop = vg.CVineCop()
+
+        # 1. With renewal
+        cvinecop.fit_auto(data=self.quantiles_data_train, pv_target_idx=1, if_renew=True, alt_cvine_structure=True)
+        # Check its aic value on the training data
+        aic_1 = cvinecop.aic(u=self.quantiles_data_train, num_threads=1)
+        expected_aic_1 = -379.8244061045313
+        self.assertAlmostEqual(aic_1, expected_aic_1, places=3)
+
+        # 2. Without renewal, fit the cvine copula using the test set.
+        cvinecop.fit_auto(data=self.quantiles_data_test, pv_target_idx=1, if_renew=False)
+        # Check its aic value on the training data. Should still get the same result.
+        aic_2 = cvinecop.aic(u=self.quantiles_data_train, num_threads=1)
+        expected_aic_2 = -379.8244061045313
         self.assertAlmostEqual(aic_2, expected_aic_2, places=3)
 
     def test_strat_init(self) -> None:
