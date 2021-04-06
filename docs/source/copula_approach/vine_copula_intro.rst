@@ -159,7 +159,7 @@ Formal Definitions
 Vine Copula Types
 *****************
 Every vine copula has a Regular Vine structure (R-vine). And there are 2 specific subgenres of R-vine called
-Cannonical Vine and Drawable Vine. Those structure hold true for every layer of the tree.
+Canonical Vine and Drawable Vine. Those structure hold true for every layer of the tree.
 They can be visualized as follows:
 
 .. figure:: images/Rvine_Cvine_Dvine.png
@@ -177,7 +177,7 @@ For an R-vine, for each level of the tree, it needs to satisfy the following con
     layer 1, node 1 and node 3 makes a (1,3) node in layer 2.
 
 For a C-vine, it must be an R-vine at first, but for every layer of the tree there is a center component. This structure
-makes it possible to represend the C-vine structure using an ordered tuple: reading backwards, each number represents
+makes it possible to represent the C-vine structure using an ordered tuple: reading backwards, each number represents
 the centered component at each level of the tree.
 
 For a D-vine, each tree is a *path*: there is one road that goes through all the nodes.
@@ -311,7 +311,7 @@ integration from the probability density.
 Cumulative Density
 ******************
 
-When dealing with "traditional" copula models, this is from the definition, and is thus ususally the easiest one to be computed.
+When dealing with "traditional" copula models, this is from the definition, and is thus usually the easiest one to be computed.
 In vine copula models this is the hardest one in contrast, because vine copula starts from probability densities, not from
 cumulative densities. Hence this quantity needs to be numerically integrated across the hypercube :math:`[0, 1]^4`. Often people
 use Monte-Carlo integration for this computation. This quantity is not used as often in trading applications.
@@ -321,14 +321,14 @@ Sample and Fitting
 
 Those are very interesting topics but are beyond our scope here. Interested readers can refer to [Dißmann et al. 2012] for more
 details. This is an active research field and involves a lot of heavy lifting. Luckily, a lot of great algorithms are already nicely
-blackboxed, handled automatically by softwares. Specifically, sample generation is a pretty much solved problem, whereas determine
-the best R-vine structure given data and determing all copula types and parameters are still discussed, but some algorithms are available.
+blackboxed, handled automatically by software. Specifically, sample generation is a pretty much solved problem, whereas determine
+the best R-vine structure given data and determine all copula types and parameters are still under discussion, but some algorithms are available.
 Thus, sampling is very fast, and fitting can be slow.
 
 .. Note::
     
     1. When working with copula models, whether it is a "traditional" copula model or vine copula, we always fit the
-    pseudo-observations, i.e., quanties data, instead of the real data.
+    pseudo-observations, i.e., quantiles data, instead of the real data.
     
     2. For fitting a vine copula, we need to determine the best tree structure that reflects the data, along with specifying
     the type of bivariate copulas and their parameters. The amount of calculation is huge.

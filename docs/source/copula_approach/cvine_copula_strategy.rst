@@ -125,11 +125,13 @@ Therefore, to make stock 1 never at the center (except at the tree root), it is 
     Moreover, I think if we treat stock 1 as the key stock, it should be **at the center of every level of the tree**, because
     it makes intuitive sense to model all other stocks' and their bivariate copula densities relation given the stock 1's information.
     Stock 1 is the object of interest, and therefore should be the governing quantity here.
+    C-vine structure intrinsically orders the marginal variables by their importance of interdependencies from its ordered tuple representation,
+    and the target stock should be the most important (therefore at the end of the tuple).
+    It is strange to argue that the least important stock in terms of interdependencies should become the target stock.
     I.e., 1 should be put at the end of the tuple, not at the beginning, and there are still 6 many possible structures for
     4 stocks.
     
-    Currently we provide only the implementation in [Stübinger et al. 2018]. In the future we will provide the alternative method
-    that puts the target stock at the center.
+    Currently we provide the implementation in [Stübinger et al. 2018] and the alternative method that puts the target stock at the center.
     
 After chosen the 6 possible vine structures, we then fit everyone of them and calculate the associated AIC value. We choose
 the final C-vine structure among candidates with the lowest AIC value.
