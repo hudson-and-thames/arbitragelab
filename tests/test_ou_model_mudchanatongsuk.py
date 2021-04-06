@@ -47,7 +47,6 @@ class TestOUModelMudchanatongsuk(unittest.TestCase):
 
         # Checking parameter values for spread calculation.
         self.assertAlmostEqual(np.mean(sc_mudchana.spread), 2.0465361303, delta=1e-7)
-        # TODO : Why is the mean value of spread not equal to the estimated theta param below?
         self.assertAlmostEqual(sc_mudchana.spread[7], 2.1073878043, delta=1e-7)
         self.assertAlmostEqual(sc_mudchana.spread[28], 2.0496029865, delta=1e-7)
         self.assertAlmostEqual(sc_mudchana.spread[-1], 2.0202245834, delta=1e-7)
