@@ -18,7 +18,7 @@ directly look at how they are "related".
 Indeed, traders and analysts have been using copula to exploit statistical arbitrage under the pairs trading framework
 for some time, and we have implemented some of the most popular methods in :code:`ArbitrageLab`.
 However, it is natural to expand beyond dealing with just a pair of stocks: There already exist a great amount of competing
-stat arb methods alongside with copula, thinning the potential alpha. It is also intuitive for human to think about relative
+stat arb methods alongside copula, thinning the potential alpha. It is also intuitive for human to think about relative
 pricing among 2 stocks, where as for higher dimensions it is not so easy, and left great chances for quantitative approaches.
 
 Copula itself is not limited to just 2 dimensions. You can expand it to arbitrarily large dimensions as you wish.
@@ -218,7 +218,7 @@ The R-vine structure is mapped to the matrix as follows:
 
     1. Find a diagonal term :math:`a`. For example :math:`M_{2, 2} = 4`.
     
-    2. Follow that column downwards and stop somewhere :math:`b`, say we stop at :math:`M_{4, 5} = 1`.
+    2. Follow that column downwards and stop somewhere :math:`b`, say we stop at :math:`M_{4, 2} = 1`.
     
     3. The leftover terms below :math:`b` in that column are then conditions :math:`\{c_1, c_2, \cdots\}`. In this example
        we have :math:`\{2, 3\}` left.
