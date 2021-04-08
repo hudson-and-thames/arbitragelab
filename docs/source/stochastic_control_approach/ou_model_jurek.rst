@@ -1,7 +1,7 @@
-.. _stochastic_control_approach_strategies-ou_model_jurek:
+.. _stochastic_control_approach-ou_model_jurek:
 
 .. note::
-   The following implementations and documentation closely following work:
+    The following implementations and documentation closely following work:
 
     `Jurek, J.W. and Yang, H., 2007, April. Dynamic portfolio selection in arbitrage. <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=882536>`__
 
@@ -385,6 +385,8 @@ We use GLD and GDX tickers from Yahoo Finance as the dataset for this example.
 
 .. code-block::
 
+    import yfinance as yf
+
     data1 =  yf.download("GLD GDX", start="2009-03-25", end="2019-03-25")
     data2 =  yf.download("GLD GDX", start="2019-03-27", end="2020-03-27")
 
@@ -392,7 +394,7 @@ We use GLD and GDX tickers from Yahoo Finance as the dataset for this example.
     data_test_dataframe = data2["Adj Close"][["GLD", "GDX"]]
 
 .. Note::
-    To get good results for the estimated parameters, using atleast 10 years of training data is recommended.
+    To get good results for the estimated parameters, using  t 10 years of training data is recommended.
 
 Example 1
 *********
@@ -412,11 +414,11 @@ Finally, we use the out-of-sample test data to calculate the optimal portfolio w
 
     print(sc.describe())
 
-    plt.plot(sc.optimal_portfolio_weights(data_test_dataframe, beta = 0.01, gamma = 0.5, utility_type=1))
+    plt.plot(sc.optimal_portfolio_weights(data_test_dataframe, beta=0.01, gamma=0.5, utility_type=1))
     plt.show()
 
 
-.. Note::
+.. warning::
     For utility_type = 2 and low values of :math:`\gamma (< 1)`, the model becomes unstable with respect to the value of :math:`k`.
 
 Example 2
@@ -437,7 +439,7 @@ Finally, on the out-of-sample test data we calculate the stabilization region fo
 
     print(sc.describe())
 
-    S, min_bound, max_bound = sc.stabilization_region(data_test_dataframe, beta = 0.01, gamma = 0.5, utility_type=1)
+    S, min_bound, max_bound = sc.stabilization_region(data_test_dataframe, beta=0.01, gamma=0.5, utility_type=1)
 
     plt.plot(S, label='Spread')
     plt.plot(min_bound, color='red', linestyle='dashed')
@@ -466,7 +468,7 @@ using the fitted model.
 
     print(sc.describe())
 
-    plt.plot(sc.optimal_portfolio_weights_fund_flows(data_test_dataframe, f=0.05, gamma = 0.5))
+    plt.plot(sc.optimal_portfolio_weights_fund_flows(data_test_dataframe, f=0.05, gamma=0.5))
     plt.show()
 
 

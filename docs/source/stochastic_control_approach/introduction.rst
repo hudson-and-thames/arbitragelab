@@ -1,14 +1,14 @@
-.. _stochastic_control_approach_strategies-introduction:
+.. _stochastic_control_approach-introduction:
 
 .. note::
-   The following documentation appears in Section 5 of the following work:
+    The following documentation appears in Section 5 of the following work:
 
-        `Krauss (2015), Statistical arbitrage pairs trading strategies:Review and outlook <https://www.econstor.eu/bitstream/10419/116783/1/833997289.pdf>`__
+    `Krauss (2015), Statistical arbitrage pairs trading strategies: Review and outlook <https://www.econstor.eu/bitstream/10419/116783/1/833997289.pdf>`__
 
 
-======================================================
-Introduction to Stochastic Control Approach Strategies
-======================================================
+============
+Introduction
+============
 
 Modeling asset pricing dynamics with the Ornstein-Uhlenbeck process
 ###################################################################
@@ -18,8 +18,8 @@ OU Model Jurek
 
 `Jurek and Yang (2007) <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=882536>`__ provide the paper with the
 highest impact in this domain. In their setup, they allow non-myopic arbitrageurs to allocate their capital
-to a mean-reverting spread or to a risk free asset. The former evolves according to an Ornstein-Uhlenbeck process
-and the latter is compounded continuously with the riskfree rate. Two scenarios for investor preferences are considered
+to a mean-reverting spread or to a risk-free asset. The former evolves according to an Ornstein-Uhlenbeck process,
+and the latter is compounded continuously with the risk-free rate. Two scenarios for investor preferences are considered
 over a finite time horizon: constant relative risk aversion and the recursive Epstein-Zinutility function.
 Utilizing the asset price dynamics, Jurek and Yang develop the budget constraints
 and the wealth dynamics of the arbitrageurs’ assets.
@@ -32,7 +32,7 @@ the most comprehensive discussion of the stochastic control approach applied to 
 OU Model Mudchanatongsuk
 ************************
 
-`Mudchanatongsuk  et  al.(2008) <http://folk.ntnu.no/skoge/prost/proceedings/acc08/data/papers/0479.pdf>`__ also solves
+`Mudchanatongsuk  et  al.(2008) <http://folk.ntnu.no/skoge/prost/proceedings/acc08/data/papers/0479.pdf>`__ also solve
 the stochastic control problem for pairs trading under power utility for terminal wealth.
 Their ansatz mostly differs in the assumed asset pricing dynamics, but the spread also relies on an OU-process.
 

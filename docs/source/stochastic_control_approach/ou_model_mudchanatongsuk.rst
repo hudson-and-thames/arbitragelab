@@ -1,11 +1,10 @@
-.. _stochastic_control_approach_strategies-ou_model_mudchanatongsuk:
+.. _stochastic_control_approach-ou_model_mudchanatongsuk:
 
 .. note::
-   The following implementations and documentation closely following work:
+    The following implementations and documentation closely following work:
 
     `Mudchanatongsuk, S., Primbs, J.A. and Wong, W., 2008, June. Optimal pairs trading: A stochastic control approach.
     <http://folk.ntnu.no/skoge/prost/proceedings/acc08/data/papers/0479.pdf>`__
-
 
 
 ========================
@@ -15,12 +14,12 @@ OU Model Mudchanatongsuk
 Introduction
 ############
 
-In the paper corresponding to this module, the authors implement a stochastic control based approach to the problem of pairs trading.
+In the paper corresponding to this module, the authors implement a stochastic control-based approach to the problem of pairs trading.
 The paper models the log-relationship between a pair of stock prices as an Ornstein-Uhlenbeck process
 and use this to formulate a portfolio optimization based stochastic control problem.
 This problem is constructed in such a way that one may either
 trade based on the spread (by buying and selling equal amounts of the stocks in the pair) or
-place money in a risk free asset. Then the optimal solution to this control problem
+place money in a risk-free asset. Then the optimal solution to this control problem
 is obtained in closed form via the corresponding Hamilton-Jacobi-Bellman equation under a power utility on terminal wealth.
 
 Modelling
@@ -145,7 +144,7 @@ Step 2: Getting the Optimal Portfolio Weights
 
 In this step we input the evaluation data and specify the utility function parameter :math:`\gamma`.
 
-.. note::
+.. warning::
     As noted in the paper, please make sure the value of gamma is less than 1.
 
 
@@ -161,6 +160,8 @@ Example
 We use GLD and GDX tickers from Yahoo Finance as the dataset for this example.
 
 .. code-block::
+
+    import yfinance as yf
 
     data1 =  yf.download("GLD GDX", start="2012-03-25", end="2016-01-09")
     data2 =  yf.download("GLD GDX", start="2016-02-21", end="2020-08-15")
@@ -198,9 +199,7 @@ The following research notebook can be used to better understand the approach de
 .. _`Optimal Pairs Trading A Stochastic Control Approach`:
 
 
-
 References
 ##########
 
 *     `Mudchanatongsuk, S., Primbs, J.A. and Wong, W., 2008, June. Optimal pairs trading: A stochastic control approach. <http://folk.ntnu.no/skoge/prost/proceedings/acc08/data/papers/0479.pdf>`__
-
