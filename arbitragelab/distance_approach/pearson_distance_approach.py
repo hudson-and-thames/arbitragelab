@@ -11,6 +11,7 @@ https://papers.ssrn.com/sol3/papers.cfm?abstract_id=141615.
 
 import itertools
 import pandas as pd
+import numpy as np
 from sklearn.linear_model import LinearRegression
 
 from arbitragelab.util import devadarsh
@@ -29,17 +30,18 @@ class PearsonStrategy:
         """
 
         # Internal Parameters
-        self.train_data = None  # Monthly return dataset in formation period
+        self.monthly_return = None  # Monthly return dataset in formation period
         self.risk_free = None  # Risk free rate dataset for calculating return differences
         self.beta_dict = None  # Regression coefficients for each stock in the formation period
         self.pairs_dict = None  # Top n pairs selected during the formation period
         self.short_stocks = None  # Stocks having lowest values of return differences
         self.long_stocks = None  # Stocks having highest values of return differences
         self.return_diff_sorted = None  # Sorted dictionary of return difference in the test period
+        self.normalized_prices = None  # Normalized prices of the train data
 
         devadarsh.track('PearsonStrategy')
 
-    def form_portfolio(self, train_data, risk_free=None, num_pairs=50):
+    def form_portfolio(self, train_data, risk_free=None, num_pairs=50, weight='equal'):
         """
         Forms portfolio based on the input train data.
 
@@ -66,16 +68,17 @@ class PearsonStrategy:
         :param train_data: (pd.DataFrame) Daily price data with date in its index and stocks in its columns.
         :param risk_free: (pd.Series) Daily risk free rate data with date in its index.
         :param num_pairs: (int) Number of top pairs to use for portfolio formation.
+        :param weight: (str) Weighting Scheme for portfolio returns [``equal`` by default, ``correlation``].
         """
 
         # Preprocess data to get monthly return from daily price data
         self.data_preprocess(train_data, risk_free)
 
         # Calculating beta and getting pairs in the formation period
-        self.beta_pairs_formation(num_pairs)
+        self.beta_pairs_formation(num_pairs, weight)
 
         # Build portfolio based on the return difference in the last period
-        last_month = self.train_data.iloc[-1, :]
+        last_month = self.monthly_return.iloc[-1, :]
 
         # Calculate the return differences of all stocks in the train data
         return_diff_dict = self.calculate_return_diff(last_month)
@@ -91,6 +94,9 @@ class PearsonStrategy:
 
         # Stocks with top 10% value of the return differences should be longed
         self.long_stocks = dict(itertools.islice(self.return_diff_sorted.items(), int(num_stocks * 0.9), num_stocks))
+
+    def trade_pairs(self, test_data, methods):
+
 
     def get_short_stocks(self):
         """
@@ -118,7 +124,7 @@ class PearsonStrategy:
 
         return self.return_diff_sorted
 
-    def data_preprocess(self, train_data, risk_free):
+    def _data_preprocess(self, train_data, risk_free):
         """
         Preprocess train data and risk free data.
 
@@ -129,21 +135,25 @@ class PearsonStrategy:
         :param risk_free: (pd.Series) Daily risk free rate data with date in its index.
         """
 
+        # Calculate normalized prices with mean and standard deviation
+        data_copy = train_data.copy()
+        self.normalized_prices = (data_copy - data_copy.mean()) / (data_copy.std())
+
         # Change the daily price data into daily return by calculating the percent change
-        train_data = train_data.pct_change()
+        daily_return = train_data.pct_change()
 
         # Change the index of the train data into string to group by months later
-        train_data.index = train_data.index.map(lambda x: pd.to_datetime(str(x)))
+        daily_return.index = daily_return.index.map(lambda x: pd.to_datetime(str(x)))
 
         # Add 1 to the values to calculate the compound return
-        train_data = train_data + 1
+        daily_return = daily_return + 1
 
         # Calculate monthly return for the given data
-        train_data = train_data.groupby([train_data.index.year, train_data.index.month]).prod()
+        monthly_return = daily_return.groupby([daily_return.index.year, daily_return.index.month]).prod()
 
-        self.train_data = train_data
+        self.monthly_return = monthly_return
 
-        if not risk_free:
+        if risk_free is not None:
             # Get risk free rate
             risk_free = risk_free.rename('risk_free')
             risk_free.index = risk_free.index.map(lambda x: pd.to_datetime(str(x)))
@@ -151,11 +161,11 @@ class PearsonStrategy:
 
             self.risk_free = risk_free
 
-    def beta_pairs_formation(self, num_pairs):
+    def _beta_pairs_formation(self, num_pairs, weight):
         """
 
         :param num_pairs:
-        :return:
+        :param weight: (str) Weighting Scheme for portfolio returns [``equal`` by default, ``correlation``].        :return:
         """
 
         # Make empty dictionaries for beta value and pairs for each stock
@@ -163,9 +173,9 @@ class PearsonStrategy:
         pairs_dict = {}
 
         # Get beta for each of the stocks in the train data
-        for stock in self.train_data.columns:
+        for stock in self.monthly_return.columns:
             # Make a correlation matrix to get top 50 pairs for a given stock
-            corr_matrix = self.train_data.corr()
+            corr_matrix = self.monthly_return.corr()
 
             # Find pairs based on the Pearson correlation
             pairs = corr_matrix.loc[stock].sort_values(ascending=False)[1:num_pairs + 1].index.to_list()
@@ -173,12 +183,26 @@ class PearsonStrategy:
             # Save the pairs in a dictionary
             pairs_dict[stock] = pairs
 
-            # Calculate equal weighted portfolio returns with pairs
-            portfolio_return = self.train_data.loc[:, pairs].mean(axis=1).values - 1
-            portfolio_return = portfolio_return.reshape((-1, 1))
-
             # Get stock return to derive regression coefficient
-            stock_return = self.train_data.loc[:, stock].values
+            stock_return = self.monthly_return.loc[:, stock].values
+
+            # Equal weighting
+            if weight == 'equal':
+
+                # Calculate equal weighted portfolio returns with pairs
+                portfolio_return = self.monthly_return.loc[:, pairs].mean(axis=1).values - 1
+                portfolio_return = portfolio_return.reshape((-1, 1))
+
+            # Correlation based weighting
+            else:
+
+                # Find correlation values for pairs
+                corr_values = corr_matrix.loc[stock].loc[pairs].values
+                corr_values = corr_values/corr_values.sum()
+
+                # Get pair return values
+                pairs_return = self.monthly_return.loc[:, pairs].values
+                portfolio_return = np.matmul(pairs_return, corr_values)
 
             # Use linear regression to get regression coefficient of two returns
             model = LinearRegression().fit(portfolio_return, stock_return)
@@ -190,7 +214,7 @@ class PearsonStrategy:
         self.beta_dict = beta_dict
         self.pairs_dict = pairs_dict
 
-    def calculate_return_diff(self, last_month):
+    def _calculate_return_diff(self, last_month):
         """
 
         :param last_month:
