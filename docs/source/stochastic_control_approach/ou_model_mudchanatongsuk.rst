@@ -1,7 +1,7 @@
 .. _stochastic_control_approach-ou_model_mudchanatongsuk:
 
 .. note::
-    The following implementations and documentation closely following work:
+    The following implementations and documentation closely follow the below work:
 
     `Mudchanatongsuk, S., Primbs, J.A. and Wong, W., 2008, June. Optimal pairs trading: A stochastic control approach.
     <http://folk.ntnu.no/skoge/prost/proceedings/acc08/data/papers/0479.pdf>`__
