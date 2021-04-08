@@ -133,7 +133,15 @@ This project is licensed under an all rights reserved licence.
     :hidden:
 
     other_approaches/kalman_filter
-    other_approaches/pca_approach
+
+
+.. toctree::
+    :maxdepth: 2
+    :caption: PCA Approach
+    :hidden:
+
+    pca_approach/pca_approach
+
 
 .. toctree::
     :maxdepth: 2

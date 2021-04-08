@@ -69,6 +69,7 @@ class Golem:
         import arbitragelab.cointegration_approach as cointegration_approach
         import arbitragelab.copula_approach as copula_approach
         import arbitragelab.distance_approach as distance_approach
+        import arbitragelab.pca_approach as pca_approach
         import arbitragelab.other_approaches as other_approaches
         import arbitragelab.util as util
         import arbitragelab.optimal_mean_reversion as optimal_mean_reversion
