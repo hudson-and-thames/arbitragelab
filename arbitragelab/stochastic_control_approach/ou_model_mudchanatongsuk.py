@@ -94,6 +94,26 @@ class OUModelMudchanatongsuk:
         self.sigma, self.mu, self.k, self.theta, self.eta, self.rho = params[:-1]
 
 
+    def spread_calc(self, prices: pd.DataFrame) -> tuple:
+        """
+        This method calculates the spread on test data.
+
+        :param prices: (pd.DataFrame) Contains price series of both stocks in spread.
+        :return: (tuple) Consists of time remaining array and spread numpy array.
+        """
+
+        # Preprocessing
+        prices = self._data_preprocessing(prices)
+        t = np.arange(0, len(prices)) * self.delta_t
+        tau = t[-1] - t
+
+        # Calculating spread
+        x = np.log(prices.iloc[:, 0]) - np.log(prices.iloc[:, 1])
+        x = x.to_numpy()  # Converting from pd.Series to numpy array
+
+        return tau, x
+
+
     def optimal_portfolio_weights(self, prices: pd.DataFrame, gamma: float = -100) -> np.array:
         """
         This method calculates the final optimal portfolio weights for the calculated spread.
@@ -111,17 +131,11 @@ class OUModelMudchanatongsuk:
         if gamma >= 1:
             raise Exception("Please make sure value of gamma is less than 1.")
 
-        # Preprocessing
-        prices = self._data_preprocessing(prices)
-
         # Setting instance attributes
         self.gamma = gamma
-        t = np.arange(0, len(prices)) * self.delta_t
-        tau = t[-1] - t
 
         # Calculating spread
-        x = np.log(prices.iloc[:, 0]) - np.log(prices.iloc[:, 1])
-        x = x.to_numpy()  # Converting from pd.Series to numpy array
+        tau, x = self.spread_calc(prices)
 
         # Calculating the alpha and beta functions
         alpha_t, beta_t = self._alpha_beta_calc(tau)

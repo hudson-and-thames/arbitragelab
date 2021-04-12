@@ -156,7 +156,7 @@ class OUModelJurek:
         return mu, k, sigma
 
 
-    def _spread_calc(self, prices: pd.DataFrame) -> tuple:
+    def spread_calc(self, prices: pd.DataFrame) -> tuple:
         """
         This method calculates the spread on test data using the scaled weights from training data.
 
@@ -228,7 +228,7 @@ class OUModelJurek:
         self.gamma = gamma
         self.beta = beta
 
-        tau, S = self._spread_calc(prices)
+        tau, S = self.spread_calc(prices)
 
         W = np.ones(len(tau))  # Wealth is normalized to one
 
@@ -315,7 +315,7 @@ class OUModelJurek:
         self.beta = beta
 
         # Calculating the time left array and the spread
-        tau, S = self._spread_calc(prices)
+        tau, S = self.spread_calc(prices)
 
         if self.gamma == 1:
             #  Calculation of A and B functions are not done in case of gamma = 1 (Refer Appendix A.1 and B.2)
@@ -799,6 +799,7 @@ class OUModelJurek:
         return output
 
 
+# pylint: disable=too-many-arguments, too-many-statements
     def plot_results(self, prices: pd.DataFrame, num_test_windows: int = 5, delta_t: float = 1 / 252, utility_type: int = 1,
                      gamma: float = 10, beta: float = 0.01, r: float = 0.05, f: float = 0.1, figsize: tuple = (8, 4), fontsize: int = 8):
         """
@@ -808,6 +809,9 @@ class OUModelJurek:
 
         For example, if the total data is of length 16 years, with the number of test windows set to 5,
         the length of training data would be 16 - (5 + 1) = 10. (The last year is not considered for testing).
+
+        This method plots the stabilization region, optimal portfolio weights with and without fund flows, and the
+        evolution of the wealth process with initial wealth normalized to 1.
 
         :param prices: (pd.DataFrame) Contains price series of both stocks in spread with dates as index.
         :param num_test_windows: (int) Number of out of sample testing windows to plot.
@@ -846,8 +850,12 @@ class OUModelJurek:
         # Initializing a dataframe which stores optimal weights in the case with fund flows
         optimal_fund_flows_result_dataframe = pd.DataFrame(index=prices.loc[str(years[-(num_test_windows + 1)]):
                                                                           str(years[-1])].index, columns=['Weights'])
+        # Initializing a dataframe which stores wealth
+        wealth_dataframe = pd.DataFrame(index=prices.loc[str(years[-(num_test_windows + 1)]):str(years[-1])].index,
+                                                columns=['Wealth'])
 
         ind = 0
+        W_initial = 1 # Initial wealth normalized to 1
         # Iterating over the test windows
         for year in np.arange(years[-(num_test_windows + 1)], years[-1], 1):
 
@@ -864,10 +872,29 @@ class OUModelJurek:
             S, min_bound, max_bound = self.stabilization_region(data_test_dataframe, gamma=gamma,
                                                                 utility_type=utility_type, beta=beta, r=r)
 
+            W = np.zeros(len(data_test_dataframe))
+            W[0] = W_initial
+
+            if utility_type == 1:
+                for i in range(len(data_test_dataframe) - 1):
+                    # Calculating the wealth process for CRRA investor. Follows equation (3) in Appendix A
+                    W[i + 1] = W[i] + W[i] * optimal_weights[i] * (S[i + 1] - S[i]) + r * W[i] * (
+                                1 - optimal_weights[i] * S[i]) * delta_t
+            else:
+                for i in range(len(data_test_dataframe) - 1):
+                    # Calculating the wealth process for investor with intermediate consumption
+                    # Follows equation (39) in Appendix A
+                    # Here we add an extra term which denotes consumption
+                    W[i + 1] = W[i] + W[i] * optimal_weights[i] * (S[i + 1] - S[i]) + r * W[i] * (
+                                1 - optimal_weights[i] * S[i]) * delta_t - beta * W[i] * delta_t
+
+            W_initial = W[-1]
+
             # Adding the final results to their corresponding dataframes for each test window
             stab_result_dataframe.iloc[ind:ind + len(S), :] = np.array([S, min_bound, max_bound]).T
             optimal_result_dataframe.iloc[ind:ind + len(S), :] = np.array([optimal_weights]).T
             optimal_fund_flows_result_dataframe.iloc[ind:ind + len(S), :] = np.array([optimal_fund_flow_weights]).T
+            wealth_dataframe.iloc[ind:ind + len(S), :] = np.array([W]).T
             ind += len(S)
 
         # Plotting the stabilization bound plot
@@ -889,4 +916,11 @@ class OUModelJurek:
         ax.xaxis.grid(color='grey', linestyle=':', linewidth=0.6)
         ax.set_ylabel('Optimal Weights with fund flows')
         ax.set_title('Optimal allocation to the spread asset with fund flows scaled by wealth')
+        plt.show()
+
+        # Plotting the wealth plot
+        ax = wealth_dataframe.plot(style=['c-'], legend=False, linewidth=1.0, figsize=figsize)
+        ax.xaxis.grid(color='grey', linestyle=':', linewidth=0.6)
+        ax.set_ylabel('Wealth')
+        ax.set_title('Evolution of wealth over lifetime of simulation, with initial wealth normalized to 1')
         plt.show()

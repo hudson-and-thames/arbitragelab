@@ -298,6 +298,7 @@ class TestOUModelJurek(unittest.TestCase):
 
         # Using a different dataset with at least 10 years of data
         sc_jurek.plot_results(self.shell_rdp_data)
+        sc_jurek.plot_results(self.shell_rdp_data, utility_type=2)
 
         # Assert plt.figure got called
         assert mock_plt.show.called

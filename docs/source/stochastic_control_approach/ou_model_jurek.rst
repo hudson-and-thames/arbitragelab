@@ -263,7 +263,7 @@ this flow to commensurately decrease the amount of risk taken on by the underlyi
 How to use this submodule
 #########################
 
-This submodule contains five public methods, of which two methods are necessary to calculate the optimal weights.
+This submodule contains seven public methods, of which two methods are necessary to calculate the optimal weights.
 The first method is for estimating the parameters of the model
 using training data, and the second method is for calculating the final optimal portfolio weights using evaluation data.
 
@@ -328,8 +328,13 @@ Implementation
 .. automethod:: OUModelJurek.optimal_portfolio_weights
 
 .. note::
-    The output of the `optimal_portfolio_weights` method is the portfolio weights of the spread scaled w.r.t initial wealth.
+    The output of the ``optimal_portfolio_weights`` method is the portfolio weights of the spread scaled w.r.t wealth.
 
+
+.. tip::
+    The ``spread_calc`` method can be used to calculate the spread on the test data.
+
+    .. automethod:: OUModelJurek.spread_calc
 
 Step 3: Stabilization Region
 ****************************
@@ -363,7 +368,7 @@ Implementation
 
 
 .. note::
-    The output of the `optimal_portfolio_weights_fund_flows` is the portfolio weights of the spread scaled w.r.t initial wealth.
+    The output of the ``optimal_portfolio_weights_fund_flows`` method is the portfolio weights of the spread scaled w.r.t wealth.
 
 
 .. figure:: images/optimal_weights_fund_flows.png
@@ -378,7 +383,7 @@ Implementation
 Step 5: Plotting
 ****************
 
-In this optional step, we can plot the stabilization regions and optimal portfolio weights.
+In this optional step, we can plot the stabilization region, optimal portfolio weights and the evolution of wealth.
 
 Implementation
 ==============

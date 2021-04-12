@@ -102,7 +102,7 @@ Finally, the optimal weights are given by,
 How to use this submodule
 #########################
 
-This submodule contains two public methods. One for estimating the parameters of the model using training data,
+This submodule contains three public methods. One for estimating the parameters of the model using training data,
 and the second method is for calculating the final optimal portfolio weights using evaluation data.
 
 Step 1: Model fitting
@@ -152,6 +152,12 @@ Implementation
 ==============
 
 .. automethod:: OUModelMudchanatongsuk.optimal_portfolio_weights
+
+
+.. tip::
+    The ``spread_calc`` method can be used to calculate the spread on the test data.
+
+    .. automethod:: OUModelMudchanatongsuk.spread_calc
 
 
 Example
