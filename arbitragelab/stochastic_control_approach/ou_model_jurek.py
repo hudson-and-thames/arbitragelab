@@ -800,7 +800,7 @@ class OUModelJurek:
 
 
     def plot_results(self, prices: pd.DataFrame, num_test_windows: int = 5, delta_t: float = 1 / 252, utility_type: int = 1,
-                     gamma: float = 10, beta: float = 0.01, r: float = 0.05, f: float = 0.1):
+                     gamma: float = 10, beta: float = 0.01, r: float = 0.05, f: float = 0.1, figsize: tuple = (8, 4), fontsize: int = 8):
         """
         Method plots out of sample performance of the model on specified number of test windows.
         We use a backward looking rolling window as training data and its size depends on the number of test windows chosen.
@@ -817,10 +817,12 @@ class OUModelJurek:
         :param beta: (float) Subjective rate of time preference. (Only required for utility_type = 2).
         :param r: (float) Rate of Returns.
         :param f: (float) Coefficient of proportionality (assumed to be positive).
+        :param figsize: (tuple) Input to matplotlib figsize parameter for plotting.
+        :param fontsize: (int) general matplotlib font size for plotting.
         """
 
         # Setting font size of plots
-        plt.rcParams.update({'font.size': 8})
+        plt.rcParams.update({'font.size': fontsize})
 
         # Price series preprocessing
         prices = prices.ffill()
@@ -869,21 +871,21 @@ class OUModelJurek:
             ind += len(S)
 
         # Plotting the stabilization bound plot
-        ax = stab_result_dataframe.plot(style=['c-', 'r:', 'r:'], legend=False, linewidth=1.0, figsize=(8, 4))
+        ax = stab_result_dataframe.plot(style=['c-', 'r:', 'r:'], legend=False, linewidth=1.0, figsize=figsize)
         ax.xaxis.grid(color='grey', linestyle=':', linewidth=0.6)
         ax.set_ylabel('Spread')
         ax.set_title("Evolution of spread with stabilization bound")
         plt.show()
 
         # Plotting the optimal weights allocation plot
-        ax = optimal_result_dataframe.plot(style=['c-'], legend=False, linewidth=1.0, figsize=(8, 4))
+        ax = optimal_result_dataframe.plot(style=['c-'], legend=False, linewidth=1.0, figsize=figsize)
         ax.xaxis.grid(color='grey', linestyle=':', linewidth=0.6)
         ax.set_ylabel('Optimal Weights')
         ax.set_title('Optimal allocation to the spread asset scaled by wealth')
         plt.show()
 
         # Plotting the optimal weights allocation plot in the case with fund flows
-        ax = optimal_fund_flows_result_dataframe.plot(style=['c-'], legend=False, linewidth=1.0, figsize=(8, 4))
+        ax = optimal_fund_flows_result_dataframe.plot(style=['c-'], legend=False, linewidth=1.0, figsize=figsize)
         ax.xaxis.grid(color='grey', linestyle=':', linewidth=0.6)
         ax.set_ylabel('Optimal Weights with fund flows')
         ax.set_title('Optimal allocation to the spread asset with fund flows scaled by wealth')
