@@ -327,6 +327,10 @@ Implementation
 
 .. automethod:: OUModelJurek.optimal_portfolio_weights
 
+.. note::
+    The output of the `optimal_portfolio_weights` method is the portfolio weights of the spread scaled w.r.t initial wealth.
+
+
 Step 3: Stabilization Region
 ****************************
 
@@ -356,6 +360,10 @@ Implementation
 ==============
 
 .. automethod:: OUModelJurek.optimal_portfolio_weights_fund_flows
+
+
+.. note::
+    The output of the `optimal_portfolio_weights_fund_flows` is the portfolio weights of the spread scaled w.r.t initial wealth.
 
 
 .. figure:: images/optimal_weights_fund_flows.png
