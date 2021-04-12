@@ -37,7 +37,9 @@ class PearsonStrategy:
         self.short_stocks = None  # Stocks having lowest values of return differences
         self.long_stocks = None  # Stocks having highest values of return differences
         self.return_diff_sorted = None  # Sorted dictionary of return difference in the test period
-        self.normalized_prices = None  # Normalized prices of the train data
+        self.test_monthly_return = None  # Monthly return dataset in test period
+        self.trading_signal = None  # Trading signal dataframe
+        self.mean_return = None # Average return of monthly portfolio in test period
 
         devadarsh.track('PearsonStrategy')
 
@@ -72,16 +74,16 @@ class PearsonStrategy:
         """
 
         # Preprocess data to get monthly return from daily price data
-        self.data_preprocess(train_data, risk_free)
+        self._data_preprocess(train_data, risk_free)
 
         # Calculating beta and getting pairs in the formation period
-        self.beta_pairs_formation(num_pairs, weight)
+        self._beta_pairs_formation(num_pairs, weight)
 
         # Build portfolio based on the return difference in the last period
         last_month = self.monthly_return.iloc[-1, :]
 
         # Calculate the return differences of all stocks in the train data
-        return_diff_dict = self.calculate_return_diff(last_month)
+        return_diff_dict = self._calculate_return_diff(last_month)
 
         # Sort the dictionary based on the return differences value
         self.return_diff_sorted = {k: v for k, v in sorted(return_diff_dict.items(), key=lambda item: item[1])}
@@ -95,8 +97,117 @@ class PearsonStrategy:
         # Stocks with top 10% value of the return differences should be longed
         self.long_stocks = dict(itertools.islice(self.return_diff_sorted.items(), int(num_stocks * 0.9), num_stocks))
 
-    def trade_pairs(self, test_data, methods):
+    def trade_portfolio(self, test_data, test_risk_free=None):
+        """
+        Trade portfolios by generating trading signals in the test data.
 
+        In each month in the test period, all stocks are sorted in descending order based on their previous month’s
+        return divergence from its pairs portfolio created in the formation period and split into ten deciles. Then a
+        dollar-neutral portfolio is constructed by longing decile 10 and shorting decile 1 and holding the portfolio
+        for the next one month.
+
+        By repeating steps above for the rest of the test period, this method calculates the average return of the
+        portfolio for each month of the period.
+
+        :param test_data: (pd.DataFrame) Daily price data with date in its index and stocks in its columns.
+        :param test_risk_free: (pd.Series) Daily risk free rate data with date in its index.
+        """
+
+        # Preprocess test data
+        self._data_preprocess(test_data, test_risk_free, phase='test')
+
+        # Get trading signals for the last month of training period
+        trading_signal = self._find_trading_signals(self.test_monthly_return)
+
+        # Get trading signals for the test data
+        self.trading_signal = self._find_trading_signals(self.test_monthly_return, trading_signal=trading_signal)
+
+        # Calculating return for a given dataset
+        return_dataframe = self.trading_signal * self.test_monthly_return
+
+        self.mean_return = return_dataframe.mean(axis=1)
+
+    def _find_trading_signals(self, monthly_return, trading_signal=None):
+        """
+        A helper function for finding trading signals.
+
+        This method comprises two steps: First, by copying the monthly return dataframe in the test period,
+        make sure that the trading signal is having the same index with monthly return dataframe. Next,
+        by calculating the previous month’s return divergence for each of the stock, decide its position in the next
+        month.
+
+        :param monthly_return: (pd.DataFrame) A monthly return dataframe.
+        :param trading_signal: (pd.DataFrame) A dataframe of trading signal with multi index of year and month.
+        :return: (pd.DataFrame) Generated trading signals with multi index of year and month.
+        """
+
+        # If trading signal is not yet created, create one based on the monthly return dataframe
+        if trading_signal is None:
+
+            # Make a copy of monthly return to generate trading signal
+            trading_signal = monthly_return.copy()
+
+            # Decide the trading signal for the first month of the test period
+            month = trading_signal.index[0]
+
+            # 1 if stock has long position, -1 if it has short position and 0 if nothing.
+            for stock in trading_signal.columns:
+
+                if stock in self.short_stocks.keys():
+                    trading_signal.loc[month, stock] = -1
+
+                elif stock in self.long_stocks.keys():
+                    trading_signal.loc[month, stock] = 1
+
+                else:
+                    trading_signal.loc[month, stock] = 0
+        else:
+
+            # Calculate the rest of the trading signals in the test peirod
+            for i in range(0, len(trading_signal) - 1):
+
+                prev_month = trading_signal.index[i]
+
+                trading_month = trading_signal.index[i + 1]
+
+                prev_month_return = monthly_return.loc[prev_month, :]
+
+                return_diff_dict = self._calculate_return_diff(prev_month_return)
+
+                # Sort the dictionary based on the return differences value
+                return_diff_sorted = {k: v for k, v in sorted(return_diff_dict.items(), key=lambda item: item[1])}
+
+                # Get the number of stocks to get two different portfolios
+                num_stocks = len(return_diff_sorted)
+
+                # Stocks with bottom 10% value of the return differences should be shorted
+                short_stocks = dict(itertools.islice(return_diff_sorted.items(), 0, int(num_stocks * 0.1)))
+
+                # Stocks with top 10% value of the return differences should be longed
+                long_stocks = dict(itertools.islice(return_diff_sorted.items(), int(num_stocks * 0.9), num_stocks))
+
+                for stock in trading_signal.columns:
+
+                    if stock in short_stocks.keys():
+                        trading_signal.loc[trading_month, stock] = -1
+
+                    elif stock in long_stocks.keys():
+                        trading_signal.loc[trading_month, stock] = 1
+
+                    else:
+                        trading_signal.loc[trading_month, stock] = 0
+
+        return trading_signal
+
+    def get_trading_signal(self):
+        """
+        Outputs trading signal in monthly basis. 1 for a long position, -1 for a short position and 0 for closed
+        position.
+
+        :return: (pd.DataFrame) A dataframe with multi index of year and month for given test period.
+        """
+
+        return self.trading_signal
 
     def get_short_stocks(self):
         """
@@ -124,23 +235,23 @@ class PearsonStrategy:
 
         return self.return_diff_sorted
 
-    def _data_preprocess(self, train_data, risk_free):
+    def _data_preprocess(self, price_data, risk_free, phase='train'):
         """
         Preprocess train data and risk free data.
 
         As monthly return data is used to calculate the beta and Pearson correlation in the formation period,
         it is needed to preprocess the train data and risk free data.
 
-        :param train_data: (pd.DataFrame) Daily price data with date in its index and stocks in its columns.
+        :param price_data: (pd.DataFrame) Daily price data with date in its index and stocks in its columns.
         :param risk_free: (pd.Series) Daily risk free rate data with date in its index.
+        :param phase: (str)
         """
 
         # Calculate normalized prices with mean and standard deviation
-        data_copy = train_data.copy()
-        self.normalized_prices = (data_copy - data_copy.mean()) / (data_copy.std())
+        data_copy = price_data.copy()
 
         # Change the daily price data into daily return by calculating the percent change
-        daily_return = train_data.pct_change()
+        daily_return = data_copy.pct_change()
 
         # Change the index of the train data into string to group by months later
         daily_return.index = daily_return.index.map(lambda x: pd.to_datetime(str(x)))
@@ -151,9 +262,22 @@ class PearsonStrategy:
         # Calculate monthly return for the given data
         monthly_return = daily_return.groupby([daily_return.index.year, daily_return.index.month]).prod()
 
-        self.monthly_return = monthly_return
+        # Rename the multi index
+        monthly_return.index.names = ["Year", "Month"]
 
-        if risk_free is not None:
+        if phase == 'train':
+            self.monthly_return = monthly_return
+
+        elif phase == 'test':
+            self.test_monthly_return = monthly_return
+
+        if risk_free is None:
+
+            # If risk free data is not given, use zero rate instead
+            self.risk_free = pd.Series(data=[0 for _ in range(len(monthly_return.index))], name='risk_free',
+                                       index=monthly_return.index)
+        else:
+
             # Get risk free rate
             risk_free = risk_free.rename('risk_free')
             risk_free.index = risk_free.index.map(lambda x: pd.to_datetime(str(x)))
@@ -163,9 +287,10 @@ class PearsonStrategy:
 
     def _beta_pairs_formation(self, num_pairs, weight):
         """
+        Calculate beta, a coefficient of measuring return divergence, in the formation period and form pairs.
 
-        :param num_pairs:
-        :param weight: (str) Weighting Scheme for portfolio returns [``equal`` by default, ``correlation``].        :return:
+        :param num_pairs: (int) Number of top pairs to use for portfolio formation.
+        :param weight: (str) Weighting Scheme for portfolio returns [``equal`` by default, ``correlation``].
         """
 
         # Make empty dictionaries for beta value and pairs for each stock
@@ -198,11 +323,11 @@ class PearsonStrategy:
 
                 # Find correlation values for pairs
                 corr_values = corr_matrix.loc[stock].loc[pairs].values
-                corr_values = corr_values/corr_values.sum()
+                corr_values = corr_values / corr_values.sum()
 
                 # Get pair return values
                 pairs_return = self.monthly_return.loc[:, pairs].values
-                portfolio_return = np.matmul(pairs_return, corr_values)
+                portfolio_return = np.matmul(pairs_return, corr_values).reshape((-1, 1))
 
             # Use linear regression to get regression coefficient of two returns
             model = LinearRegression().fit(portfolio_return, stock_return)
@@ -217,8 +342,8 @@ class PearsonStrategy:
     def _calculate_return_diff(self, last_month):
         """
 
-        :param last_month:
-        :return:
+        :param last_month: (pd.Series) A series of monthly return to calculate the return divergence.
+        :return: (dict) A dictionary with stocks with its key and return divergence in its values.
         """
 
         # Make a dictionary for return difference
