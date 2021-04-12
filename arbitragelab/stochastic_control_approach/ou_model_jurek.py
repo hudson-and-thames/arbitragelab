@@ -178,7 +178,7 @@ class OUModelJurek:
 
 
     def optimal_portfolio_weights(self, prices: pd.DataFrame, utility_type: int = 1, gamma: float = 1,
-                                  beta: float = 0.1, r: float = 0.05) -> np.array:
+                                  beta: float = 0.01, r: float = 0.05) -> np.array:
         """
         Implementation of Theorem 1 and Theorem 2 in Jurek (2007).
 
@@ -288,7 +288,7 @@ class OUModelJurek:
         return (1 / (1 + f)) * N
 
 
-    def stabilization_region(self, prices: pd.DataFrame, utility_type: int = 1, gamma: float = 1, beta: float = 0.1, r: float = 0.05) -> tuple:
+    def stabilization_region(self, prices: pd.DataFrame, utility_type: int = 1, gamma: float = 1, beta: float = 0.01, r: float = 0.05) -> tuple:
         """
         Implementation of Theorem 3 in Jurek (2007).
 
@@ -800,7 +800,7 @@ class OUModelJurek:
 
 
     def plot_results(self, prices: pd.DataFrame, num_test_windows: int = 5, delta_t: float = 1 / 252, utility_type: int = 1,
-                     gamma: float = 10, beta: float = 0.1, r: float = 0.05, f: float = 0.1):
+                     gamma: float = 10, beta: float = 0.01, r: float = 0.05, f: float = 0.1):
         """
         Method plots out of sample performance of the model on specified number of test windows.
         We use a backward looking rolling window as training data and its size depends on the number of test windows chosen.
