@@ -799,9 +799,9 @@ class OUModelJurek:
         return output
 
 
-# pylint: disable=too-many-arguments, too-many-statements
     def plot_results(self, prices: pd.DataFrame, num_test_windows: int = 5, delta_t: float = 1 / 252, utility_type: int = 1,
                      gamma: float = 10, beta: float = 0.01, r: float = 0.05, f: float = 0.1, figsize: tuple = (8, 4), fontsize: int = 8):
+        # pylint: disable=too-many-arguments, too-many-statements
         """
         Method plots out of sample performance of the model on specified number of test windows.
         We use a backward looking rolling window as training data and its size depends on the number of test windows chosen.
@@ -855,7 +855,7 @@ class OUModelJurek:
                                                 columns=['Wealth'])
 
         ind = 0
-        W_initial = 1 # Initial wealth normalized to 1
+        W_initial = 1  # Initial wealth normalized to 1
         # Iterating over the test windows
         for year in np.arange(years[-(num_test_windows + 1)], years[-1], 1):
 

@@ -293,7 +293,7 @@ class OUModelMudchanatongsuk:
         :return: (float) Half life.
         """
 
-        return np.log(2) / k  # Half life of shocks.
+        return np.log(2) / k  # Half life of shocks
 
 
     def describe(self) -> pd.Series:
