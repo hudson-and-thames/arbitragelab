@@ -22,6 +22,7 @@ class DistanceStrategy:
     in "Pairs trading:  Performance of a relative-value arbitrage rule." (2006)
     https://papers.ssrn.com/sol3/papers.cfm?abstract_id=141615.
     """
+
     def __init__(self):
         """
         Initialize Distance strategy.
@@ -34,11 +35,14 @@ class DistanceStrategy:
         self.train_std = None  # Historical volatility for each chosen pair portfolio
         self.normalized_data = None  # Normalized test dataset
         self.portfolios = None  # Pair portfolios composed from test dataset
+        self.train_portfolio = None  # Pair portfolios composed from train dataset
         self.trading_signals = None  # Final trading signals
+        self.num_crossing = None  # Number of zero crossings from train dataset
 
         devadarsh.track('DistanceStrategy')
 
-    def form_pairs(self, train_data, num_top=5, skip_top=0, list_names=None):
+    def form_pairs(self, train_data, method='standard', industry_dict=None, num_top=5, skip_top=0, selection_pool=50,
+                   list_names=None):
         """
         Forms pairs based on input training data.
 
@@ -51,6 +55,9 @@ class DistanceStrategy:
         prices that would have a minimum sum of square differences between normalized prices.
         Only unique pairs are picked in this step (pairs ('AA', 'BD') and ('BD', 'AA') are assumed
         to be one pair ('AA', 'BD')).
+        During this step, if one decides to match pairs within the same industry group, with the
+        industry dictionary given, the sum of square differences is calculated only for the pairs
+        of prices within the same industry group.
 
         Third, based on the desired number of top pairs to chose and the pairs to skip, they are
         taken from the list of created pairs in the previous step. Pairs are sorted so that ones
@@ -71,6 +78,10 @@ class DistanceStrategy:
         :param skip_top: (int) Number of first top pairs to skip. For example, use skip_top=10
             if you'd like to take num_top pairs starting from the 10th one.
         :param list_names: (list) List containing names of elements if Numpy array is used as input.
+        :param method: (str) Methods to use for sorting pairs [``standard`` by default, ``variance``,
+                             ``zero_crossing``].
+        :param selection_pool: (int) Number of pairs to use before sorting them with the selection method.
+        :param industry_dict: (dict) Dictionary matching ticker to industry group.
         """
 
         # If np.array given as an input
@@ -83,14 +94,77 @@ class DistanceStrategy:
         # Dropping observations with missing values (for distance calculation)
         normalized = normalized.dropna(axis=0)
 
-        # Finding closest pairs for each element, excluding duplicates
-        all_pairs = self.find_pair(normalized)
+        # If industry dictionary is given, pairs are matched within the same industry group
+        all_pairs = self.find_pair(normalized, industry_dict)
 
         # Choosing needed pairs to construct a portfolio
-        self.pairs = self.sort_pairs(all_pairs, num_top, skip_top)
+        self.pairs = self.sort_pairs(all_pairs, selection_pool)
 
         # Calculating historical volatility of pair portfolios (diffs of normalized prices)
         self.train_std = self.find_volatility(normalized, self.pairs)
+
+        # Creating portfolios for pairs chosen in the pairs formation stage with train dataset
+        self.train_portfolio = self.find_portfolios(normalized, self.pairs)
+
+        # Calculating the number of zero crossings from the dataset
+        self.num_crossing = self.count_number_crossing()
+
+        # In case of a selection method other than standard or industry is used, sorting paris
+        # based on the method
+        self.selection_method(method, num_top, skip_top)
+
+        # Storing only the necessary values for pairs selected in the above
+        self.num_crossing = {pair: self.num_crossing[pair] for pair in self.pairs}
+        self.train_std = {pair: self.train_std[pair] for pair in self.pairs}
+        self.train_portfolio = self.train_portfolio[self.train_portfolio.columns
+                                                        .intersection([str(pair) for pair in self.pairs])]
+
+    def selection_method(self, method, num_top, skip_top):
+        """
+        Select pairs based on the method. This module helps sorting selected pairs for the given method
+        in the formation period.
+
+        :param method: (str) Methods to use for sorting pairs [``standard`` by default, ``variance``,
+                             ``zero_crossing``].
+        :param num_top: (int) Number of top pairs to use for portfolio formation.
+        :param skip_top:(int) Number of first top pairs to skip. For example, use skip_top=10
+            if you'd like to take num_top pairs starting from the 10th one.
+        """
+
+        if method not in ['standard', 'zero_crossing', 'variance']:
+            # Raise an error if the given method is inappropriate.
+            raise Exception("Please give an appropriate method for sorting pairs between ‘standard’, "
+                            "‘zero_crossing’, or 'variance'")
+
+        if method == 'standard':
+
+            self.pairs = self.pairs[skip_top:(skip_top + num_top)]
+
+        elif method == 'zero_crossing':
+
+            # Sorting pairs from the dictionary by the number of zero crossings in a descending order
+            sorted_pairs = sorted(self.num_crossing.items(), key=lambda x: x[1], reverse=True)
+
+            # Picking top pairs
+            pairs_selected = sorted_pairs[skip_top:(skip_top + num_top)]
+
+            # Removing the number of crossings, so we have only tuples with elements
+            pairs_selected = [x[0] for x in pairs_selected]
+
+            self.pairs = pairs_selected
+
+        else:
+
+            # Sorting pairs from the dictionary by the size of variance in a descending order
+            sorted_pairs = sorted(self.train_std.items(), key=lambda x: x[1], reverse=True)
+
+            # Picking top pairs
+            pairs_selected = sorted_pairs[skip_top:(skip_top + num_top)]
+
+            # Removing the variance, so we have only tuples with elements
+            pairs_selected = [x[0] for x in pairs_selected]
+
+            self.pairs = pairs_selected
 
     def trade_pairs(self, test_data, divergence=2):
         """
@@ -182,12 +256,55 @@ class DistanceStrategy:
 
     def get_pairs(self):
         """
-        Outputs pairs that were created in the pairs formation step.
+        Outputs pairs that were created in the pairs formation step and sorted by the method.
 
         :return: (list) List containing tuples of two strings, for names of elements in a pair.
         """
 
         return self.pairs
+
+    def get_num_crossing(self):
+        """
+        Outputs pairs that were created in the pairs formation step with its number of zero crossing.
+
+        :return: (dict) Dictionary with keys as pairs and values as the number of zero
+            crossings for pairs.
+        """
+
+        return self.num_crossing
+
+    def count_number_crossing(self):
+        """
+        Calculate the number of zero crossings for the portfolio dataframe generated with train dataset.
+
+        As the number of zero crossings in the formation period does have some usefulness in predicting
+        future convergence, this method calculates the number of times the normalized spread crosses the
+        value zero which measures the frequency of divergence and convergence between two securities.
+
+        :return: (dict) Dictionary with keys as pairs and values as the number of zero
+            crossings for pairs.
+        """
+
+        # Creating a dictionary for number of zero crossings
+        num_zeros_dict = {}
+
+        # Iterating through pairs
+        for pair in self.train_portfolio:
+            # Getting names of individual elements from dataframe column names
+            pair_val = pair.strip('\')(\'').split('\', \'')
+            pair_val = tuple(pair_val)
+
+            # Check if portfolio price crossed zero
+            portfolio = self.train_portfolio[pair].to_frame()
+            pair_mult = portfolio * portfolio.shift(1)
+
+            # Get the number of zero crossings for the portfolio
+            num_zero_crossings = len(portfolio[pair_mult.iloc[:, 0] <= 0].index)
+
+            # Adding the pair's number of zero crossings to the dictionary
+            num_zeros_dict[pair_val] = num_zero_crossings
+
+        return num_zeros_dict
 
     def plot_portfolio(self, num_pair):
         """
@@ -262,7 +379,7 @@ class DistanceStrategy:
         return normalized, min_values, max_values
 
     @staticmethod
-    def find_pair(data):
+    def find_pair(data, industry_dict=None):
         """
         Finds the pairs with smallest distances in a given dataframe.
 
@@ -271,6 +388,7 @@ class DistanceStrategy:
         order. So pairs ('AA', 'BC') and ('BC', 'AA') are treated as one pair ('AA', 'BC').
 
         :param data: (pd.DataFrame) Dataframe with normalized price series.
+        :param industry_dict: (dictionary) Dictionary matching ticker to industry group.
         :return: (dict) Dictionary with keys as closest pairs and values as their distances.
         """
 
@@ -283,6 +401,16 @@ class DistanceStrategy:
             # Removing the chosen element from the dataframe
             data_excluded = data.drop([ticker], axis=1)
 
+            # Removing tickers in different industry group if the industry dictionary is given
+            if industry_dict is not None:
+                # Getting the industry group for the ticker
+                industry_group = industry_dict[ticker]
+                # Getting the tickers within the same industry group
+                tickers_same_industry = [ticker for ticker, industry in industry_dict.items()
+                                         if industry == industry_group]
+                # Removing other tickers in different industry group
+                data_excluded = data_excluded.loc[:, data_excluded.columns.isin(tickers_same_industry)]
+
             # Calculating differences between prices
             data_diff = data_excluded.sub(data[ticker], axis=0)
 
@@ -291,7 +419,6 @@ class DistanceStrategy:
 
             # Iterating through second elements
             for second_element in sum_sq_diff.index:
-
                 # Adding all new pairs to the dictionary
                 pairs[tuple(sorted((ticker, second_element)))] = sum_sq_diff[second_element]
 
@@ -343,7 +470,6 @@ class DistanceStrategy:
 
         # Iterating through pairs of elements
         for pair in pairs:
-
             # Getting two price series for elements in a pair
             par = data[list(pair)]
 
@@ -378,7 +504,6 @@ class DistanceStrategy:
 
         # Iterating through pairs
         for pair in pairs:
-
             # Getting two price series for elements in a pair
             par = data[list(pair)]
 
@@ -410,7 +535,7 @@ class DistanceStrategy:
 
         :param portfolios: (pd.DataFrame) Dataframe with portfolio price series for pairs.
         :param variation: (dict) Dictionary with keys as pairs and values as the
-            historical standard variation of their pair portfolio.
+            historical standard deviations of their pair portfolio.
         :param divergence: (float) Number of standard deviations used to open a position.
         :return: (pd.DataFrame) Dataframe with target quantity to hold for each portfolio.
         """
@@ -420,7 +545,6 @@ class DistanceStrategy:
 
         # Iterating through pairs
         for pair in portfolios:
-
             # Getting names of individual elements from dataframe column names
             pair_val = pair.strip('\')(\'').split('\', \'')
             pair_val = tuple(pair_val)
