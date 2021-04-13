@@ -11,7 +11,9 @@ Method based on `Stübinger, J., Mangold, B. and Krauss, C., 2018. Statistical a
 from typing import List, Union, Callable, Tuple
 import pandas as pd
 import numpy as np
+
 from arbitragelab.copula_approach.vinecop_generate import CVineCop
+from arbitragelab.util import devadarsh
 
 
 class CVineCopStrat:
@@ -40,6 +42,8 @@ class CVineCopStrat:
                                                           2: {0: 0, 1: 1, -1: -1}})
         else:
             self.signal_to_position_table = signal_to_position_table
+
+        devadarsh.track('CVineCopStrat')
 
     def calc_mpi(self, returns: pd.DataFrame, cdfs: List[Callable], pv_target_idx: int = 1,
                  subtract_mean: bool = False) -> pd.Series:

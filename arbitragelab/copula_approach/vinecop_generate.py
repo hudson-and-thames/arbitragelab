@@ -15,6 +15,8 @@ import pandas as pd
 import pyvinecopulib as pv
 import scipy.integrate as integrate
 
+from arbitragelab.util import devadarsh
+
 
 class RVineCop:
     """
@@ -22,6 +24,10 @@ class RVineCop:
     """
 
     def __init__(self):
+        """
+        Initialize.
+        """
+
         pass
 
 
@@ -48,6 +54,8 @@ class CVineCop(RVineCop):
                               pv.BicopFamily.gaussian, pv.BicopFamily.gumbel, pv.BicopFamily.indep]
         # The pv.Vinecop being wrapped
         self.cvine_cop = cvine_cop
+
+        devadarsh.track('CVineCop')
 
     def fit_auto(self, data: pd.DataFrame, pv_target_idx: int = 1, if_renew: bool = True, alt_cvine_structure=False):
         """
@@ -121,7 +129,7 @@ class CVineCop(RVineCop):
         in [Stubinger et al. 2016].
 
         :param data_dim: (int) The number of stocks.
-        :param pv_target_idx: (int). The stock to be targeted for trading. This is indexed from 1, hence 1 corresponds
+        :param pv_target_idx: (int) The stock to be targeted for trading. This is indexed from 1, hence 1 corresponds
             to the 0th column data in a pandas data frame.
         :return: (List[tuple]) The list of all possible C-vine structures stored as tuples.
         """
@@ -150,7 +158,7 @@ class CVineCop(RVineCop):
         tuple, as claimed in [Stubinger et al. 2016]. For a tuple (4, 2, 1, 3), it says stock 4 is the targeted stock.
 
         :param data_dim: (int) The number of stocks.
-        :param pv_target_idx: (int). The stock to be targeted for trading. This is indexed from 1, hence 1 corresponds
+        :param pv_target_idx: (int) The stock to be targeted for trading. This is indexed from 1, hence 1 corresponds
             to the 0th column data in a pandas data frame.
         :return: (List[tuple]) The list of all possible C-vine structures stored as tuples.
         """
@@ -197,6 +205,7 @@ class CVineCop(RVineCop):
 
         # When the input is a pd.Dataframe
         condi_probs = u.apply(lambda row: self._get_condi_prob(row, pv_target_idx, eps), axis=1)
+
         # The result is a pd.Series with matching indices
         return condi_probs
 
@@ -268,6 +277,7 @@ class CVineCop(RVineCop):
         u_np = np.array(u)
         pdfs = self.cvine_cop.pdf(u_np, num_threads)
         pdfs_series = pd.Series(pdfs, index=u.index)
+
         # The result is a pd.Series with matching indices
         return pdfs_series
 
@@ -281,7 +291,6 @@ class CVineCop(RVineCop):
         :param u: (Union[pd.DataFrame, np.array]) The quantiles data to be used. The input can be a pandas dataframe,
             or a numpy array vector. The formal case yields the result with in pandas series in matching indices, and
             the latter yields a single float number.
-
         :return: (Union[pd.Series, float]) The calculated cdf. If the input is a dataframe then the result is a series
             with matching indices. If the input is a 1D np.array then the result is a float.
         """
@@ -297,10 +306,11 @@ class CVineCop(RVineCop):
         u_np = np.array(u)
         cdfs = self.cvine_cop.cdf(u_np)
         cdfs_series = pd.Series(cdfs, index=u.index)
+
         # The result is a pd.Series with matching indices
         return cdfs_series
 
-    def simulate(self, n: int, qrn: bool = False, num_threads: int = 1, seeds: List[int] = None) -> np.ndarray:
+    def simulate(self, n: int, qrn: bool = False, num_threads: int = 1, seeds: List[int] = None) -> np.array:
         """
         Simulate from a vine copula model.
 
@@ -308,8 +318,8 @@ class CVineCop(RVineCop):
         :param qrn: (bool) Optional. Set to True for quasi-random numbers. Defaults to False.
         :param num_threads: (int) Optional. The number of threads to use for calculation. Defaults to 1.
         :param seeds: (List[int]) Optional. Seeds of the random number generator. If empty then the random generator
-            will be seeded randomly. Defaults to [].
-        :return: (pd.ndarray) The generated random samples from the vine copula.
+            will be seeded randomly. Defaults to None.
+        :return: (pd.array) The generated random samples from the vine copula.
         """
 
         if seeds is None:
@@ -325,10 +335,10 @@ class CVineCop(RVineCop):
 
         :param u: (pd.DataFrame) The quantile data used for evaluation.
         :param num_threads: (int) Optional. The number of threads to use for calculation. Defaults to 1.
-        :return: (float) calculated AIC value.
+        :return: (float) Calculated AIC value.
         """
 
-        u_np = u.to_numpy()  # Transit to numpy ndarrays
+        u_np = u.to_numpy()  # Transit to numpy arrays
         aic_value = self.cvine_cop.aic(u_np, num_threads)
 
         return aic_value
@@ -339,10 +349,10 @@ class CVineCop(RVineCop):
 
         :param u: (pd.DataFrame) The quantile data used for evaluation.
         :param num_threads: (int) Optional. The number of threads to use for calculation. Defaults to 1.
-        :return: (float) calculated BIC value.
+        :return: (float) Calculated BIC value.
         """
 
-        u_np = u.to_numpy()  # Transit to numpy ndarrays
+        u_np = u.to_numpy()  # Transit to numpy arrays
         bic_value = self.cvine_cop.bic(u_np, num_threads)
 
         return bic_value
@@ -353,10 +363,10 @@ class CVineCop(RVineCop):
 
         :param u: (pd.DataFrame) The quantile data used for evaluation.
         :param num_threads: (int) Optional. The number of threads to use for calculation. Defaults to 1.
-        :return: (float) calculated sum of log-likelihood.
+        :return: (float) Calculated sum of log-likelihood.
         """
 
-        u_np = u.to_numpy()  # Transit to numpy ndarrays
+        u_np = u.to_numpy()  # Transit to numpy arrays
         loglik_value = self.cvine_cop.loglik(u_np, num_threads)
 
         return loglik_value
