@@ -9,9 +9,9 @@
 
     `A multivariate linear rank test of independence based on a multiparametric copula with cubic sections. (2015) <https://www.statistik.rw.fau.de/files/2016/03/IWQW-10-2015.pdf>`__ by Mangold, B.
 
-========================================
-Vine Copula Partner Selection Approaches
-========================================
+=============================
+Vine Copula Partner Selection
+=============================
 
 This module contains implementation of the four partner selection approaches
 mentioned in Section 3.1.1 of Statistical Arbitrage with Vine Copulas.

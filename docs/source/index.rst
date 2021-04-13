@@ -107,8 +107,8 @@ This project is licensed under an all rights reserved licence.
     copula_approach/mispricing_index_strategy
     copula_approach/vine_copula_intro
     copula_approach/cvine_copula_strategy
-    copula_approach/utility_functions
     copula_approach/partner_selection
+    copula_approach/utility_functions
 
 .. toctree::
     :maxdepth: 2

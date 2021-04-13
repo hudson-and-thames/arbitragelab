@@ -1,8 +1,8 @@
-.. _cvine_copula_strategy:
+.. _copula_approach-cvine_copula_strategy:
 
 
 .. note::
-   This document is an implementation of:
+    This document is an implementation of:
 
     Stübinger, J., Mangold, B. and Krauss, C. `Statistical arbitrage with vine copulas. <https://www.tandfonline.com/doi/pdf/10.1080/14697688.2018.1438642?casa_token=olPBPI2bc3IAAAAA:8QViZfM9C0pbxGrarr-BU-yO2Or_wkCF_Pvk4dJFppjNtFzWjfM7W14_oc_ztl_1csHe4gFfloEWyA>`__
     Quantitative Finance, 2018. 
@@ -69,12 +69,17 @@ We work with stocks' **daily returns data** exclusively.
 .. Note::
 
     Selecting trading candidates is a serious topic, and can largely determine if a strategy is profitable or
-    not. There are 4 methods proposed in [Stübinger et al. 2018]:
-    pairwise Spearman's rho, multi-dimensional Spearman's rho,
-    sum of distance in quantile plots to hyper-diagonal, and a copula-chi-square test for dependence.
+    not.
+    There are 4 methods proposed in [Stübinger et al. 2018]:
+
+    * pairwise Spearman's rho,
+    * multi-dimensional Spearman's rho,
+    * sum of distance in quantile plots to hyper-diagonal
+    * copula-chi-square test for dependence.
+
     Loosely speaking, the goal is to find stocks cohorts that are heavily dependent, such that a mean-reversion bet
     on relative mispricings is profitable.
-    For more details in implementation, please refer to [Vijay's document].
+    For more details in implementation, please refer to :ref:`Vine Copula Partner Selection<copula_approach-partner_selection>`.
     
 
 Suppose we have chosen a few cohorts and in each cohort it has a key stock element. We then need to turn the translate
@@ -85,7 +90,7 @@ We denote the pseudo-observations as :math:`u_i`'s, and they are all uniform in 
     :scale: 40 %
     :align: center
     
-    (Fig 1: Generate pseudo-observations or quantiles and marginal ECDFs from returns data.)
+    Fig 1: Generate pseudo-observations or quantiles and marginal ECDFs from returns data.
 
 
 Step 2: Figure out the C-vine Structure
@@ -144,7 +149,7 @@ value that fits best the data.
     :scale: 60 %
     :align: center
     
-    (Fig 2: Determine the C-vine structure by AIC or maximum likelihood. Picture from [Stübinger et al. 2018].)
+    Fig 2: Determine the C-vine structure by AIC or maximum likelihood. Picture from [Stübinger et al. 2018].
 
 Step 3: Probability Density
 ***************************
@@ -160,8 +165,8 @@ top of the tree). And the final probability density is their product.
     :scale: 50 %
     :align: center
     
-    (Fig 3: Determine the joint density :math:`f(u_1, u_2, u_3, u_4)` from the vine copula. Here the notation
-    :math:`f(x_1, x_2, x_3, x_4)` is okay since we start from the beginning only using quantiles data, so :math:`u_i = x_i`.)
+    Fig 3: Determine the joint density :math:`f(u_1, u_2, u_3, u_4)` from the vine copula. Here the notation
+    :math:`f(x_1, x_2, x_3, x_4)` is okay since we start from the beginning only using quantiles data, so :math:`u_i = x_i`.
 
 Step 4: Conditional Probability
 *******************************
@@ -227,7 +232,7 @@ Bollinger band's width.
     :scale: 25 %
     :align: center
     
-    (Fig 4: Positions of the target stock and the associated Bollinger Band.)
+    Fig 4: Positions of the target stock and the associated Bollinger Band.
 
 Now we total net positions for each key stock in each cohort. Then we formulate our dollar-neutral strategy by trading
 against a cheap broad-based market index such as SPY, similar to the method used in [Avellaneda and Lee, 2010].
@@ -244,7 +249,7 @@ used as a sanity check on whether our vine copula model is off.
     :scale: 40 %
     :align: center
     
-    (Fig 5: CMPI and cumulative log returns of the target stock. Their shape looks very similar.)
+    Fig 5: CMPI and cumulative log returns of the target stock. Their shape looks very similar.
 
 Comments
 ########
@@ -279,66 +284,67 @@ Implementation
 .. automodule:: arbitragelab.copula_approach.vinecop_strategy
         
     .. autoclass:: CVineCopStrat
-	:members: __init__, calc_mpi, get_positions_bollinger, get_cur_signal_bollinger, get_cur_pos_bollinger, positions_to_units_against_index
+        :members: __init__, calc_mpi, get_positions_bollinger, get_cur_signal_bollinger, get_cur_pos_bollinger, positions_to_units_against_index
 
 Example
-*******
+#######
 
 .. code-block::
 
-   # Importing the module and other libraries
-   from arbitragelab.copula_approach.vinecop_generate import CVineCop
-   from arbitragelab.copula_approach.vinecop_strategy import CVineCopStrat
-   from arbitragelab.copula_approach.copula_calculation import to_quantile
-   import pandas as pd
-   import numpy as np
+    # Importing the module and other libraries
+    import pandas as pd
+    import numpy as np
 
-   # Loading stocks data. Use 1 cohort for example: suppose stocks 'AAPL', 'MSFT', 'AMZN', 'FB'
-   # form the cohort, and 'AAPL' is the target stock.
-   sp500_returns = pd.read_csv('all_sp500_returns.csv', index_col='Dates', parse_dates=True)
-   returns_train = sp500_returns[['AAPL', 'MSFT', 'AMZN', 'FB']][:800]
-   returns_test = sp500_returns[['AAPL', 'MSFT', 'AMZN', 'FB']][800:1100]
-   
-   prices_aapl_spy = pd.read_csv('all_sp500_prices.csv',
-                                 index_col='Dates', parse_dates=True)[['AAPL', 'SPY']][800:1100]
-   
-   rts_train_quantiles, cdfs = to_quantile(returns_train)
-   rts_test_quantiles, _ = to_quantile(returns_train)
-   
-   # Instantiate a CVineCop (C-vine copula) class to fit
-   cvinecop = CVineCop
-   
-   # Fit C-vine automatically, 'AAPL' is the target stock
-   # Note that pv_target_idx is indexed from 1
-   vinecop_structure = cvinecop.fit_auto(data=rts_train_quantiles, pv_target_idx=1, if_renew=True)
-   # Print the vine copula structure as a sanity check. You can directly fit internally by just using
-   # cvinecop.fit_auto(data=rts_train_quantiles, pv_target_idx=1, if_renew=True) if you do not want to
-   # print structures.
-   print(vinecop_structure)
-   
-   # Instantiate a CVineCopStrat (trading) class from the fitted C-vine copula
-   cvstrat = CVineCopStrat(cvinecop)
-   
-   # Generate positions over the test data, return the Bollinger band for sanity check
-   # Note that the cdfs should be from the training set.
-   positions, bband = cvstrat.get_positions_bollinger(returns=returns_test, cdfs=cdfs,
-                                                      if_return_bollinger_band=True)
-   positions = positions.shift(1)  # Avoid look-back bias
-   
-   # Formulate units from the positions against the SPY index, with 100,000 dollar investment
-   units = cvstrat.positions_to_units_against_index(target_stock_prices=prices_aapl_spy['AAPL'],
-                                                    index_prices=prices_aapl_spy['SPY'],
-                                                    positions=positions,
-                                                    multiplier=100000)
+    from arbitragelab.copula_approach.vinecop_generate import CVineCop
+    from arbitragelab.copula_approach.vinecop_strategy import CVineCopStrat
+    from arbitragelab.copula_approach.copula_calculation import to_quantile
+
+    # Loading stocks data. Use 1 cohort for example: suppose stocks 'AAPL', 'MSFT', 'AMZN', 'FB'
+    # form the cohort, and 'AAPL' is the target stock.
+    sp500_returns = pd.read_csv('all_sp500_returns.csv', index_col='Dates', parse_dates=True)
+    returns_train = sp500_returns[['AAPL', 'MSFT', 'AMZN', 'FB']][:800]
+    returns_test = sp500_returns[['AAPL', 'MSFT', 'AMZN', 'FB']][800:1100]
+
+    prices_aapl_spy = pd.read_csv('all_sp500_prices.csv',
+                                  index_col='Dates', parse_dates=True)[['AAPL', 'SPY']][800:1100]
+
+    rts_train_quantiles, cdfs = to_quantile(returns_train)
+    rts_test_quantiles, _ = to_quantile(returns_train)
+
+    # Instantiate a CVineCop (C-vine copula) class to fit
+    cvinecop = CVineCop()
+
+    # Fit C-vine automatically, 'AAPL' is the target stock
+    # Note that pv_target_idx is indexed from 1
+    vinecop_structure = cvinecop.fit_auto(data=rts_train_quantiles, pv_target_idx=1, if_renew=True)
+    # Print the vine copula structure as a sanity check. You can directly fit internally by just
+    # using cvinecop.fit_auto(data=rts_train_quantiles, pv_target_idx=1, if_renew=True) if you
+    # do not want to print structures.
+    print(vinecop_structure)
+
+    # Instantiate a CVineCopStrat (trading) class from the fitted C-vine copula
+    cvstrat = CVineCopStrat(cvinecop)
+
+    # Generate positions over the test data, return the Bollinger band for sanity check
+    # Note that the cdfs should be from the training set.
+    positions, bband = cvstrat.get_positions_bollinger(returns=returns_test, cdfs=cdfs,
+                                                       if_return_bollinger_band=True)
+    positions = positions.shift(1)  # Avoid look-back bias
+
+    # Formulate units from the positions against the SPY index, with 100,000 dollar investment
+    units = cvstrat.positions_to_units_against_index(target_stock_prices=prices_aapl_spy['AAPL'],
+                                                     index_prices=prices_aapl_spy['SPY'],
+                                                     positions=positions,
+                                                     multiplier=100000)
 
 Research Notebooks
 ##################
 
-The following research notebook can be used to better understand the basic copula strategy.
+The following research notebook can be used to better understand the C-Vine copula strategy.
 
-* `Basic Copula Strategy`_
+* `C-Vine Copula Strategy`_
 
-.. _`Basic Copula Strategy`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Copula%20Approach/Copula_Strategy_Basic.ipynb
+.. _`C-Vine Copula Strategy`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Copula%20Approach/CVine_Copula_Strategy.ipynb
 
 References
 ##########

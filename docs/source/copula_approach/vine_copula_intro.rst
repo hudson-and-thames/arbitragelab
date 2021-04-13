@@ -1,4 +1,4 @@
-.. _vine_copula_intro:
+.. _copula_approach-vine_copula_intro:
 
 .. Note::
 
@@ -146,7 +146,7 @@ It turns out that this decomposition can be visualized in a graph structure as f
     :scale: 28 %
     :align: center
     
-    (Fig 1: A vine copula tree structure for 3 random variables.)
+    Fig 1: A vine copula tree structure for 3 random variables.
 
 Here every node stands for either joint density or marginal density, and bivariate copulas are used to
 connect the nodes. You can visualize them as trees and the leaves are on the top. All the leaves stand
@@ -166,7 +166,7 @@ They can be visualized as follows:
     :scale: 28 %
     :align: center
     
-    (Fig 2: R-vine, C-vine and D-vine.)
+    Fig 2: R-vine, C-vine and D-vine.
 
 For an R-vine, for each level of the tree, it needs to satisfy the following conditions:
 
@@ -186,7 +186,7 @@ For a D-vine, each tree is a *path*: there is one road that goes through all the
     :scale: 28 %
     :align: center
     
-    (Fig 3: C-vine and its tuple representation.)
+    Fig 3: C-vine and its tuple representation.
 
 The representation of a generic R-vine is slightly more complicated, and requires a lower triangular matrix (some places
 uses an upper triangular matrix for representation, and they are indeed identical).
@@ -196,9 +196,9 @@ Let's look at the following R-vine with 7 random variables for example:
     :scale: 50 %
     :align: center
     
-    (Fig 4: An R-vine tree. Picture from Dissmann, J., Brechmann, E.C., Czado, C. and Kurowicka, D., 2013. Selecting and
+    Fig 4: An R-vine tree. Picture from Dissmann, J., Brechmann, E.C., Czado, C. and Kurowicka, D., 2013. Selecting and
     estimating regular vine copulae and application to financial returns. Computational Statistics & Data Analysis, 59,
-    pp.52-69.)
+    pp.52-69.
 
 The R-vine tree in Fig 4 can be represented by the following matrix:
 
@@ -255,8 +255,8 @@ impose some structures for model interpretability.
     :scale: 40 %
     :align: center
     
-    (Fig 4: C_vine and D-vine tree. Picture from Brechmann, E. and Schepsmeier, U., 2013. Cdvine: 
-    Modeling dependence with c-and d-vine copulas in r. Journal of statistical software, 52(3), pp.1-27.)
+    Fig 5: C_vine and D-vine tree. Picture from Brechmann, E. and Schepsmeier, U., 2013. Cdvine:
+    Modeling dependence with c-and d-vine copulas in r. Journal of statistical software, 52(3), pp.1-27.
 
 C-vine and D-vine are the most commonly used ones in practice for dependence modeling.
 C-vine due to its star-like structure, is useful when we have a key variable that largely governs the variable interactions
@@ -349,58 +349,59 @@ Implementation
 .. automodule:: arbitragelab.copula_approach.vinecop_generate
         
     .. autoclass:: CVineCop
-	:members: __init__, fit_auto, get_condi_probs, get_cop_densities, get_cop_evals, simulate, aic, bic, loglik
+        :members: __init__, fit_auto, get_condi_probs, get_cop_densities, get_cop_evals, simulate, aic, bic, loglik
 
 Example
-*******
+#######
 
 .. code-block::
 
-   # Importing the module and other libraries
-   from arbitragelab.copula_approach.vinecop_generate import CVineCop
-   from arbitragelab.copula_approach.copula_calculation import to_quantile
-   import pandas as pd
-   import numpy as np
+    # Importing the module and other libraries
+    import pandas as pd
+    import numpy as np
 
-   # Loading stocks data
-   sp500_returns = pd.read_csv('all_sp500_returns.csv', index_col='Dates', parse_dates=True)
-   subsample_returns = sp500_returns[['AAPL', 'MSFT', 'AMZN', 'FB']]
-   subsample_rts_quantiles, _ = to_quantile(subsample_returns)
-   quantiles_example = pd.DataFrame([0.1, 0.2, 0.3, 0.8],
-                                    [0.5, 0.1, 0.9, 0.2])
+    from arbitragelab.copula_approach.vinecop_generate import CVineCop
+    from arbitragelab.copula_approach.copula_calculation import to_quantile
+
+    # Loading stocks data
+    sp500_returns = pd.read_csv('all_sp500_returns.csv', index_col='Dates', parse_dates=True)
+    subsample_returns = sp500_returns[['AAPL', 'MSFT', 'AMZN', 'FB']]
+    subsample_rts_quantiles, _ = to_quantile(subsample_returns)
+    quantiles_example = pd.DataFrame([[0.1, 0.2, 0.3, 0.8],
+                                      [0.5, 0.1, 0.9, 0.2]])
    
-   # Instantiate a CVineCop class
-   cvinecop = CVineCop
+    # Instantiate a CVineCop class
+    cvinecop = CVineCop()
    
-   # Fit C-vine automatically, assuming AAPL is the target stock
-   # Note that pv_target_idx is indexed from 1
-   cvinecop.fit_auto(data=subsample_rts_quantiles, pv_target_idx=1, if_renew=True)
+    # Fit C-vine automatically, assuming AAPL is the target stock
+    # Note that pv_target_idx is indexed from 1
+    cvinecop.fit_auto(data=subsample_rts_quantiles, pv_target_idx=1, if_renew=True)
    
-   # Calculate probability densities
-   prob_densities = cvinecop.get_cop_densities(u=quantiles_example)
+    # Calculate probability densities
+    prob_densities = cvinecop.get_cop_densities(u=quantiles_example)
    
-   # Calculate conditional (cumulative) densities, assuming AAPL is the target stock
-   condi_probs = cvinecop.get_condi_probs(u=quantiles_example, pv_target_idx=1)
+    # Calculate conditional (cumulative) densities, assuming AAPL is the target stock
+    condi_probs = cvinecop.get_condi_probs(u=quantiles_example, pv_target_idx=1)
    
-   # Calculate cumulative density (copula evaluation by definition)
-   cop_evals = cvinecop.get_cop_evals(u=quantiles_example)
+    # Calculate cumulative density (copula evaluation by definition)
+    cop_evals = cvinecop.get_cop_evals(u=quantiles_example)
    
-   # Simulate n=1000 samples
-   samples_df = cvinecop.simulate(n=1000)
+    # Simulate n=1000 samples
+    samples_df = cvinecop.simulate(n=1000)
    
-   # Calculate AIC, BIC and Log-Likelihood
-   aic = cvinecop.aic(u=subsample_rts_quantiles)
-   bic = cvinecop.bic(u=subsample_rts_quantiles)
-   loglik = cvinecop.loglik(u=subsample_rts_quantiles)
+    # Calculate AIC, BIC and Log-Likelihood
+    aic = cvinecop.aic(u=subsample_rts_quantiles)
+    bic = cvinecop.bic(u=subsample_rts_quantiles)
+    loglik = cvinecop.loglik(u=subsample_rts_quantiles)
    
 Research Notebooks
 ##################
 
 The following research notebook can be used to better understand the vine copula approach.
 
-* `Basic Copula Strategy`_
+* `C-Vine Copula Strategy`_
 
-.. _`Basic Copula Strategy`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Copula%20Approach/Copula_Strategy_Basic.ipynb
+.. _`C-Vine Copula Strategy`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Copula%20Approach/CVine_Copula_Strategy.ipynb
 
 References
 ##########
