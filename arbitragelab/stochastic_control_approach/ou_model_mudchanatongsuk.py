@@ -16,6 +16,8 @@ import numpy as np
 import pandas as pd
 import scipy.optimize as so
 
+from arbitragelab.util import devadarsh
+
 
 class OUModelMudchanatongsuk:
     """
@@ -52,6 +54,8 @@ class OUModelMudchanatongsuk:
 
         # Params inputted by user
         self.gamma = None  # Parameter of utility function (self.gamma < 1)
+
+        devadarsh.track('OUModelMudchanatongsuk')
 
 
     @staticmethod
