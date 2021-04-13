@@ -2,7 +2,7 @@
 # All rights reserved
 # Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 """
-Unit tests for vinecop_generate, vinecop_strategy
+Unit tests for vinecop_generate, vinecop_strategy.
 """
 
 # pylint: disable = invalid-name, protected-access, consider-using-enumerate
@@ -12,6 +12,7 @@ import warnings
 import pandas as pd
 import numpy as np
 import pyvinecopulib as pv
+
 import arbitragelab.copula_approach.vinecop_generate as vg
 import arbitragelab.copula_approach.vinecop_strategy as vs
 import arbitragelab.copula_approach.copula_calculation as ccalc
@@ -23,6 +24,10 @@ class TestVineCop(unittest.TestCase):
     """
 
     def setUp(self) -> None:
+        """
+        Set up the data and parameters.
+        """
+
         project_path = os.path.dirname(__file__)
         data_path = project_path + "/test_data/prices_10y_SP500.csv"
         sp500_prices = pd.read_csv(data_path, index_col=0, parse_dates=True).fillna(method='ffill')
@@ -127,7 +132,7 @@ class TestVineCop(unittest.TestCase):
         Test the _get_condi_probs function from CVineCop.
         """
 
-        # Ignore possible integration warnings.
+        # Ignore possible integration warnings
         warnings.filterwarnings(action='ignore', message='The integral is probably divergent')
 
         cvinecop = vg.CVineCop(self.pv_cvine_cop)
@@ -146,7 +151,7 @@ class TestVineCop(unittest.TestCase):
         Test the get_condi_probs function from CVineCop.
         """
 
-        # Ignore possible integration warnings.
+        # Ignore possible integration warnings
         warnings.filterwarnings(action='ignore', message='The integral is probably divergent')
 
         cvinecop = vg.CVineCop(self.pv_cvine_cop)
@@ -275,9 +280,9 @@ class TestVineCop(unittest.TestCase):
         expected_aic_1 = -382.98496652926514
         self.assertAlmostEqual(aic_1, expected_aic_1, places=3)
 
-        # 2. Without renewal, fit the cvine copula using the test set.
+        # 2. Without renewal, fit the cvine copula using the test set
         cvinecop.fit_auto(data=self.quantiles_data_test, pv_target_idx=1, if_renew=False)
-        # Check its aic value on the training data. Should still get the same result.
+        # Check its aic value on the training data. Should still get the same result
         aic_2 = cvinecop.aic(u=self.quantiles_data_train, num_threads=1)
         expected_aic_2 = -382.98496652926514
         self.assertAlmostEqual(aic_2, expected_aic_2, places=3)
@@ -296,9 +301,9 @@ class TestVineCop(unittest.TestCase):
         expected_aic_1 = -379.8244061045313
         self.assertAlmostEqual(aic_1, expected_aic_1, places=3)
 
-        # 2. Without renewal, fit the cvine copula using the test set.
+        # 2. Without renewal, fit the cvine copula using the test set
         cvinecop.fit_auto(data=self.quantiles_data_test, pv_target_idx=1, if_renew=False)
-        # Check its aic value on the training data. Should still get the same result.
+        # Check its aic value on the training data. Should still get the same result
         aic_2 = cvinecop.aic(u=self.quantiles_data_train, num_threads=1)
         expected_aic_2 = -379.8244061045313
         self.assertAlmostEqual(aic_2, expected_aic_2, places=3)
@@ -335,7 +340,7 @@ class TestVineCop(unittest.TestCase):
 
         cvinecop = vg.CVineCop(self.pv_cvine_cop)
         cvstrat = vs.CVineCopStrat(cvinecop)
-        dataset = self.returns_test.iloc[:10]  # Use only 10 data points to speed up calculation.
+        dataset = self.returns_test.iloc[:10]  # Use only 10 data points to speed up calculation
 
         # 1. MPIs with no mean subtraction
         mpis_1 = cvstrat.calc_mpi(returns=dataset, cdfs=self.cdfs, pv_target_idx=1, subtract_mean=False)
@@ -363,7 +368,7 @@ class TestVineCop(unittest.TestCase):
         past_positions = [0, 1, -1]
         signals = [0, 1, -1, 2]
 
-        # 1. Default table.
+        # 1. Default table
         cvinecop = vg.CVineCop(self.pv_cvine_cop)
         cvstrat = vs.CVineCopStrat(cvinecop)
         new_positions = []
@@ -376,7 +381,7 @@ class TestVineCop(unittest.TestCase):
 
         np.testing.assert_array_equal(new_positions, expected_new_positions)
 
-        # 2. Custom table.
+        # 2. Custom table
         signal_to_position_table = pd.DataFrame({1: {0: 1, 1: 1, -1: 1},
                                                  -1: {0: -1, 1: 0, -1: -1},
                                                  0: {0: 0, 1: 0, -1: 0},
@@ -401,11 +406,11 @@ class TestVineCop(unittest.TestCase):
         cvinecop = vg.CVineCop(self.pv_cvine_cop)
         cvstrat = vs.CVineCopStrat(cvinecop)
 
-        # All possible past CMPI and current CMPI value.
+        # All possible past CMPI and current CMPI value
         past_cmpis = [1.2, 1.2, 1.2, 1.2, 0.6, 0.6, 0.6, 0.6, -1.2, -1.2, -1.2, -1.2, -0.6, -0.6, -0.6, -0.6]
         cur_cmpis = [1.3, 0.8, -0.8, -1.2, 0.8, 1.2, -0.6, -1.2, -1.3, -0.8, 0.8, 1.2, -0.8, -1.2, 0.6, 1.2]
 
-        # Set the Bollinger band be: lower bound=-1, running mean=0, upper_bound=1, for eaiser comparison.
+        # Set the Bollinger band be: lower bound=-1, running mean=0, upper_bound=1, for eaiser comparison
         signals = []
         for p in range(len(past_cmpis)):
             signals.append(cvstrat.get_cur_signal_bollinger(past_cmpis[p], cur_cmpis[p], running_mean=0,
