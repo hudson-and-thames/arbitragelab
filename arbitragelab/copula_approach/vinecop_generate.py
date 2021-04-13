@@ -28,8 +28,6 @@ class RVineCop:
         Initialize.
         """
 
-        pass
-
 
 class CVineCop(RVineCop):
     """
