@@ -12,6 +12,8 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+* :feature:`44` CVine Copula and CVine Copula Strategy added to the Copula Approach Module.
+* :support:`44` CVine Copula and CVine Copula Strategy documentation.
 * :feature:`40` Vine Copula Partner Selection Approaches added to the Copula Approach Module.
 * :support:`40` Vine Copula Partner Selection Approaches documentation.
 * :support:`38` Removed TensorFlow from requirements and adjusted installation guide.
