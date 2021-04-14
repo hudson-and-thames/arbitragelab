@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 from matplotlib.axes._axes import Axes
 
 from arbitragelab.ml_approach import neural_networks
+from arbitragelab.util import devadarsh
 
 # This silencer is related to the protected access
 # pylint: disable=W0212, import-outside-toplevel, unused-import
@@ -45,6 +46,8 @@ class RegressorCommittee:
         self.patience = patience
         self.verbose = verbose
         self.rvoter = None
+
+        devadarsh.track('RegressorCommittee')
 
     def fit(self, xtrain: pd.DataFrame, ytrain: pd.DataFrame, xtest: pd.DataFrame, ytest: pd.DataFrame):
         """

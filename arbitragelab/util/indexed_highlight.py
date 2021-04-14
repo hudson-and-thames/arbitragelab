@@ -9,6 +9,8 @@ by cluster highlighting.
 import matplotlib.pyplot as plt
 from mpldatacursor import DataCursor, HighlightingDataCursor
 
+from arbitragelab.util import devadarsh
+
 class IndexedHighlight(HighlightingDataCursor):
     """
     This class extends HighlightingDataCursor to add support for
@@ -25,6 +27,8 @@ class IndexedHighlight(HighlightingDataCursor):
         HighlightingDataCursor.__init__(self, artists, **kwargs)
         self.highlights = [self.create_highlight(artist) for artist in artists]
         plt.setp(self.highlights, visible=False)
+
+        devadarsh.track('IndexedHighlight')
 
     def update(self, event, annotation):
         """

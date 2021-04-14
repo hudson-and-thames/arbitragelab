@@ -21,8 +21,10 @@ from scipy.optimize import minimize
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+
 import arbitragelab.copula_approach.copula_generate as cg
 import arbitragelab.copula_approach.copula_calculation as ccalc
+from arbitragelab.util import devadarsh
 
 
 class MixedCopula(ABC):
@@ -224,6 +226,8 @@ class CTGMixCop(MixedCopula):
             self.gumbel_cop = cg.Gumbel(theta=self.cop_params[3])
 
         self.copulas = [self.clayton_cop, self.t_cop, self.gumbel_cop]
+
+        devadarsh.track('CTGMixCop')
 
     def fit(self, data: pd.DataFrame, max_iter: int = 25, gamma_scad: float = 0.6, a_scad: float = 6,
             weight_margin: float = 1e-2) -> float:
@@ -630,6 +634,8 @@ class CFGMixCop(MixedCopula):
             self.gumbel_cop = cg.Gumbel(theta=self.cop_params[2])
 
         self.copulas = [self.clayton_cop, self.frank_cop, self.gumbel_cop]
+
+        devadarsh.track('CFGMixCop')
 
     def fit(self, data: pd.DataFrame, max_iter: int = 25, gamma_scad: float = 0.6, a_scad: float = 6,
             weight_margin: float = 1e-2) -> float:
