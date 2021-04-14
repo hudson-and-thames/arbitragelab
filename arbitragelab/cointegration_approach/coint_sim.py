@@ -41,6 +41,7 @@ class CointegrationSimulation:
         self.ts_num = ts_num
         self.ts_length = ts_length
         self.__price_params, self.__coint_params = self.initialize_params()
+
         devadarsh.track('CointegrationSimulation')
 
     @staticmethod

@@ -112,6 +112,15 @@ This project is licensed under an all rights reserved licence.
 
 .. toctree::
     :maxdepth: 2
+    :caption: Stochastic Control Approach
+    :hidden:
+
+    stochastic_control_approach/introduction
+    stochastic_control_approach/ou_model_jurek
+    stochastic_control_approach/ou_model_mudchanatongsuk
+
+.. toctree::
+    :maxdepth: 2
     :caption: Optimal Mean Reversion
     :hidden:
 

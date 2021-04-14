@@ -9,6 +9,8 @@ import pandas as pd
 import statsmodels.api as sm
 from statsmodels.regression.linear_model import RegressionResults
 
+from arbitragelab.util import devadarsh
+
 class TAR():
     """
     The Threshold AutoRegressive Model is an extension provided by Enders and
@@ -26,6 +28,8 @@ class TAR():
 
         self.spread = price_data
         self.results = None
+
+        devadarsh.track('TAR')
 
     @staticmethod
     def _tag_regime(series: pd.Series) -> pd.DataFrame:

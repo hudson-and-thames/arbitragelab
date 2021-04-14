@@ -10,6 +10,7 @@ import pandas as pd
 from matplotlib.axes._axes import Axes
 
 from arbitragelab.util.base_futures_roller import BaseFuturesRoller
+from arbitragelab.util import devadarsh
 
 class CrudeOilFutureRoller(BaseFuturesRoller):
     """
@@ -67,6 +68,8 @@ class CrudeOilFutureRoller(BaseFuturesRoller):
         all_roll_overs = pd.concat([pd.Series(roll_over_dates_for_holidays),
                                     pd.Series(dataset.iloc[roll_over_dates_for_business_days].index.values)])
 
+        devadarsh.track('CrudeOilFutureRoller')
+
         return all_roll_overs.sort_values().values
 
 
@@ -90,6 +93,8 @@ class NBPFutureRoller(BaseFuturesRoller):
                                                                   target_dates['target_date'])
 
         nbp_roll_dates = final_df['expiry'].drop_duplicates().dropna().values[:-1]
+
+        devadarsh.track('NBPFutureRoller')
 
         return nbp_roll_dates
 
@@ -136,6 +141,8 @@ class RBFutureRoller(BaseFuturesRoller):
         target_dates = super().get_available_date_per_month_from(dataset)
 
         rb_roll_dates = target_dates['target_date'].drop_duplicates()
+
+        devadarsh.track('RBFutureRoller')
 
         return rb_roll_dates.dropna().values[1:]
 
@@ -192,6 +199,8 @@ class GrainFutureRoller(BaseFuturesRoller):
         all_roll_overs = pd.concat([pd.Series(roll_over_dates_for_holidays),
                                     pd.Series(dataset.iloc[roll_over_dates_for_business_days].index.values)])
 
+        devadarsh.track('GrainFutureRoller')
+
         return all_roll_overs.sort_values().values
 
 
@@ -241,6 +250,8 @@ class EthanolFutureRoller(BaseFuturesRoller):
         all_roll_overs = pd.concat([pd.Series(roll_over_dates_for_holidays),
                                     pd.Series(dataset.iloc[roll_over_dates_for_business_days].index.values)])
 
+        devadarsh.track('EthanolFutureRoller')
+
         return all_roll_overs.sort_values().values
 
 def plot_historical_future_slope_state(m1_last: pd.Series, m2_open: pd.Series) -> Axes:
@@ -260,5 +271,7 @@ def plot_historical_future_slope_state(m1_last: pd.Series, m2_open: pd.Series) -
     ax_object.fill_between(premium.index, perc_chg, where=perc_chg > 0, facecolor='green')
     ax_object.fill_between(premium.index, perc_chg, where=perc_chg < 0, facecolor='red')
     ax_object.legend(["", "Contango", "Backwardation"])
+
+    devadarsh.track('plot_historical_future_slope_state')
 
     return ax_object
