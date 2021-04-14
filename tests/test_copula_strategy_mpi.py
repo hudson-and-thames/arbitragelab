@@ -18,6 +18,9 @@ class TestCopulaStrategyMPI(unittest.TestCase):
     """
 
     def setUp(self):
+        """
+        Set up the data and parameters.
+        """
 
         project_path = os.path.dirname(__file__)
         self.data_path = project_path + r'/test_data'
