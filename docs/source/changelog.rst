@@ -12,6 +12,7 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+* :release:`0.4.10 <2021-04-15>`
 * :feature:`43` OU Model Jurek and OU Model Mudchanatongsuk added to the Stochastic Control Approach Module.
 * :support:`43` OU Model Jurek and OU Model Mudchanatongsuk documentation.
 * :feature:`44` CVine Copula and CVine Copula Strategy added to the Copula Approach Module.
