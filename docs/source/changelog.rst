@@ -20,6 +20,8 @@ Changelog
 * :support:`42` Updated Basic Distance Strategy documentation.
 * :feature:`40` Vine Copula Partner Selection Approaches added to the Copula Approach Module.
 * :support:`40` Vine Copula Partner Selection Approaches documentation.
+
+* :release:`0.3.1 <2021-02-19>`
 * :support:`38` Removed TensorFlow from requirements and adjusted installation guide.
 
 * :release:`0.3.0 <2021-02-16>`
