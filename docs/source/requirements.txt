@@ -20,6 +20,7 @@ keras==2.3.1
 tensorflow==2.2.1
 arch==4.16.1
 analytics-python==1.2.9
+pyvinecopulib==0.5.5
 
 # Develop
 bump2version==1.0.1
