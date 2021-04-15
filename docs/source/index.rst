@@ -105,7 +105,19 @@ This project is licensed under an all rights reserved licence.
     copula_approach/copula_deeper_intro
     copula_approach/basic_trading_strategy
     copula_approach/mispricing_index_strategy
+    copula_approach/vine_copula_intro
+    copula_approach/cvine_copula_strategy
+    copula_approach/partner_selection
     copula_approach/utility_functions
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Stochastic Control Approach
+    :hidden:
+
+    stochastic_control_approach/introduction
+    stochastic_control_approach/ou_model_jurek
+    stochastic_control_approach/ou_model_mudchanatongsuk
 
 .. toctree::
     :maxdepth: 2

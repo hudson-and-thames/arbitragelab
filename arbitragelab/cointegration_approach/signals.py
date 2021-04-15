@@ -10,6 +10,7 @@ import numpy as np
 import pandas as pd
 from sklearn.linear_model import LinearRegression
 
+from arbitragelab.util import devadarsh
 
 def get_half_life_of_mean_reversion(data: pd.Series) -> float:
     """
@@ -18,6 +19,8 @@ def get_half_life_of_mean_reversion(data: pd.Series) -> float:
     :param data: (np.array) Data points
     :return: (float) Half-life of mean reversion
     """
+
+    devadarsh.track('get_half_life_of_mean_reversion')
 
     reg = LinearRegression(fit_intercept=True)
 
@@ -45,6 +48,8 @@ def linear_trading_strategy(portfolio_series: pd.Series, sma_window: int = None,
     :param std_window: (int) Window for SMD (Simple Moving st. Deviation).
     :return: (pd.DataFrame) Mean-reverting portfolio series and target allocation on each day.
     """
+
+    devadarsh.track('linear_trading_strategy')
 
     if sma_window is None:
         # The book suggests to use window = speed of reversion
@@ -82,6 +87,8 @@ def bollinger_bands_trading_strategy(portfolio_series: pd.Series, sma_window: in
     :param exit_z_score: (float) Z-score value to exit (long or short) the position.
     :return: (pd.DataFrame) Mean-reverting portfolio series and target allocation on each day.
     """
+
+    devadarsh.track('bollinger_bands_trading_strategy')
 
     if exit_z_score >= entry_z_score:
         raise ValueError('Exit Z-score can not be bigger than entry Z-Score.')

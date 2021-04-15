@@ -12,6 +12,8 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
 from arch.univariate import ZeroMean, EWMAVariance
 
+from arbitragelab.util import devadarsh
+
 class CorrelationFilter:
     """
     Correlation Filter implementation.
@@ -33,6 +35,8 @@ class CorrelationFilter:
         self.corr_series = None
         self.frame = None
         self.transformed = None
+
+        devadarsh.track('CorrelationFilter')
 
     def fit(self, frame: pd.DataFrame):
         """
@@ -180,6 +184,8 @@ class ThresholdFilter:
         self.frame = None
         self.transformed = None
 
+        devadarsh.track('ThresholdFilter')
+
     def plot(self) -> list:
         """
         Function to plot buy and sell events.
@@ -270,6 +276,8 @@ class VolatilityFilter:
         self.vol_series = None
         self.rolling_mean_vol = None
         self.vol_forcast_series = None
+
+        devadarsh.track('VolatilityFilter')
 
     def plot(self) -> list:
         """
