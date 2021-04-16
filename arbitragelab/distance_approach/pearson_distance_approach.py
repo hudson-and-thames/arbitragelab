@@ -36,14 +36,15 @@ class PearsonStrategy:
         self.pairs_dict = None  # Top n pairs selected during the formation period
         self.short_stocks = None  # Stocks having lowest values of return differences
         self.long_stocks = None  # Stocks having highest values of return differences
-        self.return_diff_sorted = None  # Sorted dictionary of return difference in the test period
         self.test_monthly_return = None  # Monthly return dataset in test period
         self.trading_signal = None  # Trading signal dataframe
-        self.mean_return = None # Average return of monthly portfolio in test period
+        self.mean_return = None  # Average return of monthly portfolio in test period
+        self.long_pct = 0.1  # Percentage of long stocks in the sorted return divergence.
+        self.short_pct = 0.1  # Percentage of short stocks in the sorted return divergence.
 
         devadarsh.track('PearsonStrategy')
 
-    def form_portfolio(self, train_data, risk_free=None, num_pairs=50, weight='equal'):
+    def form_portfolio(self, train_data, risk_free=None, num_pairs=50, weight='equal', long_pct=0.1, short_pct=0.1):
         """
         Forms portfolio based on the input train data.
 
@@ -71,6 +72,8 @@ class PearsonStrategy:
         :param risk_free: (pd.Series) Daily risk free rate data with date in its index.
         :param num_pairs: (int) Number of top pairs to use for portfolio formation.
         :param weight: (str) Weighting Scheme for portfolio returns [``equal`` by default, ``correlation``].
+        :param long_pct: (float) Percentage of long stocks in the sorted return divergence.
+        :param short_pct: (float) Percentage of short stocks in the sorted return divergence.
         """
 
         # Preprocess data to get monthly return from daily price data
@@ -82,20 +85,11 @@ class PearsonStrategy:
         # Build portfolio based on the return difference in the last period
         last_month = self.monthly_return.iloc[-1, :]
 
-        # Calculate the return differences of all stocks in the train data
-        return_diff_dict = self._calculate_return_diff(last_month)
+        # Set long and short percentage when trading
+        self.long_pct, self.short_pct = long_pct, short_pct
 
-        # Sort the dictionary based on the return differences value
-        self.return_diff_sorted = {k: v for k, v in sorted(return_diff_dict.items(), key=lambda item: item[1])}
-
-        # Get the number of stocks to get two different portfolios
-        num_stocks = len(self.return_diff_sorted)
-
-        # Stocks with bottom 10% value of the return differences should be shorted
-        self.short_stocks = dict(itertools.islice(self.return_diff_sorted.items(), 0, int(num_stocks * 0.1)))
-
-        # Stocks with top 10% value of the return differences should be longed
-        self.long_stocks = dict(itertools.islice(self.return_diff_sorted.items(), int(num_stocks * 0.9), num_stocks))
+        # Calculate long and short stocks
+        self.long_stocks, self.short_stocks = self._get_long_short(last_month, self.long_pct, self.short_pct)
 
     def trade_portfolio(self, test_data, test_risk_free=None):
         """
@@ -172,19 +166,7 @@ class PearsonStrategy:
 
                 prev_month_return = monthly_return.loc[prev_month, :]
 
-                return_diff_dict = self._calculate_return_diff(prev_month_return)
-
-                # Sort the dictionary based on the return differences value
-                return_diff_sorted = {k: v for k, v in sorted(return_diff_dict.items(), key=lambda item: item[1])}
-
-                # Get the number of stocks to get two different portfolios
-                num_stocks = len(return_diff_sorted)
-
-                # Stocks with bottom 10% value of the return differences should be shorted
-                short_stocks = dict(itertools.islice(return_diff_sorted.items(), 0, int(num_stocks * 0.1)))
-
-                # Stocks with top 10% value of the return differences should be longed
-                long_stocks = dict(itertools.islice(return_diff_sorted.items(), int(num_stocks * 0.9), num_stocks))
+                long_stocks, short_stocks = self._get_long_short(prev_month_return, self.long_pct, self.short_pct)
 
                 for stock in trading_signal.columns:
 
@@ -198,6 +180,32 @@ class PearsonStrategy:
                         trading_signal.loc[trading_month, stock] = 0
 
         return trading_signal
+
+    def _get_long_short(self, prev_month_return, long_pct=0.1, short_pct=0.1):
+        """
+        Derive long and short stocks by calculating return divergence and form a portfolio based on the values.
+
+        :param prev_month_return: (pd.Series) A series of monthly return to calculate the return divergence.
+        :param long_pct: (float) Percentage of long stocks in the sorted return divergence.
+        :param short_pct: (float) Percentage of short stocks in the sorted return divergence.
+        :return: (dict) Long and short stocks with its corresponding return divergence values on its items.
+        """
+
+        return_diff_dict = self._calculate_return_diff(prev_month_return)
+
+        # Sort the dictionary based on the return differences value
+        return_diff_sorted = {k: v for k, v in sorted(return_diff_dict.items(), key=lambda item: item[1])}
+
+        # Get the number of stocks to get two different portfolios
+        num_stocks = len(return_diff_sorted)
+
+        # Stocks with bottom 10% value of the return differences should be shorted
+        short_stocks = dict(itertools.islice(return_diff_sorted.items(), 0, int(num_stocks * short_pct)))
+
+        # Stocks with top 10% value of the return differences should be longed
+        long_stocks = dict(itertools.islice(return_diff_sorted.items(), int(num_stocks * (1 - long_pct)), num_stocks))
+
+        return long_stocks, short_stocks
 
     def get_trading_signal(self):
         """
@@ -227,14 +235,6 @@ class PearsonStrategy:
 
         return self.long_stocks
 
-    def get_return_diff(self):
-        """
-        Outputs the whole dictionary of return difference calculated in the last month of the formation period
-        :return: (dict) A dictionary with stocks in its key and the value of return differences in its value.
-        """
-
-        return self.return_diff_sorted
-
     def _data_preprocess(self, price_data, risk_free, phase='train'):
         """
         Preprocess train data and risk free data.
@@ -244,7 +244,7 @@ class PearsonStrategy:
 
         :param price_data: (pd.DataFrame) Daily price data with date in its index and stocks in its columns.
         :param risk_free: (pd.Series) Daily risk free rate data with date in its index.
-        :param phase: (str)
+        :param phase: (str) Phase indicating training or testing, [``train`` by default, ``test``].
         """
 
         # Calculate normalized prices with mean and standard deviation
