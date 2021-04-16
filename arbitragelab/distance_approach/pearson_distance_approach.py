@@ -34,13 +34,12 @@ class PearsonStrategy:
         self.risk_free = None  # Risk free rate dataset for calculating return differences
         self.beta_dict = None  # Regression coefficients for each stock in the formation period
         self.pairs_dict = None  # Top n pairs selected during the formation period
-        self.short_stocks = None  # Stocks having lowest values of return differences
-        self.long_stocks = None  # Stocks having highest values of return differences
+        self.last_month = None  # Returns from the last month of training data
         self.test_monthly_return = None  # Monthly return dataset in test period
         self.trading_signal = None  # Trading signal dataframe
         self.mean_return = None  # Average return of monthly portfolio in test period
-        self.long_pct = 0.1  # Percentage of long stocks in the sorted return divergence.
-        self.short_pct = 0.1  # Percentage of short stocks in the sorted return divergence.
+        self.long_pct = 0.1  # Percentage of long stocks in the sorted return divergence
+        self.short_pct = 0.1  # Percentage of short stocks in the sorted return divergence
 
         devadarsh.track('PearsonStrategy')
 
@@ -82,14 +81,11 @@ class PearsonStrategy:
         # Calculating beta and getting pairs in the formation period
         self._beta_pairs_formation(num_pairs, weight)
 
-        # Build portfolio based on the return difference in the last period
-        last_month = self.monthly_return.iloc[-1, :]
+        # Save the last month return for the signal generation step
+        self.last_month = self.monthly_return.iloc[-1, :]
 
         # Set long and short percentage when trading
         self.long_pct, self.short_pct = long_pct, short_pct
-
-        # Calculate long and short stocks
-        self.long_stocks, self.short_stocks = self._get_long_short(last_month, self.long_pct, self.short_pct)
 
     def trade_portfolio(self, test_data, test_risk_free=None):
         """
@@ -110,11 +106,8 @@ class PearsonStrategy:
         # Preprocess test data
         self._data_preprocess(test_data, test_risk_free, phase='test')
 
-        # Get trading signals for the last month of training period
-        trading_signal = self._find_trading_signals(self.test_monthly_return)
-
         # Get trading signals for the test data
-        self.trading_signal = self._find_trading_signals(self.test_monthly_return, trading_signal=trading_signal)
+        self.trading_signal = self._find_trading_signals(self.test_monthly_return)
 
         # Calculating return for a given dataset
         return_dataframe = self.trading_signal * self.test_monthly_return
@@ -135,49 +128,39 @@ class PearsonStrategy:
         :return: (pd.DataFrame) Generated trading signals with multi index of year and month.
         """
 
-        # If trading signal is not yet created, create one based on the monthly return dataframe
-        if trading_signal is None:
+        # Calculate the trading signals in the test period
+        for i in range(len(monthly_return)):
 
-            # Make a copy of monthly return to generate trading signal
-            trading_signal = monthly_return.copy()
+            if i == 0:
+                # Make a copy of monthly return to generate trading signal
+                trading_signal = monthly_return.copy()
 
-            # Decide the trading signal for the first month of the test period
-            month = trading_signal.index[0]
+                # Decide the trading signal for the first month of the test period
+                trading_month = trading_signal.index[0]
 
-            # 1 if stock has long position, -1 if it has short position and 0 if nothing.
-            for stock in trading_signal.columns:
+                # Using the last month from the training dataset as the previous month
+                prev_month_return = self.last_month
 
-                if stock in self.short_stocks.keys():
-                    trading_signal.loc[month, stock] = -1
+            else:
 
-                elif stock in self.long_stocks.keys():
-                    trading_signal.loc[month, stock] = 1
+                prev_month = trading_signal.index[i - 1]
 
-                else:
-                    trading_signal.loc[month, stock] = 0
-        else:
-
-            # Calculate the rest of the trading signals in the test peirod
-            for i in range(0, len(trading_signal) - 1):
-
-                prev_month = trading_signal.index[i]
-
-                trading_month = trading_signal.index[i + 1]
+                trading_month = trading_signal.index[i]
 
                 prev_month_return = monthly_return.loc[prev_month, :]
 
-                long_stocks, short_stocks = self._get_long_short(prev_month_return, self.long_pct, self.short_pct)
+            long_stocks, short_stocks = self._get_long_short(prev_month_return, self.long_pct, self.short_pct)
 
-                for stock in trading_signal.columns:
+            for stock in trading_signal.columns:
 
-                    if stock in short_stocks.keys():
-                        trading_signal.loc[trading_month, stock] = -1
+                if stock in short_stocks.keys():
+                    trading_signal.loc[trading_month, stock] = -1
 
-                    elif stock in long_stocks.keys():
-                        trading_signal.loc[trading_month, stock] = 1
+                elif stock in long_stocks.keys():
+                    trading_signal.loc[trading_month, stock] = 1
 
-                    else:
-                        trading_signal.loc[trading_month, stock] = 0
+                else:
+                    trading_signal.loc[trading_month, stock] = 0
 
         return trading_signal
 
@@ -216,24 +199,6 @@ class PearsonStrategy:
         """
 
         return self.trading_signal
-
-    def get_short_stocks(self):
-        """
-        Outputs generated stocks in decile 1 which have low return differences.
-
-        :return: (dict) A dictionary with stocks in its key and the value of return differences in its value.
-        """
-
-        return self.short_stocks
-
-    def get_long_stocks(self):
-        """
-        Outputs generated stocks in decile 10 which have high return differences.
-
-        :return: (dict) A dictionary with stocks in its key and the value of return differences in its value.
-        """
-
-        return self.long_stocks
 
     def _data_preprocess(self, price_data, risk_free, phase='train'):
         """
@@ -276,6 +241,13 @@ class PearsonStrategy:
             # If risk free data is not given, use zero rate instead
             self.risk_free = pd.Series(data=[0 for _ in range(len(monthly_return.index))], name='risk_free',
                                        index=monthly_return.index)
+
+        elif isinstance(risk_free, float):
+
+            # If risk free data is given as float, construct pd series
+            self.risk_free = pd.Series(data=[risk_free for _ in range(len(monthly_return.index))], name='risk_free',
+                                       index=monthly_return.index)
+
         else:
 
             # Get risk free rate
