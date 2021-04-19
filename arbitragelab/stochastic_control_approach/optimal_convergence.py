@@ -13,29 +13,85 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-class OptimalConvergence:
-    def __init__(self):
+from arbitragelab.cointegration_approach import JohansenPortfolio
 
-        self.gamma = None # gamma should be positive
+
+class OptimalConvergence:
+    """
+    Implementation of Optimal Convergence Trade Strategies.
+    """
+
+    def __init__(self):
+        """
+        Initializes the parameters of the module.
+        """
+
+        # Estimated from error-correction model
+        self.ticker_A = None
+        self.ticker_B = None
+        self.delta_t = 1 / 252
         self.lambda_1 = None
         self.lambda_2 = None
+
+        # Moment based estimates
         self.b_squared = None
         self.sigma_squared = None
-        self.delta_t = 1 / 252
+        self.beta = None
+
+        # Parameters inputted by user
+        self.gamma = None  # gamma should be positive
         self.r = None
+        self.mu_m = None
+        self.sigma_m = None
 
 
-    def unconstrained_portfolio_weights_continuous(self, prices_1, prices_2, mu_m, sigma_m, beta):
+    def fit(self, prices: pd.DataFrame, delta_t: float = 1 / 252):
+        """
+
+        :param prices: (pd.DataFrame) Contains price series of both stocks in spread.
+        :param delta_t: (float) Time difference between each index of data, calculated in years.
+        """
+
+        #TODO: Need to input market index data and orthogonalize the price data with market index before using cointegration.
+        # Refer Table 1 in paper.
+
+        # Setting instance attributes
+        self.delta_t = delta_t
+        self.ticker_A, self.ticker_B = prices.columns[0], prices.columns[1]
+
+        prices = self._data_preprocessing(prices)
+
+        # As mentioned in the paper, the vector of linear weights are calculated using co-integrating regression
+        j_portfolio = JohansenPortfolio()
+        j_portfolio.fit(np.log(prices), det_order=0)  # Fitting the log prices
+        j_cointegration_vectors = j_portfolio.cointegration_vectors  # Stores the calculated weights for the pair of stocks in the spread
+
+        self.lambda_1, self.lambda_2 = j_cointegration_vectors.values[0]
+        # TODO : Is using Johanssen test correct here for estimating lambda's.
+
+        # TODO: Construct "moment based estimates" for b, sigma and beta.
+
+
+    def unconstrained_portfolio_weights_continuous(self, prices_1, prices_2, mu_m, sigma_m, gamma, r):
         """
         Implementation of Proposition 1.
 
+        :param r:
+        :param gamma:
         :param prices_1:
         :param prices_2:
         :param mu_m:
         :param sigma_m:
-        :param beta:
         :return:
         """
+
+        if gamma <= 0:
+            raise Exception("The value of gamma should be positive.")
+
+        self.mu_m = mu_m
+        self.sigma_m = sigma_m
+        self.gamma = gamma
+        self.r = r
 
         x, tau = self._x_tau_calc(prices_1, prices_2)
 
@@ -57,21 +113,31 @@ class OptimalConvergence:
         phi_1 = phi[0, :]
         phi_2 = phi[1, :]
 
-        phi_m = (mu_m / (self.gamma * sigma_m ** 2)) - (phi_1 + phi_2) * beta
+        phi_m = (self.mu_m / (self.gamma * self.sigma_m ** 2)) - (phi_1 + phi_2) * self.beta
 
         return phi_1, phi_2, phi_m
 
 
-    def delta_neutral_portfolio_weights_continuous(self, prices_1, prices_2, mu_m, sigma_m):
+    def delta_neutral_portfolio_weights_continuous(self, prices_1, prices_2, mu_m, sigma_m, gamma, r):
         """
         Implementation of Proposition 2.
 
+        :param r:
+        :param gamma:
         :param prices_1:
         :param prices_2:
         :param mu_m:
         :param sigma_m:
         :return:
         """
+
+        if gamma <= 0:
+            raise Exception("The value of gamma should be positive.")
+
+        self.mu_m = mu_m
+        self.sigma_m = sigma_m
+        self.gamma = gamma
+        self.r = r
 
         x, tau = self._x_tau_calc(prices_1, prices_2)
 
@@ -81,14 +147,17 @@ class OptimalConvergence:
 
         phi_2 = -phi_1
 
-        phi_m = mu_m / (self.gamma * sigma_m ** 2)
+        phi_m = self.mu_m / (self.gamma * self.sigma_m ** 2)
 
         return phi_1, phi_2, phi_m
 
 
-    def wealth_gain_continuous(self, prices_1, prices_2, mu_m, sigma_m):
+    def wealth_gain_continuous(self, prices_1, prices_2, mu_m, sigma_m, gamma, r):
         """
         Implementation of Proposition 4.
+
+        :param r:
+        :param gamma:
         :param prices_1:
         :param prices_2:
         :param mu_m:
@@ -96,14 +165,28 @@ class OptimalConvergence:
         :return:
         """
 
+        if gamma <= 0:
+            raise Exception("The value of gamma should be positive.")
+
+        self.mu_m = mu_m
+        self.sigma_m = sigma_m
+        self.gamma = gamma
+        self.r = r
+
         x, tau = self._x_tau_calc(prices_1, prices_2)
 
-        u_x_t = self._u_func_continuous_calc(x, tau, mu_m, sigma_m)
-        v_x_t = self._v_func_continuous_calc(x, tau, mu_m, sigma_m)
+        u_x_t = self._u_func_continuous_calc(x, tau)
+        v_x_t = self._v_func_continuous_calc(x, tau)
 
         R = np.exp((u_x_t - v_x_t) / (1 - self.gamma))
 
         return R
+
+
+    def wealth_process(self):
+        # TODO : To construct the final wealth from portfolio weights, we would need the market index data.
+        #  Refer Section 2 in paper.
+        pass
 
 
     def _x_tau_calc(self, prices_1, prices_2):
@@ -189,46 +272,40 @@ class OptimalConvergence:
         return D
 
 
-    def _A_calc(self, tau, mu_m, sigma_m):
+    def _A_calc(self, tau):
         """
         Implementation of function A given in Appendix A.1.
         :param tau:
-        :param mu_m:
-        :param sigma_m:
         :return:
         """
 
         xi, lambda_x = self._xi_calc()
 
-        A = self._A_B_helper(lambda_x, mu_m, sigma_m, tau, xi)
+        A = self._A_B_helper(lambda_x, tau, xi)
 
         return A
 
 
-    def _B_calc(self, tau, mu_m, sigma_m):
+    def _B_calc(self, tau):
         """
         Implementation of function B given in Appendix A.2.
         :param tau:
-        :param mu_m:
-        :param sigma_m:
         :return:
         """
 
         lambda_x = self._lambda_x_calc()
         eta = lambda_x * np.sqrt(self.gamma)
 
-        B = self._A_B_helper(lambda_x, mu_m, sigma_m, tau, eta)
+        B = self._A_B_helper(lambda_x, tau, eta)
 
         return B
 
 
-    def _A_B_helper(self, lambda_x, mu_m, sigma_m, tau, rep_term):
+    def _A_B_helper(self, lambda_x, tau, rep_term):
         """
         Helper function implements the common formulae present in A and B function calculations.
 
         :param lambda_x:
-        :param mu_m:
-        :param sigma_m:
         :param tau:
         :param rep_term:
         :return:
@@ -238,7 +315,7 @@ class OptimalConvergence:
         exp_term_1 = np.exp(inner_exp_term)
         exp_term_2 = np.exp(-inner_exp_term)
 
-        first_term = self.r + (1 / (2 * self.gamma)) * (mu_m ** 2 / sigma_m ** 2)
+        first_term = self.r + (1 / (2 * self.gamma)) * (self.mu_m ** 2 / self.sigma_m ** 2)
         log_term = np.log((lambda_x / 2) * ((exp_term_1 - exp_term_2) / rep_term) + 0.5 * (exp_term_1 + exp_term_2))
 
         result = first_term * (1 - self.gamma) * tau + (lambda_x / 2) * tau - (self.gamma / 2) * log_term
@@ -246,37 +323,45 @@ class OptimalConvergence:
         return result
 
 
-    def _u_func_continuous_calc(self, x, tau, mu_m, sigma_m):
+    def _u_func_continuous_calc(self, x, tau):
         """
         Implementation of Lemma 1.
         :param x:
         :param tau:
-        :param mu_m:
-        :param sigma_m:
         :return:
         """
 
         C_t = self._C_calc(tau)
-        A_t = self._A_calc(tau, mu_m, sigma_m)
+        A_t = self._A_calc(tau)
 
         u = A_t + 0.5 * C_t * np.power(x, 2)
 
         return u
 
 
-    def _v_func_continuous_calc(self, x, tau, mu_m, sigma_m):
+    def _v_func_continuous_calc(self, x, tau):
         """
         Implementation of Lemma 2.
         :param x:
         :param tau:
-        :param mu_m:
-        :param sigma_m:
         :return:
         """
 
         D_t = self._D_calc(tau)
-        B_t = self._B_calc(tau, mu_m, sigma_m)
+        B_t = self._B_calc(tau)
 
         v = B_t + 0.5 * D_t * np.power(x, 2)
 
         return v
+
+
+    @staticmethod
+    def _data_preprocessing(prices: pd.DataFrame) -> pd.DataFrame:
+        """
+        Helper function for input data preprocessing.
+
+        :param prices: (pd.DataFrame) Pricing data of both stocks in spread.
+        :return: (pd.DataFrame) Processed dataframe.
+        """
+
+        return prices.ffill()
