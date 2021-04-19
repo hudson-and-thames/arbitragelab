@@ -46,15 +46,12 @@ class TestOptimalConvergence(unittest.TestCase):
     def test_unconstrained_continuous(self):
 
         oc = OptimalConvergence()
-        oc.gamma = 4
-        oc.lambda_1 = 0.35
-        oc.lambda_2 = -0.2
+        oc.fit(self.dataframe)
+
         oc.b_squared = 0.3 ** 2
         oc.sigma_squared = 0.15 ** 2
-        oc.r = 0.02
+        oc.beta = 0.5
 
-        data = self.dataframe.values
-        phi_1, phi_2, phi_m = oc.unconstrained_portfolio_weights_continuous(data[:, 0], data[:, 1], mu_m=0.05
-                                                                            , sigma_m=0.35, beta = 0.5)
+        phi_1, phi_2, phi_m = oc.unconstrained_portfolio_weights_continuous(self.dataframe, mu_m=0.05, sigma_m=0.35, gamma=4, r=0.02)
 
         print(phi_m)

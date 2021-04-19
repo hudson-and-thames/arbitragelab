@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from arbitragelab.cointegration_approach import JohansenPortfolio
+from arbitragelab.cointegration_approach import EngleGrangerPortfolio
 
 
 class OptimalConvergence:
@@ -45,11 +45,14 @@ class OptimalConvergence:
         self.sigma_m = None
 
 
-    def fit(self, prices: pd.DataFrame, delta_t: float = 1 / 252):
+    def fit(self, prices: pd.DataFrame, delta_t: float = 1 / 252, adf_test: bool = False, significance_level: float = 0.95):
         """
 
         :param prices: (pd.DataFrame) Contains price series of both stocks in spread.
         :param delta_t: (float) Time difference between each index of data, calculated in years.
+        :param adf_test: (bool) Flag which defines whether the adf statistic test should be conducted.
+        :param significance_level: (float) This significance level is used in the ADF statistic test.
+            Value can be one of the following: (0.90, 0.95, 0.99).
         """
 
         #TODO: Need to input market index data and orthogonalize the price data with market index before using cointegration.
@@ -60,26 +63,35 @@ class OptimalConvergence:
         self.ticker_A, self.ticker_B = prices.columns[0], prices.columns[1]
 
         prices = self._data_preprocessing(prices)
-
         # As mentioned in the paper, the vector of linear weights are calculated using co-integrating regression
-        j_portfolio = JohansenPortfolio()
-        j_portfolio.fit(np.log(prices), det_order=0)  # Fitting the log prices
-        j_cointegration_vectors = j_portfolio.cointegration_vectors  # Stores the calculated weights for the pair of stocks in the spread
+        eg_portfolio = EngleGrangerPortfolio()
+        eg_portfolio.fit(prices, add_constant=True)  # Fitting the prices
+        eg_adf_statistics = eg_portfolio.adf_statistics  # Stores the results of the ADF statistic test
+        eg_cointegration_vectors = eg_portfolio.cointegration_vectors  # Stores the calculated weights for the pair of stocks in the spread
 
-        self.lambda_1, self.lambda_2 = j_cointegration_vectors.values[0]
-        # TODO : Is using Johanssen test correct here for estimating lambda's.
+        if adf_test is True and eg_adf_statistics.loc['statistic_value', 0] > eg_adf_statistics.loc[
+            f'{int(significance_level * 100)}%', 0]:
+            # Making sure that the data passes the ADF statistic test
+            print(eg_adf_statistics)
+            warnings.warn("ADF statistic test failure.")
+
+        # Scaling the weights such that they sum to 1
+        self.lambda_1, self.lambda_2 = eg_cointegration_vectors.loc[0] / abs(eg_cointegration_vectors.loc[0]).sum()
+        # TODO : Is using EG test correct here for estimating lambda's.
 
         # TODO: Construct "moment based estimates" for b, sigma and beta.
 
 
-    def unconstrained_portfolio_weights_continuous(self, prices_1, prices_2, mu_m, sigma_m, gamma, r):
+    def unconstrained_portfolio_weights_continuous(self, prices, mu_m, sigma_m, gamma, r):
         """
         Implementation of Proposition 1.
 
+        If lambda_1 = lambda_2, from the portfolio weights outputted from this method phi_2 + phi_1 = 0,
+        which implies delta neutrality. This follows Proposition 3 in the paper.
+
         :param r:
         :param gamma:
-        :param prices_1:
-        :param prices_2:
+        :param prices: (pd.DataFrame) Contains price series of both stocks in spread.
         :param mu_m:
         :param sigma_m:
         :return:
@@ -93,7 +105,7 @@ class OptimalConvergence:
         self.gamma = gamma
         self.r = r
 
-        x, tau = self._x_tau_calc(prices_1, prices_2)
+        x, tau = self._x_tau_calc(prices)
 
         C_t = self._C_calc(tau)
 
@@ -118,14 +130,13 @@ class OptimalConvergence:
         return phi_1, phi_2, phi_m
 
 
-    def delta_neutral_portfolio_weights_continuous(self, prices_1, prices_2, mu_m, sigma_m, gamma, r):
+    def delta_neutral_portfolio_weights_continuous(self, prices, mu_m, sigma_m, gamma, r):
         """
         Implementation of Proposition 2.
 
         :param r:
         :param gamma:
-        :param prices_1:
-        :param prices_2:
+        :param prices: (pd.DataFrame) Contains price series of both stocks in spread.
         :param mu_m:
         :param sigma_m:
         :return:
@@ -139,7 +150,7 @@ class OptimalConvergence:
         self.gamma = gamma
         self.r = r
 
-        x, tau = self._x_tau_calc(prices_1, prices_2)
+        x, tau = self._x_tau_calc(prices)
 
         D_t = self._D_calc(tau)
 
@@ -147,19 +158,18 @@ class OptimalConvergence:
 
         phi_2 = -phi_1
 
-        phi_m = self.mu_m / (self.gamma * self.sigma_m ** 2)
+        phi_m = self.mu_m / (self.gamma * self.sigma_m ** 2) + np.zeros(phi_1.shape)
 
         return phi_1, phi_2, phi_m
 
 
-    def wealth_gain_continuous(self, prices_1, prices_2, mu_m, sigma_m, gamma, r):
+    def wealth_gain_continuous(self, prices, mu_m, sigma_m, gamma, r):
         """
         Implementation of Proposition 4.
 
         :param r:
         :param gamma:
-        :param prices_1:
-        :param prices_2:
+        :param prices: (pd.DataFrame) Contains price series of both stocks in spread.
         :param mu_m:
         :param sigma_m:
         :return:
@@ -173,7 +183,7 @@ class OptimalConvergence:
         self.gamma = gamma
         self.r = r
 
-        x, tau = self._x_tau_calc(prices_1, prices_2)
+        x, tau = self._x_tau_calc(prices)
 
         u_x_t = self._u_func_continuous_calc(x, tau)
         v_x_t = self._v_func_continuous_calc(x, tau)
@@ -189,18 +199,18 @@ class OptimalConvergence:
         pass
 
 
-    def _x_tau_calc(self, prices_1, prices_2):
+    def _x_tau_calc(self, prices):
         """
         Calculates the error correction term x given in equation (4) and the time remaining in years.
-        :param prices_1:
-        :param prices_2:
+        :param prices: (pd.DataFrame) Contains price series of both stocks in spread.
         :return:
         """
+        prices = self._data_preprocessing(prices).to_numpy()
 
-        t = np.arange(0, len(prices_1)) * self.delta_t
+        t = np.arange(0, len(prices)) * self.delta_t
         tau = t[-1] - t  # Stores time remaining till closure (In years)
 
-        x = np.log(prices_1 / prices_2)
+        x = np.log(prices[:, 0] / prices[:, 1])
 
         return x, tau
 
