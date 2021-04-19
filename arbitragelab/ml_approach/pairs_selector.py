@@ -211,7 +211,6 @@ class PairsSelector:
 
         # For each cluster.
         for cluster in range(0, no_of_classes):
-
             # Get specific cluster data from the tsne processed dataframe.
             cluster_data = tsne_df[self.clust_labels_ == cluster]
 
@@ -272,7 +271,6 @@ class PairsSelector:
 
         # For each cluster.
         for cluster in range(0, no_of_classes):
-
             # Get specific cluster data from the tsne process dataframe.
             cluster_data = tsne_df[self.clust_labels_ == cluster]
 
@@ -393,8 +391,8 @@ class PairsSelector:
             raise Exception("No pairs have been found!")
 
         for idx, frame in pairs.iterrows():
-            asset_one = self.prices_df.loc[:, idx[1]].values
-            asset_two = self.prices_df.loc[:, idx[0]].values
+            asset_one = self.prices_df.loc[:, idx[0]].values
+            asset_two = self.prices_df.loc[:, idx[1]].values
 
             spread_ts = (asset_one - asset_two * frame['hedge_ratio'])
             hurst_exp = self.hurst(spread_ts)
@@ -490,7 +488,7 @@ class PairsSelector:
                                          min_crossover_threshold_per_year, test_period)
 
     def _criterion_selection(self, cluster_x_cointegration_combinations: list,
-                             pvalue_threshold: int = 0.01, hurst_exp_threshold: int = 0.5,
+                             adf_cutoff_threshold: float = 0.95, hurst_exp_threshold: int = 0.5,
                              min_crossover_threshold_per_year: int = 12,
                              test_period: str = '2Y') -> list:
         """
@@ -502,7 +500,8 @@ class PairsSelector:
         within convenient periods and finally that the spread reverts to the mean with enough frequency.
 
         :param cluster_x_cointegration_combinations: (list) List of asset pairs.
-        :param pvalue_threshold: (int) Max p-value threshold to be used in the cointegration tests.
+        :param adf_cutoff_threshold: (float) ADF test threshold used to define if the spread is cointegrated. Can be
+                                             0.99, 0.95 or 0.9.
         :param hurst_exp_threshold: (int) Max Hurst threshold value.
         :param min_crossover_threshold_per_year: (int) Minimum amount of mean crossovers per year.
         :param test_period: (str) Time delta format, to be used as the time
@@ -516,8 +515,9 @@ class PairsSelector:
         cointegration_results = _outer_cointegration_loop(
             self.prices_df, cluster_x_cointegration_combinations)
 
-        passing_pairs = cointegration_results.loc[cointegration_results['pvalue']
-                                                  <= pvalue_threshold]
+        passing_pairs = cointegration_results.loc[cointegration_results['coint_t']
+                                                  <= cointegration_results[
+                                                      'p_value_{}%'.format(int(adf_cutoff_threshold * 100))]]
 
         self.coint_pass_pairs = passing_pairs
 

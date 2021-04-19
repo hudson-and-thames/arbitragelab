@@ -6,12 +6,9 @@ This module houses utility functions used by the PairsSelector.
 """
 
 import sys
-from scipy.odr import ODR, Model, RealData
 import numpy as np
 import pandas as pd
-import statsmodels.api as sm
-from statsmodels.tsa.adfvalues import mackinnonp
-from statsmodels.tsa.stattools import adfuller
+from arbitragelab.cointegration_approach import EngleGrangerPortfolio, get_half_life_of_mean_reversion
 
 
 def _print_progress(iteration, max_iterations, prefix='', suffix='', decimals=1, bar_length=50):
@@ -65,16 +62,7 @@ def _outer_ou_loop(spreads_df: pd.DataFrame, test_period: str,
     ou_results = []
 
     for iteration, pair in enumerate(molecule):
-
         spread = spreads_df.loc[:, str(pair)]
-        lagged_spread = spread.shift(1).dropna(0)
-
-        # Setup regression parameters.
-        lagged_spread_c = sm.add_constant(lagged_spread)
-        delta_y_t = np.diff(spread)
-
-        model = sm.OLS(delta_y_t, lagged_spread_c)
-        res = model.fit()
 
         # Split the spread in two periods. The training data is used to
         # extract the long term mean of the spread. Then the mean is used
@@ -101,7 +89,8 @@ def _outer_ou_loop(spreads_df: pd.DataFrame, test_period: str,
         cross_overs = len(cross_overs_counts[cross_overs_counts['counts'] > cross_overs_per_delta]) > 0
 
         # Append half-life and number of cross overs.
-        ou_results.append([np.log(2) / abs(res.params[0]), cross_overs])
+        half_life = get_half_life_of_mean_reversion(data=spread)
+        ou_results.append([half_life, cross_overs])
 
         _print_progress(iteration + 1, len(molecule), prefix='Outer OU Loop Progress:',
                         suffix='Complete')
@@ -118,13 +107,13 @@ def _linear_f(beta: np.array, x_variable: np.array) -> np.array:
     :return: (np.array) Vector result of equation calculation.
     """
 
-    return beta[0]*x_variable + beta[1]
+    return beta[0] * x_variable + beta[1]
 
 
 def _outer_cointegration_loop(prices_df: pd.DataFrame, molecule: list) -> pd.DataFrame:
     """
-    This function calculates the Engle-Granger test for each pair in the molecule. Uses the Total
-    Least Squares approach to take into consideration the variance of both price series.
+    This function calculates the Engle-Granger test for each pair in the molecule. Uses the OLS
+    approach to calculate hedge ratio.
 
     :param prices_df: (pd.DataFrame) Price Universe.
     :param molecule: (list) Indices of pairs.
@@ -134,26 +123,21 @@ def _outer_cointegration_loop(prices_df: pd.DataFrame, molecule: list) -> pd.Dat
     cointegration_results = []
 
     for iteration, pair in enumerate(molecule):
-        maxlag = None
-        autolag = "aic"
-        trend = "c"
+        eg_port = EngleGrangerPortfolio()
+        eg_port.fit(price_data=prices_df.loc[:, [pair[0], pair[1]]])
 
-        linear = Model(_linear_f)
-        mydata = RealData(prices_df.loc[:, pair[0]], prices_df.loc[:, pair[1]])
-        myodr = ODR(mydata, linear, beta0=[1., 2.])
-        res_co = myodr.run()
+        constant = eg_port.residuals.mean()
+        statistic_value = eg_port.adf_statistics.loc['statistic_value'].iloc[0]
+        p_value_99 = eg_port.adf_statistics.loc['99%'].iloc[0]
+        p_value_95 = eg_port.adf_statistics.loc['95%'].iloc[0]
+        p_value_90 = eg_port.adf_statistics.loc['90%'].iloc[0]
 
-        res_adf = adfuller(res_co.delta - res_co.eps, maxlag=maxlag,
-                           autolag=autolag, regression="nc")
-
-        pval_asy = mackinnonp(res_adf[0], regression=trend)
-
-        cointegration_results.append((res_adf[0], pval_asy,
-                                      res_co.beta[0], res_co.beta[1]))
-
+        cointegration_results.append(
+            [statistic_value, p_value_99, p_value_95, p_value_90, -eg_port.cointegration_vectors[pair[1]].iloc[0],
+             constant])
         _print_progress(iteration + 1, len(molecule), prefix='Outer Cointegration Loop Progress:',
                         suffix='Complete')
 
     return pd.DataFrame(cointegration_results,
                         index=molecule,
-                        columns=['coint_t', 'pvalue', 'hedge_ratio', 'constant'])
+                        columns=['coint_t', 'p_value_99%', 'p_value_95%', 'p_value_90%', 'hedge_ratio', 'constant'])

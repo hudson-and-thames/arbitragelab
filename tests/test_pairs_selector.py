@@ -178,7 +178,7 @@ class TestPairsSelector(unittest.TestCase):
         coint_pairs = [('ABMD', 'AZO'), ('AES', 'BBY'), ('BKR', 'CE')]
         input_pairs = final_pairs + coint_pairs
 
-        result = self.pair_selector._criterion_selection(input_pairs, pvalue_threshold=0.1)
+        result = self.pair_selector._criterion_selection(input_pairs, adf_cutoff_threshold=0.9)
         result = pd.Series(result)
 
         coint_pp = self.pair_selector.coint_pass_pairs.index
