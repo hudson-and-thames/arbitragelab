@@ -219,6 +219,33 @@ class TestPairsSelector(unittest.TestCase):
         pd.testing.assert_series_equal(pd.Series(coint_pairs), coint_pp)
         pd.testing.assert_series_equal(pd.Series(final_pairs), result)
 
+    def test_criterion_selector_min_hl(self):
+        """
+        Verifies final user exposed criterion selection method with minimum HL hedge ration calculation.
+        """
+
+        # Setup initial variables needed for the test.
+        self.pair_selector.dimensionality_reduction_by_components(2)
+        self.pair_selector.cluster_using_optics(min_samples=3)
+
+        final_pairs = [('BA', 'CF')]
+        other_pairs = [('ABMD', 'AZO'), ('AES', 'BBY'), ('BKR', 'CE')]
+        coint_pairs = [('BA', 'CF')]
+        input_pairs = final_pairs + other_pairs
+
+        result = self.pair_selector._criterion_selection(input_pairs, adf_cutoff_threshold=0.95,
+                                                         min_crossover_threshold_per_year=8,
+                                                         hurst_exp_threshold=0.55,
+                                                         hedge_ratio_calculation='min_half_life')
+        result = pd.Series(result)
+
+        coint_pp = self.pair_selector.coint_pass_pairs.index
+        coint_pp = pd.Series(coint_pp)
+
+        # Assert that only 2 pairs passes cointegration tests and only 2 pairs passes all tests (no crossover).
+        pd.testing.assert_series_equal(pd.Series(coint_pairs), coint_pp)
+        pd.testing.assert_series_equal(pd.Series(final_pairs), result)
+
     def test_unsupervised_candidate_pair_selector(self):
         """
         Tests the parent candidate pair selection method.

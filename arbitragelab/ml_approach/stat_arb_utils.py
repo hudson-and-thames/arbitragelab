@@ -8,8 +8,8 @@ This module houses utility functions used by the PairsSelector.
 import sys
 import numpy as np
 import pandas as pd
+from arbitragelab.hedge_ratios import get_tls_hedge_ratio, get_ols_hedge_ratio, get_minimum_hl_hedge_ratio
 from arbitragelab.cointegration_approach import EngleGrangerPortfolio, get_half_life_of_mean_reversion
-from arbitragelab.hedge_ratios import get_tls_hedge_ratio, get_ols_hedge_ratio
 
 
 def _print_progress(iteration, max_iterations, prefix='', suffix='', decimals=1, bar_length=50):
@@ -133,10 +133,16 @@ def _outer_cointegration_loop(prices_df: pd.DataFrame, molecule: list, hedge_rat
             fit, _, _, residuals = get_ols_hedge_ratio(price_data=prices_df.loc[:, [pair[0], pair[1]]],
                                                        dependent_variable=pair[0])
             hedge_ratio = fit.coef_
-        if hedge_ratio_calculation == 'TLS':
+        elif hedge_ratio_calculation == 'TLS':
             fit, _, _, residuals = get_tls_hedge_ratio(price_data=prices_df.loc[:, [pair[0], pair[1]]],
                                                        dependent_variable=pair[0])
             hedge_ratio = fit.beta[0]
+        elif hedge_ratio_calculation == 'min_half_life':
+            fit, _, _, residuals = get_minimum_hl_hedge_ratio(price_data=prices_df.loc[:, [pair[0], pair[1]]],
+                                                              dependent_variable=pair[0])
+            hedge_ratio = fit.x[0]
+        else:
+            raise ValueError('Unknown hedge ratio calculation parameter value')
 
         constant = residuals.mean()
         eg_port._perform_eg_test(residuals)
