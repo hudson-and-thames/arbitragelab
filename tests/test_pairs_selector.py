@@ -126,7 +126,7 @@ class TestPairsSelector(unittest.TestCase):
 
         result = self.pair_selector._hurst_criterion(input_pairs)
         hurst_pp = pd.Series(result[1].index)
-        pd.testing.assert_series_equal(pd.Series([idx[0]]), hurst_pp)
+        pd.testing.assert_series_equal(pd.Series(idx), hurst_pp)
 
         # Test the hurst criterion with invalid input data.
         with self.assertRaises(Exception):
@@ -159,8 +159,8 @@ class TestPairsSelector(unittest.TestCase):
         # Check that the first pair passes the Half Life Test.
         pd.testing.assert_series_equal(pd.Series([idx[0]]), hl_pairs_sr)
 
-        # Check that no pairs pass through to the final list.
-        pd.testing.assert_series_equal(pd.Series([], dtype=object), final_pairs_sr)
+        # Check that 1 pair pass through to the final list.
+        pd.testing.assert_series_equal(pd.Series([('A', 'AVB')], dtype=object), final_pairs_sr)
 
         # Test final criterions method using invalid data.
         with self.assertRaises(Exception):
@@ -264,7 +264,9 @@ class TestPairsSelector(unittest.TestCase):
         self.pair_selector.clust_labels_ = np.array([-1] * 100)
         np.put(self.pair_selector.clust_labels_, [55, 56, 86], 1)
 
-        self.assertTrue(type(self.pair_selector.unsupervised_candidate_pair_selector()), list)
+        self.assertTrue(
+            type(self.pair_selector.unsupervised_candidate_pair_selector(adf_cutoff_threshold=0.9,
+                                                                         min_crossover_threshold_per_year=4)), list)
 
         final_pairs = pd.DataFrame(index=[('ABMD', 'AZO'), ('AES', 'BBY'), ('BKR', 'CE')])
         self.pair_selector.final_pairs = final_pairs

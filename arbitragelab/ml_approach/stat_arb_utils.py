@@ -132,7 +132,7 @@ def _outer_cointegration_loop(prices_df: pd.DataFrame, molecule: list, hedge_rat
         if hedge_ratio_calculation == 'OLS':
             fit, _, _, residuals = get_ols_hedge_ratio(price_data=prices_df.loc[:, [pair[0], pair[1]]],
                                                        dependent_variable=pair[0])
-            hedge_ratio = fit.coef_
+            hedge_ratio = fit.coef_[0]
         elif hedge_ratio_calculation == 'TLS':
             fit, _, _, residuals = get_tls_hedge_ratio(price_data=prices_df.loc[:, [pair[0], pair[1]]],
                                                        dependent_variable=pair[0])
