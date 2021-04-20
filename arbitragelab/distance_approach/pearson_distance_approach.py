@@ -10,6 +10,7 @@ https://papers.ssrn.com/sol3/papers.cfm?abstract_id=141615.
 """
 
 import itertools
+import math
 import pandas as pd
 import numpy as np
 from sklearn.linear_model import LinearRegression
@@ -31,7 +32,8 @@ class PearsonStrategy:
 
         # Internal Parameters
         self.monthly_return = None  # Monthly return dataset in formation period
-        self.risk_free = None  # Risk free rate dataset for calculating return differences
+        self.risk_free = None  # Risk free rate dataset for calculating return differences in train period
+        self.test_risk_free = None  # Risk free rate dataset for calculating return differences in test period
         self.beta_dict = None  # Regression coefficients for each stock in the formation period
         self.pairs_dict = None  # Top n pairs selected during the formation period
         self.last_month = None  # Returns from the last month of training data
@@ -43,7 +45,7 @@ class PearsonStrategy:
 
         devadarsh.track('PearsonStrategy')
 
-    def form_portfolio(self, train_data, risk_free=None, num_pairs=50, weight='equal', long_pct=0.1, short_pct=0.1):
+    def form_portfolio(self, train_data, risk_free=0.0, num_pairs=50, weight='equal', long_pct=0.1, short_pct=0.1):
         """
         Forms portfolio based on the input train data.
 
@@ -68,7 +70,7 @@ class PearsonStrategy:
         divergence, decile 10 is “long stocks” and decile 1 is “short stocks”.
 
         :param train_data: (pd.DataFrame) Daily price data with date in its index and stocks in its columns.
-        :param risk_free: (pd.Series) Daily risk free rate data with date in its index.
+        :param risk_free: (pd.Series or float) Daily risk free rate data as a series or a float number.
         :param num_pairs: (int) Number of top pairs to use for portfolio formation.
         :param weight: (str) Weighting Scheme for portfolio returns [``equal`` by default, ``correlation``].
         :param long_pct: (float) Percentage of long stocks in the sorted return divergence.
@@ -87,7 +89,7 @@ class PearsonStrategy:
         # Set long and short percentage when trading
         self.long_pct, self.short_pct = long_pct, short_pct
 
-    def trade_portfolio(self, test_data, test_risk_free=None):
+    def trade_portfolio(self, test_data, test_risk_free=0.0):
         """
         Trade portfolios by generating trading signals in the test data.
 
@@ -100,7 +102,7 @@ class PearsonStrategy:
         portfolio for each month of the period.
 
         :param test_data: (pd.DataFrame) Daily price data with date in its index and stocks in its columns.
-        :param test_risk_free: (pd.Series) Daily risk free rate data with date in its index.
+        :param test_risk_free: (pd.Series or float) Daily risk free rate data as a series or a float number.
         """
 
         # Preprocess test data
@@ -183,10 +185,11 @@ class PearsonStrategy:
         num_stocks = len(return_diff_sorted)
 
         # Stocks with bottom 10% value of the return differences should be shorted
-        short_stocks = dict(itertools.islice(return_diff_sorted.items(), 0, int(num_stocks * short_pct)))
+        short_stocks = dict(itertools.islice(return_diff_sorted.items(), 0, math.ceil(num_stocks * short_pct)))
 
         # Stocks with top 10% value of the return differences should be longed
-        long_stocks = dict(itertools.islice(return_diff_sorted.items(), int(num_stocks * (1 - long_pct)), num_stocks))
+        long_stocks = dict(
+            itertools.islice(return_diff_sorted.items(), math.ceil(num_stocks * (1 - long_pct)), num_stocks))
 
         return long_stocks, short_stocks
 
@@ -208,7 +211,7 @@ class PearsonStrategy:
         it is needed to preprocess the train data and risk free data.
 
         :param price_data: (pd.DataFrame) Daily price data with date in its index and stocks in its columns.
-        :param risk_free: (pd.Series) Daily risk free rate data with date in its index.
+        :param risk_free: (pd.Series or float) Daily risk free rate data as a series or a float number.
         :param phase: (str) Phase indicating training or testing, [``train`` by default, ``test``].
         """
 
@@ -218,8 +221,8 @@ class PearsonStrategy:
         # Change the daily price data into daily return by calculating the percent change
         daily_return = data_copy.pct_change()
 
-        # Change the index of the train data into string to group by months later
-        daily_return.index = daily_return.index.map(lambda x: pd.to_datetime(str(x)))
+        # Change the index of the train data into datetime to group by months later
+        daily_return.index = pd.to_datetime(daily_return.index)
 
         # Add 1 to the values to calculate the compound return
         daily_return = daily_return + 1
@@ -230,23 +233,11 @@ class PearsonStrategy:
         # Rename the multi index
         monthly_return.index.names = ["Year", "Month"]
 
-        if phase == 'train':
-            self.monthly_return = monthly_return
-
-        elif phase == 'test':
-            self.test_monthly_return = monthly_return
-
-        if risk_free is None:
-
-            # If risk free data is not given, use zero rate instead
-            self.risk_free = pd.Series(data=[0 for _ in range(len(monthly_return.index))], name='risk_free',
-                                       index=monthly_return.index)
-
-        elif isinstance(risk_free, float):
+        if isinstance(risk_free, float):
 
             # If risk free data is given as float, construct pd series
-            self.risk_free = pd.Series(data=[risk_free for _ in range(len(monthly_return.index))], name='risk_free',
-                                       index=monthly_return.index)
+            risk_free = pd.Series(data=[risk_free for _ in range(len(monthly_return.index))], name='risk_free',
+                                  index=monthly_return.index)
 
         else:
 
@@ -255,7 +246,13 @@ class PearsonStrategy:
             risk_free.index = risk_free.index.map(lambda x: pd.to_datetime(str(x)))
             risk_free = risk_free.groupby([risk_free.index.year, risk_free.index.month]).mean()
 
+        if phase == 'train':
+            self.monthly_return = monthly_return
             self.risk_free = risk_free
+
+        elif phase == 'test':
+            self.test_monthly_return = monthly_return
+            self.risk_free = self.risk_free.append(risk_free)
 
     def _beta_pairs_formation(self, num_pairs, weight):
         """
@@ -294,7 +291,7 @@ class PearsonStrategy:
             else:
 
                 # Find correlation values for pairs
-                corr_values = corr_matrix.loc[stock].loc[pairs].values
+                corr_values = corr_matrix.loc[stock].loc[pairs].values - 1
                 corr_values = corr_values / corr_values.sum()
 
                 # Get pair return values
@@ -302,7 +299,7 @@ class PearsonStrategy:
                 portfolio_return = np.matmul(pairs_return, corr_values).reshape((-1, 1))
 
             # Use linear regression to get regression coefficient of two returns
-            model = LinearRegression().fit(portfolio_return, stock_return)
+            model = LinearRegression().fit(portfolio_return, stock_return - 1)
             stock_coefficient = model.coef_[0]
 
             # Save the beta in a dictionary
@@ -323,7 +320,7 @@ class PearsonStrategy:
 
         for stock in last_month.index:
             # Risk free rate for the last month
-            risk_free_test = self.risk_free[last_month.name]
+            risk_free = self.risk_free[last_month.name]
 
             # Get pairs and beta from the dictionaries
             pairs = self.pairs_dict[stock]
@@ -334,7 +331,7 @@ class PearsonStrategy:
             stock_return = last_month[stock]
 
             # Calculate return difference value
-            return_diff = beta * (portfolio_return - risk_free_test) - (stock_return - risk_free_test)
+            return_diff = beta * (portfolio_return - risk_free) - (stock_return - risk_free)
 
             # Save the return difference in the dictionary
             return_diff_dict[stock] = return_diff
