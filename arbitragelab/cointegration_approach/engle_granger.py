@@ -64,8 +64,9 @@ class EngleGrangerPortfolio(CointegratedPortfolio):
         self.dependent_variable = price_data.columns[0]
 
         # Fit the regression
-        self.ols_model, X, y, residuals = get_ols_hedge_ratio(price_data=price_data, dependent_variable=self.dependent_variable,
-                                                   add_constant=add_constant)
+        self.ols_model, _, _, residuals = get_ols_hedge_ratio(price_data=price_data,
+                                                              dependent_variable=self.dependent_variable,
+                                                              add_constant=add_constant)
         self.cointegration_vectors = pd.DataFrame([np.append(1, -1 * self.ols_model.coef_)],
                                                   columns=price_data.columns)
 

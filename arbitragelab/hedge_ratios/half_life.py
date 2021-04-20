@@ -9,7 +9,7 @@ import numpy as np
 from scipy.optimize import minimize
 from arbitragelab.cointegration_approach import get_half_life_of_mean_reversion
 
-
+# pylint: disable=invalid-name
 def _min_hl_function(beta: np.array, X: pd.DataFrame, y: pd.Series) -> float:
     """
     Fitness function to minimize in Minimum Half Life Hedge Ratio algorithm.
@@ -22,7 +22,7 @@ def _min_hl_function(beta: np.array, X: pd.DataFrame, y: pd.Series) -> float:
     spread = y - (beta * X).sum(axis=1)
     return get_half_life_of_mean_reversion(spread)
 
-
+# pylint: disable=invalid-name
 def get_minimum_hl_hedge_ratio(price_data: pd.DataFrame, dependent_variable: str) -> \
         Tuple[object, pd.DataFrame, pd.Series, pd.Series]:
     """
