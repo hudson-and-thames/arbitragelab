@@ -39,7 +39,6 @@ class PearsonStrategy:
         self.last_month = None  # Returns from the last month of training data
         self.test_monthly_return = None  # Monthly return dataset in test period
         self.trading_signal = None  # Trading signal dataframe
-        self.mean_return = None  # Average return of monthly portfolio in test period
         self.long_pct = 0.1  # Percentage of long stocks in the sorted return divergence
         self.short_pct = 0.1  # Percentage of short stocks in the sorted return divergence
 
@@ -89,7 +88,7 @@ class PearsonStrategy:
         # Set long and short percentage when trading
         self.long_pct, self.short_pct = long_pct, short_pct
 
-    def trade_portfolio(self, test_data, test_risk_free=0.0):
+    def trade_portfolio(self, test_data=None, test_risk_free=0.0):
         """
         Trade portfolios by generating trading signals in the test data.
 
@@ -105,18 +104,17 @@ class PearsonStrategy:
         :param test_risk_free: (pd.Series or float) Daily risk free rate data as a series or a float number.
         """
 
-        # Preprocess test data
-        self._data_preprocess(test_data, test_risk_free, phase='test')
+        if test_data is None:
+            self.trading_signal = self._find_trading_signals(self.last_month, single_period=True)
 
-        # Get trading signals for the test data
-        self.trading_signal = self._find_trading_signals(self.test_monthly_return)
+        else:
+            # Preprocess test data
+            self._data_preprocess(test_data, test_risk_free, phase='test')
 
-        # Calculating return for a given dataset
-        return_dataframe = self.trading_signal * self.test_monthly_return
+            # Get trading signals for the test data
+            self.trading_signal = self._find_trading_signals(self.test_monthly_return)
 
-        self.mean_return = return_dataframe.mean(axis=1)
-
-    def _find_trading_signals(self, monthly_return, trading_signal=None):
+    def _find_trading_signals(self, monthly_return, single_period=False):
         """
         A helper function for finding trading signals.
 
@@ -126,43 +124,57 @@ class PearsonStrategy:
         month.
 
         :param monthly_return: (pd.DataFrame) A monthly return dataframe.
-        :param trading_signal: (pd.DataFrame) A dataframe of trading signal with multi index of year and month.
+        :param single_period: (bool) Whether finding trading signal for a single period ahead.
         :return: (pd.DataFrame) Generated trading signals with multi index of year and month.
         """
 
-        # Calculate the trading signals in the test period
-        for i in range(len(monthly_return)):
+        # Check if test data is not given and generating trading signal for only a single period
+        if single_period:
 
-            if i == 0:
-                # Make a copy of monthly return to generate trading signal
-                trading_signal = monthly_return.copy()
+            # Get long and short stock for the given data
+            long_stocks, short_stocks = self._get_long_short(monthly_return, self.long_pct, self.short_pct)
 
-                # Decide the trading signal for the first month of the test period
-                trading_month = trading_signal.index[0]
+            # Assign 1 for long stocks, -1 for short stocks, and 0 for others
+            trading_signal_values = [1 if stock in long_stocks.keys()
+                                     else -1 if stock in short_stocks.keys() else 0 for stock in monthly_return.index]
 
-                # Using the last month from the training dataset as the previous month
-                prev_month_return = self.last_month
+            # Create a series of trading signal
+            trading_signal = pd.Series(trading_signal_values, index=monthly_return.index)
 
-            else:
+        else:
+            # Calculate the trading signals in the test period
+            for i in range(len(monthly_return)):
 
-                prev_month = trading_signal.index[i - 1]
+                if i == 0:
+                    # Make a copy of monthly return to generate trading signal
+                    trading_signal = monthly_return.copy()
 
-                trading_month = trading_signal.index[i]
+                    # Decide the trading signal for the first month of the test period
+                    trading_month = trading_signal.index[0]
 
-                prev_month_return = monthly_return.loc[prev_month, :]
-
-            long_stocks, short_stocks = self._get_long_short(prev_month_return, self.long_pct, self.short_pct)
-
-            for stock in trading_signal.columns:
-
-                if stock in short_stocks.keys():
-                    trading_signal.loc[trading_month, stock] = -1
-
-                elif stock in long_stocks.keys():
-                    trading_signal.loc[trading_month, stock] = 1
+                    # Using the last month from the training dataset as the previous month
+                    prev_month_return = self.last_month
 
                 else:
-                    trading_signal.loc[trading_month, stock] = 0
+
+                    prev_month = trading_signal.index[i - 1]
+
+                    trading_month = trading_signal.index[i]
+
+                    prev_month_return = monthly_return.loc[prev_month, :]
+
+                long_stocks, short_stocks = self._get_long_short(prev_month_return, self.long_pct, self.short_pct)
+
+                for stock in trading_signal.columns:
+
+                    if stock in short_stocks.keys():
+                        trading_signal.loc[trading_month, stock] = -1
+
+                    elif stock in long_stocks.keys():
+                        trading_signal.loc[trading_month, stock] = 1
+
+                    else:
+                        trading_signal.loc[trading_month, stock] = 0
 
         return trading_signal
 
@@ -188,8 +200,8 @@ class PearsonStrategy:
         short_stocks = dict(itertools.islice(return_diff_sorted.items(), 0, math.ceil(num_stocks * short_pct)))
 
         # Stocks with top 10% value of the return differences should be longed
-        long_stocks = dict(
-            itertools.islice(return_diff_sorted.items(), math.ceil(num_stocks * (1 - long_pct)), num_stocks))
+        long_stocks = dict(itertools.islice(return_diff_sorted.items(), math.ceil(num_stocks * (1 - long_pct)),
+                                            num_stocks))
 
         return long_stocks, short_stocks
 
