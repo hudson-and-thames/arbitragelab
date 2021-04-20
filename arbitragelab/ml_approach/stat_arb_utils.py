@@ -9,6 +9,7 @@ import sys
 import numpy as np
 import pandas as pd
 from arbitragelab.cointegration_approach import EngleGrangerPortfolio, get_half_life_of_mean_reversion
+from arbitragelab.hedge_ratios import get_tls_hedge_ratio, get_ols_hedge_ratio
 
 
 def _print_progress(iteration, max_iterations, prefix='', suffix='', decimals=1, bar_length=50):
@@ -86,7 +87,10 @@ def _outer_ou_loop(spreads_df: pd.DataFrame, test_period: str,
 
         # Check that the number of crossovers are in accordance with the given selection
         # criteria.
-        cross_overs = len(cross_overs_counts[cross_overs_counts['counts'] > cross_overs_per_delta]) > 0
+        if cross_overs_per_delta is not None:
+            cross_overs = len(cross_overs_counts[cross_overs_counts['counts'] >= cross_overs_per_delta]) > 0
+        else:
+            cross_overs = True
 
         # Append half-life and number of cross overs.
         half_life = get_half_life_of_mean_reversion(data=spread)
@@ -110,13 +114,14 @@ def _linear_f(beta: np.array, x_variable: np.array) -> np.array:
     return beta[0] * x_variable + beta[1]
 
 
-def _outer_cointegration_loop(prices_df: pd.DataFrame, molecule: list) -> pd.DataFrame:
+def _outer_cointegration_loop(prices_df: pd.DataFrame, molecule: list, hedge_ratio_calculation: str) -> pd.DataFrame:
     """
-    This function calculates the Engle-Granger test for each pair in the molecule. Uses the OLS
-    approach to calculate hedge ratio.
+    This function calculates the Engle-Granger test for each pair in the molecule.
 
     :param prices_df: (pd.DataFrame) Price Universe.
     :param molecule: (list) Indices of pairs.
+    :param hedge_ratio_calculation: (str) Defines how hedge ratio is calculated. Can be either 'OLS,
+                                        'TLS' (Total Least Squares) or 'min_half_life'.
     :return: (pd.DataFrame) Cointegration statistics.
     """
 
@@ -124,16 +129,24 @@ def _outer_cointegration_loop(prices_df: pd.DataFrame, molecule: list) -> pd.Dat
 
     for iteration, pair in enumerate(molecule):
         eg_port = EngleGrangerPortfolio()
-        eg_port.fit(price_data=prices_df.loc[:, [pair[0], pair[1]]])
+        if hedge_ratio_calculation == 'OLS':
+            fit, _, _, residuals = get_ols_hedge_ratio(price_data=prices_df.loc[:, [pair[0], pair[1]]],
+                                                       dependent_variable=pair[0])
+            hedge_ratio = fit.coef_
+        if hedge_ratio_calculation == 'TLS':
+            fit, _, _, residuals = get_tls_hedge_ratio(price_data=prices_df.loc[:, [pair[0], pair[1]]],
+                                                       dependent_variable=pair[0])
+            hedge_ratio = fit.beta[0]
 
-        constant = eg_port.residuals.mean()
+        constant = residuals.mean()
+        eg_port._perform_eg_test(residuals)
         statistic_value = eg_port.adf_statistics.loc['statistic_value'].iloc[0]
         p_value_99 = eg_port.adf_statistics.loc['99%'].iloc[0]
         p_value_95 = eg_port.adf_statistics.loc['95%'].iloc[0]
         p_value_90 = eg_port.adf_statistics.loc['90%'].iloc[0]
 
         cointegration_results.append(
-            [statistic_value, p_value_99, p_value_95, p_value_90, -eg_port.cointegration_vectors[pair[1]].iloc[0],
+            [statistic_value, p_value_99, p_value_95, p_value_90, hedge_ratio,
              constant])
         _print_progress(iteration + 1, len(molecule), prefix='Outer Cointegration Loop Progress:',
                         suffix='Complete')

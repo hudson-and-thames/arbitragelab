@@ -13,6 +13,7 @@ import matplotlib
 
 from arbitragelab.ml_approach import PairsSelector
 
+
 # pylint: disable=protected-access
 
 
@@ -165,9 +166,9 @@ class TestPairsSelector(unittest.TestCase):
         with self.assertRaises(Exception):
             self.pair_selector._final_criterions([], [])
 
-    def test_criterion_selector(self):
+    def test_criterion_selector_ols(self):
         """
-        Verifies final user exposed criterion selection method.
+        Verifies final user exposed criterion selection method with OLS hedge ratio calculation.
         """
 
         # Setup initial variables needed for the test.
@@ -175,17 +176,47 @@ class TestPairsSelector(unittest.TestCase):
         self.pair_selector.cluster_using_optics(min_samples=3)
 
         final_pairs = [('BA', 'CF')]
-        coint_pairs = [('ABMD', 'AZO'), ('AES', 'BBY'), ('BKR', 'CE')]
-        input_pairs = final_pairs + coint_pairs
+        other_pairs = [('ABMD', 'AZO'), ('AES', 'BBY'), ('BKR', 'CE')]
+        coint_pairs = [('BA', 'CF'), ('BKR', 'CE')]
+        input_pairs = final_pairs + other_pairs
 
-        result = self.pair_selector._criterion_selection(input_pairs, adf_cutoff_threshold=0.9)
+        result = self.pair_selector._criterion_selection(input_pairs, adf_cutoff_threshold=0.9,
+                                                         min_crossover_threshold_per_year=0,
+                                                         hedge_ratio_calculation='OLS')
         result = pd.Series(result)
 
         coint_pp = self.pair_selector.coint_pass_pairs.index
         coint_pp = pd.Series(coint_pp)
 
-        # Assert that only the first pair passes through all the tests.
-        pd.testing.assert_series_equal(pd.Series(final_pairs), coint_pp)
+        # Assert that only 2 pairs passes cointegration tests and only 1 pair passes all tests.
+        pd.testing.assert_series_equal(pd.Series(coint_pairs), coint_pp)
+        pd.testing.assert_series_equal(pd.Series(final_pairs), result)
+
+    def test_criterion_selector_tls(self):
+        """
+        Verifies final user exposed criterion selection method with TLS hedge ration calculation.
+        """
+
+        # Setup initial variables needed for the test.
+        self.pair_selector.dimensionality_reduction_by_components(2)
+        self.pair_selector.cluster_using_optics(min_samples=3)
+
+        final_pairs = [('BA', 'CF'), ('BKR', 'CE')]
+        other_pairs = [('ABMD', 'AZO'), ('AES', 'BBY')]
+        coint_pairs = [('BA', 'CF'), ('BKR', 'CE')]
+        input_pairs = final_pairs + other_pairs
+
+        result = self.pair_selector._criterion_selection(input_pairs, adf_cutoff_threshold=0.9,
+                                                         min_crossover_threshold_per_year=None,
+                                                         hurst_exp_threshold=0.55,
+                                                         hedge_ratio_calculation='TLS')
+        result = pd.Series(result)
+
+        coint_pp = self.pair_selector.coint_pass_pairs.index
+        coint_pp = pd.Series(coint_pp)
+
+        # Assert that only 2 pairs passes cointegration tests and only 2 pairs passes all tests (no crossover).
+        pd.testing.assert_series_equal(pd.Series(coint_pairs), coint_pp)
         pd.testing.assert_series_equal(pd.Series(final_pairs), result)
 
     def test_unsupervised_candidate_pair_selector(self):
@@ -216,7 +247,7 @@ class TestPairsSelector(unittest.TestCase):
         self.assertTrue(type(selected_pairs_return), list)
 
         with self.assertRaises(Exception):
-            pairs_list = list((('F', 'V'),)*45)
+            pairs_list = list((('F', 'V'),) * 45)
             final_pairs = pd.DataFrame(index=pairs_list)
             self.pair_selector.final_pairs = final_pairs
             self.pair_selector.plot_selected_pairs()

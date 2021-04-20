@@ -21,6 +21,7 @@ from matplotlib.figure import Figure
 from arbitragelab.ml_approach.stat_arb_utils import _outer_cointegration_loop, _outer_ou_loop
 from arbitragelab.util import devadarsh
 from arbitragelab.util.indexed_highlight import IndexedHighlight
+from arbitragelab.util.hurst import get_hurst_exponent
 
 
 class PairsSelector:
@@ -395,7 +396,7 @@ class PairsSelector:
             asset_two = self.prices_df.loc[:, idx[1]].values
 
             spread_ts = (asset_one - asset_two * frame['hedge_ratio'])
-            hurst_exp = self.hurst(spread_ts)
+            hurst_exp = get_hurst_exponent(spread_ts)
 
             if hurst_exp < hurst_exp_threshold:
                 hurst_pass_pairs.append((idx, hurst_exp))
@@ -431,9 +432,6 @@ class PairsSelector:
             test and the second is a DataFrame of final pairs and their mean crossover counts.
         """
 
-        hl_pass_pairs = []
-        final_pairs = []
-
         if len(pairs) == 0:
             raise Exception("No pairs have been found!")
 
@@ -452,7 +450,8 @@ class PairsSelector:
 
         return hl_pass_pairs, final_pairs
 
-    def unsupervised_candidate_pair_selector(self, pvalue_threshold: int = 0.01,
+    def unsupervised_candidate_pair_selector(self, hedge_ratio_calculation: str = 'OLS',
+                                             adf_cutoff_threshold: float = 0.95,
                                              hurst_exp_threshold: int = 0.5,
                                              min_crossover_threshold_per_year: int = 12,
                                              test_period: str = '2Y') -> list:
@@ -464,7 +463,10 @@ class PairsSelector:
         in the paper: the pair being cointegrated, the Hurst exponent being <0.5, the spread moves
         within convenient periods and finally that the spread reverts to the mean with enough frequency.
 
-        :param pvalue_threshold: (int) Max p-value threshold to be used in the cointegration tests.
+        :param hedge_ratio_calculation: (str) Defines how hedge ratio is calculated. Can be either 'OLS,
+                                        'TLS' (Total Least Squares) or 'min_half_life'.
+        :param adf_cutoff_threshold: (float) ADF test threshold used to define if the spread is cointegrated. Can be
+                                             0.99, 0.95 or 0.9.
         :param hurst_exp_threshold: (int) Max Hurst threshold value.
         :param min_crossover_threshold_per_year: (int) Minimum amount of mean crossovers per year.
         :param test_period: (str) Time delta format, to be used as the time
@@ -483,11 +485,11 @@ class PairsSelector:
         cluster_x_cointegration_combinations = self._generate_pairwise_combinations(c_labels)
         self.cluster_pairs_combinations = cluster_x_cointegration_combinations
 
-        return self._criterion_selection(cluster_x_cointegration_combinations,
-                                         pvalue_threshold, hurst_exp_threshold,
+        return self._criterion_selection(cluster_x_cointegration_combinations, hedge_ratio_calculation,
+                                         adf_cutoff_threshold, hurst_exp_threshold,
                                          min_crossover_threshold_per_year, test_period)
 
-    def _criterion_selection(self, cluster_x_cointegration_combinations: list,
+    def _criterion_selection(self, cluster_x_cointegration_combinations: list, hedge_ratio_calculation: str = 'OLS',
                              adf_cutoff_threshold: float = 0.95, hurst_exp_threshold: int = 0.5,
                              min_crossover_threshold_per_year: int = 12,
                              test_period: str = '2Y') -> list:
@@ -500,6 +502,8 @@ class PairsSelector:
         within convenient periods and finally that the spread reverts to the mean with enough frequency.
 
         :param cluster_x_cointegration_combinations: (list) List of asset pairs.
+        :param hedge_ratio_calculation: (str) Defines how hedge ratio is calculated. Can be either 'OLS,
+                                        'TLS' (Total Least Squares) or 'min_half_life'.
         :param adf_cutoff_threshold: (float) ADF test threshold used to define if the spread is cointegrated. Can be
                                              0.99, 0.95 or 0.9.
         :param hurst_exp_threshold: (int) Max Hurst threshold value.
@@ -509,11 +513,10 @@ class PairsSelector:
         :return: (list) Tuple list of final pairs.
         """
 
-        # Selection Criterion One: First, it is imposed that pairs are
-        # cointegrated, using a p-value of 1%.
+        # Selection Criterion One: First, it is imposed that pairs are cointegrated
 
         cointegration_results = _outer_cointegration_loop(
-            self.prices_df, cluster_x_cointegration_combinations)
+            self.prices_df, cluster_x_cointegration_combinations, hedge_ratio_calculation=hedge_ratio_calculation)
 
         passing_pairs = cointegration_results.loc[cointegration_results['coint_t']
                                                   <= cointegration_results[
@@ -690,20 +693,3 @@ class PairsSelector:
                 tck_info.append(info_as_tuple)
 
         return pd.DataFrame(tck_info)
-
-    @staticmethod
-    def hurst(data: pd.DataFrame, max_lags: int = 100) -> float:
-        """
-        Hurst Exponent Calculation.
-
-        :param data: (pd.DataFrame) Time Series that is going to be analyzed.
-        :param max_lags: (int) Maximum amount of lags to be used calculating tau.
-        :return: (float) Hurst exponent.
-        """
-
-        lags = range(2, max_lags)
-        tau = [np.sqrt(np.std(np.subtract(data[lag:], data[:-lag])))
-               for lag in lags]
-        poly = np.polyfit(np.log(lags), np.log(tau), 1)
-
-        return poly[0] * 2.0
