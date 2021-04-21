@@ -18,7 +18,6 @@ import dash_table
 import plotly.graph_objects as go
 from dash.dependencies import Input, Output
 
-
 from arbitragelab.util import devadarsh
 
 
@@ -51,14 +50,14 @@ class TearSheet:
 
         self.data = data
 
-        self.confidence_levels = ['Confidence level',
-                                  ['99%', '95%', '90%']]
+        self.confidence_levels = ['Confidence level', ['99%', '95%', '90%']]
 
         if tearsheet_type == 'cointegration':
-
             self.get_cointegration_approach_tearsheet()
-
-
+        # elif tearsheet_type == 'ou_model':
+        #     self.get_ou_model_tearsheet()
+        # elif tearsheet_type == 'pair_selection':
+        #     self.get_pair_selection_tearsheet()
 
     def get_basic_asset_data(self):
         """
@@ -69,7 +68,8 @@ class TearSheet:
 
         asset_name_1 = data.columns[0]
 
-        norm_asset_price_1 = (data[asset_name_1] - data[asset_name_1].min())/(data[asset_name_1].max()-data[asset_name_1].min())
+        norm_asset_price_1 = (data[asset_name_1] - data[asset_name_1].min()) / (
+                data[asset_name_1].max() - data[asset_name_1].min())
 
         asset_price_1 = pd.DataFrame(data=data[asset_name_1])
 
@@ -80,7 +80,8 @@ class TearSheet:
 
         asset_name_2 = data.columns[1]
 
-        norm_asset_price_2 = (data[asset_name_2] - data[asset_name_2].min())/(data[asset_name_2].max()-data[asset_name_2].min())
+        norm_asset_price_2 = (data[asset_name_2] - data[asset_name_2].min()) / (
+                data[asset_name_2].max() - data[asset_name_2].min())
 
         asset_price_2 = pd.DataFrame(data=data[asset_name_2])
 
@@ -89,7 +90,8 @@ class TearSheet:
 
         test_stat_2 = adfuller(asset_price_2, autolag='AIC')[0]
 
-        output = [asset_name_1,norm_asset_price_1, adf_asset_1, test_stat_1, asset_name_2, norm_asset_price_2, adf_asset_2, test_stat_2]
+        output = [asset_name_1, norm_asset_price_1, adf_asset_1, test_stat_1, asset_name_2, norm_asset_price_2,
+                  adf_asset_2, test_stat_2]
 
         return output
 
@@ -110,12 +112,11 @@ class TearSheet:
         else:
             shapiro_wilk = 'Failed'
 
-        residuals_dataframe = pd.DataFrame(data={'Charachteristic': ['Standard Deviation', 'Half-life',
-                                                                     'Skewness', 'Kurtosis',
-                                                                     'Shapiro-Wilk normality test'],
-                                                 'Value': [round(standard_deviation, 5), round(half_life, 5),
-                                                           round(skewness, 5), round(kurtosis_, 5),
-                                                           shapiro_wilk]})
+        residuals_dataframe = pd.DataFrame(data={
+            'Characteristic': ['Standard Deviation', 'Half-life', 'Skewness', 'Kurtosis',
+                               'Shapiro-Wilk normality test'],
+            'Value': [round(standard_deviation, 5), round(half_life, 5), round(skewness, 5), round(kurtosis_, 5),
+                      shapiro_wilk]})
 
         qq_y = stats.probplot(residuals, dist='norm', sparams=(1))
         x = np.array([qq_y[0][0][0], qq_y[0][0][-1]])
@@ -124,14 +125,12 @@ class TearSheet:
 
         acf_result = acf(residuals, nlags=20, fft=True)
 
-        return (residuals, residuals_dataframe, qq_y, x, pacf_result, acf_result)
+        return residuals, residuals_dataframe, qq_y, x, pacf_result, acf_result
 
-
-    def get_engle_granger_data(self):
+    def get_engle_granger_data(self, data):
         """
 
         """
-        data = self.data
 
         data_returns = (data / data.shift(1) - 1)[1:]
 
@@ -146,7 +145,7 @@ class TearSheet:
         adf_test_stat = adf.loc['statistic_value'][0]
 
         adf_dataframe = pd.DataFrame(
-            data={confidence_levels[0]: confidence_levels[1], 'Values': list(adf[:-1][0].round(5))})
+            data={self.confidence_levels[0]: self.confidence_levels[1], 'Values': list(adf[:-1][0].round(5))})
 
         cointegration_vector = portfolio.cointegration_vectors
 
@@ -156,11 +155,10 @@ class TearSheet:
 
         portfolio_price = (portfolio_returns + 1).cumprod()
 
-        residuals, residuals_dataframe, qq_y, x, pacf_result, acf_result = residual_analysis(portfolio.residuals)
+        residuals, residuals_dataframe, qq_y, x, pacf_result, acf_result = self.residual_analysis(portfolio.residuals)
 
         return (adf_dataframe, adf_test_stat, cointegration_vector, portfolio_returns, portfolio_price, residuals,
                 residuals_dataframe, qq_y, x, pacf_result, acf_result)
-
 
     def get_johansen_data(self):
         """
@@ -183,12 +181,12 @@ class TearSheet:
 
         test_trace = portfolio.johansen_trace_statistic
 
-        test_eigen_dataframe = pd.DataFrame(data={confidence_levels[0]: confidence_levels[1],
+        test_eigen_dataframe = pd.DataFrame(data={self.confidence_levels[0]: self.confidence_levels[1],
                                                   'Values for {}'.format(asset_name_1): list(
                                                       test_eigen.iloc[2::-1][asset_name_1].round(5)),
                                                   'Values for {}'.format(asset_name_2): list(
                                                       test_eigen.iloc[2::-1][asset_name_2].round(5))})
-        test_trace_dataframe = pd.DataFrame(data={confidence_levels[0]: confidence_levels[1],
+        test_trace_dataframe = pd.DataFrame(data={self.confidence_levels[0]: self.confidence_levels[1],
                                                   'Values for {}'.format(asset_name_1): list(
                                                       test_trace.iloc[2::-1][asset_name_1].round(5)),
                                                   'Values for {}'.format(asset_name_2): list(
@@ -218,33 +216,20 @@ class TearSheet:
 
         portfolio_price_2 = (portfolio_returns_2 + 1).cumprod()
 
-        residuals_1 = data[asset_name_1] * cointegration_vector_1[asset_name_1][0] - data[asset_name_2] * \
-                      cointegration_vector_1[asset_name_2][0]
-        residuals_2 = data[asset_name_1] * cointegration_vector_2[asset_name_1][1] - data[asset_name_2] * \
-                      cointegration_vector_2[asset_name_2][1]
 
-        residuals_1, residuals_dataframe_1, qq_y_1, x_1, pacf_result_1, acf_result_1 = residual_analysis(residuals_1)
-
-        residuals_2, residuals_dataframe_2, qq_y_2, x_2, pacf_result_2, acf_result_2 = residual_analysis(residuals_2)
 
         return (test_eigen_dataframe, test_trace_dataframe, eigen_test_statistic_1, eigen_test_statistic_2,
                 trace_test_statistic_1, trace_test_statistic_2, cointegration_vector_1, cointegration_vector_2,
-                portfolio_returns_1, portfolio_price_1, portfolio_returns_2, portfolio_price_2, residuals_1,
-                residuals_dataframe_1, qq_y_1, x_1, pacf_result_1, acf_result_1, residuals_2, residuals_dataframe_2,
-                qq_y_2, x_2, pacf_result_2, acf_result_2)
-
-
+                portfolio_returns_1, portfolio_price_1, portfolio_returns_2, portfolio_price_2)
 
     def adf_test_result(self, dataframe, test_statistic):
         """
 
         """
 
-        orange = self.orange
-        black = self.black
         font = 'Roboto'
 
-        color = black
+        color = self.black
 
         if test_statistic < dataframe.iloc[0][1]:
 
@@ -261,24 +246,21 @@ class TearSheet:
         else:
 
             message = 'HYPOTHESIS REJECTED'
-            color = orange
+            color = self.orange
             font = 'Josefin Sans'
 
         output = [message, color, font]
 
         return output
 
-
     def johansen_test_result(self, dataframe, test_statistic_1, test_statistic_2):
         """
 
         """
 
-        orange = self.orange
-        black = self.black
         font = 'Roboto'
 
-        color = black
+        color = self.black
 
         if (test_statistic_1 > dataframe.iloc[0][1]) and test_statistic_2 > dataframe.iloc[0][2]:
 
@@ -295,108 +277,111 @@ class TearSheet:
         else:
 
             message = 'HYPOTHESIS REJECTED'
-            color = orange
+            color = self.orange
             font = 'Josefin Sans'
 
         output = [message, color, font]
 
         return output
 
-    @staticmethod
-    def asset_prices_plot(data, norm_1, norm_2, name_1, name_2, blue, orange):
+    def asset_prices_plot(self, data, norm_1, norm_2, name_1, name_2):
         """
 
         """
 
         asset_prices = go.Figure()
-        asset_prices.add_trace(go.Scatter(x=data.index, y=norm_1, mode='lines', line=dict(color=blue), name=name_1))
-        asset_prices.add_trace(go.Scatter(x=data.index, y=norm_2, mode='lines', line=dict(color=orange), name=name_2))
+
+        asset_prices.add_trace(
+            go.Scatter(x=data.index, y=norm_1, mode='lines', line=dict(color=self.blue), name=name_1))
+        asset_prices.add_trace(
+            go.Scatter(x=data.index, y=norm_2, mode='lines', line=dict(color=self.orange), name=name_2))
+
         asset_prices.update_layout(legend=dict(yanchor="top", y=0.97, xanchor="left", x=0.925), title="Asset prices",
-            xaxis_title="Date", yaxis_title="Price", font_family='Josefin Sans', font_size=18, height=500,
-            hovermode='x unified')
+                                   xaxis_title="Date", yaxis_title="Price", font_family='Josefin Sans', font_size=18,
+                                   height=500, hovermode='x unified')
 
         asset_prices.update_xaxes(rangeslider_visible=True)
 
         return asset_prices
 
-    @staticmethod
-    def portfolio_plot(portfolio_price, portfolio_return, blue, orange):
+    def portfolio_plot(self, portfolio_price, portfolio_return):
         """
 
         """
         portfolio = go.Figure()
-        portfolio.add_trace(go.Scatter(x=portfolio_price.index, y=portfolio_price, mode='lines', line=dict(color=blue),
-                                       name='Portfolio price'))
+
         portfolio.add_trace(
-            go.Scatter(x=portfolio_return.index, y=portfolio_return, mode='lines', line=dict(color=orange),
+            go.Scatter(x=portfolio_price.index, y=portfolio_price, mode='lines', line=dict(color=self.blue),
+                       name='Portfolio price'))
+        portfolio.add_trace(
+            go.Scatter(x=portfolio_return.index, y=portfolio_return, mode='lines', line=dict(color=self.orange),
                        name='Portfolio return', visible='legendonly'))
+
         portfolio.update_layout(legend=dict(yanchor="top", y=0.97, xanchor="left", x=0.77),
-            title="Normalized portfolio", xaxis_title="Date", yaxis_title="Price", font_family='Josefin Sans',
-            font_size=18, height=500, margin=dict(l=30, r=30, t=50, b=30))
+                                title="Normalized portfolio", xaxis_title="Date", yaxis_title="Price",
+                                font_family='Josefin Sans', font_size=18, height=500,
+                                margin=dict(l=30, r=30, t=50, b=30))
+
         portfolio.update_xaxes(rangeslider_visible=True)
 
         return portfolio
 
-    @staticmethod
-    def pacf_plot(pacf, blue):
+    def pacf_plot(self, pacf):
         """
 
         """
 
-        trace = {"name": "PACF", "type": "bar", "marker_color": blue, "y": pacf
-
-        }
+        trace = {"name": "PACF", "type": "bar", "marker_color": self.blue, "y": pacf}
 
         pacf_plot = go.Figure(data=trace)
 
-        pacf_plot.update_layout(title="PACF", xaxis_title="Lag",  # yaxis_title="Price",
-                                font_family='Josefin Sans', font_size=14, height=250, margin=dict(l=30, r=30, t=50, b=30))
+        pacf_plot.update_layout(title="PACF", xaxis_title="Lag", font_family='Josefin Sans', font_size=14, height=250,
+                                margin=dict(l=30, r=30, t=50, b=30))
 
         return pacf_plot
 
-    @staticmethod
-    def acf_plot(acf, blue):
+    def acf_plot(self, acf):
         """
 
         """
 
-        trace = {"name": "ACF", "type": "bar", "marker_color": blue, "y": acf
-
-        }
+        trace = {"name": "ACF", "type": "bar", "marker_color": self.blue, "y": acf}
 
         acf_plot = go.Figure(data=trace)
 
-        acf_plot.update_layout(title="ACF", xaxis_title="Lag",  # yaxis_title="Price",
-                               font_family='Josefin Sans', font_size=14, height=250, margin=dict(l=30, r=30, t=50, b=30))
+        acf_plot.update_layout(title="ACF", xaxis_title="Lag", font_family='Josefin Sans', font_size=14, height=250,
+                               margin=dict(l=30, r=30, t=50, b=30))
 
         return acf_plot
 
-    @staticmethod
-    def residuals_plot(residuals, orange):
+    def residuals_plot(self, residuals):
         """
 
         """
 
         resid_plot = go.Figure()
-        resid_plot.add_trace(go.Scatter(x=residuals.index, y=residuals, mode='lines', line=dict(color=orange)))
+        resid_plot.add_trace(go.Scatter(x=residuals.index, y=residuals, mode='lines', line=dict(color=self.orange)))
         resid_plot.add_shape(type='line', x0=residuals.index[0], y0=residuals.mean(), x1=residuals.index[-1],
-                             y1=residuals.mean(), line=dict(color=grey, dash='dash'))
+                             y1=residuals.mean(), line=dict(color=self.grey, dash='dash'))
+
         resid_plot.update_layout(title="Residuals plot", font_family='Josefin Sans', font_size=14, height=250,
-            margin=dict(l=30, r=30, t=50, b=30))
+                                 margin=dict(l=30, r=30, t=50, b=30))
 
         return resid_plot
 
-    @staticmethod
-    def qq_plot(qq_data, x_data, blue, orange):
+    def qq_plot(self, qq_data, x_data):
         """
 
         """
 
         qq_plot = go.Figure()
-        qq_plot.add_scatter(x=qq_data[0][0], y=qq_data[0][1], mode='markers', line=dict(color=blue))
-        qq_plot.add_scatter(x=x_data, y=qq_data[1][1] + qq_data[1][0] * x_data, mode='lines', line=dict(color=grey))
+
+        qq_plot.add_scatter(x=qq_data[0][0], y=qq_data[0][1], mode='markers', line=dict(color=self.blue))
+        qq_plot.add_scatter(x=x_data, y=qq_data[1][1] + qq_data[1][0] * x_data, mode='lines',
+                            line=dict(color=self.grey))
+
         qq_plot.update_layout(title="Q-Q Plot", font_family='Josefin Sans', font_size=14, height=550,
-            margin=dict(l=30, r=30, t=50, b=30), showlegend=False)
+                              margin=dict(l=30, r=30, t=50, b=30), showlegend=False)
         return qq_plot
 
     def jh_coint_test_div(self, asset_1, asset_2, coint_test_eigen, coint_test_trace, eigen_test_statistic_1,
@@ -407,168 +392,166 @@ class TearSheet:
 
         output = html.Div(
             style={'padding-left': 50, 'padding-right': 0, 'padding-top': 20, 'padding-bottom': 50, 'margin-left': 50,
-                   'margin-right': 0, 'margin-top': 0, 'margin-bottom': 0, 'backgroundColor': white,
+                   'margin-right': 0, 'margin-top': 0, 'margin-bottom': 0, 'backgroundColor': self.white,
                    'horizontal-align': 'center', }, children=[
 
                 html.H3(children='Cointegration tests results:',
-                        style={'textAlign': 'left', 'color': black, 'font-family': 'Josefin Sans', 'font-weight': '500',
-                               'font-size': 24, 'padding-bottom': '1%', 'padding-top': '1%', 'display': 'block'}),
+                        style={'textAlign': 'left', 'color': self.black, 'font-family': 'Josefin Sans',
+                               'font-weight': '500', 'font-size': 24, 'padding-bottom': '1%', 'padding-top': '1%',
+                               'display': 'block'}),
 
-                html.Div(
-                    style={'backgroundColor': white, 'display': 'inline-block', 'padding-left': 0, 'padding-right': 50,
-                           'padding-top': 0, 'padding-bottom': 0, 'margin-left': 10, 'margin-right': 50,
-                           'margin-top': 0, 'margin-bottom': 0, 'vertical-align': 'center',
-                           'horizontal-align': 'center', 'width': '34%'}, children=[
+                html.Div(style={'backgroundColor': self.white, 'display': 'inline-block', 'padding-left': 0,
+                                'padding-right': 50, 'padding-top': 0, 'padding-bottom': 0, 'margin-left': 10,
+                                'margin-right': 50, 'margin-top': 0, 'margin-bottom': 0, 'vertical-align': 'center',
+                                'horizontal-align': 'center', 'width': '34%'}, children=[
 
-                        html.H3(children='Eigenvalue test:',
-                                style={'textAlign': 'left', 'color': black, 'font-family': 'Josefin Sans',
-                                       'font-weight': '500', 'font-size': 22, 'padding-bottom': '2%',
-                                       'display': 'block'}),
+                    html.H3(children='Eigenvalue test:',
+                            style={'textAlign': 'left', 'color': self.black, 'font-family': 'Josefin Sans',
+                                   'font-weight': '500', 'font-size': 22, 'padding-bottom': '2%', 'display': 'block'}),
 
-                        html.P(children=
-                               johansen_test_result(coint_test_eigen, eigen_test_statistic_1, eigen_test_statistic_2)[
-                                   0], style={'textAlign': 'left', 'color':
-                            johansen_test_result(coint_test_eigen, eigen_test_statistic_1, eigen_test_statistic_2)[1],
-                                              'font-family':
-                                                  johansen_test_result(coint_test_eigen, eigen_test_statistic_1,
-                                                                       eigen_test_statistic_2)[2], 'font-weight': '350',
-                                              'font-size': 20, 'padding-bottom': '2%', 'padding-top': 0,
-                                              'display': 'block'}),
+                    html.P(children=
+                    self.johansen_test_result(coint_test_eigen, eigen_test_statistic_1, eigen_test_statistic_2)[0],
+                        style={'textAlign': 'left', 'color':
+                            self.johansen_test_result(coint_test_eigen, eigen_test_statistic_1, eigen_test_statistic_2)[
+                                1], 'font-family': self.johansen_test_result(coint_test_eigen, eigen_test_statistic_1,
+                                                                             eigen_test_statistic_2)[2],
+                               'font-weight': '350', 'font-size': 20, 'padding-bottom': '2%', 'padding-top': 0,
+                               'display': 'block'}),
 
-                        dash_table.DataTable(data=coint_test_eigen.to_dict('records'),
-                            columns=[{'id': c, 'name': c} for c in coint_test_eigen.columns], style_as_list_view=True,
+                    dash_table.DataTable(data=coint_test_eigen.to_dict('records'),
+                                         columns=[{'id': c, 'name': c} for c in coint_test_eigen.columns],
+                                         style_as_list_view=True,
 
-                            style_cell={'padding': '10px', 'backgroundColor': 'white', 'fontSize': 14,
-                                        'font-family': 'Roboto'},
+                                         style_cell={'padding': '10px', 'backgroundColor': 'white', 'fontSize': 14,
+                                                     'font-family': 'Roboto'},
 
-                            style_header={'backgroundColor': 'white', 'fontWeight': 'bold', 'fontSize': 14,
-                                          'font-family': 'Josefin Sans'
+                                         style_header={'backgroundColor': 'white', 'fontWeight': 'bold', 'fontSize': 14,
+                                                       'font-family': 'Josefin Sans'
 
-                                          }),
+                                                       }),
 
-                        html.Div(style={'display': 'block'}, children=[
+                    html.Div(style={'display': 'block'}, children=[
 
-                            html.P(children='Test statistic value for {}: '.format(asset_1),
-                                style={'textAlign': 'left', 'color': black, 'font-family': 'Josefin Sans',
-                                       'font-weight': '300', 'font-size': 18, 'padding-bottom': 0,
-                                       'display': 'inline-block'}),
+                        html.P(children='Test statistic value for {}: '.format(asset_1),
+                               style={'textAlign': 'left', 'color': self.black, 'font-family': 'Josefin Sans',
+                                      'font-weight': '300', 'font-size': 18, 'padding-bottom': 0,
+                                      'display': 'inline-block'}),
 
-                            html.P(children='⠀{}⠀'.format(round(eigen_test_statistic_1, 5)),
-                                   style={'textAlign': 'center', 'color': blue, 'font-family': 'Josefin Sans',
-                                          'font-weight': '400', 'font-size': 18, 'padding-bottom': 0,
-                                          'display': 'inline-block'}), html.Div(children=[
+                        html.P(children='⠀{}⠀'.format(round(eigen_test_statistic_1, 5)),
+                               style={'textAlign': 'center', 'color': self.blue, 'font-family': 'Josefin Sans',
+                                      'font-weight': '400', 'font-size': 18, 'padding-bottom': 0,
+                                      'display': 'inline-block'}), html.Div(children=[
 
-                                html.P(children='Test statistic value for {}: '.format(asset_2),
-                                       style={'textAlign': 'left', 'color': black, 'font-family': 'Josefin Sans',
-                                              'font-weight': '300', 'font-size': 18, 'padding-bottom': '5%',
-                                              'display': 'inline-block'}),
+                            html.P(children='Test statistic value for {}: '.format(asset_2),
+                                   style={'textAlign': 'left', 'color': self.black, 'font-family': 'Josefin Sans',
+                                          'font-weight': '300', 'font-size': 18, 'padding-bottom': '5%',
+                                          'display': 'inline-block'}),
 
-                                html.P(children='⠀{}⠀'.format(round(eigen_test_statistic_2, 5)),
-                                       style={'textAlign': 'center', 'color': blue, 'font-family': 'Josefin Sans',
-                                              'font-weight': '400', 'font-size': 18, 'padding-bottom': '5%',
-                                              'display': 'inline-block'}), ])
-
-                        ]),
+                            html.P(children='⠀{}⠀'.format(round(eigen_test_statistic_2, 5)),
+                                   style={'textAlign': 'center', 'color': self.blue, 'font-family': 'Josefin Sans',
+                                          'font-weight': '400', 'font-size': 18, 'padding-bottom': '5%',
+                                          'display': 'inline-block'}), ])
 
                     ]),
 
-                html.Div(
-                    style={'backgroundColor': white, 'display': 'inline-block', 'padding-left': 50, 'padding-right': 0,
-                           'padding-top': 0, 'padding-bottom': 0, 'margin-left': 0, 'margin-right': 0, 'margin-top': 0,
-                           'margin-bottom': 0, 'vertical-align': 'center', 'horizontal-align': 'center',
-                           'width': '34%'}, children=[
+                ]),
 
-                        html.H3(children='Trace test:',
-                                style={'textAlign': 'left', 'color': black, 'font-family': 'Josefin Sans',
-                                       'font-weight': '500', 'font-size': 22, 'padding-bottom': '2%',
-                                       'display': 'block'}),
+                html.Div(style={'backgroundColor': self.white, 'display': 'inline-block', 'padding-left': 50,
+                                'padding-right': 0, 'padding-top': 0, 'padding-bottom': 0, 'margin-left': 0,
+                                'margin-right': 0, 'margin-top': 0, 'margin-bottom': 0, 'vertical-align': 'center',
+                                'horizontal-align': 'center', 'width': '34%'}, children=[
 
-                        html.P(children=
-                               johansen_test_result(coint_test_trace, trace_test_statistic_1, trace_test_statistic_2)[
-                                   0], style={'textAlign': 'left', 'color':
-                            johansen_test_result(coint_test_trace, trace_test_statistic_1, trace_test_statistic_2)[1],
-                                              'font-family':
-                                                  johansen_test_result(coint_test_trace, trace_test_statistic_1,
-                                                                       trace_test_statistic_2)[2], 'font-weight': '350',
-                                              'font-size': 20, 'padding-bottom': '2%', 'padding-top': 0,
-                                              'display': 'block'}),
+                    html.H3(children='Trace test:',
+                            style={'textAlign': 'left', 'color': self.black, 'font-family': 'Josefin Sans',
+                                   'font-weight': '500', 'font-size': 22, 'padding-bottom': '2%', 'display': 'block'}),
 
-                        dash_table.DataTable(data=coint_test_trace.to_dict('records'),
-                            columns=[{'id': c, 'name': c} for c in coint_test_trace.columns], style_as_list_view=True,
+                    html.P(children=
+                           self.johansen_test_result(coint_test_trace, trace_test_statistic_1, trace_test_statistic_2)[
+                               0], style={'textAlign': 'left', 'color':
+                        self.johansen_test_result(coint_test_trace, trace_test_statistic_1, trace_test_statistic_2)[1],
+                                          'font-family':
+                                              self.johansen_test_result(coint_test_trace, trace_test_statistic_1,
+                                                                        trace_test_statistic_2)[2], 'font-size': 20,
+                                          'padding-bottom': '2%', 'padding-top': 0, 'display': 'block'}),
 
-                            style_cell={'padding': '10px', 'backgroundColor': 'white', 'fontSize': 14,
-                                        'font-family': 'Roboto'},
+                    dash_table.DataTable(data=coint_test_trace.to_dict('records'),
+                                         columns=[{'id': c, 'name': c} for c in coint_test_trace.columns],
+                                         style_as_list_view=True,
+                                         style_cell={'padding': '10px', 'backgroundColor': 'white', 'fontSize': 14,
+                                                     'font-family': 'Roboto'},
 
-                            style_header={'backgroundColor': 'white', 'fontWeight': 'bold', 'fontSize': 14,
-                                          'font-family': 'Josefin Sans'
+                                         style_header={'backgroundColor': 'white', 'fontWeight': 'bold', 'fontSize': 14,
+                                                       'font-family': 'Josefin Sans'}),
 
-                                          }),
+                    html.Div(style={'display': 'block'}, children=[
 
-                        html.Div(style={'display': 'block'}, children=[
+                        html.P(children='Test statistic value for {}: '.format(asset_1),
 
-                            html.P(children='Test statistic value for {}: '.format(asset_1),
-                                style={'textAlign': 'left', 'color': black, 'font-family': 'Josefin Sans',
-                                       'font-weight': '300', 'font-size': 18, 'padding-bottom': 0,
-                                       'display': 'inline-block'}),
+                               style={'textAlign': 'left', 'color': self.black, 'font-family': 'Josefin Sans',
+                                      'font-weight': '300', 'font-size': 18, 'padding-bottom': 0,
+                                      'display': 'inline-block'}),
 
-                            html.P(children='⠀{}⠀'.format(round(trace_test_statistic_1, 5)),
-                                   style={'textAlign': 'center', 'color': blue, 'font-family': 'Josefin Sans',
-                                          'font-weight': '400', 'font-size': 18, 'padding-bottom': 0,
-                                          'display': 'inline-block'}), html.Div(children=[
+                        html.P(children='⠀{}⠀'.format(round(trace_test_statistic_1, 5)),
 
-                                html.P(children='Test statistic value for {}: '.format(asset_2),
-                                       style={'textAlign': 'left', 'color': black, 'font-family': 'Josefin Sans',
-                                              'font-weight': '300', 'font-size': 18, 'padding-bottom': '5%',
-                                              'display': 'inline-block'}),
+                               style={'textAlign': 'center', 'color': self.blue, 'font-family': 'Josefin Sans',
+                                      'font-weight': '400', 'font-size': 18, 'padding-bottom': 0,
+                                      'display': 'inline-block'}), html.Div(children=[
 
-                                html.P(children='⠀{}⠀'.format(round(trace_test_statistic_2, 5)),
-                                       style={'textAlign': 'center', 'color': blue, 'font-family': 'Josefin Sans',
-                                              'font-weight': '400', 'font-size': 18, 'padding-bottom': '5%',
-                                              'display': 'inline-block'}), ])
+                            html.P(children='Test statistic value for {}: '.format(asset_2),
+                                   style={'textAlign': 'left', 'color': self.black, 'font-family': 'Josefin Sans',
+                                          'font-weight': '300', 'font-size': 18, 'padding-bottom': '5%',
+                                          'display': 'inline-block'}),
 
-                        ]),
+                            html.P(children='⠀{}⠀'.format(round(trace_test_statistic_2, 5)),
+                                   style={'textAlign': 'center', 'color': self.blue, 'font-family': 'Josefin Sans',
+                                          'font-weight': '400', 'font-size': 18, 'padding-bottom': '5%',
+                                          'display': 'inline-block'}), ])
 
-                    ])
+                    ]),
+
+                ])
 
             ])
 
         return output
 
-    def jh_div(self, asset_1, asset_2, coint_vector, portfolio_price, portfolio_return,
-               white, black, blue, orange):
+    def jh_div(self, asset_1, asset_2, coint_vector, portfolio_price, portfolio_return):
 
         div = html.Div(
             style={'padding-left': 50, 'padding-right': 50, 'padding-top': 20, 'padding-bottom': 50, 'margin-left': 50,
-                   'margin-right': 50, 'margin-top': 0, 'margin-bottom': 50, 'backgroundColor': white,
-                   'horizontal-align': 'center', }, children=[# Equation
-                html.Div(style={'backgroundColor': white, 'padding-bottom': 20, 'textAlign': 'center',
+                   'margin-right': 50, 'margin-top': 0, 'margin-bottom': 50, 'backgroundColor': self.white,
+                   'horizontal-align': 'center', }, children=[
+
+                html.Div(style={'backgroundColor': self.white, 'padding-bottom': 20, 'textAlign': 'center',
                                 'horizontal-align': 'center'}, children=[
 
-                    html.H2(children='S⠀', style={'textAlign': 'left', 'color': black, 'font-family': 'Josefin Sans',
-                                                  'font-weight': '500', 'font-size': 30, 'padding-bottom': 30,
-                                                  'display': 'inline-block'}),
+                    html.H2(children='S⠀',
+                            style={'textAlign': 'left', 'color': self.black, 'font-family': 'Josefin Sans',
+                                   'font-weight': '500', 'font-size': 30, 'padding-bottom': 30,
+                                   'display': 'inline-block'}),
 
-                    html.H2(children='=', style={'textAlign': 'left', 'color': black, 'font-family': 'Josefin Sans',
-                                                 'font-weight': '300', 'font-size': 30, 'padding-bottom': 30,
-                                                 'display': 'inline-block'}),
+                    html.H2(children='=',
+                            style={'textAlign': 'left', 'color': self.black, 'font-family': 'Josefin Sans',
+                                   'font-weight': '300', 'font-size': 30, 'padding-bottom': 30,
+                                   'display': 'inline-block'}),
 
                     html.H2(children='⠀{}⠀'.format(round(coint_vector.iloc[0][0], 4)),
-                            style={'textAlign': 'left', 'color': orange, 'font-family': 'Josefin Sans',
+                            style={'textAlign': 'left', 'color': self.orange, 'font-family': 'Josefin Sans',
                                    'font-weight': '400', 'font-size': 30, 'padding-bottom': 30,
                                    'display': 'inline-block'}),
 
                     html.H2(children='* {} + '.format(asset_1),
-                            style={'textAlign': 'left', 'color': black, 'font-family': 'Josefin Sans',
+                            style={'textAlign': 'left', 'color': self.black, 'font-family': 'Josefin Sans',
                                    'font-weight': '300', 'font-size': 30, 'padding-bottom': 30,
                                    'display': 'inline-block'}),
 
                     html.H2(children='⠀{}⠀'.format(round(coint_vector.iloc[0][1], 4)),
-                            style={'textAlign': 'left', 'color': blue, 'font-family': 'Josefin Sans',
+                            style={'textAlign': 'left', 'color': self.blue, 'font-family': 'Josefin Sans',
                                    'font-weight': '400', 'font-size': 30, 'padding-bottom': 30,
                                    'display': 'inline-block'}),
 
                     html.H2(children='* {}'.format(asset_2),
-                            style={'textAlign': 'left', 'color': black, 'font-family': 'Josefin Sans',
+                            style={'textAlign': 'left', 'color': self.black, 'font-family': 'Josefin Sans',
                                    'font-weight': '300', 'font-size': 30, 'padding-bottom': 30,
                                    'display': 'inline-block'}),
 
@@ -577,13 +560,12 @@ class TearSheet:
                 # Coint tests
                 html.Div(children=[
 
-                    dcc.Graph(id='portfolio-plot',
-                        figure=portfolio_plot(portfolio_price, portfolio_return, blue, orange),
-                        style={'width': '98%', 'height': '100%', 'padding-left': 0, 'padding-right': 0,
-                               'padding-top': 0, 'padding-bottom': 50, 'margin-right': 0, 'margin-top': 0,
-                               'margin-bottom': 50, 'vertical-align': 'top', 'horizontal-align': 'center',
-                               'display': 'inline-block', 'font-family': 'Josefin Sans', 'font-weight': '300',
-                               'font-size': 20, 'textAlign': 'center'})
+                    dcc.Graph(id='portfolio-plot', figure=self.portfolio_plot(portfolio_price, portfolio_return),
+                              style={'width': '98%', 'height': '100%', 'padding-left': 0, 'padding-right': 0,
+                                     'padding-top': 0, 'padding-bottom': 50, 'margin-right': 0, 'margin-top': 0,
+                                     'margin-bottom': 50, 'vertical-align': 'top', 'horizontal-align': 'center',
+                                     'display': 'inline-block', 'font-family': 'Josefin Sans', 'font-weight': '300',
+                                     'font-size': 20, 'textAlign': 'center'})
 
                 ]),
 
@@ -592,35 +574,39 @@ class TearSheet:
         return div
 
     def eg_div(self, asset_1, asset_2, coint_test, test_statistic, beta, portfolio_price, portfolio_return, pacf, acf,
-               residuals, qq_data, x_data, res_data, white, black, blue, orange):
+               residuals, qq_data, x_data, res_data):
 
         div = html.Div(
+
             style={'padding-left': 50, 'padding-right': 0, 'padding-top': 20, 'padding-bottom': 50, 'margin-left': 50,
-                   'margin-right': 0, 'margin-top': 0, 'margin-bottom': 0, 'backgroundColor': white,
-                   'horizontal-align': 'center', }, children=[# Equation
-                html.Div(style={'backgroundColor': white, 'padding-top': 30, 'textAlign': 'left',
+                   'margin-right': 0, 'margin-top': 0, 'margin-bottom': 0, 'backgroundColor': self.white,
+                   'horizontal-align': 'center', }, children=[
+
+                html.Div(style={'backgroundColor': self.white, 'padding-top': 30, 'textAlign': 'left',
                                 'horizontal-align': 'center'}, children=[
 
-                    html.H2(children='S⠀', style={'textAlign': 'left', 'color': black, 'font-family': 'Josefin Sans',
-                                                  'font-weight': '500', 'font-size': 30, 'padding-bottom': 30,
-                                                  'display': 'inline-block'}),
+                    html.H2(children='S⠀',
+                            style={'textAlign': 'left', 'color': self.black, 'font-family': 'Josefin Sans',
+                                   'font-weight': '500', 'font-size': 30, 'padding-bottom': 30,
+                                   'display': 'inline-block'}),
 
-                    html.H2(children='=', style={'textAlign': 'left', 'color': black, 'font-family': 'Josefin Sans',
-                                                 'font-weight': '300', 'font-size': 30, 'padding-bottom': 30,
-                                                 'display': 'inline-block'}),
+                    html.H2(children='=',
+                            style={'textAlign': 'left', 'color': self.black, 'font-family': 'Josefin Sans',
+                                   'font-weight': '300', 'font-size': 30, 'padding-bottom': 30,
+                                   'display': 'inline-block'}),
 
                     html.H2(children='⠀{} +'.format(asset_1),
-                            style={'textAlign': 'left', 'color': black, 'font-family': 'Josefin Sans',
+                            style={'textAlign': 'left', 'color': self.black, 'font-family': 'Josefin Sans',
                                    'font-weight': '300', 'font-size': 30, 'padding-bottom': 30,
                                    'display': 'inline-block'}),
 
                     html.H2(children='⠀{}⠀'.format(round(beta, 4)),
-                            style={'textAlign': 'left', 'color': blue, 'font-family': 'Josefin Sans',
+                            style={'textAlign': 'left', 'color': self.blue, 'font-family': 'Josefin Sans',
                                    'font-weight': '400', 'font-size': 30, 'padding-bottom': 30,
                                    'display': 'inline-block'}),
 
                     html.H2(children='* {}'.format(asset_2),
-                            style={'textAlign': 'left', 'color': black, 'font-family': 'Josefin Sans',
+                            style={'textAlign': 'left', 'color': self.black, 'font-family': 'Josefin Sans',
                                    'font-weight': '300', 'font-size': 30, 'padding-bottom': 30,
                                    'display': 'inline-block'}),
 
@@ -629,41 +615,42 @@ class TearSheet:
                 # Coint tests
                 html.Div(children=[
 
-                    html.Div(style={'backgroundColor': white, 'display': 'inline-block', 'padding-left': 0,
+                    html.Div(style={'backgroundColor': self.white, 'display': 'inline-block', 'padding-left': 0,
                                     'padding-right': 50, 'padding-top': 0, 'padding-bottom': 0, 'margin-left': 0,
                                     'margin-right': 10, 'margin-top': 0, 'margin-bottom': 0, 'vertical-align': 'center',
                                     'horizontal-align': 'center', 'width': '22%'}, children=[
 
                         html.H3(children='Cointegration test results:',
-                                style={'textAlign': 'left', 'color': black, 'font-family': 'Josefin Sans',
+                                style={'textAlign': 'left', 'color': self.black, 'font-family': 'Josefin Sans',
                                        'font-weight': '500', 'font-size': 24, 'padding-bottom': '2%',
                                        'display': 'block'}),
-                        html.P(children=adf_test_result(coint_test, test_statistic)[0],
-                               style={'textAlign': 'left', 'color': adf_test_result(coint_test, test_statistic)[1],
-                                      'font-family': adf_test_result(coint_test, test_statistic)[2],
+                        html.P(children=self.adf_test_result(coint_test, test_statistic)[0],
+                               style={'textAlign': 'left', 'color': self.adf_test_result(coint_test, test_statistic)[1],
+                                      'font-family': self.adf_test_result(coint_test, test_statistic)[2],
                                       'font-weight': '350', 'font-size': 20, 'padding-bottom': '15%', 'padding-top': 0,
                                       'display': 'block'}),
 
                         dash_table.DataTable(data=coint_test.to_dict('records'),
-                            columns=[{'id': c, 'name': c} for c in coint_test.columns], style_as_list_view=True,
+                                             columns=[{'id': c, 'name': c} for c in coint_test.columns],
+                                             style_as_list_view=True,
 
-                            style_cell={'padding': '10px', 'backgroundColor': 'white', 'fontSize': 14,
-                                        'font-family': 'Roboto'},
+                                             style_cell={'padding': '10px', 'backgroundColor': 'white', 'fontSize': 14,
+                                                         'font-family': 'Roboto'},
 
-                            style_header={'backgroundColor': 'white', 'fontWeight': 'bold', 'fontSize': 14,
-                                          'font-family': 'Josefin Sans'
+                                             style_header={'backgroundColor': 'white', 'fontWeight': 'bold',
+                                                           'fontSize': 14, 'font-family': 'Josefin Sans'
 
-                                          }, ),
+                                                           }, ),
 
                         html.Div(style={'display': 'block'}, children=[
 
                             html.P(children='Test statistic value: ',
-                                style={'textAlign': 'left', 'color': black, 'font-family': 'Josefin Sans',
-                                       'font-weight': '300', 'font-size': 18, 'padding-bottom': '10%',
-                                       'display': 'inline-block'}),
+                                   style={'textAlign': 'left', 'color': self.black, 'font-family': 'Josefin Sans',
+                                          'font-weight': '300', 'font-size': 18, 'padding-bottom': '10%',
+                                          'display': 'inline-block'}),
 
                             html.P(children='⠀{}⠀'.format(round(test_statistic, 5)),
-                                   style={'textAlign': 'center', 'color': blue, 'font-family': 'Josefin Sans',
+                                   style={'textAlign': 'center', 'color': self.blue, 'font-family': 'Josefin Sans',
                                           'font-weight': '400', 'font-size': 18, 'padding-bottom': '10%',
                                           'display': 'inline-block'}),
 
@@ -671,83 +658,86 @@ class TearSheet:
 
                     ]),
 
-                    dcc.Graph(id='portfolio-plot',
-                        figure=portfolio_plot(portfolio_price, portfolio_return, blue, orange),
-                        style={'width': '68%', 'height': '100%', 'padding-left': 50, 'padding-right': 0,
-                               'padding-top': 0, 'padding-bottom': 0, 'margin-right': 0, 'margin-top': 0,
-                               'margin-bottom': 0, 'vertical-align': 'top', 'horizontal-align': 'right',
-                               'display': 'inline-block', 'font-family': 'Josefin Sans', 'font-weight': '300',
-                               'font-size': 20, })
+                    dcc.Graph(id='portfolio-plot', figure=self.portfolio_plot(portfolio_price, portfolio_return),
+                              style={'width': '68%', 'height': '100%', 'padding-left': 50, 'padding-right': 0,
+                                     'padding-top': 0, 'padding-bottom': 0, 'margin-right': 0, 'margin-top': 0,
+                                     'margin-bottom': 0, 'vertical-align': 'top', 'horizontal-align': 'right',
+                                     'display': 'inline-block', 'font-family': 'Josefin Sans', 'font-weight': '300',
+                                     'font-size': 20, })
 
                 ]),
 
                 # Coint tests
                 html.Div(id='resid', children=[
 
-                    html.Div(style={'backgroundColor': white, 'display': 'inline-block', 'padding-left': 0,
+                    html.Div(style={'backgroundColor': self.white, 'display': 'inline-block', 'padding-left': 0,
                                     'padding-right': 0, 'padding-top': 0, 'padding-bottom': 0, 'margin-left': 0,
                                     'margin-right': 0, 'margin-top': 0, 'margin-bottom': 0, 'vertical-align': 'center',
                                     'horizontal-align': 'center', 'width': '100%'}, children=[
 
                         html.H3(children='Residuals analysis results:',
-                                style={'textAlign': 'left', 'color': black, 'font-family': 'Josefin Sans',
+                                style={'textAlign': 'left', 'color': self.black, 'font-family': 'Josefin Sans',
                                        'font-weight': '500', 'font-size': 22, 'padding-bottom': '2%',
                                        'display': 'block'}), html.Div(
-                            style={'backgroundColor': white, 'display': 'inline-block', 'padding-left': 0,
+                            style={'backgroundColor': self.white, 'display': 'inline-block', 'padding-left': 0,
                                    'padding-right': 20, 'padding-top': 0, 'padding-bottom': 0, 'margin-left': 0,
                                    'margin-right': 0, 'margin-top': 0, 'margin-bottom': 0, 'vertical-align': 'top',
                                    'horizontal-align': 'center', 'width': '30%'}, children=[
 
                                 dash_table.DataTable(data=res_data.to_dict('records'),
-                                    columns=[{'id': c, 'name': c} for c in res_data.columns], style_as_list_view=True,
+                                                     columns=[{'id': c, 'name': c} for c in res_data.columns],
+                                                     style_as_list_view=True,
 
-                                    style_cell={'padding': '10px', 'backgroundColor': 'white', 'fontSize': 14,
-                                                'font-family': 'Roboto', 'textAlign': 'left'},
+                                                     style_cell={'padding': '10px', 'backgroundColor': 'white',
+                                                                 'fontSize': 14, 'font-family': 'Roboto',
+                                                                 'textAlign': 'left'},
 
-                                    style_header={'padding': '15px', 'backgroundColor': light_grey, 'fontSize': 18,
-                                                  'font-family': 'Josefin Sans', 'textAlign': 'left'
+                                                     style_header={'padding': '15px',
+                                                                   'backgroundColor': self.light_grey, 'fontSize': 18,
+                                                                   'font-family': 'Josefin Sans', 'textAlign': 'left'
 
-                                                  }),
+                                                                   }),
 
-                                dcc.Graph(id='residuals-plot', figure=residuals_plot(residuals, orange),
-                                    style={'width': '100%', 'height': '100%', 'padding-left': 0, 'padding-right': 0,
-                                           'padding-top': 50, 'padding-bottom': 0, 'margin-right': 0, 'margin-top': 0,
-                                           'margin-bottom': 0, 'vertical-align': 'top', 'horizontal-align': 'right',
-                                           'display': 'block', 'font-family': 'Josefin Sans', 'font-weight': '300',
-                                           'font-size': 20, }),
+                                dcc.Graph(id='residuals-plot', figure=self.residuals_plot(residuals),
+                                          style={'width': '100%', 'height': '100%', 'padding-left': 0,
+                                                 'padding-right': 0, 'padding-top': 50, 'padding-bottom': 0,
+                                                 'margin-right': 0, 'margin-top': 0, 'margin-bottom': 0,
+                                                 'vertical-align': 'top', 'horizontal-align': 'right',
+                                                 'display': 'block', 'font-family': 'Josefin Sans',
+                                                 'font-weight': '300', 'font-size': 20, }),
 
                             ]),
 
-                        html.Div(style={'backgroundColor': white, 'display': 'inline-block', 'width': '30%',
+                        html.Div(style={'backgroundColor': self.white, 'display': 'inline-block', 'width': '30%',
                                         'vertical-align': 'center', 'horizontal-align': 'center', }, children=[
 
-                            dcc.Graph(id='pacf-plot', figure=pacf_plot(pacf, blue),
-                                style={'width': '100%', 'height': '100%', 'padding-left': 0, 'padding-right': 0,
-                                       'padding-top': 0, 'padding-bottom': 50, 'margin-right': 0, 'margin-top': 0,
-                                       'margin-bottom': 0, 'vertical-align': 'top', 'horizontal-align': 'right',
-                                       'display': 'block', 'font-family': 'Josefin Sans', 'font-weight': '300',
-                                       'font-size': 20, }),
+                            dcc.Graph(id='pacf-plot', figure=self.pacf_plot(pacf),
+                                      style={'width': '100%', 'height': '100%', 'padding-left': 0, 'padding-right': 0,
+                                             'padding-top': 0, 'padding-bottom': 50, 'margin-right': 0, 'margin-top': 0,
+                                             'margin-bottom': 0, 'vertical-align': 'top', 'horizontal-align': 'right',
+                                             'display': 'block', 'font-family': 'Josefin Sans', 'font-weight': '300',
+                                             'font-size': 20, }),
 
-                            dcc.Graph(id='acf-plot', figure=acf_plot(acf, blue),
-                                style={'width': '100%', 'height': '100%', 'padding-left': 0, 'padding-right': 0,
-                                       'padding-top': 0, 'padding-bottom': 50, 'margin-right': 0, 'margin-top': 0,
-                                       'margin-bottom': 0, 'vertical-align': 'top', 'horizontal-align': 'right',
-                                       'display': 'block', 'font-family': 'Josefin Sans', 'font-weight': '300',
-                                       'font-size': 20, }), ]),
+                            dcc.Graph(id='acf-plot', figure=self.acf_plot(acf),
+                                      style={'width': '100%', 'height': '100%', 'padding-left': 0, 'padding-right': 0,
+                                             'padding-top': 0, 'padding-bottom': 50, 'margin-right': 0, 'margin-top': 0,
+                                             'margin-bottom': 0, 'vertical-align': 'top', 'horizontal-align': 'right',
+                                             'display': 'block', 'font-family': 'Josefin Sans', 'font-weight': '300',
+                                             'font-size': 20, }), ]),
 
-                        html.Div(style={'backgroundColor': white, 'display': 'inline-block', 'padding-left': 0,
+                        html.Div(style={'backgroundColor': self.white, 'display': 'inline-block', 'padding-left': 0,
                                         'padding-right': 0, 'padding-top': 0, 'padding-bottom': 0, 'margin-left': 0,
                                         'margin-right': 0, 'margin-top': 0, 'margin-bottom': 0,
                                         'vertical-align': 'center', 'horizontal-align': 'center', 'width': '30%'},
                                  children=[
 
-                                     dcc.Graph(id='qq-plot', figure=qq_plot(qq_data, x_data, blue, orange),
-                                         style={'width': '100%', 'height': '100%', 'padding-left': 10,
-                                                'padding-right': 0, 'padding-top': 0, 'padding-bottom': 50,
-                                                'margin-right': 0, 'margin-top': 0, 'margin-bottom': 0,
-                                                'vertical-align': 'top', 'horizontal-align': 'right',
-                                                'display': 'block', 'font-family': 'Josefin Sans', 'font-weight': '300',
-                                                'font-size': 20, }),
+                                     dcc.Graph(id='qq-plot', figure=self.qq_plot(qq_data, x_data),
+                                               style={'width': '100%', 'height': '100%', 'padding-left': 10,
+                                                      'padding-right': 0, 'padding-top': 0, 'padding-bottom': 50,
+                                                      'margin-right': 0, 'margin-top': 0, 'margin-bottom': 0,
+                                                      'vertical-align': 'top', 'horizontal-align': 'right',
+                                                      'display': 'block', 'font-family': 'Josefin Sans',
+                                                      'font-weight': '300', 'font-size': 20, }),
 
                                  ]), ]), ]), ])
 
@@ -760,120 +750,113 @@ class TearSheet:
 
         data_1 = self.data
 
-        name_1, norm_price_asset_1, adf_asset_1, test_stat_1, name_2,\
-        norm_price_asset_2, adf_asset_2, test_stat_2 = get_basic_asset_data(data_1)
+        name_1, norm_price_asset_1, adf_asset_1, test_stat_1, name_2, norm_price_asset_2, adf_asset_2, test_stat_2 = self.get_basic_asset_data()
 
         data_2 = self.data[[name_2, name_1]]
 
-        eg_adf_dataframe_1, eg_adf_test_stat_1, eg_cointegration_vector_1, \
-        eg_portfolio_returns_1, eg_portfolio_price_1, eg_residuals_1,\
-        eg_residuals_dataframe_1, eg_qq_y_1, eg_x_1,\
-        eg_pacf_result_1, eg_acf_result_1 = self.get_engle_granger_data(data_1)
+        eg_adf_dataframe_1, eg_adf_test_stat_1, eg_cointegration_vector_1, eg_portfolio_returns_1, \
+        eg_portfolio_price_1, eg_residuals_1, eg_residuals_dataframe_1, \
+        eg_qq_y_1, eg_x_1, eg_pacf_result_1, eg_acf_result_1 = self.get_engle_granger_data(data_1)
 
-        eg_adf_dataframe_2, eg_adf_test_stat_2, eg_cointegration_vector_2,\
-        eg_portfolio_returns_2, eg_portfolio_price_2, eg_residuals_2, \
-        eg_residuals_dataframe_2, eg_qq_y_2, eg_x_2, \
-        eg_pacf_result_2, eg_acf_result_2 = self.get_engle_granger_data(data_2)
+        eg_adf_dataframe_2, eg_adf_test_stat_2, eg_cointegration_vector_2, eg_portfolio_returns_2,\
+        eg_portfolio_price_2, eg_residuals_2, eg_residuals_dataframe_2,\
+        eg_qq_y_2, eg_x_2, eg_pacf_result_2, eg_acf_result_2 = self.get_engle_granger_data(data_2)
 
-        j_test_eigen_dataframe, j_test_trace_dataframe, j_eigen_test_statistic_1,\
+        j_test_eigen_dataframe, j_test_trace_dataframe, j_eigen_test_statistic_1, \
         j_eigen_test_statistic_2, j_trace_test_statistic_1, j_trace_test_statistic_2,\
-        j_cointegration_vector_1, j_cointegration_vector_2,\
-        j_portfolio_returns_1, j_portfolio_price_1, j_portfolio_returns_2,\
-        j_portfolio_price_2, j_residuals_1, j_residuals_dataframe_1,\
-        j_qq_y_1, j_x_1, j_pacf_result_1, j_acf_result_1, j_residuals_2,\
-        j_residuals_dataframe_2, j_qq_y_2, j_x_2, j_pacf_result_2, j_acf_result_2 = get_johansen_data(data_1)
+        j_cointegration_vector_1, j_cointegration_vector_2, j_portfolio_returns_1, \
+        j_portfolio_price_1, j_portfolio_returns_2, j_portfolio_price_2 = self.get_johansen_data()
 
         app = dash.Dash()
 
-        app.layout = html.Div(style={'backgroundColor': light_grey, 'padding-bottom': 30}, children=[
+        app.layout = html.Div(style={'backgroundColor': self.light_grey, 'padding-bottom': 30}, children=[
 
             html.Img(src='/assets/ArbitrageLab-logo.png',
                      style={'width': '20%', 'height': '20%', 'padding-top': 50, 'display': 'block',
                             'margin-left': 'auto', 'margin-right': 'auto'}),
 
             html.H1(children='COINTEGRATION ANALYSIS OF {}/{}'.format(name_1, name_2),
-                style={'textAlign': 'center', 'color': black, 'font-family': 'Josefin Sans', 'font-weight': '300',
-                    'font-size': 50, 'padding-top': 30, 'padding-left': 50, 'margin-top': 30, 'margin-left': 'auto',
-                    'margin-right': 'auto'}),
+                    style={'textAlign': 'center', 'color': self.black, 'font-family': 'Josefin Sans',
+                           'font-weight': '300', 'font-size': 50, 'padding-top': 30, 'padding-left': 50,
+                           'margin-top': 30, 'margin-left': 'auto', 'margin-right': 'auto'}),
 
             # INITIAL DIV
             html.Div(style={'margin-left': '5%', 'margin-right': '5%', 'margin-top': '5%', 'margin-bottom': '5%',
-                            'backgroundColor': white, 'horizontal-align': 'center'}, children=[
+                            'backgroundColor': self.white, 'horizontal-align': 'center'}, children=[
 
-                html.Div(
-                    style={'backgroundColor': white, 'display': 'inline-block', 'padding-left': 30, 'padding-right': 50,
-                           'padding-top': 60, 'padding-bottom': 50, 'margin-left': 50, 'margin-right': 50,
-                           'margin-top': 0, 'margin-bottom': 50, 'vertical-align': 'center',
-                           'horizontal-align': 'center', 'height': 315, 'width': '20%'}, children=[
+                html.Div(style={'backgroundColor': self.white, 'display': 'inline-block', 'padding-left': 30,
+                                'padding-right': 50, 'padding-top': 60, 'padding-bottom': 50, 'margin-left': 50,
+                                'margin-right': 50, 'margin-top': 0, 'margin-bottom': 50, 'vertical-align': 'center',
+                                'horizontal-align': 'center', 'height': 315, 'width': '20%'}, children=[
 
-                        html.H2(children='The results of the ADF tests:',
-                            style={'textAlign': 'left', 'color': black, 'font-family': 'Josefin Sans',
-                                'font-weight': '500', 'font-size': 24, 'padding-bottom': '20%', }),
+                    html.H2(children='The results of the ADF tests:',
+                            style={'textAlign': 'left', 'color': self.black, 'font-family': 'Josefin Sans',
+                                   'font-weight': '500', 'font-size': 24, 'padding-bottom': '20%', }),
 
-                        html.P(children='{}'.format(name_1),
-                            style={'textAlign': 'left', 'color': blue, 'font-family': 'Josefin Sans',
-                                'font-weight': '500', 'font-size': 20
+                    html.P(children='{}'.format(name_1),
+                           style={'textAlign': 'left', 'color': self.blue, 'font-family': 'Josefin Sans',
+                                  'font-weight': '500', 'font-size': 20
 
-                            }),
+                                  }),
 
-                        html.P(children=adf_test_result(adf_asset_1, test_stat_1)[0],
-                            style={'textAlign': 'left', 'color': adf_test_result(adf_asset_1, test_stat_1)[1],
-                                'font-family': adf_test_result(adf_asset_1, test_stat_1)[2], 'font-weight': '300',
-                                'font-size': 18, 'padding-bottom': 10
+                    html.P(children=self.adf_test_result(adf_asset_1, test_stat_1)[0],
+                           style={'textAlign': 'left', 'color': self.adf_test_result(adf_asset_1, test_stat_1)[1],
+                                  'font-family': self.adf_test_result(adf_asset_1, test_stat_1)[2],
+                                  'font-weight': '300', 'font-size': 18, 'padding-bottom': 10
 
-                            }),
+                                  }),
 
-                        html.P(children='GDXJ',
-                            style={'textAlign': 'left', 'color': blue, 'font-family': 'Josefin Sans',
-                                'font-weight': '500', 'font-size': 20
+                    html.P(children='GDXJ',
+                           style={'textAlign': 'left', 'color': self.blue, 'font-family': 'Josefin Sans',
+                                  'font-weight': '500', 'font-size': 20
 
-                            }),
+                                  }),
 
-                        html.P(children=adf_test_result(adf_asset_2, test_stat_2)[0],
-                            style={'textAlign': 'left', 'color': adf_test_result(adf_asset_2, test_stat_2)[1],
-                                'font-family': adf_test_result(adf_asset_2, test_stat_2)[2], 'font-weight': '300',
-                                'font-size': 18
+                    html.P(children=self.adf_test_result(adf_asset_2, test_stat_2)[0],
+                           style={'textAlign': 'left', 'color': self.adf_test_result(adf_asset_2, test_stat_2)[1],
+                                  'font-family': self.adf_test_result(adf_asset_2, test_stat_2)[2],
+                                  'font-weight': '300', 'font-size': 18
 
-                            }),
+                                  }),
 
-                    ]),
+                ]),
 
                 dcc.Graph(id='asset-prices',
-                    figure=asset_prices_plot(data_1, norm_price_asset_1, norm_price_asset_2, name_1, name_2, blue,
-                                             orange),
-                    style={'width': '60%', 'height': '100%', 'padding-left': 50,  # 'padding-right': 50,
-                           'padding-top': 50, 'padding-bottom': 30,  # 'margin-right': 50,
-                           'margin-top': 0, 'margin-bottom': 0, 'vertical-align': 'top', 'horizontal-align': 'right',
-                           'display': 'inline-block', 'font-family': 'Josefin Sans', 'font-weight': '300',
-                           'font-size': 24,
+                          figure=self.asset_prices_plot(data_1, norm_price_asset_1, norm_price_asset_2, name_1, name_2),
+                          style={'width': '60%', 'height': '100%', 'padding-left': 50,  # 'padding-right': 50,
+                                 'padding-top': 50, 'padding-bottom': 30,  # 'margin-right': 50,
+                                 'margin-top': 0, 'margin-bottom': 0, 'vertical-align': 'top',
+                                 'horizontal-align': 'right', 'display': 'inline-block', 'font-family': 'Josefin Sans',
+                                 'font-weight': '300', 'font-size': 24,
 
-                           })
+                                 })
 
             ]),
 
             html.Div(style={'margin-left': '5%', 'margin-right': '5%', 'margin-top': '5%', 'margin-bottom': '5%',
                             'padding-left': 0, 'padding-right': 0, 'padding-top': 0, 'padding-bottom': 0,
-                            'backgroundColor': white, 'horizontal-align': 'center'}, children=[
+                            'backgroundColor': self.white, 'horizontal-align': 'center'}, children=[
 
                 html.H2(children='ENGLE-GRANGER APPROACH',
-                    style={'textAlign': 'left', 'color': black, 'font-family': 'Josefin Sans', 'font-weight': '300',
-                        'font-size': 40, 'padding-left': 50, 'padding-right': 50, 'padding-top': 60,
-                        'padding-bottom': 0, 'margin-left': 50, 'margin-right': 50, 'margin-top': 0, 'margin-bottom': 0,
+                        style={'textAlign': 'left', 'color': self.black, 'font-family': 'Josefin Sans',
+                               'font-weight': '300', 'font-size': 40, 'padding-left': 50, 'padding-right': 50,
+                               'padding-top': 60, 'padding-bottom': 0, 'margin-left': 50, 'margin-right': 50,
+                               'margin-top': 0, 'margin-bottom': 0,
 
-                    }),
+                               }),
 
                 html.Div(style={'display': 'block', 'padding-left': 50, 'padding-right': 50, 'padding-top': 60,
                                 'padding-bottom': 0, 'margin-left': 50, 'margin-right': 50, 'margin-top': 0,
                                 'margin-bottom': 0, 'vertical-align': 'center', 'horizontal-align': 'right'}, children=[
 
                     html.Button('{}/{}'.format(name_1, name_2), id='button-1', n_clicks=0,
-                                style={'BackgroundColor': white, 'padding-left': 40, 'padding-right': 40,
+                                style={'BackgroundColor': self.white, 'padding-left': 40, 'padding-right': 40,
                                        'padding-top': 20, 'padding-bottom': 20, 'margin-left': 0, 'margin-right': 25,
                                        'margin-top': 0, 'margin-bottom': 0, 'font-family': 'Josefin Sans',
                                        'font-weight': '300', 'font-size': 20, }),
 
                     html.Button('{}/{}'.format(name_2, name_1), id='button-2', n_clicks=0,
-                                style={'BackgroundColor': white, 'padding-left': 40, 'padding-right': 40,
+                                style={'BackgroundColor': self.white, 'padding-left': 40, 'padding-right': 40,
                                        'padding-top': 20, 'padding-bottom': 20, 'margin-left': 25, 'margin-right': 40,
                                        'margin-top': 0, 'margin-bottom': 0, 'font-family': 'Josefin Sans',
                                        'font-weight': '300', 'font-size': 20, }), ]),
@@ -884,23 +867,25 @@ class TearSheet:
 
             html.Div(style={'margin-left': '5%', 'margin-right': '5%', 'margin-top': '5%', 'margin-bottom': '5%',
                             'padding-left': 0, 'padding-right': 0, 'padding-top': 0, 'padding-bottom': 0,
-                            'backgroundColor': white, 'horizontal-align': 'center'}, children=[
+                            'backgroundColor': self.white, 'horizontal-align': 'center'}, children=[
 
                 html.H2(children='JOHANSEN APPROACH',
-                    style={'textAlign': 'left', 'color': black, 'font-family': 'Josefin Sans', 'font-weight': '300',
-                        'font-size': 40, 'padding-left': 50, 'padding-right': 50, 'padding-top': 60,
-                        'padding-bottom': 0, 'margin-left': 50, 'margin-right': 50, 'margin-top': 0, 'margin-bottom': 0,
+                        style={'textAlign': 'left', 'color': self.black, 'font-family': 'Josefin Sans',
+                               'font-weight': '300', 'font-size': 40, 'padding-left': 50, 'padding-right': 50,
+                               'padding-top': 60, 'padding-bottom': 0, 'margin-left': 50, 'margin-right': 50,
+                               'margin-top': 0, 'margin-bottom': 0,
 
-                    }),
+                               }),
 
                 html.Div(style={'horizontal-align': 'center'}, children=[
 
                     html.Div(style={'display': 'inline-block', 'horizontal-align': 'center'}, children=[
-                        jh_coint_test_div(name_1, name_2, j_test_eigen_dataframe, j_test_trace_dataframe,
-                                          j_eigen_test_statistic_1, j_eigen_test_statistic_2, j_trace_test_statistic_1,
-                                          j_trace_test_statistic_2)]),
+                        self.jh_coint_test_div(name_1, name_2, j_test_eigen_dataframe, j_test_trace_dataframe,
+                                               j_eigen_test_statistic_1, j_eigen_test_statistic_2,
+                                               j_trace_test_statistic_1, j_trace_test_statistic_2)]),
 
                     html.Div(
+
                         style={'display': 'inline-block', 'padding-left': '5%', 'padding-right': 0, 'padding-top': 0,
                                'padding-bottom': '5%', 'margin-left': 10, 'margin-right': 0, 'margin-top': 0,
                                'margin-bottom': 0, 'vertical-align': 'bottom', 'width': '25%', 'height': '100%',
@@ -909,20 +894,21 @@ class TearSheet:
                             html.Div(style={'display': 'block'}, children=[
 
                                 html.Button('Cointegration vector 1', id='button-3', n_clicks=0,
-                                            style={'BackgroundColor': white, 'padding-left': 40, 'padding-right': 40,
-                                                   'padding-top': 20, 'padding-bottom': 20, 'margin-left': 50,
-                                                   'margin-right': 50, 'margin-top': 50, 'margin-bottom': 50,
-                                                   'font-family': 'Josefin Sans', 'font-weight': '300', 'font-size': 20,
-                                                   'vertical-align': 'center', 'horizontal-align': 'center'}), ]),
+                                            style={'BackgroundColor': self.white, 'padding-left': 40,
+                                                   'padding-right': 40, 'padding-top': 20, 'padding-bottom': 20,
+                                                   'margin-left': 50, 'margin-right': 50, 'margin-top': 50,
+                                                   'margin-bottom': 50, 'font-family': 'Josefin Sans',
+                                                   'font-weight': '300', 'font-size': 20, 'vertical-align': 'center',
+                                                   'horizontal-align': 'center'}), ]),
 
                             html.Div(style={'display': 'block', 'padding-bottom': "5%", }, children=[
 
                                 html.Button('Cointegration vector 2', id='button-4', n_clicks=0,
-                                            style={'BackgroundColor': white, 'padding-left': 40, 'padding-right': 40,
-                                                   'padding-top': 20, 'padding-bottom': 20, 'margin-left': 50,
-                                                   'margin-right': 50, 'margin-top': 50, 'margin-bottom': 50,
-                                                   'font-family': 'Josefin Sans', 'font-weight': '300',
-                                                   'font-size': 20, }), ]),
+                                            style={'BackgroundColor': self.white, 'padding-left': 40,
+                                                   'padding-right': 40, 'padding-top': 20, 'padding-bottom': 20,
+                                                   'margin-left': 50, 'margin-right': 50, 'margin-top': 50,
+                                                   'margin-bottom': 50, 'font-family': 'Josefin Sans',
+                                                   'font-weight': '300', 'font-size': 20, }), ]),
 
                         ]), ]),
 
@@ -979,10 +965,8 @@ class TearSheet:
                 x_data = eg_x_1
                 res_data = eg_residuals_dataframe_1
 
-            return self.eg_div(asset_1, asset_2, coint_test, test_statistic, beta,
-                               portfolio_price, portfolio_return, pacf,
-                               acf, residuals, qq_data, x_data,
-                               res_data, white, black, blue, orange)
+            return self.eg_div(asset_1, asset_2, coint_test, test_statistic, beta, portfolio_price, portfolio_return,
+                               pacf, acf, residuals, qq_data, x_data, res_data)
 
         @app.callback(Output('johansen_container', 'children'), Input('button-3', 'n_clicks'),
                       Input('button-4', 'n_clicks'))
@@ -991,68 +975,28 @@ class TearSheet:
             if 'button-3' in changed_id:
                 asset_1 = name_1
                 asset_2 = name_2
-                coint_test_eigen = j_test_eigen_dataframe
-                coint_test_trace = j_test_trace_dataframe
-                eigen_test_statistic_1 = j_eigen_test_statistic_1
-                eigen_test_statistic_2 = j_eigen_test_statistic_2
-                trace_test_statistic_1 = j_trace_test_statistic_1
-                trace_test_statistic_2 = j_trace_test_statistic_2
                 coint_vector = j_cointegration_vector_1
                 portfolio_price = j_portfolio_price_1
                 portfolio_return = j_portfolio_returns_1
-                pacf = j_pacf_result_1
-                acf = j_acf_result_1
-                residuals = j_residuals_1
-                qq_data = j_qq_y_1
-                x_data = j_x_1
-                res_data = j_residuals_dataframe_1
+
 
             elif 'button-4' in changed_id:
                 asset_1 = name_1
                 asset_2 = name_2
-                coint_test_eigen = j_test_eigen_dataframe
-                coint_test_trace = j_test_trace_dataframe
-                eigen_test_statistic_1 = j_eigen_test_statistic_1
-                eigen_test_statistic_2 = j_eigen_test_statistic_2
-                trace_test_statistic_1 = j_trace_test_statistic_1
-                trace_test_statistic_2 = j_trace_test_statistic_2
                 coint_vector = j_cointegration_vector_2
                 portfolio_price = j_portfolio_price_2
                 portfolio_return = j_portfolio_returns_2
-                pacf = j_pacf_result_2
-                acf = j_acf_result_2
-                residuals = j_residuals_2
-                qq_data = j_qq_y_2
-                x_data = j_x_2
-                res_data = j_residuals_dataframe_2
+
 
             else:
                 asset_1 = name_1
                 asset_2 = name_2
-                coint_test_eigen = j_test_eigen_dataframe
-                coint_test_trace = j_test_trace_dataframe
-                eigen_test_statistic_1 = j_eigen_test_statistic_1
-                eigen_test_statistic_2 = j_eigen_test_statistic_2
-                trace_test_statistic_1 = j_trace_test_statistic_1
-                trace_test_statistic_2 = j_trace_test_statistic_2
                 coint_vector = j_cointegration_vector_1
                 portfolio_price = j_portfolio_price_1
                 portfolio_return = j_portfolio_returns_1
-                pacf = j_pacf_result_1
-                acf = j_acf_result_1
-                residuals = j_residuals_1
-                qq_data = j_qq_y_1
-                x_data = j_x_1
-                res_data = j_residuals_dataframe_1
 
-            return self.jh_div(asset_1, asset_2, coint_vector,
-                               portfolio_price, portfolio_return, pacf, acf, residuals,
-                               qq_data, x_data, res_data, white, black, blue, orange)
+
+            return self.jh_div(asset_1, asset_2, coint_vector, portfolio_price, portfolio_return)
 
         if __name__ == '__main__':
             app.run_server()
-
-
-
-
-
