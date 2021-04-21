@@ -7,7 +7,7 @@ from typing import Tuple
 import pandas as pd
 import numpy as np
 from scipy.optimize import minimize
-from arbitragelab.cointegration_approach import get_half_life_of_mean_reversion
+from arbitragelab.cointegration_approach.signals import get_half_life_of_mean_reversion
 
 # pylint: disable=invalid-name
 def _min_hl_function(beta: np.array, X: pd.DataFrame, y: pd.Series) -> float:

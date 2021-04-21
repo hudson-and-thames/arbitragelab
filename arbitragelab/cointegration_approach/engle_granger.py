@@ -12,7 +12,7 @@ from statsmodels.tsa.stattools import adfuller
 
 from arbitragelab.cointegration_approach.base import CointegratedPortfolio
 from arbitragelab.util import devadarsh
-from arbitragelab.hedge_ratios import get_ols_hedge_ratio
+from arbitragelab.hedge_ratios.linear import get_ols_hedge_ratio
 
 
 class EngleGrangerPortfolio(CointegratedPortfolio):
