@@ -113,7 +113,7 @@ def _linear_f(beta: np.array, x_variable: np.array) -> np.array:
 
     return beta[0] * x_variable + beta[1]
 
-
+# pylint: disable=protected-access
 def _outer_cointegration_loop(prices_df: pd.DataFrame, molecule: list, hedge_ratio_calculation: str) -> pd.DataFrame:
     """
     This function calculates the Engle-Granger test for each pair in the molecule.
