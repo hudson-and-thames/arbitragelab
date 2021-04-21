@@ -102,17 +102,6 @@ def _outer_ou_loop(spreads_df: pd.DataFrame, test_period: str,
     return pd.DataFrame(ou_results, index=molecule, columns=['hl', 'crossovers'])
 
 
-def _linear_f(beta: np.array, x_variable: np.array) -> np.array:
-    """
-    This is the helper linear model that is going to be used in the Orthogonal Regression.
-
-    :param beta: (np.array) Model beta coefficient.
-    :param x_variable: (np.array) Model X vector.
-    :return: (np.array) Vector result of equation calculation.
-    """
-
-    return beta[0] * x_variable + beta[1]
-
 # pylint: disable=protected-access
 def _outer_cointegration_loop(prices_df: pd.DataFrame, molecule: list, hedge_ratio_calculation: str) -> pd.DataFrame:
     """

@@ -237,6 +237,12 @@ class TestPairsSelector(unittest.TestCase):
                                                          min_crossover_threshold_per_year=8,
                                                          hurst_exp_threshold=0.55,
                                                          hedge_ratio_calculation='min_half_life')
+        # Check value error raise for unknown hedge ratio input.
+        with self.assertRaises(ValueError):
+            self.pair_selector._criterion_selection(input_pairs, adf_cutoff_threshold=0.95,
+                                                    min_crossover_threshold_per_year=8,
+                                                    hurst_exp_threshold=0.55,
+                                                    hedge_ratio_calculation='johansen')
         result = pd.Series(result)
 
         coint_pp = self.pair_selector.coint_pass_pairs.index
