@@ -11,7 +11,7 @@ import pandas as pd
 import numpy as np
 import matplotlib
 
-from arbitragelab.ml_approach import PairsSelector
+from arbitragelab.ml_approach import DBSCANPairsClustering
 
 
 # pylint: disable=protected-access
@@ -109,6 +109,7 @@ class TestPairsSelector(unittest.TestCase):
         with self.assertRaises(Exception):
             self.pair_selector._generate_pairwise_combinations([])
 
+    # TODO: move to pairs selection class.
     def test_hurst_criterion(self):
         """
         Verifies private hurst processing method.
