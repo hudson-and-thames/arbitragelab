@@ -11,14 +11,22 @@ This module is a realization of the methodology in the following paper:
 import warnings
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 
 from arbitragelab.cointegration_approach import EngleGrangerPortfolio
 
 
 class OptimalConvergence:
     """
-    Implementation of Optimal Convergence Trade Strategies.
+     This module models the optimal convergence trades under both recurring and nonrecurring arbitrage opportunities
+     represented by continuing and “stopped” co-integrated price processes.
+
+     Along with delta neutral portfolios, this module also considers unconstrained optimal portfolios where the portfolio weights
+     of both the stocks in the spread are calculated dynamically. Conventional long-short delta neutral strategies
+     are generally suboptimal and it can be optimal to simultaneously go long (or short) in two mis-priced assets.
+     Standard arbitrage strategies and/or delta neutral convergence trades are designed to explore long-term arbitrage
+     opportunities but do typically not optimally exploit the short-run risk return trade-off. By placing arbitrage
+     opportunities in the context of a portfolio maximization problem, this optimal convergence strategy accounts
+     for both arbitrage opportunities and diversification benefits.
     """
 
     def __init__(self):
@@ -47,6 +55,7 @@ class OptimalConvergence:
 
     def fit(self, prices: pd.DataFrame, delta_t: float = 1 / 252, adf_test: bool = False, significance_level: float = 0.95):
         """
+        This method estimates the error-correction terms(lambda) using the inputted pricing data.
 
         :param prices: (pd.DataFrame) Contains price series of both stocks in spread.
         :param delta_t: (float) Time difference between each index of data, calculated in years.
@@ -85,6 +94,11 @@ class OptimalConvergence:
     def unconstrained_portfolio_weights_continuous(self, prices, mu_m, sigma_m, gamma, r):
         """
         Implementation of Proposition 1.
+
+        This method calculates the portfolio weights for the market asset and for both the stocks in the spread
+        when there are no constraints put of values of lambda.
+        We also assume a continuing cointegrated price process (recurring arbitrage opportunities),
+        which gives closed-form solutions for the optimal portfolio weights.
 
         If lambda_1 = lambda_2, from the portfolio weights outputted from this method phi_2 + phi_1 = 0,
         which implies delta neutrality. This follows Proposition 3 in the paper.
@@ -134,6 +148,11 @@ class OptimalConvergence:
         """
         Implementation of Proposition 2.
 
+        This method calculates the portfolio weights for the market asset and for both the stocks in the spread
+        when the portfolio is constrained to be delta-neutral, where sum of portfolio weights of both the assets
+        in the spread is zero. We also assume a continuing cointegrated price process (recurring arbitrage opportunities),
+        which gives closed-form solutions for the optimal portfolio weights.
+
         :param r:
         :param gamma:
         :param prices: (pd.DataFrame) Contains price series of both stocks in spread.
@@ -166,6 +185,9 @@ class OptimalConvergence:
     def wealth_gain_continuous(self, prices, mu_m, sigma_m, gamma, r):
         """
         Implementation of Proposition 4.
+
+        This method calculates the expected wealth gain of the unconstrained optimal strategy relative to the
+        delta neutral strategy assuming a mis-pricing of the spread.
 
         :param r:
         :param gamma:
@@ -202,6 +224,7 @@ class OptimalConvergence:
     def _x_tau_calc(self, prices):
         """
         Calculates the error correction term x given in equation (4) and the time remaining in years.
+
         :param prices: (pd.DataFrame) Contains price series of both stocks in spread.
         :return:
         """
@@ -218,6 +241,7 @@ class OptimalConvergence:
     def _lambda_x_calc(self):
         """
         Helper function calculates lambda_x.
+
         :return:
         """
 
@@ -229,6 +253,7 @@ class OptimalConvergence:
         """
         Helper function which calculates xi, present in Appendix A.1.
         Xi is used in the calculations of A and C functions.
+
         :return:
         """
 
@@ -246,6 +271,7 @@ class OptimalConvergence:
     def _C_calc(self, tau):
         """
         Implementation of function C given in Appendix A.1.
+
         :param tau:
         :return:
         """
@@ -265,6 +291,7 @@ class OptimalConvergence:
     def _D_calc(self, tau):
         """
         Implementation of function D given in Appendix A.2.
+
         :param tau:
         :return:
         """
@@ -285,6 +312,7 @@ class OptimalConvergence:
     def _A_calc(self, tau):
         """
         Implementation of function A given in Appendix A.1.
+
         :param tau:
         :return:
         """
@@ -299,6 +327,7 @@ class OptimalConvergence:
     def _B_calc(self, tau):
         """
         Implementation of function B given in Appendix A.2.
+
         :param tau:
         :return:
         """
@@ -336,6 +365,7 @@ class OptimalConvergence:
     def _u_func_continuous_calc(self, x, tau):
         """
         Implementation of Lemma 1.
+
         :param x:
         :param tau:
         :return:
@@ -352,6 +382,7 @@ class OptimalConvergence:
     def _v_func_continuous_calc(self, x, tau):
         """
         Implementation of Lemma 2.
+
         :param x:
         :param tau:
         :return:
