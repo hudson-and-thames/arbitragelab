@@ -12,6 +12,8 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+* :support:`50` Updated documentation theme to hudsonthames-sphinx-docs.
+
 * :release:`0.4.10 <2021-04-15>`
 * :feature:`43` OU Model Jurek and OU Model Mudchanatongsuk added to the Stochastic Control Approach Module.
 * :support:`43` OU Model Jurek and OU Model Mudchanatongsuk documentation.
