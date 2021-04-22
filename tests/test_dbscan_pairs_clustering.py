@@ -17,14 +17,14 @@ from arbitragelab.ml_approach import DBSCANPairsClustering
 # pylint: disable=protected-access
 
 
-class TestPairsSelector(unittest.TestCase):
+class TestDBSCANClustering(unittest.TestCase):
     """
-    Tests Pairs Selector class.
+    Tests DBSCANPairsClustering class.
     """
 
     def setUp(self):
         """
-        Loads price universe and instantiates the pairs selection class.
+        Loads price universe and instantiates the DBSCANPairsClustering selection class.
         """
 
         np.random.seed(0)
@@ -33,7 +33,7 @@ class TestPairsSelector(unittest.TestCase):
         data_path = project_path + '/test_data/sp100_prices.csv'
         self.data = pd.read_csv(data_path, parse_dates=True, index_col="Date")
         self.data.dropna(inplace=True)
-        self.pair_selector = PairsSelector(self.data)
+        self.pair_selector = DBSCANPairsClustering(self.data)
 
     def test_dimensionality_reduction(self):
         """
@@ -58,22 +58,22 @@ class TestPairsSelector(unittest.TestCase):
 
         # Test dimensionality reduction when inputting invalid data.
         with self.assertRaises(Exception):
-            pair_selector = PairsSelector(None)
+            pair_selector = DBSCANPairsClustering(None)
             pair_selector.dimensionality_reduction_by_components(15)
 
     def test_clustering(self):
         """
-        Verifies generated clusters from both techniques in the PairsSelector class.
+        Verifies generated clusters from both techniques in the DBSCANPairsClustering class.
         """
 
         # Test Optics clustering without any price data.
         with self.assertRaises(Exception):
-            pair_selector = PairsSelector(None)
+            pair_selector = DBSCANPairsClustering(None)
             pair_selector.cluster_using_optics()
 
         # Test Dbscan clustering without any price data.
         with self.assertRaises(Exception):
-            pair_selector = PairsSelector(None)
+            pair_selector = DBSCANPairsClustering(None)
             pair_selector.cluster_using_dbscan()
 
         self.pair_selector.dimensionality_reduction_by_components(2)
@@ -88,7 +88,7 @@ class TestPairsSelector(unittest.TestCase):
 
     def test_generate_pairwise_combinations(self):
         """
-        Verifies pairs generator in the PairsSelector class.
+        Verifies pairs generator in the DBSCANPairsClustering class.
         """
 
         # Setup initial variables needed for the test.
@@ -108,213 +108,6 @@ class TestPairsSelector(unittest.TestCase):
         # Try to generate combinations without valid input data.
         with self.assertRaises(Exception):
             self.pair_selector._generate_pairwise_combinations([])
-
-    # TODO: move to pairs selection class.
-    def test_hurst_criterion(self):
-        """
-        Verifies private hurst processing method.
-        """
-
-        # Setup initial variables needed for the test.
-        self.pair_selector.dimensionality_reduction_by_components(2)
-        self.pair_selector.cluster_using_optics(min_samples=3)
-
-        # Setup needed information to validate the hurst criterion return.
-        hedge_ratios = [0.832406370860649, 70]
-        idx = [('A', 'AVB'), ('ABMD', 'AZO')]
-        input_pairs = pd.DataFrame(data=hedge_ratios, index=idx)
-        input_pairs.columns = ['hedge_ratio']
-
-        result = self.pair_selector._hurst_criterion(input_pairs)
-        hurst_pp = pd.Series(result[1].index)
-        pd.testing.assert_series_equal(pd.Series(idx), hurst_pp)
-
-        # Test the hurst criterion with invalid input data.
-        with self.assertRaises(Exception):
-            self.pair_selector._hurst_criterion([])
-
-    def test_final_criterions(self):
-        """
-        Verifies private final criterions processing method.
-        """
-
-        # Setup initial variables needed for the test.
-        self.pair_selector.dimensionality_reduction_by_components(2)
-        self.pair_selector.cluster_using_optics(min_samples=3)
-
-        hedge_ratios = [0.832406370860649, 70]
-        idx = [('A', 'AVB'), ('ABMD', 'AZO')]
-        input_pairs = pd.DataFrame(data=hedge_ratios, index=idx)
-        input_pairs.columns = ['hedge_ratio']
-
-        # Generate the inputs needed for the final criterions method test.
-        spreads_df, hurst_pass_pairs = self.pair_selector._hurst_criterion(input_pairs)
-
-        hl_pairs, final_pairs = self.pair_selector._final_criterions(
-            spreads_df, hurst_pass_pairs.index.values
-        )
-
-        hl_pairs_sr = pd.Series(hl_pairs.index)
-        final_pairs_sr = pd.Series(final_pairs.index)
-
-        # Check that the first pair passes the Half Life Test.
-        pd.testing.assert_series_equal(pd.Series([idx[0]]), hl_pairs_sr)
-
-        # Check that 1 pair pass through to the final list.
-        pd.testing.assert_series_equal(pd.Series([('A', 'AVB')], dtype=object), final_pairs_sr)
-
-        # Test final criterions method using invalid data.
-        with self.assertRaises(Exception):
-            self.pair_selector._final_criterions([], [])
-
-    def test_criterion_selector_ols(self):
-        """
-        Verifies final user exposed criterion selection method with OLS hedge ratio calculation.
-        """
-
-        # Setup initial variables needed for the test.
-        self.pair_selector.dimensionality_reduction_by_components(2)
-        self.pair_selector.cluster_using_optics(min_samples=3)
-
-        final_pairs = [('BA', 'CF')]
-        other_pairs = [('ABMD', 'AZO'), ('AES', 'BBY'), ('BKR', 'CE')]
-        coint_pairs = [('BA', 'CF'), ('BKR', 'CE')]
-        input_pairs = final_pairs + other_pairs
-
-        result = self.pair_selector._criterion_selection(input_pairs, adf_cutoff_threshold=0.9,
-                                                         min_crossover_threshold_per_year=0,
-                                                         hedge_ratio_calculation='OLS')
-        result = pd.Series(result)
-
-        coint_pp = self.pair_selector.coint_pass_pairs.index
-        coint_pp = pd.Series(coint_pp)
-
-        # Assert that only 2 pairs passes cointegration tests and only 1 pair passes all tests.
-        pd.testing.assert_series_equal(pd.Series(coint_pairs), coint_pp)
-        pd.testing.assert_series_equal(pd.Series(final_pairs), result)
-
-    def test_criterion_selector_tls(self):
-        """
-        Verifies final user exposed criterion selection method with TLS hedge ration calculation.
-        """
-
-        # Setup initial variables needed for the test.
-        self.pair_selector.dimensionality_reduction_by_components(2)
-        self.pair_selector.cluster_using_optics(min_samples=3)
-
-        final_pairs = [('BA', 'CF'), ('BKR', 'CE')]
-        other_pairs = [('ABMD', 'AZO'), ('AES', 'BBY')]
-        coint_pairs = [('BA', 'CF'), ('BKR', 'CE')]
-        input_pairs = final_pairs + other_pairs
-
-        result = self.pair_selector._criterion_selection(input_pairs, adf_cutoff_threshold=0.9,
-                                                         min_crossover_threshold_per_year=None,
-                                                         hurst_exp_threshold=0.55,
-                                                         hedge_ratio_calculation='TLS')
-        result = pd.Series(result)
-
-        coint_pp = self.pair_selector.coint_pass_pairs.index
-        coint_pp = pd.Series(coint_pp)
-
-        # Assert that only 2 pairs passes cointegration tests and only 2 pairs passes all tests (no crossover).
-        pd.testing.assert_series_equal(pd.Series(coint_pairs), coint_pp)
-        pd.testing.assert_series_equal(pd.Series(final_pairs), result)
-
-    def test_criterion_selector_min_hl(self):
-        """
-        Verifies final user exposed criterion selection method with minimum HL hedge ration calculation.
-        """
-
-        # Setup initial variables needed for the test.
-        self.pair_selector.dimensionality_reduction_by_components(2)
-        self.pair_selector.cluster_using_optics(min_samples=3)
-
-        final_pairs = [('BA', 'CF')]
-        other_pairs = [('ABMD', 'AZO'), ('AES', 'BBY'), ('BKR', 'CE')]
-        coint_pairs = [('BA', 'CF')]
-        input_pairs = final_pairs + other_pairs
-
-        result = self.pair_selector._criterion_selection(input_pairs, adf_cutoff_threshold=0.95,
-                                                         min_crossover_threshold_per_year=8,
-                                                         hurst_exp_threshold=0.55,
-                                                         hedge_ratio_calculation='min_half_life')
-        # Check value error raise for unknown hedge ratio input.
-        with self.assertRaises(ValueError):
-            self.pair_selector._criterion_selection(input_pairs, adf_cutoff_threshold=0.95,
-                                                    min_crossover_threshold_per_year=8,
-                                                    hurst_exp_threshold=0.55,
-                                                    hedge_ratio_calculation='johansen')
-        result = pd.Series(result)
-
-        coint_pp = self.pair_selector.coint_pass_pairs.index
-        coint_pp = pd.Series(coint_pp)
-
-        # Assert that only 2 pairs passes cointegration tests and only 2 pairs passes all tests (no crossover).
-        pd.testing.assert_series_equal(pd.Series(coint_pairs), coint_pp)
-        pd.testing.assert_series_equal(pd.Series(final_pairs), result)
-
-    def test_unsupervised_candidate_pair_selector(self):
-        """
-        Tests the parent candidate pair selection method.
-        """
-
-        # Tests pair selector with invalid data seed clustering data.
-        with self.assertRaises(Exception):
-            self.pair_selector.clust_labels_ = []
-            self.pair_selector.unsupervised_candidate_pair_selector()
-
-        # Setup initial variables needed for the test.
-        self.pair_selector.dimensionality_reduction_by_components(2)
-
-        # The following will mark a few tickers as valid to be used
-        # in the pairs generation process.
-        self.pair_selector.clust_labels_ = np.array([-1] * 100)
-        np.put(self.pair_selector.clust_labels_, [55, 56, 86], 1)
-
-        self.assertTrue(
-            type(self.pair_selector.unsupervised_candidate_pair_selector(adf_cutoff_threshold=0.9,
-                                                                         min_crossover_threshold_per_year=4)), list)
-
-        final_pairs = pd.DataFrame(index=[('ABMD', 'AZO'), ('AES', 'BBY'), ('BKR', 'CE')])
-        self.pair_selector.final_pairs = final_pairs
-        selected_pairs_return = self.pair_selector.plot_selected_pairs()
-
-        # Check if returned plot object is a list of Axes objects.
-        self.assertTrue(type(selected_pairs_return), list)
-
-        with self.assertRaises(Exception):
-            pairs_list = list((('F', 'V'),) * 45)
-            final_pairs = pd.DataFrame(index=pairs_list)
-            self.pair_selector.final_pairs = final_pairs
-            self.pair_selector.plot_selected_pairs()
-
-    def test_description_methods(self):
-        """
-        Tests the various pair description methods.
-        """
-
-        # Test return of the describe method.
-        intro_descr = self.pair_selector.describe()
-        self.assertEqual(type(intro_descr), pd.DataFrame)
-
-        # Test return of the extended describe method.
-        extended_descr = self.pair_selector.describe_extra()
-        self.assertEqual(type(extended_descr), pd.DataFrame)
-
-        # Test return of the sectoral based method with empty sector info dataframe input.
-        empty_sectoral_df = pd.DataFrame(columns=['ticker', 'sector', 'industry'])
-        empty_sectoral_descr = self.pair_selector.describe_pairs_sectoral_info(['AJG'], ['ICE'], empty_sectoral_df)
-        self.assertEqual(type(empty_sectoral_descr), pd.DataFrame)
-
-        sector_info = pd.DataFrame(data=[
-            ('AJG', 'sector', 'industry'),
-            ('ICE', 'sector', 'industry')
-        ])
-        sector_info.columns = ['ticker', 'sector', 'industry']
-        full_sectoral_descr = self.pair_selector.describe_pairs_sectoral_info(['AJG'], ['ICE'], sector_info)
-
-        # Test return of the sectoral based method with full sector info dataframe input.
-        self.assertEqual(type(full_sectoral_descr), pd.DataFrame)
 
     def test_manual_methods(self):
         """
@@ -337,10 +130,6 @@ class TestPairsSelector(unittest.TestCase):
         Tests all plotting methods.
         """
 
-        # Test the final pairs plotting method with no information.
-        with self.assertRaises(Exception):
-            self.pair_selector.plot_selected_pairs()
-
         # Test the clustering plotting method with no information.
         with self.assertRaises(Exception):
             self.pair_selector.plot_clustering_info()
@@ -352,10 +141,6 @@ class TestPairsSelector(unittest.TestCase):
         # Test knee plot return object.
         knee_plot_pyplot_obj = self.pair_selector.plot_knee_plot()
         self.assertTrue(issubclass(type(knee_plot_pyplot_obj), matplotlib.axes.SubplotBase))
-
-        # Test single pair plot return object.
-        singlepair_pyplot_obj = self.pair_selector.plot_single_pair(('AJG', 'ABMD'))
-        self.assertTrue(issubclass(type(singlepair_pyplot_obj), matplotlib.axes.SubplotBase))
 
         # Test 2d cluster plot return object.
         twod_pyplot_obj = self.pair_selector.plot_clustering_info(n_dimensions=2)
