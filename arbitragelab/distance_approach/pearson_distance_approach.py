@@ -215,6 +215,24 @@ class PearsonStrategy:
 
         return self.trading_signal
 
+    def get_beta_dict(self):
+        """
+        Outputs beta, a regression coefficients for each stock, in the formation period.
+
+        :return: (dict) A dictionary with stock in its key and beta in its value
+        """
+
+        return self.beta_dict
+
+    def get_pairs_dict(self):
+        """
+        Outputs top n pairs selected during the formation period for each of the stock.
+
+        :return: (dict) A dictionary with stock in its key and pairs in its value
+        """
+
+        return self.pairs_dict
+
     def _data_preprocess(self, price_data, risk_free, phase='train'):
         """
         Preprocess train data and risk free data.

@@ -34,10 +34,9 @@ The hypothesis in this approach is that if a stock’s return deviates more from
 than usual, this divergence should be reversed in the next month and expecting abnormally higher returns than
 other stocks.
 
-Therefore, after calculating the return divergence of all the stocks, decile portfolios are constructed where
-stocks with high return divergence have higher subsequent returns. Therefore after all stocks are sorted in
-descending order based on their previous month’s return divergence, decile 10 is “long stocks” and decile 1
-is “short stocks”.
+Therefore, after calculating the return divergence of all the stocks,  a long-short portfolio is constructed
+where stocks with high return divergence have higher subsequent returns.
+
 
 Pairs Portfolio Formation
 #########################
@@ -79,9 +78,9 @@ and one of its pairs.
 After pairs portfolio returns are calculated, the method derives beta from the monthly return of the stock and
 its pairs portfolio. By using linear regression, setting stock return as independent variable and pairs portfolio
 return as the dependent variable, the methods set beta as a regression coefficient. Then the beta is stored in a
-dictionary for future uses in trading. Below is a figure showing two stocks with high and low beta.
+dictionary for future uses in trading. Below is a figure showing two stocks with high beta(ENPH) and low beta(RE).
 
-.. figure:: images/distance_approach_pair.png
+.. figure:: images/pearson_approach_beta_stocks.png
     :scale: 100 %
     :align: center
 
@@ -97,91 +96,62 @@ Implementation
 
 Trading Signal Generation
 #########################
+After calculating the betas for all of the stocks in the formation period, the next step is to generate trading
+signals by calculating the return divergence for each of the stocks. In this method, test data is not necessarily
+required if only a trading signal for the very next month of formation period is needed. However, if one wants to
+see the backtesting results of the method and test with test data, a successive dataset after the formation period
+is required to generate the proper trading signals. The steps are as follows:
 
-As basic pairs formation confirms declining profitability in pairs trading, some other refined pair
-selection criteria have emerged. Here, we describe three different methods from the basic approach in
-selecting pairs for trading.
+1. **Data Preprocessing**
 
-First is only allowing for matching securities within the same industry group . The second is sorting
-selected pairs based on the number of zero-crossings in the formation period and the third is sorting
-selected pairs based on the historical standard deviation where pairs with high standard deviation are selected.
-These selection methods are inspired by the work by Do and Faff (2010, 2012).
+The same data preprocessing is done with the formation period as the data needs to be in the same format. As in
+the formation period, risk free rate can be given in the form of either a float number of a series of data.
 
-1. **Pairs within the same industry group**
+2. **Calculating the Return Divergence**
 
-In the pairs formation step above, one can add this method when finding pairs in order to match securities
-within the same industry group.
+For every month of test data, starting from the very last month of the train data, return divergences are calculated
+with the beta created in the formation period. The equation for calculating the return divergence is in the first section
+of this documentation. Note that while the return divergence between a portfolio of :math:`n` most-highly correlated stocks
+with stock i and stock :math:`i` is used as a sorting variable, only individual stock :math:`i` enters the portfolio
+construction, not those :math:`n` stocks. The portfolio of those :math:`n` stocks only serves as a benchmark for portfolio sorting.
 
-With a dictionary containing the name/ticker of the securities and each corresponding industry group,
-the securities are first separated into different industry groups. Then, by calculating the Euclidean
-square distance for each of the pair within the same group, the :math:`n` closest pairs are selected(in default,
-our function also allows skipping a number of first pairs, so one can choose pairs 10-15 to study). This pair
-selection criterion can be used as default before adding other methods such as zero-crossings or variance if one
-gives a dictionary of industry group as an input.
+3. **Finding Trading Signals**
 
-2. **Pairs with a higher number of zero-crossings**
-
-The number of zero crossings in the formation period has a positive relation to the future spread
-convergence according to the work by Do and Faff (2010).
-
-After pairs were matched either within the same industry group or every industry, the top :math:`n` pairs
-that had the highest number of zero crossings during the formation period are admitted to the
-portfolio we select. This method incorporates the time-series dimension of the historical data in the
-form of the number of zero crossings.
-
-3. **Pairs with a higher historical standard deviation**
-
-The historical standard deviation calculated in the formation period can also be a criterion to sort
-selected pairs. According to the work of Do and Faff(2010), as having a small SSD decreases the variance
-of the spread, this approach could increase the expected profitability of the method.
-
-After pairs were matched, we can sort them based on their historical standard deviation in the formation period
-to select top :math:`n` pairs with the highest variance of the spread.
+Then, all stocks are sorted in descending order based on their previous month's return divergence.  If the percentages
+of long and short stocks are given, say :math:`p\%` and :math:`q\%`, the top :math:`p\%` of the sorted stocks are chosen
+for the long stocks and the bottom :math:`q\%` of the sorted stocks are chosen for the short stocks. If a user wants to
+construct a dollar-neutral portfolio, one should choose the same percentage for :math:`p` and :math:`q`. Finally,
+a new dataframe is created with all of the trading signals: 1 if a stock is in a long position, -1 if it is in a short
+position and 0 if it does not have any position.
 
 
 Implementation
 **************
-
-.. automethod:: DistanceStrategy.trade_pairs
-
-###
-
-Results output and plotting
-###########################
-
-The DistanceStrategy class contains multiple methods to get results in the desired form.
-
-Functions that can be used to get data:
-
-- **get_signals()** outputs generated trading signals for each pair.
-
-- **get_portfolios()** outputs values series of each pair portfolios.
-
-- **get_scaling_parameters()** outputs scaling parameters from the training dataset used to normalize data.
-
-- **get_pairs()** outputs a list of tuples, containing chosen top pairs in the pairs formation step.
-
-- **get_num_crossing()** outputs a list of tuples, containing chosen top pairs with its number of zero-crossings.
-
-Functions that can be used to plot data:
-
-- **plot_pair()** plots normalized price series for elements in a given pair and the corresponding
-  trading signals for portfolio of these elements.
-
-- **plot_portfolio()** plots portfolio value for a given pair and the corresponding trading signals.
-
-Implementation
-**************
-
-.. automethod:: PearsonStrategy.form_portfolio
 
 .. automethod:: PearsonStrategy.trade_portfolio
 
+
+Results output
+##############
+
+The PearsonStrategy class contains multiple methods to get results in the desired form.
+
+Functions that can be used to get data:
+
+- **get_trading_signal()** outputs trading signal in monthly basis. 1 for a long position, -1 for a short position and 0 for closed position.
+
+- **get_beta_dict()** outputs beta, a regression coefficients for each stock, in the formation period.
+
+- **get_pairs_dict()** outputs top n pairs selected during the formation period for each of the stock.
+
+Implementation
+**************
+
 .. automethod:: PearsonStrategy.get_trading_signal
 
-.. automethod:: PearsonStrategy.get_short_stocks
+.. automethod:: PearsonStrategy.get_beta_dict
 
-.. automethod:: PearsonStrategy.get_long_stocks
+.. automethod:: PearsonStrategy.get_pairs_dict
 
 
 Examples
@@ -194,67 +164,49 @@ Code Example
 
    # Importing packages
    import pandas as pd
-   from arbitragelab.distance_approach.basic_distance_approach import DistanceStrategy
+   from arbitragelab.distance_approach.pearson_distance_approach import PearsonStrategy
 
    # Getting the dataframe with price time series for a set of assets
    data = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])
+   risk_free = pd.read_csv('Y_FILE_PATH.csv', index_col=0, parse_dates = [0])
 
    # Dividing the dataset into two parts - the first one for pairs formation
-   data_pairs_formation = data.loc[:'2019-01-01']
+   train_data = data.loc[:'2019-01-01']
+   risk_free_train = risk_free.loc[:'2019-01-01']
 
    # And the second one for signals generation
-   data_signals_generation = data.loc['2019-01-01':]
+   test_data = data.loc['2019-01-01':]
+   risk_free_test = risk_free.loc['2019-01-01':]
 
-   # Performing the pairs formation stage of the DistanceStrategy
-   # Choosing pairs 5-25 from top pairs to construct portfolios
-   strategy = DistanceStrategy()
-   strategy.form_pairs(data_pairs_formation, num_top=20, skip_top=5)
+   # Performing the portfolio formation stage of the PearsonStrategy
+   # Choosing top 50 pairs to calculate beta and set other parameters as default
+   strategy = PearsonStrategy()
+   strategy.form_portfolio(train_data, risk_free_train, num_pairs=50)
 
-   # Adding an industry-based selection criterion to The DistanceStrategy
-   strategy_industry = DistanceStrategy()
-   strategy_industry.form_pairs(data_pairs_formation, industry_dict=industry_dict,
-                                num_top=20, skip_top=5)
+   # Checking a list of beta that were calculated
+   beta_dict = strategy.get_beta_dict()
 
-   # Using the number of zero-crossing for pair selection after industry-based selection
-   strategy_zero_crossing = DistanceStrategy()
-   strategy_zero_crossing.form_pairs(data_pairs_formation, method='zero_crossing',
-                                     industry_dict=industry_dict, num_top=20, skip_top=5)
+   # Checking a list of pairs in the formation period
+   pairs = strategy.get_pairs_dict()
 
-   # Checking a list of pairs that were created
-   pairs = strategy.get_pairs()
+   # Now generating signals for formed pairs and beta
+   strategy.trade_portfolio(test_data, risk_free_test)
 
-   # Checking a list of pairs with the number of zero crossings
-   num_crossing = strategy.get_num_crossing()
-
-   # Now generating signals for formed pairs, using (2 * st. variation) as a threshold
-   # to enter a position
-   strategy.trade_pairs(data_signals_generation, divergence=2)
-
-   # Checking portfolio values for pairs and generated trading signals
-   portfolios = strategy.get_portfolios()
-   signals = strategy.get_signals()
-
-   # Plotting price series for elements in the second pair (counting from zero)
-   # and corresponding trading signals for the pair portfolio
-   figure = strategy.plot_pair(1)
+   # Checking generated trading signals in the test period
+   signals = strategy.get_trading_signal()
 
 Research Notebooks
 ******************
 
-The following research notebook can be used to better understand the distance approach described above.
+The following research notebook can be used to better understand the pearson approach described above.
 
-* `Basic Distance Approach`_
-
-* `Basic Distance Approach Comparison`_
+* `Pearson Distance Approach`_
 
 .. _`Basic Distance Approach`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Distance%20Approach/basic_distance_approach.ipynb
-
-.. _`Basic Distance Approach Comparison`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Distance%20Approach/basic_distance_approach_comparison.ipynb
 
 References
 ##########
 
-* `Do, B. and Faff, R., 2010. Does simple pairs trading still work?. Financial Analysts Journal, 66(4), pp.83-95. <https://www.jstor.org/stable/pdf/25741293.pdf?casa_token=nIfIcPq13NAAAAAA:Nfrg__C0Q1lcvoBi6Z8DwC_-6pA_cHDdLxxINYg7BPvuq-R5nNzbhVWra2PBL7t2hntj_WBxGH_vCezpp-ZN7NKYhKuZMoX97A7im7PREt7oh2mAew>`_
-* `Do, B., and Faff, R. (2012). Are pairs trading profits robust to trading costs? Journal of Financial Research, 35(2):261–287. <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1707125>`_
-* `Gatev, E., Goetzmann, W.N. and Rouwenhorst, K.G., 2006. Pairs trading: Performance of a relative-value arbitrage rule. The Review of Financial Studies, 19(3), pp.797-827. <https://www.nber.org/system/files/working_papers/w7032/w7032.pdf>`_
-* `Krauss, C., 2017. Statistical arbitrage pairs trading strategies: Review and outlook. Journal of Economic Surveys, 31(2), pp.513-545. <https://www.econstor.eu/bitstream/10419/116783/1/833997289.pdf>`_
+* `Empirical investigation of an equity pairs trading strategy <http://www.pbcsf.tsinghua.edu.cn/research/chenzhuo/paper/Empirical%20Investigation%20of%20an%20Equity%20Pairs%20Trading%20Strategy.pdf>`_
+* `Evaluation of pairs-trading strategy at the Brazilian financial market <https://link.springer.com/article/10.1057/jdhf.2009.4>`_
+* `Statistical arbitrage pairs trading strategies: Review and outlook <https://www.econstor.eu/bitstream/10419/116783/1/833997289.pdf>`_
