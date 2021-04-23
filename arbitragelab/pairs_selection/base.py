@@ -13,9 +13,16 @@ from matplotlib.axes._axes import Axes
 
 
 class AbstractPairsSelector(ABC):
+    """
+    This is an abstract class for pairs selectors objects. It has abstract method select_pairs() which needs to be
+    implemented.
+    """
 
     @abstractmethod
     def select_pairs(self):
+        """
+        Method which selects pairs based on some predefined criterions.
+        """
         raise NotImplementedError('Must implement select_pairs() method.')
 
     @staticmethod

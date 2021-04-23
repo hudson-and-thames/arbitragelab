@@ -13,6 +13,7 @@ from arbitragelab.util.hurst import get_hurst_exponent
 from arbitragelab.pairs_selection.base import AbstractPairsSelector
 
 
+# pylint: disable=arguments-differ
 class CointegrationPairsSelector(AbstractPairsSelector):
     """
     Implementation of the Proposed Pairs Selection Framework in the following paper:
