@@ -11,6 +11,7 @@ This module is a realization of the methodology in the following paper:
 import warnings
 import numpy as np
 import pandas as pd
+from sklearn.linear_model import LinearRegression
 
 from arbitragelab.cointegration_approach import EngleGrangerPortfolio
 
@@ -53,10 +54,13 @@ class OptimalConvergence:
         self.sigma_m = None
 
 
-    def fit(self, prices: pd.DataFrame, delta_t: float = 1 / 252, adf_test: bool = False, significance_level: float = 0.95):
+    def fit(self, prices: pd.DataFrame, mu_m, sigma_m, r, delta_t: float = 1 / 252, adf_test: bool = False, significance_level: float = 0.95):
         """
         This method estimates the error-correction terms(lambda) using the inputted pricing data.
 
+        :param r:
+        :param sigma_m:
+        :param mu_m:
         :param prices: (pd.DataFrame) Contains price series of both stocks in spread.
         :param delta_t: (float) Time difference between each index of data, calculated in years.
         :param adf_test: (bool) Flag which defines whether the adf statistic test should be conducted.
@@ -64,34 +68,82 @@ class OptimalConvergence:
             Value can be one of the following: (0.90, 0.95, 0.99).
         """
 
-        #TODO: Need to input market index data and orthogonalize the price data with market index before using cointegration.
-        # Refer Table 1 in paper.
-
         # Setting instance attributes
         self.delta_t = delta_t
         self.ticker_A, self.ticker_B = prices.columns[0], prices.columns[1]
 
+        self.mu_m = mu_m
+        self.sigma_m = sigma_m
+        self.r = r
+
+        # Using Equation (1) and (2) to calculate lambda's and beta term
+
+        x, tau = self._x_tau_calc(prices)
         prices = self._data_preprocessing(prices)
-        # As mentioned in the paper, the vector of linear weights are calculated using co-integrating regression
-        eg_portfolio = EngleGrangerPortfolio()
-        eg_portfolio.fit(prices, add_constant=True)  # Fitting the prices
-        eg_adf_statistics = eg_portfolio.adf_statistics  # Stores the results of the ADF statistic test
-        eg_cointegration_vectors = eg_portfolio.cointegration_vectors  # Stores the calculated weights for the pair of stocks in the spread
 
-        if adf_test is True and eg_adf_statistics.loc['statistic_value', 0] > eg_adf_statistics.loc[
-            f'{int(significance_level * 100)}%', 0]:
-            # Making sure that the data passes the ADF statistic test
-            print(eg_adf_statistics)
-            warnings.warn("ADF statistic test failure.")
+        returns_df = prices.pct_change()
+        returns_df = returns_df.replace([np.inf, -np.inf], np.nan).ffill().dropna()
 
-        # Scaling the weights such that they sum to 1
-        self.lambda_1, self.lambda_2 = eg_cointegration_vectors.loc[0] / abs(eg_cointegration_vectors.loc[0]).sum()
-        # TODO : Is using EG test correct here for estimating lambda's.
+        lr = LinearRegression(fit_intercept=True)
 
-        # TODO: Construct "moment based estimates" for b, sigma and beta.
+        y_1 = returns_df.iloc[:, 0].to_numpy()
+        y_2 = returns_df.iloc[:, 1].to_numpy()
+
+        lr.fit(x[:-1].reshape(-1,1), y_1)
+
+        self.lambda_1 = -lr.coef_
+        beta_1 = (lr.intercept_ - self.r) / self.mu_m
+
+        lr.fit(x[:-1].reshape(-1,1), y_2)
+        self.lambda_2 = lr.coef_
+        beta_2 = (lr.intercept_ - self.r) / self.mu_m
+
+        self.beta = (beta_1 + beta_2) / 2
+
+        # Equation (5) in the paper models x as a mean reverting OU process with 0 drift.
+        # The parameter estimators are taken from Appendix in Jurek paper.
+
+        spread = x
+        mu = 0
+        N = len(spread)
+        # Estimator for rate of mean reversion
+        k = (-1 / self.delta_t) * np.log(np.multiply(spread[1:] - mu, spread[:-1] - mu).sum()
+                                              / np.power(spread[1:] - mu, 2).sum())
+
+        # Part of sigma estimation formula
+        sigma_calc_sum = np.power((spread[1:] - mu - np.exp(-k * self.delta_t) * (spread[:-1] - mu))
+                                  / np.exp(-k * self.delta_t), 2).sum()
+
+        # Estimator for standard deviation
+        b_x = np.sqrt(2 * k * sigma_calc_sum / ((np.exp(2 * k * self.delta_t) - 1) * (N - 2)))
+
+        self.b_squared = (b_x ** 2) / 2
+
+        self.sigma_squared = np.var(y_1) - self.b_squared - (self.beta ** 2) * (self.sigma_m ** 2)
 
 
-    def unconstrained_portfolio_weights_continuous(self, prices, mu_m, sigma_m, gamma, r):
+        # TODO: Need to input market index data and orthogonalize the price data with market index before using cointegration.
+        # Refer Table 1 in paper.
+
+        # prices = self._data_preprocessing(prices)
+        # # As mentioned in the paper, the vector of linear weights are calculated using co-integrating regression
+        # eg_portfolio = EngleGrangerPortfolio()
+        # eg_portfolio.fit(prices, add_constant=True)  # Fitting the prices
+        # eg_adf_statistics = eg_portfolio.adf_statistics  # Stores the results of the ADF statistic test
+        # eg_cointegration_vectors = eg_portfolio.cointegration_vectors  # Stores the calculated weights for the pair of stocks in the spread
+        #
+        # if adf_test is True and eg_adf_statistics.loc['statistic_value', 0] > eg_adf_statistics.loc[
+        #     f'{int(significance_level * 100)}%', 0]:
+        #     # Making sure that the data passes the ADF statistic test
+        #     print(eg_adf_statistics)
+        #     warnings.warn("ADF statistic test failure.")
+        #
+        # # Scaling the weights such that they sum to 1
+        # self.lambda_1, self.lambda_2 = eg_cointegration_vectors.loc[0] / abs(eg_cointegration_vectors.loc[0]).sum()
+        # # TODO : Is using EG test correct here for estimating lambda's.
+
+
+    def unconstrained_portfolio_weights_continuous(self, prices, gamma):
         """
         Implementation of Proposition 1.
 
@@ -103,21 +155,15 @@ class OptimalConvergence:
         If lambda_1 = lambda_2, from the portfolio weights outputted from this method phi_2 + phi_1 = 0,
         which implies delta neutrality. This follows Proposition 3 in the paper.
 
-        :param r:
         :param gamma:
         :param prices: (pd.DataFrame) Contains price series of both stocks in spread.
-        :param mu_m:
-        :param sigma_m:
         :return:
         """
 
         if gamma <= 0:
             raise Exception("The value of gamma should be positive.")
 
-        self.mu_m = mu_m
-        self.sigma_m = sigma_m
         self.gamma = gamma
-        self.r = r
 
         x, tau = self._x_tau_calc(prices)
 
@@ -144,7 +190,7 @@ class OptimalConvergence:
         return phi_1, phi_2, phi_m
 
 
-    def delta_neutral_portfolio_weights_continuous(self, prices, mu_m, sigma_m, gamma, r):
+    def delta_neutral_portfolio_weights_continuous(self, prices, gamma):
         """
         Implementation of Proposition 2.
 
@@ -153,21 +199,15 @@ class OptimalConvergence:
         in the spread is zero. We also assume a continuing cointegrated price process (recurring arbitrage opportunities),
         which gives closed-form solutions for the optimal portfolio weights.
 
-        :param r:
         :param gamma:
         :param prices: (pd.DataFrame) Contains price series of both stocks in spread.
-        :param mu_m:
-        :param sigma_m:
         :return:
         """
 
         if gamma <= 0:
             raise Exception("The value of gamma should be positive.")
 
-        self.mu_m = mu_m
-        self.sigma_m = sigma_m
         self.gamma = gamma
-        self.r = r
 
         x, tau = self._x_tau_calc(prices)
 
@@ -182,28 +222,22 @@ class OptimalConvergence:
         return phi_1, phi_2, phi_m
 
 
-    def wealth_gain_continuous(self, prices, mu_m, sigma_m, gamma, r):
+    def wealth_gain_continuous(self, prices, gamma):
         """
         Implementation of Proposition 4.
 
         This method calculates the expected wealth gain of the unconstrained optimal strategy relative to the
         delta neutral strategy assuming a mis-pricing of the spread.
 
-        :param r:
         :param gamma:
         :param prices: (pd.DataFrame) Contains price series of both stocks in spread.
-        :param mu_m:
-        :param sigma_m:
         :return:
         """
 
         if gamma <= 0:
             raise Exception("The value of gamma should be positive.")
 
-        self.mu_m = mu_m
-        self.sigma_m = sigma_m
         self.gamma = gamma
-        self.r = r
 
         x, tau = self._x_tau_calc(prices)
 
