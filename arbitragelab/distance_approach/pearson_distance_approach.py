@@ -4,9 +4,9 @@
 
 """
 Implementation of the statistical arbitrage distance approach proposed by
-Gatev, E., Goetzmann, W. N., and Rouwenhorst, K. G. in
-"Pairs trading:  Performance of a relative-value arbitrage rule." (2006)
-https://papers.ssrn.com/sol3/papers.cfm?abstract_id=141615.
+Chen, H., Chen, S. J., and Li, F.
+in "Empirical Investigation of an Equity Pairs Trading Strategy." (2012)
+https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1361293.
 """
 
 import itertools
@@ -69,7 +69,7 @@ class PearsonStrategy:
         divergence, decile 10 is “long stocks” and decile 1 is “short stocks”.
 
         :param train_data: (pd.DataFrame) Daily price data with date in its index and stocks in its columns.
-        :param risk_free: (pd.Series or float) Daily risk free rate data as a series or a float number.
+        :param risk_free: (pd.Series/float) Daily risk free rate data as a series or a float number.
         :param num_pairs: (int) Number of top pairs to use for portfolio formation.
         :param weight: (str) Weighting Scheme for portfolio returns [``equal`` by default, ``correlation``].
         :param long_pct: (float) Percentage of long stocks in the sorted return divergence.
