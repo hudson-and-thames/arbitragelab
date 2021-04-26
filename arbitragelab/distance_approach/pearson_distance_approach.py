@@ -191,7 +191,7 @@ class PearsonStrategy:
         return_diff_dict = self._calculate_return_diff(prev_month_return)
 
         # Sort the dictionary based on the return differences value
-        return_diff_sorted = {k: v for k, v in sorted(return_diff_dict.items(), key=lambda item: item[1])}
+        return_diff_sorted = dict(sorted(return_diff_dict.items(), key=lambda item: item[1]))
 
         # Get the number of stocks to get two different portfolios
         num_stocks = len(return_diff_sorted)
@@ -280,7 +280,7 @@ class PearsonStrategy:
             self.monthly_return = monthly_return
             self.risk_free = risk_free
 
-        elif phase == 'test':
+        else:
             self.test_monthly_return = monthly_return
             self.risk_free = self.risk_free.append(risk_free)
 

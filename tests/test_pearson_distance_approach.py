@@ -8,9 +8,7 @@ Tests the pearson distance approach from the Distance Approach module of Arbitra
 import unittest
 import os
 
-import numpy as np
 import pandas as pd
-import matplotlib
 
 from arbitragelab.distance_approach.pearson_distance_approach import PearsonStrategy
 
@@ -28,50 +26,111 @@ class TestPearsonStrategy(unittest.TestCase):
         # Using saved ETF price series for testing and trading
         project_path = os.path.dirname(__file__)
         data_path = project_path + "/test_data/stock_prices.csv"
+        rf_path = project_path + "/test_data/risk_free.csv"
         data = pd.read_csv(data_path, parse_dates=True, index_col="Date")
+        risk_free = pd.read_csv(rf_path, parse_dates=True, index_col="Date")
 
-        # Datasets for pairs formation and trading steps of the strategy
-        self.train_data = data[:100]
-        self.test_data = data[100:]
+        # Datasets for portfolio formation and trading steps of the strategy
+        self.train_data = data[:252 * 5 - 1]  # 5 years
+        self.test_data = data[252 * 5 - 1:252 * 6 - 1]  # 1year
+        self.risk_free_train = risk_free[:252 * 5 - 1]['risk_free']
+        self.risk_free_test = risk_free[252 * 5 - 1:252 * 6 - 1]['risk_free']
 
     def test_form_portfolio(self):
         """
         Tests the generation of portfolios from the PearsonStrategy class.
         """
+        # Three different strategies
+        strategy_basic = PearsonStrategy()
+        strategy_risk_free = PearsonStrategy()
+        strategy_corr_weight = PearsonStrategy()
+
+        # Performing the portfolio formation step
+        strategy_basic.form_portfolio(self.train_data, long_pct=0.05, short_pct=0.05)
+        strategy_risk_free.form_portfolio(self.train_data, self.risk_free_train)
+        strategy_corr_weight.form_portfolio(self.train_data, weight="correlation")
+
+        # Testing the last month data of the formation period
+        self.assertAlmostEqual(strategy_basic.last_month.mean(), 1.017491, delta=1e-5)
+        self.assertAlmostEqual(strategy_risk_free.last_month.mean(), 1.017491, delta=1e-5)
+        self.assertAlmostEqual(strategy_corr_weight.last_month.mean(), 1.017491, delta=1e-5)
+
+        # Testing the long and short percentage for the strategy_basic
+        self.assertEqual(strategy_basic.long_pct, 0.05)
+        self.assertEqual(strategy_basic.short_pct, 0.05)
+
+        # Testing the monthly return for the formation period
+        self.assertAlmostEqual(strategy_basic.monthly_return.mean().mean(), 0.999993, delta=1e-5)
+        self.assertAlmostEqual(strategy_risk_free.monthly_return.mean().mean(), 0.999993, delta=1e-5)
+        self.assertAlmostEqual(strategy_corr_weight.monthly_return.mean().mean(), 0.999993, delta=1e-5)
+
+        # Testing the risk free rate for the formation period
+        self.assertAlmostEqual(strategy_basic.risk_free.mean(), 0.0, delta=1e-5)
+        self.assertAlmostEqual(strategy_risk_free.risk_free.mean(), 0.01, delta=1e-5)
+        self.assertAlmostEqual(strategy_corr_weight.risk_free.mean(), 0.0, delta=1e-5)
+
+        # Testing the beta value for the stocks
+        self.assertAlmostEqual(sum(strategy_basic.beta_dict.values()), 23.038961, delta=1e-5)
+        self.assertAlmostEqual(sum(strategy_risk_free.beta_dict.values()), 23.038961, delta=1e-5)
+        self.assertAlmostEqual(sum(strategy_corr_weight.beta_dict.values()), 34.371443, delta=1e-5)
+
+        # Testing the pairs
+        expected_pairs = ['EPP', 'EFA', 'XLB', 'EWG', 'VGK', 'VPL', 'EWU', 'EWQ', 'FXI', 'SPY', 'DIA', 'XLK', 'XLE',
+                          'XLF', 'EWJ', 'XLU', 'CSJ', 'TIP', 'LQD', 'BND', 'IEF', 'TLT']
+        self.assertCountEqual(strategy_basic.pairs_dict['EEM'], expected_pairs)
+        self.assertCountEqual(strategy_risk_free.pairs_dict['EEM'], expected_pairs)
+        self.assertCountEqual(strategy_corr_weight.pairs_dict['EEM'], expected_pairs)
+
+    def test_trade_portfolio(self):
+        """
+        Tests the generation of trading signals in the test phase
+        """
+
         # Basic Strategy
+        strategy_no_test = PearsonStrategy()
+        strategy_test = PearsonStrategy()
+
+        # Performing the portfolio formation step
+        strategy_no_test.form_portfolio(self.train_data)
+        strategy_test.form_portfolio(self.train_data, self.risk_free_train)
+
+        # Generating trading signal
+        strategy_no_test.trade_portfolio()
+        strategy_test.trade_portfolio(self.test_data, self.risk_free_test)
+
+        # Testing trading signals
+        self.assertAlmostEqual(strategy_no_test.trading_signal.mean(), -0.043478, delta=1e-5)
+        self.assertAlmostEqual(strategy_test.trading_signal.mean(), -0.043478, delta=1e-5)
+
+        # Testing monthly return and risk free rate in test period
+        self.assertAlmostEqual(strategy_test.test_monthly_return.mean().mean(), 1.007467, delta=1e-5)
+        self.assertAlmostEqual(strategy_test.risk_free.mean().mean(), 0.01, delta=1e-5)
+
+    def test_get_trading_signal(self):
+
         strategy = PearsonStrategy()
 
-        # Performing the pairs formation step
-        strategy.form_pairs(self.train_data, method = 'standard', num_top=5, skip_top=0)
+        strategy.form_portfolio(self.train_data)
 
-        # Testing min and max values of series used for dataset normalization
-        self.assertAlmostEqual(strategy.min_normalize.mean(), 63.502009, delta=1e-5)
-        self.assertAlmostEqual(strategy.max_normalize.mean(), 72.119729, delta=1e-5)
+        strategy.trade_portfolio(self.test_data)
 
-        # Testing values of historical volatility for portfolios
-        self.assertAlmostEqual(np.mean(list(strategy.train_std.values())), 0.056361, delta=1e-5)
+        pd.testing.assert_frame_equal(strategy.trading_signal, strategy.get_trading_signal())
 
-        # Testing values of train portfolio which was created to get the number of zero crossings
-        self.assertAlmostEqual(strategy_industry.train_portfolio.mean().mean(), 0.011405, delta=1e-5)
+    def test_get_beta_dict(self):
 
-        # Testing the number of zero crossings for the pairs
-        self.assertAlmostEqual(np.mean(list(strategy_industry.num_crossing.values())), 16.4, delta=1e-5)
+        strategy = PearsonStrategy()
 
-        # Testing the list of created pairs for both of the cases
-        expected_pairs = [('EFA', 'VGK'), ('EPP', 'VPL'), ('EWQ', 'VGK'),
-                          ('EFA', 'EWQ'), ('EPP', 'SPY')]
-        expected_pairs_industry = [('EFA', 'EWQ'), ('EFA', 'EWU'), ('SPY', 'VPL'),
-                                   ('EEM', 'EWU'), ('DIA', 'SPY')]
-        expected_pairs_zero_crossing = [('EPP', 'SPY'), ('DIA', 'EWJ'), ('EEM', 'EWJ'),
-                                        ('EEM', 'EFA'), ('EWU', 'VPL')]
-        expected_pairs_variance = [('IEF', 'TIP'), ('EWU', 'FXI'), ('SPY', 'VGK'),
-                                   ('EWJ', 'EWQ'), ('EEM', 'EWQ')]
+        strategy.form_portfolio(self.train_data)
 
-        self.assertCountEqual(strategy.pairs, expected_pairs)
-        self.assertCountEqual(strategy_industry.pairs, expected_pairs_industry)
-        self.assertCountEqual(strategy_zero_crossing.pairs, expected_pairs_zero_crossing)
-        self.assertCountEqual(strategy_variance.pairs, expected_pairs_variance)
+        self.assertAlmostEqual(sum(strategy.get_beta_dict().values()), sum(strategy.beta_dict.values()), delta=1e-5)
 
+    def test_get_pairs_dict(self):
 
+        strategy = PearsonStrategy()
 
+        strategy.form_portfolio(self.train_data)
 
+        expected_pairs = ['EPP', 'EFA', 'XLB', 'EWG', 'VGK', 'VPL', 'EWU', 'EWQ', 'FXI', 'SPY', 'DIA', 'XLK', 'XLE',
+                          'XLF', 'EWJ', 'XLU', 'CSJ', 'TIP', 'LQD', 'BND', 'IEF', 'TLT']
+
+        self.assertCountEqual(strategy.get_pairs_dict()['EEM'], expected_pairs)
