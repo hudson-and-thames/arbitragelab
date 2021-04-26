@@ -9,6 +9,7 @@ import unittest
 import os
 
 import pandas as pd
+import numpy as np
 
 from arbitragelab.distance_approach.pearson_distance_approach import PearsonStrategy
 
@@ -26,15 +27,16 @@ class TestPearsonStrategy(unittest.TestCase):
         # Using saved ETF price series for testing and trading
         project_path = os.path.dirname(__file__)
         data_path = project_path + "/test_data/stock_prices.csv"
-        rf_path = project_path + "/test_data/risk_free.csv"
         data = pd.read_csv(data_path, parse_dates=True, index_col="Date")
-        risk_free = pd.read_csv(rf_path, parse_dates=True, index_col="Date")
+        risk_free = pd.Series(data=np.array([0.01]*2141))
+        risk_free.index = data.index
+        risk_free.rename("risk_free")
 
         # Datasets for portfolio formation and trading steps of the strategy
         self.train_data = data[:252 * 5 - 1]  # 5 years
         self.test_data = data[252 * 5 - 1:252 * 6 - 1]  # 1year
-        self.risk_free_train = risk_free[:252 * 5 - 1]['risk_free']
-        self.risk_free_test = risk_free[252 * 5 - 1:252 * 6 - 1]['risk_free']
+        self.risk_free_train = risk_free[:252 * 5 - 1]
+        self.risk_free_test = risk_free[252 * 5 - 1:252 * 6 - 1]
 
     def test_form_portfolio(self):
         """
@@ -100,7 +102,7 @@ class TestPearsonStrategy(unittest.TestCase):
 
         # Testing trading signals
         self.assertAlmostEqual(strategy_no_test.trading_signal.mean(), -0.043478, delta=1e-5)
-        self.assertAlmostEqual(strategy_test.trading_signal.mean(), -0.043478, delta=1e-5)
+        self.assertAlmostEqual(strategy_test.trading_signal.mean().mean(), -0.043478, delta=1e-5)
 
         # Testing monthly return and risk free rate in test period
         self.assertAlmostEqual(strategy_test.test_monthly_return.mean().mean(), 1.007467, delta=1e-5)
