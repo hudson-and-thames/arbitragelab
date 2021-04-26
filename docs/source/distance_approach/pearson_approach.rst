@@ -28,11 +28,11 @@ are calculated based on monthly return data. Then the authors construct a new va
 
 
 where :math:`\beta` denotes the regression coefficient of stock's monthly return :math:`R_{i t}` on its
-pairs-portfolio return :math:`R_{j t}` and :math:`R_{f}` is the risk-free rate
+pairs-portfolio return :math:`R_{j t}`, and :math:`R_{f}` is the risk-free rate
 
-The hypothesis in this approach is that if a stock’s return deviates more from its pairs portfolio returns
-than usual, this divergence should be reversed in the next month and expecting abnormally higher returns than
-other stocks.
+The hypothesis in this approach is that if a stock’s return deviates from its pairs portfolio returns more
+than usual, this divergence is expected to be reversed in the next month. And the returns of this stock are
+expected to be abnormally high/low in comparison to other stocks.
 
 Therefore, after calculating the return divergence of all the stocks,  a long-short portfolio is constructed
 where stocks with high return divergence have higher subsequent returns.
@@ -45,13 +45,13 @@ This stage of PearsonStrategy consists of the following steps:
 
 1. **Data preprocessing**
 
-As the method has to compute all of the pairs’ correlation in the following steps, for :math:`m` stocks,
+As the method has to compute all of the pairs’ correlation values in the following steps, for :math:`m` stocks,
 there are :math:`\frac{m*(m-1)}{2}` correlations to be computed in the formation period. As the number of
-observations for the correlations grows exponentially with the number of stocks, the estimation is
+observations for the correlations grows exponentially with the number of stocks, this estimation is
 computationally intensive.
 
 Therefore, to reduce the computation burden, this method uses monthly stock returns data in the formation
-period (ex. 60 monthly stock returns if the formation period is 5 years). For the given daily price data,
+period (ex. 60 monthly stock returns if the formation period is 5 years). If the daily price data is given,
 the method calculates the monthly returns before moving into the next steps.
 
 2. **Finding pairs**
@@ -87,7 +87,7 @@ dictionary for future uses in trading. Below is a figure showing two stocks with
 Implementation
 **************
 
-.. automodule:: arbitragelab.pearson_distance_approach
+.. automodule:: arbitragelab.distance_approach.pearson_distance_approach
 
 .. autoclass:: PearsonStrategy
    :members: __init__
@@ -202,7 +202,7 @@ The following research notebook can be used to better understand the pearson app
 
 * `Pearson Distance Approach`_
 
-.. _`Basic Distance Approach`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Distance%20Approach/basic_distance_approach.ipynb
+.. _`Pearson Distance Approach`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Distance%20Approach/basic_distance_approach.ipynb
 
 References
 ##########
