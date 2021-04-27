@@ -7,15 +7,13 @@ This module implements the PCA approach described by by Marco Avellaneda and Jeo
 `"Statistical Arbitrage in the U.S. Equities Market"
 <https://math.nyu.edu/faculty/avellane/AvellanedaLeeStatArb20090616.pdf>`_.
 """
-
+# pylint: disable=invalid-name, too-many-locals
 
 import numpy as np
 import pandas as pd
 from sklearn.decomposition import PCA
 from sklearn.linear_model import LinearRegression
 
-
-# pylint: disable=invalid-name
 from arbitragelab.util import devadarsh
 
 
@@ -66,7 +64,7 @@ class PCAStrategy:
 
         return standardized, matrix.std()
 
-    def get_factorweights(self, matrix: pd.DataFrame) -> pd.DataFrame:
+    def get_factorweights(self, matrix: pd.DataFrame, explained_var: float = None) -> pd.DataFrame:
         """
         A function to calculate weights (scaled eigen vectors) to use for factor return calculation.
 
@@ -77,6 +75,9 @@ class PCAStrategy:
         So the output is a dataframe containing the weight for each asset in a portfolio for each eigen vector.
 
         :param matrix: (pd.DataFrame) Dataframe with index and columns containing asset returns.
+        :param explained_var (float) The user-defined explained variance criteria. If a value is given, then the param
+            n_components would be replaced and determined by the least number of components satisfying the user-defined
+            explained variance. Value range is [0, 1].
         :return: (pd.DataFrame) Weights (scaled PCA components) for each index from the matrix.
         """
 
@@ -86,6 +87,22 @@ class PCAStrategy:
         # Fitting PCA
         pca_factors = self.pca_model.fit(standardized)
 
+        # TODO: Also implement this with a rolling window of observations to get explained variance
+        # Getting a number of eigenvectors for fixed explained variance
+        if explained_var is not None:
+
+            # Explained variance ratios from fitted PCA model
+            expl_variance = pca_factors.explained_variance_ratio_
+
+            # The minimum number of eigenvectors to explain fixed variance level
+            condition = min(np.cumsum(expl_variance), key=lambda x: abs(x - explained_var))
+            num_pc = np.where(np.cumsum(expl_variance) == condition)[0][0] + 1
+
+            # Fitting PCA to a new number of components
+            self.n_components = num_pc
+            self.pca_model = PCA(n_components=num_pc)
+            pca_factors = self.pca_model.fit(standardized)
+
         # Output eigen vectors for weights calculation
         weights = pd.DataFrame(pca_factors.components_, columns=standardized.columns)
 
@@ -94,7 +111,7 @@ class PCAStrategy:
 
         return weights
 
-    def get_residuals(self, matrix: pd.DataFrame, pca_factorret: pd.DataFrame) -> (pd.DataFrame, pd.Series):
+    def get_residuals(self, matrix: pd.DataFrame, pca_factorret: pd.DataFrame) -> (pd.DataFrame, pd.Series, pd.Series):
         """
         A function to calculate residuals given matrix of returns and factor returns.
 
@@ -107,7 +124,8 @@ class PCAStrategy:
 
         :param matrix: (pd.DataFrame) Dataframe with index and columns containing asset returns.
         :param pca_factorret: (pd.DataFrame) Dataframe with PCA factor returns for assets.
-        :return: (pd.DataFrame, pd.Series) Dataframe with residuals and series of beta coefficients.
+        :return: (pd.DataFrame, pd.Series, pd.Series) Dataframe with residuals, series of beta coefficients,
+            series of intercepts.
         """
 
         # Creating a DataFrame to store residuals
@@ -115,6 +133,9 @@ class PCAStrategy:
 
         # And a DataFrame to store regression coefficients
         coefficient = pd.DataFrame(columns=matrix.columns, index=range(self.n_components))
+
+        # And a pd.Series to store regression intercept(beta0)
+        intercept = pd.Series(index=matrix.columns, dtype=float)
 
         # A class for regression
         regression = LinearRegression()
@@ -130,10 +151,14 @@ class PCAStrategy:
             # Writing down the regression coefficient
             coefficient[ticker] = regression.coef_
 
-        return residual, coefficient
+            # Writing down the regression intercept
+            intercept[ticker] = regression.intercept_
+
+        return residual, coefficient, intercept
 
     @staticmethod
-    def get_sscores(residuals: pd.DataFrame, k: float) -> pd.Series:
+    def get_sscores(residuals: pd.DataFrame, intercept: pd.Series, k: float, drift: bool = False,
+                    p_value: float = None) -> pd.Series:
         """
         A function to calculate S-scores for asset eigen portfolios given dataframes of residuals
         and a mean reversion speed threshold.
@@ -150,12 +175,21 @@ class PCAStrategy:
         window for residual estimation. If this window is 60 days, half of it is 30 days.
         So k > 252/30 = 8.4. (Assuming 252 trading days in a year)
 
-        :param residuals: (pd.DataFrame) Dataframe with residuals after fitting returns to
-            PCA factor returns.
-        :param k: (float) Required speed of mean reversion to use the eigen portfolio in
-            trading.
+        :param residuals: (pd.DataFrame) Dataframe with residuals after fitting returns to PCA factor returns.
+        :param intercept: (pd.Series) Series with intercepts(beta0) of each stock to test for stationarity.
+        :param k: (float) Required speed of mean reversion to use the eigen portfolio in trading.
+        :param drift: (bool) Flag to adjust the model to take drift into consideration. False by default.
+        :param p_value (float) The p value criteria to determine whether a residual is stationary.
         :return: (pd.Series) Series of S-scores for each asset for a given residual dataframe.
         """
+
+        # TODO: Check if this is the test we should conduct
+        # Check residual stationarity (Drop a ticker if its residual not stationary)
+        if p_value is not None:
+            for ticker in residuals.columns:
+                p = sm.tsa.stattools.adfuller(residuals[ticker])[1]
+                if p > p_value:
+                    residuals.drop([ticker], axis=1)
 
         # Creating the auxiliary process K_k - discrete version of X(t)
         X_k = residuals.cumsum()
@@ -166,11 +200,20 @@ class PCAStrategy:
         # Variable sigma for S-score calculation
         sigma_eq = pd.Series(index=X_k.columns, dtype=np.float64)
 
+        # Variable tau for modified S-socore calculation
+        tau = pd.Series(index=X_k.columns, dtype=np.float64)
+
+        # Update (pd.Series) intercept's index
+        intercept = intercept[X_k.columns]
+
         # Iterating over tickers
         for ticker in X_k.columns:
 
             # Calculate parameter b using auto-correlations
             b = X_k[ticker].autocorr()
+
+            # Calculating the tau for every ticker
+            tau[ticker] = 1 / (-np.log(b) * 252)
 
             # If mean reversion times are good, enter trades
             if -np.log(b) * 252 > k:
@@ -192,12 +235,22 @@ class PCAStrategy:
         # Small filtering for parameter m and sigma
         m = m.dropna()
         sigma_eq = sigma_eq.dropna()
+        tau = tau.dropna()
 
         # Original paper suggests that centered means show better results
         m = m - m.mean()
 
         # S-score calculation for each ticker
         s_score = -m / sigma_eq
+
+        # If needed, adding drift to the model
+        if drift:
+
+            # TODO: Check this implementation
+            # Adjusting parameters
+            m = -m - intercept * tau
+            s_score = m / sigma_eq
+            s_score = s_score.dropna()
 
         return s_score
 
@@ -260,9 +313,11 @@ class PCAStrategy:
 
         return position_stock
 
-    def get_signals(self, matrix: pd.DataFrame, k: float = 8.4, corr_window: int = 252,
-                    residual_window: int = 60, sbo: float = 1.25, sso: float = 1.25,
-                    ssc: float = 0.5, sbc: float = 0.75, size: float = 1) -> pd.DataFrame:
+    def get_signals(self, matrix: pd.DataFrame, vol_matrix: pd.DataFrame = None, k: float = 8.4,
+                    corr_window: int = 252, residual_window: int = 60, sbo: float = 1.25,
+                    sso: float = 1.25, ssc: float = 0.5, sbc: float = 0.75, size: float = 1,
+                    explained_var: float = None, drift: bool = False, p_value: float = None,
+                    asym: bool = False) -> pd.DataFrame:
         """
         A function to generate trading signals for given returns matrix with parameters.
 
@@ -315,6 +370,7 @@ class PCAStrategy:
         asset and buying betas of other assets.
 
         :param matrix: (pd.DataFrame) Dataframe with returns for assets.
+        :param vol_matrix: (pd.DataFrame) DataFrame with historical volume data to adjust returns if needed.
         :param k: (float) Required speed of mean reversion to use the eigen portfolio in trading.
         :param corr_window: (int) Look-back window used for correlation matrix estimation.
         :param residual_window: (int) Look-back window used for residuals calculation.
@@ -323,19 +379,24 @@ class PCAStrategy:
         :param ssc: (float) Parameter for signal generation for the S-score.
         :param sbc: (float) Parameter for signal generation for the S-score.
         :param size: (float) Number of units invested in assets when opening trades. So when opening
-            a long position, buying (size) units of stock and selling (size) * betas units of other
-            stocks.
+            a long position, buying (size) units of stock and selling (size) * betas units of other stocks.
+        :param explained_var: (float) The user-defined explained variance criteria. If a value is given,
+            then the param n_components would be replaced and determined by the least number of components
+            satisfying the user-defined explained variance. Value range is [0, 1].
+        :param drift: (bool) Flag to adjust the model to take drift into consideration. False by default.
+        :param p_value (float) The p value criteria to determine whether a residual is stationary.
+        :param asym: (bool) Flag to use asymptotic PCA when calculating eigenportfolio weights.
         :return: (pd.DataFrame) DataFrame with target weights for each asset at every observation.
             It is being calculated as a combination of all eigen portfolios that are satisfying the
             mean reversion speed requirement and S-score values.
         """
-        # pylint: disable=too-many-locals
+
+        # Adjust returns to volume if needed
+        if vol_matrix is not None:
+            matrix = self.volume_modified_return(matrix, vol_matrix, residual_window)
 
         # Dataframe containing target quantities - trading signals
         target_quantities = pd.DataFrame()
-
-        # Series of current positions for assets in our portfolio
-        position_stock = pd.DataFrame(0, columns=matrix.columns, index=[-1] + list(range(self.n_components)))
 
         # Iterating through time windows
         for t in range(corr_window - 1, len(matrix.index) - 1):
@@ -344,20 +405,29 @@ class PCAStrategy:
             if (t - (corr_window - 1)) % residual_window == 0:
                 # Getting a new set of observations for correlation matrix generation
                 obs_corr = matrix[(t - corr_window + 1):(t + 1)]
-                # Updating factor weights
-                weights = self.get_factorweights(obs_corr)
+                # Updating factor weights depending on the method
+                if asym:
+                    # TODO: Check this implementation part
+                    weights = self.get_asym_factorweights(obs_corr, explained_var)
+                else:
+                    weights = self.get_factorweights(obs_corr, explained_var)
 
             # Look-back window of observations used
             obs_residual = matrix[(t - residual_window + 1):(t + 1)]
+            # TODO: Are NA values occurring here?
+            # obs_residual = obs_residual.fillna(obs_residual.mean())
 
             # PCA factor returns - a product of weights and observations
             factorret_resid = pd.DataFrame(np.dot(obs_residual, weights.transpose()), index=obs_residual.index)
 
             # Calculating residuals for this window
-            resid, coeff = self.get_residuals(obs_residual, factorret_resid)
+            resid, coeff, intercept = self.get_residuals(obs_residual, factorret_resid)
 
             # Finding the S-scores for eigen portfolios in this period
-            s_scores = self.get_sscores(resid, k)
+            s_scores = self.get_sscores(resid, intercept, k, drift, p_value)
+
+            # Series of current positions for assets in our portfolio
+            position_stock = pd.DataFrame(0, columns=matrix.columns, index=[-1] + list(range(self.n_components)))
 
             # Generating signals using obtained S-scores
             position_stock = self._generate_signals(position_stock, s_scores, coeff,
@@ -372,7 +442,7 @@ class PCAStrategy:
             # Iterating through tickers inside weights
             for ticker in weights.columns:
                 # Multiplying our target quantities by weights
-                position_stock_temp = sum(weights[ticker] * fac_sum)
+                position_stock_temp[ticker] = sum(weights[ticker] * fac_sum)
 
             # Adding also first stocks from all eigen portfolios
             position_stock_temp = position_stock_temp + position_stock.iloc[0]
@@ -384,3 +454,94 @@ class PCAStrategy:
         target_quantities = target_quantities.T
 
         return target_quantities
+
+    @staticmethod
+    def volume_modified_return(matrix: pd.DataFrame, vol_matrix: pd.DataFrame, k: int = 60) -> pd.DataFrame:
+        """
+        A function to adjust the return dataframe with historical trading volume data.
+
+        The volume-adjusted returns is calculated as:
+
+        vol_ajust_R = R * (k-day moving average of volume) / volume
+
+        In case when volume data is missing, the respective return value will not be changed.
+
+        :param matrix: (pd.DataFrame) DataFrame with returns that need to be standardized.
+        :param vol_matrix: (pd.DataFrame) DataFrame with histoircal trading volume data.
+        :param k: (int) Look-back window used for volume moving average.
+        :return: (pd.DataFrame) A volume-adjusted returns dataFrame
+        """
+
+        # TODO: This method should be refactored
+
+        # Fill missing data with preceding values
+        returns = matrix.fillna(method='ffill')
+
+        # Moving Average of historical volume data
+        volume_mv = vol_matrix.rolling(window=k).mean()
+
+        # Adjustment term
+        adjust_term = volume_mv / vol_matrix
+
+        # Fill missing values in adjustment term with 1s
+        adjust_term = adjust_term.replace([np.inf, -np.inf], np.nan)
+        adjust_term = adjust_term.fillna(1)
+
+        # Modified returns after taking trading volume into account
+        modified_returns = returns.mul(adjust_term, fill_value=1)
+
+        # Restoring original columns order
+        modified_returns = modified_returns[returns.columns]
+
+        return modified_returns
+
+    def get_asym_factorweights(self, matrix: pd.DataFrame, explained_var: float = None) -> pd.DataFrame:
+        """
+        A function to calculate weights (scaled eigen vectors) to use for factor return calculation with
+        asymptotic PCA.
+
+        Weights are calculated from PCA components as:
+
+        Weight = Eigen vector / std.(R)
+
+        So the output is a dataframe containing the weight for each asset in a portfolio for each eigen vector.
+
+        :param matrix: (pd.DataFrame) Dataframe with index and columns containing asset returns.
+        :param explained_var (float) The user-defined explained variance criteria. If a value is given, then the param
+        n_components would be replaced and determined by the least number of components satisfying the user-defined
+        explained variance. The value should range from 0 to 1.
+        :return: (pd.DataFrame) Weights (scaled PCA components) for each index from the matrix.
+        """
+
+        # TODO: This method should be refactored
+
+        # Standardizing input
+        standardized, std = PCAStrategy.standardize_data(matrix)
+
+        # Number of elements
+        num_elem = standardized.shape[1]
+
+        # Gram Matrix
+        g_mat = standardized.T @ standardized / num_elem
+
+        # Asymptotic PCA(Eigendecomposition of the Gram Matrix)
+        eigen_values, eigen_vectors = np.linalg.eig(g_mat)
+
+        # If a user requires a fixed explained variance
+        if explained_var is not None:
+            expl_variance = []
+            for i in eigen_values:
+                expl_variance.append((i / sum(eigen_values)))
+
+            condition = min(np.cumsum(expl_variance), key=lambda x: abs(x - explained_var))
+            num_pc = np.where(np.cumsum(expl_variance) == condition)[0][0] + 1
+
+            weights = pd.DataFrame(eigen_vectors, columns=matrix.columns)[: num_pc]
+
+        else:
+            weights = pd.DataFrame(eigen_vectors, columns=matrix.columns)[: self.n_components]
+
+        # Scaling eigen vectors to get weights for eigen portfolio creation
+        weights = weights / std
+
+        return weights
