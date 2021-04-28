@@ -123,7 +123,7 @@ class TearSheet:
         return output
 
     @staticmethod
-    def residual_analysis(residuals):
+    def _residual_analysis(residuals):
         """
         Calculates all the data connected to residual analysis such as: standard deviation,
         half-life, skewness, kurtosis, Shapiro-Wilk normality test results, QQ-plot data,
@@ -214,7 +214,7 @@ class TearSheet:
         portfolio_price = (portfolio_returns + 1).cumprod()
 
         # Getting the results of a residual analysis
-        residuals, residuals_dataframe, qq_y, x, pacf_result, acf_result = self.residual_analysis(portfolio.residuals)
+        residuals, residuals_dataframe, qq_y, x, pacf_result, acf_result = self._residual_analysis(portfolio.residuals)
 
         # Combining the output tuple
         output = (adf_dataframe, adf_test_stat, cointegration_vector, portfolio_returns, portfolio_price, residuals,
@@ -1784,7 +1784,7 @@ class TearSheet:
         return app
 
     @staticmethod
-    def spread_analysis(model):
+    def _spread_analysis(model):
         """
         Consolidates all the characteristics of the OU process fitted to a mean-reverting spread such as: dataframe
         containing models statistical characteristics (mean-reversion speed, long-term mean, standard deviation,
@@ -2413,8 +2413,8 @@ class TearSheet:
         model_2.fit_to_assets(data_2)
 
         # Calculating the data connected to the OU models for both asset combinations
-        spread_dataframe_1, spread_price_1, ou_modelled_process_1 = self.spread_analysis(model_1)
-        spread_dataframe_2, spread_price_2, ou_modelled_process_2 = self.spread_analysis(model_2)
+        spread_dataframe_1, spread_price_1, ou_modelled_process_1 = self._spread_analysis(model_1)
+        spread_dataframe_2, spread_price_2, ou_modelled_process_2 = self._spread_analysis(model_2)
 
         app = self._get_app(app_display)
 
