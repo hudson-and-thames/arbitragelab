@@ -23,8 +23,9 @@ Statistical Association, 109(506), pp.788-801.
 <https://www.tandfonline.com/doi/pdf/10.1080/01621459.2013.873366?casa_token=sey8HrojSgYAAAAA:TEMBX8wLYdGFGyM78UXSYm6hXl1Qp_K6wiLgRJf6kPcqW4dYT8z3oA3I_odrAL48DNr3OSoqkQsEmQ>`__
 """
 # pylint: disable = invalid-name
-from typing import Callable
+from typing import Callable, Tuple
 import numpy as np
+import pandas as pd
 import scipy.stats as ss
 from scipy.interpolate import interp1d
 from scipy.optimize import minimize
@@ -101,6 +102,36 @@ def construct_ecdf_lin(train_data: np.array, upper_bound: float = 1-1e-5, lower_
 
     # Vectorize it to work with arrays.
     return np.vectorize(bounded_ecdf)
+
+def to_quantile(data: pd.DataFrame) -> Tuple[pd.DataFrame, list]:
+    """
+    Convert the data frame to quantile by row.
+
+    Not in place. Also returns the marginal cdfs of each column. This can work with more than just 2 columns.
+
+    The method returns:
+
+        - quantile_data: (pd.DataFrame) The calculated quantile data in a data frame with the original indexing.
+        - cdf_list: (list) The list of marginal cumulative density functions.
+
+    :param data: (pd.DataFrame) The original data in DataFrame.
+    :return: (tuple)
+        quantile_data: (pd.DataFrame) The calculated quantile data in a data frame with the original indexing.
+        cdf_list: (list) The list of marginal cumulative density functions.
+    """
+
+    column_count = len(data.columns)  # Number of columns.
+    cdf_lst = [None] * column_count  # List to store all marginal cdf functions.
+    quantile_data_lst = [None] * column_count  # List to store all quantile data in pd.Series.
+
+    # Loop through all columns.
+    for i in range(column_count):
+        cdf_lst[i] = construct_ecdf_lin(data.iloc[:, i])
+        quantile_data_lst[i] = data.iloc[:, i].map(cdf_lst[i])
+
+    quantile_data = pd.concat(quantile_data_lst, axis=1)  # Form the quantile DataFrame.
+
+    return quantile_data, cdf_lst
 
 def ml_theta_hat(x: np.array, y: np.array, copula_name: str) -> float:
     """

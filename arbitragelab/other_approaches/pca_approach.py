@@ -44,6 +44,7 @@ class PCAStrategy:
 
         self.n_components = n_components  # Number of PCA components
         self.pca_model = PCA(n_components)  # Model for PCA calculation
+
         devadarsh.track('PCAStrategy')
 
     @staticmethod

@@ -15,6 +15,7 @@ from arbitragelab.codependence.information import variation_of_information_score
 from arbitragelab.codependence.correlation import distance_correlation
 from arbitragelab.codependence.gnpr_distance import spearmans_rho, gpr_distance, gnpr_distance
 from arbitragelab.codependence.optimal_transport import optimal_transport_dependence
+from arbitragelab.util import devadarsh
 
 
 # pylint: disable=invalid-name
@@ -49,6 +50,9 @@ def get_dependence_matrix(df: pd.DataFrame, dependence_method: str, theta: float
                                   Sets the relative area of correlation in a copula. [from 0 to 1] (0.2 by default)
     :return: (pd.DataFrame) Dependence matrix.
     """
+
+    devadarsh.track('get_dependence_matrix')
+
     # Get the feature names.
     features_cols = df.columns.values
     n = df.shape[1]
@@ -110,6 +114,9 @@ def get_distance_matrix(X: pd.DataFrame, distance_metric: str = 'angular') -> pd
     :param distance_metric: (str) The distance metric to be used for generating the distance matrix.
     :return: (pd.DataFrame) Distance matrix.
     """
+
+    devadarsh.track('get_distance_matrix')
+
     if distance_metric == 'angular':
         distfun = lambda x: ((1 - x).round(5) / 2.) ** .5
     elif distance_metric == 'abs_angular':
