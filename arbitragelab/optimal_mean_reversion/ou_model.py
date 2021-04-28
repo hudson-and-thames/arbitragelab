@@ -838,7 +838,8 @@ class OrnsteinUhlenbeck:
 
         # Checking for the necessary condition
         if not self._parameter_check():
-            raise Exception("Please adjust your stop-loss level")
+            raise Exception("The optimal solution doesn't exist for a given set of parameters. "
+                            "The situation can be improved by adjusting the stop-loss level.")
 
         # If the entry level wasn't calculated before, set it
         if self.entry_level[1] is None:
