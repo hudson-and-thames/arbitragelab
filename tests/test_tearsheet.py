@@ -1,8 +1,18 @@
+# Copyright 2019, Hudson and Thames Quantitative Research
+# All rights reserved
+# Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
+"""
+Tests Tear Sheets tools.
+"""
+
 import unittest
 import os
+
 import pandas as pd
 import numpy as np
-from arbitragelab.arblab_tearsheet.tearsheet import TearSheet
+
+from arbitragelab.tearsheet.tearsheet import TearSheet
+
 
 class TestTearSheet(unittest.TestCase):
     """
@@ -30,5 +40,3 @@ class TestTearSheet(unittest.TestCase):
 
         test.cointegration_tearsheet(self.dataframe)
         test.ou_tearsheet(self.dataframe)
-
-
