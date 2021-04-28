@@ -2,27 +2,30 @@
 # All rights reserved
 # Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 
-# pylint: disable=missing-module-docstring, too-many-lines, too-many-locals, invalid-name, unused-argument, too-many-arguments, too-many-statements
+"""
+This module implements interactive Tear Sheets for various modules of the ArbitrageLab package.
+"""
+# pylint: disable=too-many-lines, too-many-locals, invalid-name, unused-argument, too-many-arguments, too-many-statements
+
 import warnings
 
 import pandas as pd
 import numpy as np
 from scipy import stats
-from scipy.stats import kurtosis, skew, shapiro
-from statsmodels.tsa.stattools import pacf, adfuller, acf
-from arbitragelab.optimal_mean_reversion import OrnsteinUhlenbeck
-from arbitragelab.cointegration_approach import get_half_life_of_mean_reversion, EngleGrangerPortfolio, \
-    JohansenPortfolio
-from arbitragelab.util import devadarsh
-
+from scipy.stats import (kurtosis, skew, shapiro)
+from statsmodels.tsa.stattools import (pacf, adfuller, acf)
 import dash
+from dash.dependencies import (Input, Output)
 import dash_core_components as dcc
 import dash_html_components as html
-from dash.dependencies import Input, Output
 import dash_table
 import plotly.graph_objects as go
 from jupyter_dash import JupyterDash
 
+from arbitragelab.optimal_mean_reversion import OrnsteinUhlenbeck
+from arbitragelab.cointegration_approach import (get_half_life_of_mean_reversion,
+                                                 EngleGrangerPortfolio, JohansenPortfolio)
+from arbitragelab.util import devadarsh
 
 
 class TearSheet:
@@ -31,20 +34,25 @@ class TearSheet:
     showcasing analytics for a provided pair of assets using modules and techniques implemented in the ArbitrageLab
     package.
 
-    In the current state this module includes cointegration analysis using both Engle-Granger and Johansen tests,
+    In the current state, this module includes cointegration analysis using both Engle-Granger and Johansen tests,
     and Ornstein-Uhlenbeck model-based analytics alongside with model fitting and optimal entry/liquidation levels
     calculation.
     """
 
     def __init__(self):
+        """
+        Initialize.
+        """
 
         self.data = None  # The dataframe of two assets
-        self.blue = '#0C9AAC'  # Blue Munsell brand colour
-        self.orange = '#DE612F'  # Flame brand colour
+        self.blue = '#0C9AAC'  # Blue Munsell brand color
+        self.orange = '#DE612F'  # Flame brand color
         self.grey = '#949494'  # Spanish Grey brand color
         self.light_grey = '#F2F3F4'  # Alice Blue brand color
         self.black = '#0B0D13'  # Rich Black brand color
         self.white = '#ffffff'  # White brand color
+        self.text_font = 'Roboto'  # Font used for test outputs
+        self.header_font = 'Josefin Sans'  # Font used for headers
 
         devadarsh.track('TearSheet')
 
@@ -54,7 +62,7 @@ class TearSheet:
         Sets the default space for building the visualization app.
 
         :param app_display: (str) Parameter that signifies whether to open a web app in a separate tab or inside
-                                  the jupyter notebook
+            a jupyter notebook
         :return: (Dash) The Dash app object, which can be run using run_server.
         """
 
@@ -65,14 +73,14 @@ class TearSheet:
 
         return app
 
-
     def _get_basic_assets_data(self):
         """
-        Gets the basic data that characterizes each of the assets from the provided pair such as
+        Gets the basic data that characterizes each of the assets from the provided pair, such as
         asset name, normalized asset price, ADF test result dataframe and ADF test statistic.
 
-        :return: (tuple) A combined tuple of the basic data for
+        :return: (tuple) A combined tuple of the basic data for tear sheet output.
         """
+
         # Assigning the data variable
         data = self.data
 
@@ -80,8 +88,8 @@ class TearSheet:
         asset_name_1 = data.columns[0]
 
         # Getting the normalized price time series for the first asset
-        norm_asset_price_1 = (data[asset_name_1] - data[asset_name_1].min()) / (
-                data[asset_name_1].max() - data[asset_name_1].min())
+        norm_asset_price_1 = (data[asset_name_1] - data[asset_name_1].min()) /\
+                             (data[asset_name_1].max() - data[asset_name_1].min())
 
         asset_price_1 = pd.DataFrame(data=data[asset_name_1])
 
@@ -96,8 +104,8 @@ class TearSheet:
         asset_name_2 = data.columns[1]
 
         # Getting the normalized price time series for the second asset
-        norm_asset_price_2 = (data[asset_name_2] - data[asset_name_2].min()) / (
-                data[asset_name_2].max() - data[asset_name_2].min())
+        norm_asset_price_2 = (data[asset_name_2] - data[asset_name_2].min()) /\
+                             (data[asset_name_2].max() - data[asset_name_2].min())
 
         asset_price_2 = pd.DataFrame(data=data[asset_name_2])
 
@@ -109,9 +117,8 @@ class TearSheet:
         test_stat_2 = adfuller(asset_price_2, autolag='AIC')[0]
 
         # Creating the output tuple containing all the obtained data
-        output = (
-        asset_name_1, norm_asset_price_1, adf_asset_1, test_stat_1, asset_name_2, norm_asset_price_2, adf_asset_2,
-        test_stat_2)
+        output = (asset_name_1, norm_asset_price_1, adf_asset_1, test_stat_1,
+                  asset_name_2, norm_asset_price_2, adf_asset_2, test_stat_2)
 
         return output
 
@@ -120,10 +127,11 @@ class TearSheet:
         """
         Calculates all the data connected to residual analysis such as: standard deviation,
         half-life, skewness, kurtosis, Shapiro-Wilk normality test results, QQ-plot data,
-        result of ACF and PACF calculations and returns it in a form of a tuple.
+        result of ACF and PACF calculations, and returns it in a form of a tuple.
 
         :return: (tuple) Combined results of the analysis of residuals.
         """
+
         # Calculating the statistical measures connected
         standard_deviation = residuals.std()
         half_life = get_half_life_of_mean_reversion(residuals)
@@ -155,7 +163,9 @@ class TearSheet:
         acf_result = acf(residuals.diff()[1:], nlags=20, fft=True)
 
         # Combining the output tuple
-        output = (residuals, residuals_dataframe, qq_plot_y, qq_plot_x, pacf_result, acf_result)
+        output = (residuals, residuals_dataframe,
+                  qq_plot_y, qq_plot_x,
+                  pacf_result, acf_result)
 
         return output
 
@@ -168,6 +178,7 @@ class TearSheet:
         :param data: (pd.DataFrame) A dataframe of two assets.
         :returns: (tuple) A tuple of combined results connected to an Engle-Granger portfolio.
         """
+
         # Calculating the data returns
         data_returns = (data / data.shift(1) - 1)[1:]
 
@@ -219,6 +230,7 @@ class TearSheet:
 
         :return: (tuple) A tuple of combined results connected to a Johansen portfolio(s).
         """
+
         data = self.data
 
         # Get asset names
@@ -264,11 +276,11 @@ class TearSheet:
         trace_test_statistic_2 = test_trace[asset_name_2][-1].round(5)
 
         # Calculating the scaled cointegration vectors
-        scaled_vector_1 = (
-                portfolio.cointegration_vectors.loc[0] / abs(portfolio.cointegration_vectors.loc[0]).sum()).round(5)
+        scaled_vector_1 = (portfolio.cointegration_vectors.loc[0] /
+                           abs(portfolio.cointegration_vectors.loc[0]).sum()).round(5)
 
-        scaled_vector_2 = (
-                portfolio.cointegration_vectors.loc[1] / abs(portfolio.cointegration_vectors.loc[1]).sum()).round(5)
+        scaled_vector_2 = (portfolio.cointegration_vectors.loc[1] /
+                           abs(portfolio.cointegration_vectors.loc[1]).sum()).round(5)
 
         # Calculating portfolio returns and portfolio price for the first cointegration vector
         portfolio_returns_1 = (data_returns * scaled_vector_1 * weights).sum(axis=1)
@@ -298,7 +310,7 @@ class TearSheet:
         """
 
         # Setting the default message font and color
-        font = 'Roboto'
+        font = self.text_font
         color = self.black
 
         # Interpreting the ADF test results
@@ -319,7 +331,7 @@ class TearSheet:
             # Specifying the color, font and message for hypothesis rejection
             message = 'HYPOTHESIS REJECTED'
             color = self.orange
-            font = 'Josefin Sans'
+            font = self.header_font
 
         # Combining the message and output style into an input tuple
         output = (message, color, font)
@@ -338,7 +350,7 @@ class TearSheet:
         """
 
         # Setting the default message font and color
-        font = 'Roboto'
+        font = self.text_font
         color = self.black
 
         # Interpreting the ADF test results
@@ -359,7 +371,7 @@ class TearSheet:
             # Specifying the color, font and message for hypothesis rejection
             message = 'HYPOTHESIS REJECTED'
             color = self.orange
-            font = 'Josefin Sans'
+            font = self.header_font
 
         # Combining the message and output style into an input tuple
         output = [message, color, font]
@@ -397,7 +409,7 @@ class TearSheet:
                                    title="Asset prices",
                                    xaxis_title="Date",
                                    yaxis_title="Price",
-                                   font_family='Josefin Sans',
+                                   font_family=self.header_font,
                                    font_size=18,
                                    height=500,
                                    hovermode='x unified')
@@ -439,7 +451,7 @@ class TearSheet:
                                 title="Normalized portfolio",
                                 xaxis_title="Date",
                                 yaxis_title="Price",
-                                font_family='Josefin Sans',
+                                font_family=self.header_font,
                                 font_size=18,
                                 height=500,
                                 margin=dict(l=30, r=30, t=50, b=30))
@@ -466,7 +478,7 @@ class TearSheet:
         # Updating the plot characteristics
         pacf_plot.update_layout(title="PACF",
                                 xaxis_title="Lag",
-                                font_family='Josefin Sans',
+                                font_family=self.header_font,
                                 font_size=14,
                                 height=250,
                                 margin=dict(l=30, r=30, t=50, b=30))
@@ -493,7 +505,7 @@ class TearSheet:
         # Updating the plot characteristics
         acf_plot.update_layout(title="ACF",
                                xaxis_title="Lag",
-                               font_family='Josefin Sans',
+                               font_family=self.header_font,
                                font_size=14,
                                height=250,
                                margin=dict(l=30, r=30, t=50, b=30))
@@ -530,7 +542,7 @@ class TearSheet:
 
         # Updating the plot characteristics
         resid_plot.update_layout(title="Residuals plot",
-                                 font_family='Josefin Sans',
+                                 font_family=self.header_font,
                                  font_size=14,
                                  height=250,
                                  margin=dict(l=30, r=30, t=50, b=30))
@@ -561,7 +573,7 @@ class TearSheet:
 
         # Updating the plot characteristics
         qq_plot.update_layout(title="Q-Q Plot",
-                              font_family='Josefin Sans',
+                              font_family=self.header_font,
                               font_size=14,
                               height=550,
                               margin=dict(l=30, r=30, t=50, b=30),
@@ -584,6 +596,7 @@ class TearSheet:
         :param trace_test_statistic_2: (float) Test statistic of the second asset for the trace test results.
         :return: (html.Div) Div for the Johansen cointegration tests results.
         """
+
         # Establish the outer div
         output = html.Div(
             style={'padding-left': 50, 'padding-right': 0, 'padding-top': 20, 'padding-bottom': 50, 'margin-left': 50,
@@ -592,7 +605,7 @@ class TearSheet:
 
                 # Cointegration test results header
                 html.H3(children='Cointegration tests results:',
-                        style={'textAlign': 'left', 'color': self.black, 'font-family': 'Josefin Sans',
+                        style={'textAlign': 'left', 'color': self.black, 'font-family': self.header_font,
                                'font-weight': '500', 'font-size': 24, 'padding-bottom': '1%', 'padding-top': '1%',
                                'display': 'block'}),
 
@@ -603,8 +616,9 @@ class TearSheet:
                                 'horizontal-align': 'center', 'width': '34%'}, children=[
 
                     html.H3(children='Eigenvalue test:',
-                            style={'textAlign': 'left', 'color': self.black, 'font-family': 'Josefin Sans',
+                            style={'textAlign': 'left', 'color': self.black, 'font-family': self.header_font,
                                    'font-weight': '500', 'font-size': 22, 'padding-bottom': '2%', 'display': 'block'}),
+
                     # Test result interpretation
                     html.P(children=self._johansen_test_result(cointegration_test_eigen,
                                                                eigen_test_statistic_1,
@@ -623,6 +637,7 @@ class TearSheet:
                                   'display': 'block'
                                   }
                            ),
+
                     # Test result dataframe
                     dash_table.DataTable(data=cointegration_test_eigen.to_dict('records'),
                                          columns=[{'id': c, 'name': c} for c in cointegration_test_eigen.columns],
@@ -631,21 +646,22 @@ class TearSheet:
                                          style_cell={'padding': '10px',
                                                      'backgroundColor': 'white',
                                                      'fontSize': 14,
-                                                     'font-family': 'Roboto'},
+                                                     'font-family': self.text_font},
 
                                          style_header={'backgroundColor': 'white',
                                                        'fontWeight': 'bold',
                                                        'fontSize': 14,
-                                                       'font-family': 'Josefin Sans'
+                                                       'font-family': self.header_font
 
                                                        }),
+
                     # Test statistics values
                     html.Div(style={'display': 'block'}, children=[
 
                         html.P(children='Test statistic value for {}: '.format(asset_1),
                                style={'textAlign': 'left',
                                       'color': self.black,
-                                      'font-family': 'Josefin Sans',
+                                      'font-family': self.header_font,
                                       'font-weight': '300',
                                       'font-size': 18,
                                       'padding-bottom': 0,
@@ -656,7 +672,7 @@ class TearSheet:
                         html.P(children='⠀{}⠀'.format(round(eigen_test_statistic_1, 5)),
                                style={'textAlign': 'center',
                                       'color': self.blue,
-                                      'font-family': 'Josefin Sans',
+                                      'font-family': self.header_font,
                                       'font-weight': '400',
                                       'font-size': 18,
                                       'padding-bottom': 0,
@@ -668,7 +684,7 @@ class TearSheet:
                             html.P(children='Test statistic value for {}: '.format(asset_2),
                                    style={'textAlign': 'left',
                                           'color': self.black,
-                                          'font-family': 'Josefin Sans',
+                                          'font-family': self.header_font,
                                           'font-weight': '300',
                                           'font-size': 18,
                                           'padding-bottom': '5%',
@@ -679,7 +695,7 @@ class TearSheet:
                             html.P(children='⠀{}⠀'.format(round(eigen_test_statistic_2, 5)),
                                    style={'textAlign': 'center',
                                           'color': self.blue,
-                                          'font-family': 'Josefin Sans',
+                                          'font-family': self.header_font,
                                           'font-weight': '400',
                                           'font-size': 18,
                                           'padding-bottom': '5%',
@@ -711,7 +727,7 @@ class TearSheet:
                     html.H3(children='Trace test:',
                             style={'textAlign': 'left',
                                    'color': self.black,
-                                   'font-family': 'Josefin Sans',
+                                   'font-family': self.header_font,
                                    'font-weight': '500',
                                    'font-size': 22,
                                    'padding-bottom': '2%',
@@ -743,12 +759,12 @@ class TearSheet:
                                          style_cell={'padding': '10px',
                                                      'backgroundColor': 'white',
                                                      'fontSize': 14,
-                                                     'font-family': 'Roboto'},
+                                                     'font-family': self.text_font},
 
                                          style_header={'backgroundColor': 'white',
                                                        'fontWeight': 'bold',
                                                        'fontSize': 14,
-                                                       'font-family': 'Josefin Sans'}),
+                                                       'font-family': self.header_font}),
                     # Test statistic values
                     html.Div(style={'display': 'block'}, children=[
 
@@ -756,7 +772,7 @@ class TearSheet:
 
                                style={'textAlign': 'left',
                                       'color': self.black,
-                                      'font-family': 'Josefin Sans',
+                                      'font-family': self.header_font,
                                       'font-weight': '300',
                                       'font-size': 18,
                                       'padding-bottom': 0,
@@ -768,7 +784,7 @@ class TearSheet:
 
                                style={'textAlign': 'center',
                                       'color': self.blue,
-                                      'font-family': 'Josefin Sans',
+                                      'font-family': self.header_font,
                                       'font-weight': '400',
                                       'font-size': 18,
                                       'padding-bottom': 0,
@@ -780,7 +796,7 @@ class TearSheet:
                             html.P(children='Test statistic value for {}: '.format(asset_2),
                                    style={'textAlign': 'left',
                                           'color': self.black,
-                                          'font-family': 'Josefin Sans',
+                                          'font-family': self.header_font,
                                           'font-weight': '300',
                                           'font-size': 18,
                                           'padding-bottom': '5%',
@@ -791,7 +807,7 @@ class TearSheet:
                             html.P(children='⠀{}⠀'.format(round(trace_test_statistic_2, 5)),
                                    style={'textAlign': 'center',
                                           'color': self.blue,
-                                          'font-family': 'Josefin Sans',
+                                          'font-family': self.header_font,
                                           'font-weight': '400',
                                           'font-size': 18,
                                           'padding-bottom': '5%',
@@ -817,7 +833,7 @@ class TearSheet:
         :param coint_vector: (pd.Series) Cointegration vector.
         :param portfolio_price: (pd.Series) The series of normalized portfolio price.
         :param portfolio_return: (pd.Series) The series of portfolio returns.
-        :return: (html.Div) Div for the Johansen cointegrated portfolio depiction in equatin and graph form.
+        :return: (html.Div) Div for the Johansen cointegrated portfolio depiction in equation and graph form.
         """
 
         output = html.Div(
@@ -834,7 +850,7 @@ class TearSheet:
                     html.H2(children='S⠀',
                             style={'textAlign': 'left',
                                    'color': self.black,
-                                   'font-family': 'Josefin Sans',
+                                   'font-family': self.header_font,
                                    'font-weight': '500',
                                    'font-size': 30,
                                    'padding-bottom': 30,
@@ -845,7 +861,7 @@ class TearSheet:
                     html.H2(children='=',
                             style={'textAlign': 'left',
                                    'color': self.black,
-                                   'font-family': 'Josefin Sans',
+                                   'font-family': self.header_font,
                                    'font-weight': '300',
                                    'font-size': 30,
                                    'padding-bottom': 30,
@@ -856,7 +872,7 @@ class TearSheet:
                     html.H2(children='⠀{}⠀'.format(round(coint_vector.iloc[0], 4)),
                             style={'textAlign': 'left',
                                    'color': self.orange,
-                                   'font-family': 'Josefin Sans',
+                                   'font-family': self.header_font,
                                    'font-weight': '400',
                                    'font-size': 30,
                                    'padding-bottom': 30,
@@ -867,7 +883,7 @@ class TearSheet:
                     html.H2(children='* {} + '.format(asset_1),
                             style={'textAlign': 'left',
                                    'color': self.black,
-                                   'font-family': 'Josefin Sans',
+                                   'font-family': self.header_font,
                                    'font-weight': '300',
                                    'font-size': 30,
                                    'padding-bottom': 30,
@@ -878,7 +894,7 @@ class TearSheet:
                     html.H2(children='⠀{}⠀'.format(round(coint_vector.iloc[1], 4)),
                             style={'textAlign': 'left',
                                    'color': self.blue,
-                                   'font-family': 'Josefin Sans',
+                                   'font-family': self.header_font,
                                    'font-weight': '400',
                                    'font-size': 30,
                                    'padding-bottom': 30,
@@ -889,7 +905,7 @@ class TearSheet:
                     html.H2(children='* {}'.format(asset_2),
                             style={'textAlign': 'left',
                                    'color': self.black,
-                                   'font-family': 'Josefin Sans',
+                                   'font-family': self.header_font,
                                    'font-weight': '300',
                                    'font-size': 30,
                                    'padding-bottom': 30,
@@ -915,7 +931,7 @@ class TearSheet:
                                      'vertical-align': 'top',
                                      'horizontal-align': 'center',
                                      'display': 'inline-block',
-                                     'font-family': 'Josefin Sans',
+                                     'font-family': self.header_font,
                                      'font-weight': '300',
                                      'font-size': 20,
                                      'textAlign': 'center'
@@ -970,7 +986,7 @@ class TearSheet:
                     html.H2(children='S⠀',
                             style={'textAlign': 'left',
                                    'color': self.black,
-                                   'font-family': 'Josefin Sans',
+                                   'font-family': self.header_font,
                                    'font-weight': '500',
                                    'font-size': 30,
                                    'padding-bottom': 30,
@@ -981,7 +997,7 @@ class TearSheet:
                     html.H2(children='=',
                             style={'textAlign': 'left',
                                    'color': self.black,
-                                   'font-family': 'Josefin Sans',
+                                   'font-family': self.header_font,
                                    'font-weight': '300',
                                    'font-size': 30,
                                    'padding-bottom': 30,
@@ -992,7 +1008,7 @@ class TearSheet:
                     html.H2(children='⠀{} +'.format(asset_1),
                             style={'textAlign': 'left',
                                    'color': self.black,
-                                   'font-family': 'Josefin Sans',
+                                   'font-family': self.header_font,
                                    'font-weight': '300',
                                    'font-size': 30,
                                    'padding-bottom': 30,
@@ -1003,7 +1019,7 @@ class TearSheet:
                     html.H2(children='⠀{}⠀'.format(round(beta, 4)),
                             style={'textAlign': 'left',
                                    'color': self.blue,
-                                   'font-family': 'Josefin Sans',
+                                   'font-family': self.header_font,
                                    'font-weight': '400',
                                    'font-size': 30,
                                    'padding-bottom': 30,
@@ -1014,7 +1030,7 @@ class TearSheet:
                     html.H2(children='* {}'.format(asset_2),
                             style={'textAlign': 'left',
                                    'color': self.black,
-                                   'font-family': 'Josefin Sans',
+                                   'font-family': self.header_font,
                                    'font-weight': '300',
                                    'font-size': 30,
                                    'padding-bottom': 30,
@@ -1045,7 +1061,7 @@ class TearSheet:
                         html.H3(children='Cointegration test results:',
                                 style={'textAlign': 'left',
                                        'color': self.black,
-                                       'font-family': 'Josefin Sans',
+                                       'font-family': self.header_font,
                                        'font-weight': '500',
                                        'font-size': 24,
                                        'padding-bottom': '2%',
@@ -1074,13 +1090,13 @@ class TearSheet:
                                              style_cell={'padding': '10px',
                                                          'backgroundColor': 'white',
                                                          'fontSize': 14,
-                                                         'font-family': 'Roboto'
+                                                         'font-family': self.text_font
                                                          },
 
                                              style_header={'backgroundColor': 'white',
                                                            'fontWeight': 'bold',
                                                            'fontSize': 14,
-                                                           'font-family': 'Josefin Sans'
+                                                           'font-family': self.header_font
                                                            }
                                              ),
 
@@ -1090,7 +1106,7 @@ class TearSheet:
                             html.P(children='Test statistic value: ',
                                    style={'textAlign': 'left',
                                           'color': self.black,
-                                          'font-family': 'Josefin Sans',
+                                          'font-family': self.header_font,
                                           'font-weight': '300',
                                           'font-size': 18,
                                           'padding-bottom': '10%',
@@ -1101,7 +1117,7 @@ class TearSheet:
                             html.P(children='⠀{}⠀'.format(round(test_statistic, 5)),
                                    style={'textAlign': 'center',
                                           'color': self.blue,
-                                          'font-family': 'Josefin Sans',
+                                          'font-family': self.header_font,
                                           'font-weight': '400',
                                           'font-size': 18,
                                           'padding-bottom': '10%',
@@ -1127,7 +1143,7 @@ class TearSheet:
                                      'vertical-align': 'top',
                                      'horizontal-align': 'right',
                                      'display': 'inline-block',
-                                     'font-family': 'Josefin Sans',
+                                     'font-family': self.header_font,
                                      'font-weight': '300',
                                      'font-size': 20
                                      }
@@ -1156,7 +1172,7 @@ class TearSheet:
                         html.H3(children='Residuals analysis results:',
                                 style={'textAlign': 'left',
                                        'color': self.black,
-                                       'font-family': 'Josefin Sans',
+                                       'font-family': self.header_font,
                                        'font-weight': '500',
                                        'font-size': 22,
                                        'padding-bottom': '2%',
@@ -1187,14 +1203,14 @@ class TearSheet:
                                                      style_cell={'padding': '10px',
                                                                  'backgroundColor': self.white,
                                                                  'fontSize': 14,
-                                                                 'font-family': 'Roboto',
+                                                                 'font-family': self.text_font,
                                                                  'textAlign': 'left'
                                                                  },
 
                                                      style_header={'padding': '15px',
                                                                    'backgroundColor': self.light_grey,
                                                                    'fontSize': 18,
-                                                                   'font-family': 'Josefin Sans',
+                                                                   'font-family': self.header_font,
                                                                    'textAlign': 'left'
                                                                    }
                                                      ),
@@ -1212,7 +1228,7 @@ class TearSheet:
                                                  'vertical-align': 'top',
                                                  'horizontal-align': 'right',
                                                  'display': 'block',
-                                                 'font-family': 'Josefin Sans',
+                                                 'font-family': self.header_font,
                                                  'font-weight': '300',
                                                  'font-size': 20
                                                  }
@@ -1241,7 +1257,7 @@ class TearSheet:
                                              'vertical-align': 'top',
                                              'horizontal-align': 'right',
                                              'display': 'block',
-                                             'font-family': 'Josefin Sans',
+                                             'font-family': self.header_font,
                                              'font-weight': '300',
                                              'font-size': 20
                                              }
@@ -1260,7 +1276,7 @@ class TearSheet:
                                              'vertical-align': 'top',
                                              'horizontal-align': 'right',
                                              'display': 'block',
-                                             'font-family': 'Josefin Sans',
+                                             'font-family': self.header_font,
                                              'font-weight': '300',
                                              'font-size': 20
                                              }
@@ -1295,7 +1311,7 @@ class TearSheet:
                                                       'vertical-align': 'top',
                                                       'horizontal-align': 'right',
                                                       'display': 'block',
-                                                      'font-family': 'Josefin Sans',
+                                                      'font-family': self.header_font,
                                                       'font-weight': '300',
                                                       'font-size': 20
                                                       }
@@ -1323,6 +1339,7 @@ class TearSheet:
                                   the jupyter notebook
         :return: (Dash) The Dash app object, which can be run using run_server.
         """
+
         # Assigning the data attribute
         self.data = data
 
@@ -1359,7 +1376,7 @@ class TearSheet:
         app.layout = html.Div(style={'backgroundColor': self.light_grey, 'padding-bottom': 30}, children=[
 
             # Adding the ArbitrageLab logo
-            html.Img(src='https://github.com/hudson-and-thames/arbitragelab/blob/arblab_tearsheet/arbitragelab/arblab_tearsheet/assets/ArbitrageLab-logo.png',
+            html.Img(src='https://hudsonthames.org/wp-content/uploads/2021/03/Asset-7.png',
                      style={'width': '20%',
                             'height': '20%',
                             'padding-top': 50,
@@ -1372,7 +1389,7 @@ class TearSheet:
             html.H1(children='COINTEGRATION ANALYSIS OF {}/{}'.format(name_1, name_2),
                     style={'textAlign': 'center',
                            'color': self.black,
-                           'font-family': 'Josefin Sans',
+                           'font-family': self.header_font,
                            'font-weight': '300',
                            'font-size': 50,
                            'padding-top': 30,
@@ -1410,7 +1427,7 @@ class TearSheet:
                     html.H2(children='The results of the ADF tests:',
                             style={'textAlign': 'left',
                                    'color': self.black,
-                                   'font-family': 'Josefin Sans',
+                                   'font-family': self.header_font,
                                    'font-weight': '500',
                                    'font-size': 24,
                                    'padding-bottom': '20%'
@@ -1420,7 +1437,7 @@ class TearSheet:
                     html.P(children='{}'.format(name_1),
                            style={'textAlign': 'left',
                                   'color': self.blue,
-                                  'font-family': 'Josefin Sans',
+                                  'font-family': self.header_font,
                                   'font-weight': '500',
                                   'font-size': 20
                                   }
@@ -1437,7 +1454,7 @@ class TearSheet:
                     html.P(children='{}'.format(name_2),
                            style={'textAlign': 'left',
                                   'color': self.blue,
-                                  'font-family': 'Josefin Sans',
+                                  'font-family': self.header_font,
                                   'font-weight': '500',
                                   'font-size': 20
                                   }
@@ -1467,7 +1484,7 @@ class TearSheet:
                                  'vertical-align': 'top',
                                  'horizontal-align': 'right',
                                  'display': 'inline-block',
-                                 'font-family': 'Josefin Sans',
+                                 'font-family': self.header_font,
                                  'font-weight': '300',
                                  'font-size': 24,
 
@@ -1492,7 +1509,7 @@ class TearSheet:
                 html.H2(children='ENGLE-GRANGER APPROACH',
                         style={'textAlign': 'left',
                                'color': self.black,
-                               'font-family': 'Josefin Sans',
+                               'font-family': self.header_font,
                                'font-weight': '300',
                                'font-size': 40,
                                'padding-left': 50,
@@ -1530,7 +1547,7 @@ class TearSheet:
                                        'margin-right': 25,
                                        'margin-top': 0,
                                        'margin-bottom': 0,
-                                       'font-family': 'Josefin Sans',
+                                       'font-family': self.header_font,
                                        'font-weight': '300',
                                        'font-size': 20
                                        }
@@ -1546,7 +1563,7 @@ class TearSheet:
                                        'margin-right': 40,
                                        'margin-top': 0,
                                        'margin-bottom': 0,
-                                       'font-family': 'Josefin Sans',
+                                       'font-family': self.header_font,
                                        'font-weight': '300',
                                        'font-size': 20})]),
 
@@ -1570,7 +1587,7 @@ class TearSheet:
                 html.H2(children='JOHANSEN APPROACH',
                         style={'textAlign': 'left',
                                'color': self.black,
-                               'font-family': 'Josefin Sans',
+                               'font-family': self.header_font,
                                'font-weight': '300',
                                'font-size': 40,
                                'padding-left': 50,
@@ -1619,7 +1636,7 @@ class TearSheet:
                                                    'margin-right': 50,
                                                    'margin-top': 50,
                                                    'margin-bottom': 50,
-                                                   'font-family': 'Josefin Sans',
+                                                   'font-family': self.header_font,
                                                    'font-weight': '300',
                                                    'font-size': 20,
                                                    'vertical-align': 'center',
@@ -1640,7 +1657,7 @@ class TearSheet:
                                                    'margin-right': 50,
                                                    'margin-top': 50,
                                                    'margin-bottom': 50,
-                                                   'font-family': 'Josefin Sans',
+                                                   'font-family': self.header_font,
                                                    'font-weight': '300',
                                                    'font-size': 20
                                                    }
@@ -1873,7 +1890,7 @@ class TearSheet:
                                    title="Spread price",
                                    xaxis_title="Date",
                                    yaxis_title="Price",
-                                   font_family='Josefin Sans', font_size=18,
+                                   font_family=self.font_family, font_size=18,
                                    height=400,
                                    hovermode='x unified', margin=dict(l=30, r=30, t=60, b=30),
                                    showlegend=True)
@@ -1909,7 +1926,7 @@ class TearSheet:
                                    title="Normalized asset prices",
                                    xaxis_title="Date",
                                    yaxis_title="Price",
-                                   font_family='Josefin Sans',
+                                   font_family=self.font_family,
                                    font_size=18,
                                    height=400,
                                    hovermode='x unified',
@@ -1949,7 +1966,7 @@ class TearSheet:
                                    title="Spread price",
                                    xaxis_title="Date",
                                    yaxis_title="Price",
-                                   font_family='Josefin Sans',
+                                   font_family=self.font_family,
                                    font_size=18,
                                    height=400,
                                    hovermode='x unified',
@@ -2001,7 +2018,7 @@ class TearSheet:
                                      'vertical-align': 'top',
                                      'horizontal-align': 'center',
                                      'display': 'inline-block',
-                                     'font-family': 'Josefin Sans',
+                                     'font-family': self.header_font,
                                      'font-weight': '300',
                                      'font-size': 20,
                                      'textAlign': 'center'
@@ -2038,7 +2055,7 @@ class TearSheet:
                     html.H2(children='WARNING:',
                             style={'textAlign': 'left',
                                    'color': self.black,
-                                   'font-family': 'Josefin Sans',
+                                   'font-family': self.header_font,
                                    'font-weight': '400',
                                    'font-size': 30,
                                    'padding-bottom': 0,
@@ -2049,7 +2066,7 @@ class TearSheet:
                     html.H2(children='The optimal solution doesn\'t exist for a given set of parameters.',
                             style={'textAlign': 'left',
                                    'color': self.orange,
-                                   'font-family': 'Josefin Sans',
+                                   'font-family': self.header_font,
                                    'font-weight': '300',
                                    'font-size': 30,
                                    'padding-bottom': 0,
@@ -2059,7 +2076,7 @@ class TearSheet:
                     html.H2(children='To improve the situation please adjust the values of model parameters.',
                             style={'textAlign': 'left',
                                    'color': self.orange,
-                                   'font-family': 'Josefin Sans',
+                                   'font-family': self.header_font,
                                    'font-weight': '300',
                                    'font-size': 30,
                                    'padding-bottom': 0,
@@ -2120,7 +2137,7 @@ class TearSheet:
                     html.H2(children='S⠀',
                             style={'textAlign': 'left',
                                    'color': self.black,
-                                   'font-family': 'Josefin Sans',
+                                   'font-family': self.header_font,
                                    'font-weight': '500',
                                    'font-size': 30,
                                    'padding-bottom': 0,
@@ -2131,7 +2148,7 @@ class TearSheet:
                     html.H2(children='=',
                             style={'textAlign': 'left',
                                    'color': self.black,
-                                   'font-family': 'Josefin Sans',
+                                   'font-family': self.header_font,
                                    'font-weight': '300',
                                    'font-size': 30,
                                    'padding-bottom': 0,
@@ -2142,7 +2159,7 @@ class TearSheet:
                     html.H2(children='⠀{} - '.format(asset_1),
                             style={'textAlign': 'left',
                                    'color': self.black,
-                                   'font-family': 'Josefin Sans',
+                                   'font-family': self.header_font,
                                    'font-weight': '300',
                                    'font-size': 30,
                                    'padding-bottom': 0,
@@ -2153,7 +2170,7 @@ class TearSheet:
                     html.H2(children='⠀{}⠀'.format(round(b, 4)),
                             style={'textAlign': 'left',
                                    'color': self.blue,
-                                   'font-family': 'Josefin Sans',
+                                   'font-family': self.header_font,
                                    'font-weight': '400',
                                    'font-size': 30,
                                    'padding-bottom': 0,
@@ -2164,7 +2181,7 @@ class TearSheet:
                     html.H2(children='* {}'.format(asset_2),
                             style={'textAlign': 'left',
                                    'color': self.black,
-                                   'font-family': 'Josefin Sans',
+                                   'font-family': self.header_font,
                                    'font-weight': '300',
                                    'font-size': 30,
                                    'padding-bottom': 0,
@@ -2210,7 +2227,7 @@ class TearSheet:
                             html.H3(children='Cointegration test results:',
                                     style={'textAlign': 'left',
                                            'color': self.black,
-                                           'font-family': 'Josefin Sans',
+                                           'font-family': self.header_font,
                                            'font-weight': '500',
                                            'font-size': 24,
                                            'padding-bottom': '2%',
@@ -2234,12 +2251,12 @@ class TearSheet:
                                                  style_cell={'padding': '10px',
                                                              'backgroundColor': 'white',
                                                              'fontSize': 14,
-                                                             'font-family': 'Roboto'},
+                                                             'font-family': self.text_font},
 
                                                  style_header={'backgroundColor': 'white',
                                                                'fontWeight': 'bold',
                                                                'fontSize': 14,
-                                                               'font-family': 'Josefin Sans'
+                                                               'font-family': self.header_font
                                                                }
                                                  ),
 
@@ -2248,7 +2265,7 @@ class TearSheet:
                                 html.P(children='Test statistic value: ',
                                        style={'textAlign': 'left',
                                               'color': self.black,
-                                              'font-family': 'Josefin Sans',
+                                              'font-family': self.header_font,
                                               'font-weight': '300',
                                               'font-size': 18,
                                               'padding-bottom': '10%',
@@ -2259,7 +2276,7 @@ class TearSheet:
                                 html.P(children='⠀{}⠀'.format(round(test_statistic, 5)),
                                        style={'textAlign': 'center',
                                               'color': self.blue,
-                                              'font-family': 'Josefin Sans',
+                                              'font-family': self.header_font,
                                               'font-weight': '400',
                                               'font-size': 18,
                                               'padding-bottom': '10%',
@@ -2272,7 +2289,7 @@ class TearSheet:
                             html.H3(children='OU model characteristics:',
                                     style={'textAlign': 'left',
                                            'color': self.black,
-                                           'font-family': 'Josefin Sans',
+                                           'font-family': self.header_font,
                                            'font-weight': '500',
                                            'font-size': 22,
                                            'padding-bottom': '2%',
@@ -2287,13 +2304,13 @@ class TearSheet:
                                                  style_cell={'padding': '10px',
                                                              'backgroundColor': 'white',
                                                              'fontSize': 14,
-                                                             'font-family': 'Roboto',
+                                                             'font-family': self.text_font,
                                                              'textAlign': 'left'},
 
                                                  style_header={'padding': '15px',
                                                                'backgroundColor': self.light_grey,
                                                                'fontSize': 18,
-                                                               'font-family': 'Josefin Sans',
+                                                               'font-family': self.header_font,
                                                                'textAlign': 'left'
                                                                }
                                                  ),
@@ -2320,7 +2337,7 @@ class TearSheet:
                                              'vertical-align': 'top',
                                              'horizontal-align': 'right',
                                              'display': 'block',
-                                             'font-family': 'Josefin Sans',
+                                             'font-family': self.header_font,
                                              'font-weight': '300',
                                              'font-size': 20
                                              }
@@ -2339,7 +2356,7 @@ class TearSheet:
                                              'vertical-align': 'top',
                                              'horizontal-align': 'right',
                                              'display': 'block',
-                                             'font-family': 'Josefin Sans',
+                                             'font-family': self.header_font,
                                              'font-weight': '300',
                                              'font-size': 20
                                              }
@@ -2405,9 +2422,7 @@ class TearSheet:
                                      'padding-bottom': 30
                                      }, children=[
             # Add the ArbitrageLab logo
-            html.Img(src='https://raw.githubusercontent.com/hudson-and-thames/arbitragelab/'
-                         'arblab_tearsheet/arbitragelab/arblab_tearsheet/'
-                         'assets/ArbitrageLab-logo.png?token=AHJ5HHMBXR5LZU7L7F4ICWLARFJX2',
+            html.Img(src='https://hudsonthames.org/wp-content/uploads/2021/03/Asset-7.png',
                      style={'width': '18%',
                             'height': '18%',
                             'padding-top': 30,
@@ -2420,7 +2435,7 @@ class TearSheet:
             html.H1(children='ORNSTEIN-UHLENBECK MODEL ANALYSIS OF {}/{} PAIR'.format(name_1, name_2),
                     style={'textAlign': 'center',
                            'color': self.black,
-                           'font-family': 'Josefin Sans',
+                           'font-family': self.header_font,
                            'font-weight': '300',
                            'font-size': 50,
                            'padding-top': 20,
@@ -2467,7 +2482,7 @@ class TearSheet:
                                        'margin-right': 25,
                                        'margin-top': 0,
                                        'margin-bottom': 0,
-                                       'font-family': 'Josefin Sans',
+                                       'font-family': self.header_font,
                                        'font-weight': '300',
                                        'font-size': 20
                                        }
@@ -2483,7 +2498,7 @@ class TearSheet:
                                        'margin-right': 40,
                                        'margin-top': 0,
                                        'margin-bottom': 0,
-                                       'font-family': 'Josefin Sans',
+                                       'font-family': self.header_font,
                                        'font-weight': '300',
                                        'font-size': 20
                                        }
@@ -2512,7 +2527,7 @@ class TearSheet:
                 html.H2(children='OPTIMAL POSITION ENTRY/EXIT ANALYSIS',
                         style={'textAlign': 'left',
                                'color': self.black,
-                               'font-family': 'Josefin Sans',
+                               'font-family': self.header_font,
                                'font-weight': '300',
                                'font-size': 40,
                                'padding-left': 50,
@@ -2547,7 +2562,7 @@ class TearSheet:
                         html.H3(children='Model constraints:',
                                 style={'textAlign': 'left',
                                        'color': self.black,
-                                       'font-family': 'Josefin Sans',
+                                       'font-family': self.header_font,
                                        'font-weight': '500',
                                        'font-size': 24,
                                        'padding-bottom': '2%',
@@ -2560,7 +2575,7 @@ class TearSheet:
                             html.P(children='Discount rate: ',
                                    style={'textAlign': 'left',
                                           'color': self.black,
-                                          'font-family': 'Josefin Sans',
+                                          'font-family': self.header_font,
                                           'font-weight': '300',
                                           'font-size': 20,
                                           'padding-top': '10%',
@@ -2573,7 +2588,7 @@ class TearSheet:
                             html.P(children='Transaction cost: ',
                                    style={'textAlign': 'left',
                                           'color': self.black,
-                                          'font-family': 'Josefin Sans',
+                                          'font-family': self.header_font,
                                           'font-weight': '300',
                                           'font-size': 20,
                                           'padding-top': '10%',
@@ -2586,7 +2601,7 @@ class TearSheet:
                             html.P(children='Stop-loss level: ',
                                    style={'textAlign': 'left',
                                           'color': self.black,
-                                          'font-family': 'Josefin Sans',
+                                          'font-family': self.header_font,
                                           'font-weight': '300',
                                           'font-size': 20,
                                           'padding-top': '10%',
@@ -2600,7 +2615,7 @@ class TearSheet:
 
                             dcc.Input(id='discount-rate', type='number', value=0,
                                       style={'color': self.black,
-                                             'font-family': 'Josefin Sans',
+                                             'font-family': self.header_font,
                                              'font-weight': '300',
                                              'font-size': 20,
                                              'height': 50,
@@ -2615,7 +2630,7 @@ class TearSheet:
 
                             dcc.Input(id='transaction-cost', type='number', value=0,
                                       style={'color': self.black,
-                                             'font-family': 'Josefin Sans',
+                                             'font-family': self.header_font,
                                              'font-weight': '300',
                                              'font-size': 20,
                                              'height': 50,
@@ -2629,7 +2644,7 @@ class TearSheet:
 
                             dcc.Input(id='stop-loss', type='number', placeholder="None",
                                       style={'color': self.black,
-                                             'font-family': 'Josefin Sans',
+                                             'font-family': self.header_font,
                                              'font-weight': '300',
                                              'font-size': 20,
                                              'height': 50,
