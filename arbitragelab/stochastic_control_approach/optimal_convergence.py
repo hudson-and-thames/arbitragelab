@@ -99,7 +99,7 @@ class OptimalConvergence:
         beta_2 = (lr.intercept_ - self.r) / self.mu_m
 
         self.beta = (beta_1 + beta_2) / 2
-
+        print(f"{beta_1}_{beta_2}")
         # Equation (5) in the paper models x as a mean reverting OU process with 0 drift.
         # The parameter estimators are taken from Appendix in Jurek paper.
 
@@ -119,8 +119,10 @@ class OptimalConvergence:
 
         self.b_squared = (b_x ** 2) / 2
 
-        self.sigma_squared = np.var(y_1) - self.b_squared - (self.beta ** 2) * (self.sigma_m ** 2)
+        #self.sigma_squared = (np.var(y_1, ddof=1) / self.delta_t) - self.b_squared - (self.beta ** 2) * (self.sigma_m ** 2)
 
+        self.sigma_squared_1 = (np.var(y_1, ddof=1) / self.delta_t) - self.b_squared - (self.beta ** 2) * (self.sigma_m ** 2)
+        self.sigma_squared_2 = (np.var(y_2, ddof=1) / self.delta_t) - self.b_squared - (self.beta ** 2) * (self.sigma_m ** 2)
 
         # TODO: Need to input market index data and orthogonalize the price data with market index before using cointegration.
         # Refer Table 1 in paper.
