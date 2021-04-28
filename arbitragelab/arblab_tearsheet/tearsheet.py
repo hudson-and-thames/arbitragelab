@@ -21,6 +21,8 @@ import dash_html_components as html
 from dash.dependencies import Input, Output
 import dash_table
 import plotly.graph_objects as go
+from jupyter_dash import JupyterDash
+
 
 
 class TearSheet:
@@ -45,6 +47,24 @@ class TearSheet:
         self.white = '#ffffff'  # White brand color
 
         devadarsh.track('TearSheet')
+
+    @staticmethod
+    def _get_app(app_display='default'):
+        """
+        Sets the default space for building the visualization app.
+
+        :param app_display: (str) Parameter that signifies whether to open a web app in a separate tab or inside
+                                  the jupyter notebook
+        :return: (Dash) The Dash app object, which can be run using run_server.
+        """
+
+        if app_display == 'jupyter':
+            app = JupyterDash()
+        else:
+            app = dash.Dash()
+
+        return app
+
 
     def _get_basic_assets_data(self):
         """
@@ -1288,7 +1308,7 @@ class TearSheet:
 
         return output
 
-    def cointegration_tearsheet(self, data):
+    def cointegration_tearsheet(self, data, app_display='default'):
         """
         Creates a web-application that visualizes the results of the cointegration analysis of the provided pair of
         assets. The mentioned pair is subjected to Engle-Granger and Johansen tests and residual analysis if possible.
@@ -1299,6 +1319,9 @@ class TearSheet:
         Johansen analysis results are also available for both found cointegration vectors.
 
         :param data: (pd.Dataframe) A dataframe of two asset prices with asset names as the names of the columns.
+        :param app_display: (str) Parameter that signifies whether to open a web app in a separate tab or inside
+                                  the jupyter notebook
+        :return: (Dash) The Dash app object, which can be run using run_server.
         """
         # Assigning the data attribute
         self.data = data
@@ -1331,12 +1354,12 @@ class TearSheet:
         j_cointegration_vector_1, j_cointegration_vector_2, j_portfolio_returns_1,\
         j_portfolio_price_1, j_portfolio_returns_2, j_portfolio_price_2 = self._get_johansen_data()
 
-        app = dash.Dash()
+        app = self._get_app(app_display)
 
         app.layout = html.Div(style={'backgroundColor': self.light_grey, 'padding-bottom': 30}, children=[
 
             # Adding the ArbitrageLab logo
-            html.Img(src='/assets/ArbitrageLab-logo.png',
+            html.Img(src='https://github.com/hudson-and-thames/arbitragelab/blob/arblab_tearsheet/arbitragelab/arblab_tearsheet/assets/ArbitrageLab-logo.png',
                      style={'width': '20%',
                             'height': '20%',
                             'padding-top': 50,
@@ -1741,9 +1764,7 @@ class TearSheet:
 
             return output
 
-        # Running the web application
-        if __name__ == '__main__':
-            app.run_server()
+        return app
 
     @staticmethod
     def spread_analysis(model):
@@ -2333,7 +2354,7 @@ class TearSheet:
 
         return output
 
-    def ou_tearsheet(self, data):
+    def ou_tearsheet(self, data, app_display='default'):
         """
         Creates a web-application that visualizes the results of the OU model analysis of the provided pair of
         assets. The mentioned pair is subjected to Engle-Granger test and optimal portfolio creation.
@@ -2342,6 +2363,9 @@ class TearSheet:
         asset_1 = b_1 * asset_2 and asset_2 = b_2 * asset_1.
 
         :param data: (pd.Dataframe) A dataframe of two asset prices with asset names as the names of the columns.
+        :param app_display: (str) Parameter that signifies whether to open a web app in a separate tab or inside
+                                  the jupyter notebook
+        :return: (Dash) The Dash app object, which can be run using run_server.
         """
         # Setting the data class atribute
         self.data = data
@@ -2375,13 +2399,15 @@ class TearSheet:
         spread_dataframe_1, spread_price_1, ou_modelled_process_1 = self.spread_analysis(model_1)
         spread_dataframe_2, spread_price_2, ou_modelled_process_2 = self.spread_analysis(model_2)
 
-        app = dash.Dash()
+        app = self._get_app(app_display)
 
         app.layout = html.Div(style={'backgroundColor': self.light_grey,
                                      'padding-bottom': 30
                                      }, children=[
             # Add the ArbitrageLab logo
-            html.Img(src='/assets/ArbitrageLab-logo.png',
+            html.Img(src='https://raw.githubusercontent.com/hudson-and-thames/arbitragelab/'
+                         'arblab_tearsheet/arbitragelab/arblab_tearsheet/'
+                         'assets/ArbitrageLab-logo.png?token=AHJ5HHMBXR5LZU7L7F4ICWLARFJX2',
                      style={'width': '18%',
                             'height': '18%',
                             'padding-top': 30,
@@ -2758,5 +2784,4 @@ class TearSheet:
 
             return output
 
-        if __name__ == '__main__':
-            app.run_server()
+        return app
