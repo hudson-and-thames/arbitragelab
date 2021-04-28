@@ -21,6 +21,8 @@ tensorflow==2.2.1
 arch==4.16.1
 analytics-python==1.2.9
 pyvinecopulib==0.5.5
+dash==1.20.0
+jupyter-dash==0.4.0
 
 # Develop
 bump2version==1.0.1
