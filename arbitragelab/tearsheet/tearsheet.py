@@ -5,7 +5,8 @@
 """
 This module implements interactive Tear Sheets for various modules of the ArbitrageLab package.
 """
-# pylint: disable=too-many-lines, too-many-locals, invalid-name, unused-argument, too-many-arguments, too-many-statements
+# pylint: disable=too-many-lines, too-many-locals, invalid-name, unused-argument
+# pylint: disable=too-many-arguments, too-many-statements, unused-variable
 
 import warnings
 
