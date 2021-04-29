@@ -12,6 +12,7 @@ import os
 import pandas as pd
 import numpy as np
 
+from arbitragelab.optimal_mean_reversion import OrnsteinUhlenbeck
 from arbitragelab.tearsheet.tearsheet import TearSheet
 
 
@@ -211,22 +212,24 @@ class TestTearSheet(unittest.TestCase):
 
     def test_cointegration_plot(self):
         """
-        Tests plotting methods.
+        Tests Cointegration plotting methods.
         """
 
         # Calling the tear sheet and setting the data parameter
         test = TearSheet()
         test.data = self.dataframe
 
-        # Getting ADF statistics table
+        # Running data preprocessing
         transformed_data = test._get_basic_assets_data()
         (asset_name_1, norm_asset_price_1, _, _,
          asset_name_2, norm_asset_price_2, _, _) = transformed_data
 
+        # Running Engle Granger test
         engle_granger_data = test._get_engle_granger_data(self.dataframe)
         (_, _, _, portfolio_returns, portfolio_price, residuals,
          _, qq_y, x, pacf_result, acf_result) = engle_granger_data
 
+        # Getting all plots
         asset_prices_plot = test._asset_prices_plot(norm_asset_price_1, norm_asset_price_2, asset_name_1, asset_name_2)
         portfolio_plot = test._portfolio_plot(portfolio_price, portfolio_returns)
         pacf_plot = test._pacf_plot(pacf_result)
@@ -234,7 +237,7 @@ class TestTearSheet(unittest.TestCase):
         residuals_plot = test._residuals_plot(residuals)
         qq_plot = test._qq_plot(qq_y, x)
 
-        # Testing interpretations
+        # Testing plots
         self.assertEqual(str(type(asset_prices_plot)), "<class 'plotly.graph_objs._figure.Figure'>")
         self.assertEqual(str(type(portfolio_plot)), "<class 'plotly.graph_objs._figure.Figure'>")
         self.assertEqual(str(type(pacf_plot)), "<class 'plotly.graph_objs._figure.Figure'>")
@@ -244,28 +247,30 @@ class TestTearSheet(unittest.TestCase):
 
     def test_cointegration_div(self):
         """
-        Tests plotting methods.
+        Tests HTML div methods in Cointegration Tear Sheet.
         """
 
         # Calling the tear sheet and setting the data parameter
         test = TearSheet()
         test.data = self.dataframe
 
-        # Getting ADF statistics table
+        # Running data preprocessing
         transformed_data = test._get_basic_assets_data()
         (asset_name_1, _, _, _,
          asset_name_2, _, _, _) = transformed_data
 
+        # Running Johansen test
         johansen_data = test._get_johansen_data()
         (test_eigen_dataframe, test_trace_dataframe, eigen_test_statistic_1, eigen_test_statistic_2,
          trace_test_statistic_1, trace_test_statistic_2, scaled_vector_1, _, portfolio_returns_1,
          portfolio_price_1, _, _) = johansen_data
 
-
+        # Running Engle Granger test
         engle_granger_data = test._get_engle_granger_data(self.dataframe)
         (adf_dataframe, adf_test_stat, cointegration_vector, portfolio_returns, portfolio_price, residuals,
          residuals_dataframe, qq_y, x, pacf_result, acf_result) = engle_granger_data
 
+        # Getting div HTML
         jh_coint_test_div = test._jh_coint_test_div(asset_name_1, asset_name_2, test_eigen_dataframe,
                                                     test_trace_dataframe, eigen_test_statistic_1,
                                                     eigen_test_statistic_2, trace_test_statistic_1,
@@ -277,7 +282,112 @@ class TestTearSheet(unittest.TestCase):
                               portfolio_price, portfolio_returns, pacf_result, acf_result, residuals, qq_y, x,
                               residuals_dataframe)
 
-        # Testing interpretations
+        # Testing divs
         self.assertEqual(str(type(jh_coint_test_div)), "<class 'dash_html_components.Div.Div'>")
         self.assertEqual(str(type(jh_div)), "<class 'dash_html_components.Div.Div'>")
         self.assertEqual(str(type(eg_div)), "<class 'dash_html_components.Div.Div'>")
+
+    def test_spread_analysis(self):
+        """
+        Tests spread analysis part of the OU Module Tear Sheet.
+        """
+
+        # Calling the tear sheet and setting the data parameter
+        test = TearSheet()
+        model = OrnsteinUhlenbeck()
+        test.data = self.dataframe
+
+        # Fitting the OU models for both asset combinations
+        model.delta_t = 1 / 252
+        model.fit_to_assets(self.dataframe)
+
+        # Calculating the data connected to the OU model
+        (spread_dataframe, spread_price, ou_modelled_process) = test._spread_analysis(model)
+
+        # Evaluating output statistics
+        self.assertAlmostEqual(spread_dataframe.loc[spread_dataframe['Characteristic'] == 'Mean-reversion speed',
+                                                    'Value'].iloc[0], 6.306, places=5)
+        self.assertAlmostEqual(spread_dataframe.loc[spread_dataframe['Characteristic'] == 'Long-term mean',
+                                                    'Value'].iloc[0], 0.71758, places=5)
+        self.assertAlmostEqual(spread_dataframe.loc[spread_dataframe['Characteristic'] == 'Standard deviation',
+                                                    'Value'].iloc[0], 0.00698, places=5)
+        self.assertAlmostEqual(spread_dataframe.loc[spread_dataframe['Characteristic'] == 'Max log-likelihood',
+                                                    'Value'].iloc[0], 3.84064, places=5)
+
+        # Calculated spread price
+        self.assertAlmostEqual(spread_price.mean(), 0.754722, places=5)
+
+        # Modelled process
+        self.assertAlmostEqual(ou_modelled_process.mean(), 0.731289, places=5)
+
+    def test_ou_plot(self):
+        """
+        Tests OU Model plotting methods.
+        """
+
+        # Calling the tear sheet and setting the data parameter
+        test = TearSheet()
+        model = OrnsteinUhlenbeck()
+        test.data = self.dataframe
+
+        # Fitting the OU models for both asset combinations
+        model.delta_t = 1 / 252
+        model.fit_to_assets(self.dataframe)
+
+        # Running data preprocessing
+        transformed_data = test._get_basic_assets_data()
+        (asset_name_1, norm_asset_price_1, _, _,
+         asset_name_2, norm_asset_price_2, _, _) = transformed_data
+
+        # Calculating the data connected to the OU model
+        (spread_dataframe, spread_price, ou_modelled_process) = test._spread_analysis(model)
+
+        # Getting plots
+        ou_optimal_plot = test._ou_optimal_plot(spread_dataframe, spread_price)
+        ou_asset_prices_plot = test._ou_asset_prices_plot(norm_asset_price_1, norm_asset_price_2,
+                                                          asset_name_1, asset_name_2)
+        ou_spread_plot = test._ou_spread_plot(spread_price, ou_modelled_process)
+
+        # Testing plots
+        self.assertEqual(str(type(ou_optimal_plot)), "<class 'plotly.graph_objs._figure.Figure'>")
+        self.assertEqual(str(type(ou_asset_prices_plot)), "<class 'plotly.graph_objs._figure.Figure'>")
+        self.assertEqual(str(type(ou_spread_plot)), "<class 'plotly.graph_objs._figure.Figure'>")
+
+    def test_ou_model_div(self):
+        """
+        Tests HTML div methods in OU Model Tear Sheet.
+        """
+
+        # Calling the tear sheet and setting the data parameter
+        test = TearSheet()
+        model = OrnsteinUhlenbeck()
+        test.data = self.dataframe
+
+        # Fitting the OU models for both asset combinations
+        model.delta_t = 1 / 252
+        model.fit_to_assets(self.dataframe)
+
+        # Running data preprocessing
+        transformed_data = test._get_basic_assets_data()
+        (asset_name_1, norm_asset_price_1, _, _,
+         asset_name_2, norm_asset_price_2, _, _) = transformed_data
+
+        # Running Engle Granger test
+        engle_granger_data = test._get_engle_granger_data(self.dataframe)
+        (adf_dataframe, adf_test_stat, _, _, _, _, _, _, _, _, _) = engle_granger_data
+
+        # Calculating the data connected to the OU model
+        (spread_dataframe, spread_price, ou_modelled_process) = test._spread_analysis(model)
+
+        # Getting div HTML
+        optimal_levels_div = test._optimal_levels_div(spread_dataframe, spread_price, 0, 0, [0, 0], [0, 0])
+
+        optimal_levels_error_div = test._optimal_levels_error_div()
+
+        ou_div = test._ou_div(spread_price, ou_modelled_process, spread_dataframe, model, adf_dataframe, adf_test_stat,
+                              norm_asset_price_1, norm_asset_price_2, asset_name_1, asset_name_2)
+
+        # Testing divs
+        self.assertEqual(str(type(optimal_levels_div)), "<class 'dash_html_components.Div.Div'>")
+        self.assertEqual(str(type(optimal_levels_error_div)), "<class 'dash_html_components.Div.Div'>")
+        self.assertEqual(str(type(ou_div)), "<class 'dash_html_components.Div.Div'>")
