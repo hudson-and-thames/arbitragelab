@@ -1891,7 +1891,7 @@ class TearSheet:
                                    title="Spread price",
                                    xaxis_title="Date",
                                    yaxis_title="Price",
-                                   font_family=self.font_family, font_size=18,
+                                   font_family=self.header_font, font_size=18,
                                    height=400,
                                    hovermode='x unified', margin=dict(l=30, r=30, t=60, b=30),
                                    showlegend=True)
@@ -1927,7 +1927,7 @@ class TearSheet:
                                    title="Normalized asset prices",
                                    xaxis_title="Date",
                                    yaxis_title="Price",
-                                   font_family=self.font_family,
+                                   font_family=self.header_font,
                                    font_size=18,
                                    height=400,
                                    hovermode='x unified',
@@ -1967,7 +1967,7 @@ class TearSheet:
                                    title="Spread price",
                                    xaxis_title="Date",
                                    yaxis_title="Price",
-                                   font_family=self.font_family,
+                                   font_family=self.header_font,
                                    font_size=18,
                                    height=400,
                                    hovermode='x unified',
@@ -2790,7 +2790,7 @@ class TearSheet:
                 else:
                     b = model.optimal_liquidation_level()
                     d = model.optimal_entry_level()
-            except ValueError:
+            except Exception:
                 output = self._optimal_levels_error_div()
 
             else:

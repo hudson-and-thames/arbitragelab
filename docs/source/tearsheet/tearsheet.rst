@@ -8,7 +8,7 @@ Visualization Tear Sheets
 
 `TearSheet` is the visualization class for the pairs analysis process
 based on different modules implemented in ArbitrageLab. It creates a locally ran Flask server,
-which, bringing an interactive approach to the data visualization with `Plotly's Dash <https://dash.plotly.com>`_.
+bringing an interactive approach to the data visualization with `Plotly's Dash <https://dash.plotly.com>`_.
 
 .. Note::
 
