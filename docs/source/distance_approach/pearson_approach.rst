@@ -35,7 +35,7 @@ than usual, this divergence is expected to be reversed in the next month. And th
 expected to be abnormally high/low in comparison to other stocks.
 
 Therefore, after calculating the return divergence of all the stocks,  a long-short portfolio is constructed
-where stocks with high return divergence have higher subsequent returns.
+based on the long and short ratio given by the user.
 
 
 Pairs Portfolio Formation
@@ -56,10 +56,11 @@ the method calculates the monthly returns before moving into the next steps.
 
 2. **Finding pairs**
 
-Using monthly stock returns data in the formation period, for each stock, the method finds :math:`n` stocks
-with the highest correlations to the stock as its pairs. For each stock, to calculate the pairs portfolio’s
-returns for creating :math:`beta` in the following step, the method uses two different weighting metrics in
-calculating the returns.
+For each stock, the method finds :math:`n` stocks with the highest correlations to the stock as its pairs using
+monthly stock returns. After pairs are formed, returns of pairs, which refer to as pairs portfolios in the paper,
+are needed to create :math:`beta` in the following step. Therefore, this method uses two different weighting
+metrics in calculating the returns.
+
 
 The first is an equal-weighted portfolio. The method by default computes the pairs portfolio returns as the
 equal-weighted average returns of the top n pairs of stocks. The second is a correlation-weighted portfolio.
@@ -98,7 +99,7 @@ Trading Signal Generation
 #########################
 After calculating the betas for all of the stocks in the formation period, the next step is to generate trading
 signals by calculating the return divergence for each of the stocks. In this method, test data is not necessarily
-required if only a trading signal for the very next month of formation period is needed. However, if one wants to
+required if only a trading signal for the last month of formation period is needed. However, if one wants to
 see the backtesting results of the method and test with test data, a successive dataset after the formation period
 is required to generate the proper trading signals. The steps are as follows:
 

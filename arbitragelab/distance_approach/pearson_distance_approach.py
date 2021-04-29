@@ -44,7 +44,7 @@ class PearsonStrategy:
 
         devadarsh.track('PearsonStrategy')
 
-    def form_portfolio(self, train_data, risk_free=0.0, num_pairs=50, weight='equal', long_pct=0.1, short_pct=0.1):
+    def form_portfolio(self, train_data, risk_free=0.0, num_pairs=50, weight='equal'):
         """
         Forms portfolio based on the input train data.
 
@@ -64,16 +64,14 @@ class PearsonStrategy:
         divergence between i’s stock return and its pairs-portfolio return.
 
         After calculating the “return differences” of all stocks for the last month of the formation period,
-        this method constructs decile portfolios where stocks with high return differences have higher subsequent
+        this method constructs a long-short portfolios where stocks with high return differences have higher subsequent
         returns. Therefore after all stocks are sorted in descending order based on their previous month’s return
-        divergence, decile 10 is “long stocks” and decile 1 is “short stocks”.
+        divergence, top p % of the stocks are “long stocks” and bottom q % of stocks are “short stocks”.
 
         :param train_data: (pd.DataFrame) Daily price data with date in its index and stocks in its columns.
         :param risk_free: (pd.Series/float) Daily risk free rate data as a series or a float number.
         :param num_pairs: (int) Number of top pairs to use for portfolio formation.
         :param weight: (str) Weighting Scheme for portfolio returns [``equal`` by default, ``correlation``].
-        :param long_pct: (float) Percentage of long stocks in the sorted return divergence.
-        :param short_pct: (float) Percentage of short stocks in the sorted return divergence.
         """
 
         # Preprocess data to get monthly return from daily price data
@@ -85,24 +83,24 @@ class PearsonStrategy:
         # Save the last month return for the signal generation step
         self.last_month = self.monthly_return.iloc[-1, :]
 
-        # Set long and short percentage when trading
-        self.long_pct, self.short_pct = long_pct, short_pct
-
-    def trade_portfolio(self, test_data=None, test_risk_free=0.0):
+    def trade_portfolio(self, test_data=None, test_risk_free=0.0, long_pct=0.1, short_pct=0.1):
         """
         Trade portfolios by generating trading signals in the test data.
 
         In each month in the test period, all stocks are sorted in descending order based on their previous month’s
-        return divergence from its pairs portfolio created in the formation period and split into ten deciles. Then a
-        dollar-neutral portfolio is constructed by longing decile 10 and shorting decile 1 and holding the portfolio
-        for the next one month.
+        return divergence from its pairs portfolio created in the formation period. Then a long-short portfolio is
+        constructed with top p % of the stocks are “long stocks” and bottom q % of stocks are “short stocks”.
 
-        By repeating steps above for the rest of the test period, this method calculates the average return of the
-        portfolio for each month of the period.
+        If the test data is not given in this method, it automatically results in signals from the last month of the
+        training data.
 
         :param test_data: (pd.DataFrame) Daily price data with date in its index and stocks in its columns.
         :param test_risk_free: (pd.Series or float) Daily risk free rate data as a series or a float number.
+        :param long_pct: (float) Percentage of long stocks in the sorted return divergence.
+        :param short_pct: (float) Percentage of short stocks in the sorted return divergence.
         """
+        # Set long and short percentage when trading
+        self.long_pct, self.short_pct = long_pct, short_pct
 
         if test_data is None:
             self.trading_signal = self._find_trading_signals(self.last_month, single_period=True)
@@ -340,6 +338,7 @@ class PearsonStrategy:
 
     def _calculate_return_diff(self, last_month):
         """
+        Calculate return divergence of the stocks based on the beta calculated in the formation period.
 
         :param last_month: (pd.Series) A series of monthly return to calculate the return divergence.
         :return: (dict) A dictionary with stocks with its key and return divergence in its values.
