@@ -6,7 +6,7 @@
 This module implements interactive Tear Sheets for various modules of the ArbitrageLab package.
 """
 # pylint: disable=too-many-lines, too-many-locals, invalid-name, unused-argument
-# pylint: disable=too-many-arguments, too-many-statements, unused-variable
+# pylint: disable=too-many-arguments, too-many-statements, unused-variable, broad-except
 
 import warnings
 
@@ -1677,7 +1677,7 @@ class TearSheet:
         @app.callback(Output('container-button', 'children'),
                       Input('button-1', 'n_clicks'),
                       Input('button-2', 'n_clicks'))
-        def displayclick(btn1, btn2):
+        def displayclick(btn1, btn2):  # pragma: no cover
             """
             Returns the Engle-Granger analysis div depending on what asset combination was chosen by pressing
             a respective button.
@@ -1745,7 +1745,7 @@ class TearSheet:
         @app.callback(Output('johansen_container', 'children'),
                       Input('button-3', 'n_clicks'),
                       Input('button-4', 'n_clicks'))
-        def displayClick(btn1, btn2):
+        def displayClick(btn1, btn2):  # pragma: no cover
             """
             Returns the Johansen cointegrated portfolio div depending on what cointegration vector was chosen by
             pressing the respective button.
@@ -2687,7 +2687,7 @@ class TearSheet:
 
         @app.callback(Output('pair-container-button', 'children'), Input('button-1', 'n_clicks'),
                       Input('button-2', 'n_clicks'))
-        def displayclick(btn1, btn2):
+        def displayclick(btn1, btn2):  # pragma: no cover
             """
             Returns the OU model analysis div depending on what asset combination was chosen by pressing
             a respective button.
@@ -2736,7 +2736,7 @@ class TearSheet:
                       Input(component_id='discount-rate', component_property='value'),
                       Input(component_id='transaction-cost', component_property='value'),
                       Input(component_id='stop-loss', component_property='value'))
-        def display(btn1, btn2, discount_rate, transaction_cost, stop_loss):
+        def display(btn1, btn2, discount_rate, transaction_cost, stop_loss):  # pragma: no cover
             """
             Returns the OU model analysis div depending on what asset combination was chosen by pressing
             a respective button.
