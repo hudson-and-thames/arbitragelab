@@ -48,7 +48,7 @@ class TestPearsonStrategy(unittest.TestCase):
         strategy_corr_weight = PearsonStrategy()
 
         # Performing the portfolio formation step
-        strategy_basic.form_portfolio(self.train_data, long_pct=0.05, short_pct=0.05)
+        strategy_basic.form_portfolio(self.train_data)
         strategy_risk_free.form_portfolio(self.train_data, self.risk_free_train)
         strategy_corr_weight.form_portfolio(self.train_data, weight="correlation")
 
@@ -56,10 +56,6 @@ class TestPearsonStrategy(unittest.TestCase):
         self.assertAlmostEqual(strategy_basic.last_month.mean(), 1.017491, delta=1e-5)
         self.assertAlmostEqual(strategy_risk_free.last_month.mean(), 1.017491, delta=1e-5)
         self.assertAlmostEqual(strategy_corr_weight.last_month.mean(), 1.017491, delta=1e-5)
-
-        # Testing the long and short percentage for the strategy_basic
-        self.assertEqual(strategy_basic.long_pct, 0.05)
-        self.assertEqual(strategy_basic.short_pct, 0.05)
 
         # Testing the monthly return for the formation period
         self.assertAlmostEqual(strategy_basic.monthly_return.mean().mean(), 0.999993, delta=1e-5)
@@ -98,7 +94,11 @@ class TestPearsonStrategy(unittest.TestCase):
 
         # Generating trading signal
         strategy_no_test.trade_portfolio()
-        strategy_test.trade_portfolio(self.test_data, self.risk_free_test)
+        strategy_test.trade_portfolio(self.test_data, self.risk_free_test, long_pct=0.1, short_pct=0.1)
+
+        # Testing the long and short percentage for the strategy_basic
+        self.assertEqual(strategy_test.long_pct, 0.1)
+        self.assertEqual(strategy_test.short_pct, 0.1)
 
         # Testing trading signals
         self.assertAlmostEqual(strategy_no_test.trading_signal.mean(), -0.043478, delta=1e-5)
