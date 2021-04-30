@@ -48,7 +48,7 @@ class TestPearsonStrategy(unittest.TestCase):
         strategy_corr_weight = PearsonStrategy()
 
         # Performing the portfolio formation step
-        strategy_basic.form_portfolio(self.train_data, long_pct=0.05, short_pct=0.05)
+        strategy_basic.form_portfolio(self.train_data)
         strategy_risk_free.form_portfolio(self.train_data, self.risk_free_train)
         strategy_corr_weight.form_portfolio(self.train_data, weight="correlation")
 
@@ -56,10 +56,6 @@ class TestPearsonStrategy(unittest.TestCase):
         self.assertAlmostEqual(strategy_basic.last_month.mean(), 1.017491, delta=1e-5)
         self.assertAlmostEqual(strategy_risk_free.last_month.mean(), 1.017491, delta=1e-5)
         self.assertAlmostEqual(strategy_corr_weight.last_month.mean(), 1.017491, delta=1e-5)
-
-        # Testing the long and short percentage for the strategy_basic
-        self.assertEqual(strategy_basic.long_pct, 0.05)
-        self.assertEqual(strategy_basic.short_pct, 0.05)
 
         # Testing the monthly return for the formation period
         self.assertAlmostEqual(strategy_basic.monthly_return.mean().mean(), 0.999993, delta=1e-5)
@@ -85,7 +81,7 @@ class TestPearsonStrategy(unittest.TestCase):
 
     def test_trade_portfolio(self):
         """
-        Tests the generation of trading signals in the test phase
+        Tests the generation of trading signals in the test phase.
         """
 
         # Basic Strategy
@@ -98,7 +94,11 @@ class TestPearsonStrategy(unittest.TestCase):
 
         # Generating trading signal
         strategy_no_test.trade_portfolio()
-        strategy_test.trade_portfolio(self.test_data, self.risk_free_test)
+        strategy_test.trade_portfolio(self.test_data, self.risk_free_test, long_pct=0.05, short_pct=0.05)
+
+        # Testing the long and short percentage for the strategy_basic
+        self.assertEqual(strategy_test.long_pct, 0.05)
+        self.assertEqual(strategy_test.short_pct, 0.05)
 
         # Testing trading signals
         self.assertAlmostEqual(strategy_no_test.trading_signal.mean(), -0.043478, delta=1e-5)
@@ -109,6 +109,9 @@ class TestPearsonStrategy(unittest.TestCase):
         self.assertAlmostEqual(strategy_test.risk_free.mean().mean(), 0.01, delta=1e-5)
 
     def test_get_trading_signal(self):
+        """
+        Tests the getter method for trading signal.
+        """
 
         strategy = PearsonStrategy()
 
@@ -119,6 +122,9 @@ class TestPearsonStrategy(unittest.TestCase):
         pd.testing.assert_frame_equal(strategy.trading_signal, strategy.get_trading_signal())
 
     def test_get_beta_dict(self):
+        """
+        Tests the getter method for beta dict.
+        """
 
         strategy = PearsonStrategy()
 
@@ -127,6 +133,9 @@ class TestPearsonStrategy(unittest.TestCase):
         self.assertAlmostEqual(sum(strategy.get_beta_dict().values()), sum(strategy.beta_dict.values()), delta=1e-5)
 
     def test_get_pairs_dict(self):
+        """
+        Tests the getter method for pairs dict.
+        """
 
         strategy = PearsonStrategy()
 
