@@ -1,5 +1,5 @@
 .. image:: _static/logo_black.png
-   :scale: 15 %
+   :scale: 50 %
    :align: center
    :target: https://hudsonthames.org/
 

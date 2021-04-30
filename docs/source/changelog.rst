@@ -12,6 +12,9 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+* :support:`50` Updated documentation theme to hudsonthames-sphinx-docs.
+
+* :release:`0.4.10 <2021-04-15>`
 * :feature:`43` OU Model Jurek and OU Model Mudchanatongsuk added to the Stochastic Control Approach Module.
 * :support:`43` OU Model Jurek and OU Model Mudchanatongsuk documentation.
 * :feature:`44` CVine Copula and CVine Copula Strategy added to the Copula Approach Module.
@@ -20,6 +23,8 @@ Changelog
 * :support:`42` Updated Basic Distance Strategy documentation.
 * :feature:`40` Vine Copula Partner Selection Approaches added to the Copula Approach Module.
 * :support:`40` Vine Copula Partner Selection Approaches documentation.
+
+* :release:`0.3.1 <2021-02-19>`
 * :support:`38` Removed TensorFlow from requirements and adjusted installation guide.
 
 * :release:`0.3.0 <2021-02-16>`

@@ -22,7 +22,7 @@ copyright = '2019, Hudson & Thames Quantitative Research.'
 author = 'Hudson & Thames Quantitative Research'
 
 # The full version, including alpha/beta/rc tags
-release = '0.3.0'
+release = '0.4.0'
 
 
 # -- General configuration ---------------------------------------------------
@@ -55,7 +55,7 @@ exclude_patterns = []
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinx_rtd_theme'
+html_theme = 'hudsonthames_sphinx_theme'
 add_module_names = False
 
 # Theme options are theme-specific and customize the look and feel of a theme
