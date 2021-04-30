@@ -54,7 +54,7 @@ class OptimalConvergence:
         self.sigma_m = None
 
 
-    def fit(self, prices: pd.DataFrame, mu_m, sigma_m, r, delta_t: float = 1 / 252, adf_test: bool = False, significance_level: float = 0.95):
+    def fit(self, prices: pd.DataFrame, mu_m: float, sigma_m: float, r: float, delta_t: float = 1 / 252):
         """
         This method estimates the error-correction terms(lambda) using the inputted pricing data.
 
@@ -63,9 +63,6 @@ class OptimalConvergence:
         :param mu_m:
         :param prices: (pd.DataFrame) Contains price series of both stocks in spread.
         :param delta_t: (float) Time difference between each index of data, calculated in years.
-        :param adf_test: (bool) Flag which defines whether the adf statistic test should be conducted.
-        :param significance_level: (float) This significance level is used in the ADF statistic test.
-            Value can be one of the following: (0.90, 0.95, 0.99).
         """
 
         # Setting instance attributes
@@ -145,19 +142,45 @@ class OptimalConvergence:
         # # TODO : Is using EG test correct here for estimating lambda's.
 
 
-    def unconstrained_portfolio_weights_continuous(self, prices, gamma):
+    def describe(self) -> pd.Series:
+        """
+        Method returns values of instance attributes calculated from training data.
+
+        :return: (pd.Series) series describing parameter values.
+        """
+
+        if self.lambda_1 is None:
+            raise Exception("Please run the fit method before calling describe.")
+
+        # List defines the indexes of the final pandas object
+        index = ['Ticker of first stock', 'Ticker of second stock',
+                 'lambda_1', 'lambda_2', 'b_squared', 'sigma_squared',
+                 'beta']
+
+        # List defines the values of the final pandas object
+        data = [self.ticker_A, self.ticker_B,
+                self.lambda_1, self.lambda_2, self.b_squared, self.sigma_squared,
+                self.beta]
+
+        # Combine data and indexes into the pandas Series
+        output = pd.Series(data=data, index=index)
+
+        return output
+
+
+    def unconstrained_portfolio_weights_continuous(self, prices: pd.DataFrame, gamma: float = 4) -> tuple:
         """
         Implementation of Proposition 1.
 
         This method calculates the portfolio weights for the market asset and for both the stocks in the spread
-        when there are no constraints put of values of lambda.
+        when there are no constraints put on values of lambda.
         We also assume a continuing cointegrated price process (recurring arbitrage opportunities),
         which gives closed-form solutions for the optimal portfolio weights.
 
         If lambda_1 = lambda_2, from the portfolio weights outputted from this method phi_2 + phi_1 = 0,
         which implies delta neutrality. This follows Proposition 3 in the paper.
 
-        :param gamma:
+        :param gamma: (float) signifies investor's attitude towards risk.
         :param prices: (pd.DataFrame) Contains price series of both stocks in spread.
         :return:
         """
@@ -192,7 +215,7 @@ class OptimalConvergence:
         return phi_1, phi_2, phi_m
 
 
-    def delta_neutral_portfolio_weights_continuous(self, prices, gamma):
+    def delta_neutral_portfolio_weights_continuous(self, prices: pd.DataFrame, gamma: float = 4) -> tuple:
         """
         Implementation of Proposition 2.
 
@@ -201,7 +224,7 @@ class OptimalConvergence:
         in the spread is zero. We also assume a continuing cointegrated price process (recurring arbitrage opportunities),
         which gives closed-form solutions for the optimal portfolio weights.
 
-        :param gamma:
+        :param gamma: (float) signifies investor's attitude towards risk.
         :param prices: (pd.DataFrame) Contains price series of both stocks in spread.
         :return:
         """
@@ -224,14 +247,14 @@ class OptimalConvergence:
         return phi_1, phi_2, phi_m
 
 
-    def wealth_gain_continuous(self, prices, gamma):
+    def wealth_gain_continuous(self, prices: pd.DataFrame, gamma: float = 4) -> np.array:
         """
         Implementation of Proposition 4.
 
         This method calculates the expected wealth gain of the unconstrained optimal strategy relative to the
         delta neutral strategy assuming a mis-pricing of the spread.
 
-        :param gamma:
+        :param gamma: (float) signifies investor's attitude towards risk.
         :param prices: (pd.DataFrame) Contains price series of both stocks in spread.
         :return:
         """
@@ -257,7 +280,7 @@ class OptimalConvergence:
         pass
 
 
-    def _x_tau_calc(self, prices):
+    def _x_tau_calc(self, prices: pd.DataFrame) -> tuple:
         """
         Calculates the error correction term x given in equation (4) and the time remaining in years.
 
@@ -274,7 +297,7 @@ class OptimalConvergence:
         return x, tau
 
 
-    def _lambda_x_calc(self):
+    def _lambda_x_calc(self) -> float:
         """
         Helper function calculates lambda_x.
 
@@ -285,7 +308,7 @@ class OptimalConvergence:
         return lambda_x
 
 
-    def _xi_calc(self):
+    def _xi_calc(self) -> tuple:
         """
         Helper function which calculates xi, present in Appendix A.1.
         Xi is used in the calculations of A and C functions.
@@ -304,7 +327,7 @@ class OptimalConvergence:
         return xi, lambda_x
 
 
-    def _C_calc(self, tau):
+    def _C_calc(self, tau: np.array) -> np.array:
         """
         Implementation of function C given in Appendix A.1.
 
@@ -324,7 +347,7 @@ class OptimalConvergence:
         return C
 
 
-    def _D_calc(self, tau):
+    def _D_calc(self, tau: np.array) -> np.array:
         """
         Implementation of function D given in Appendix A.2.
 
@@ -345,7 +368,7 @@ class OptimalConvergence:
         return D
 
 
-    def _A_calc(self, tau):
+    def _A_calc(self, tau: np.array) -> np.array:
         """
         Implementation of function A given in Appendix A.1.
 
@@ -360,7 +383,7 @@ class OptimalConvergence:
         return A
 
 
-    def _B_calc(self, tau):
+    def _B_calc(self, tau: np.array) -> np.array:
         """
         Implementation of function B given in Appendix A.2.
 
@@ -376,7 +399,7 @@ class OptimalConvergence:
         return B
 
 
-    def _A_B_helper(self, lambda_x, tau, rep_term):
+    def _A_B_helper(self, lambda_x: float, tau: np.array, rep_term: float) -> np.array:
         """
         Helper function implements the common formulae present in A and B function calculations.
 
@@ -398,7 +421,7 @@ class OptimalConvergence:
         return result
 
 
-    def _u_func_continuous_calc(self, x, tau):
+    def _u_func_continuous_calc(self, x: np.array, tau: np.array) -> np.array:
         """
         Implementation of Lemma 1.
 
@@ -415,7 +438,7 @@ class OptimalConvergence:
         return u
 
 
-    def _v_func_continuous_calc(self, x, tau):
+    def _v_func_continuous_calc(self, x: np.array, tau: np.array) -> np.array:
         """
         Implementation of Lemma 2.
 

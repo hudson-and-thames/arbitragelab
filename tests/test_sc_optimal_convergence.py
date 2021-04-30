@@ -43,15 +43,55 @@ class TestOptimalConvergence(unittest.TestCase):
         data.index = pd.to_datetime(data.index, format="%d/%m/%Y")
         cls.shell_rdp_data = data
 
+
+    def test_fit(self):
+        """
+        Tests the fit method in the class.
+        """
+
+        # Creating an object of the class
+        pass
+
+
+    def test_describe(self):
+        """
+        Tests the describe method in the class.
+        """
+
+        # Creating an object of the class
+        oc = OptimalConvergence()
+
+        # Testing for the run fit before this method exception
+        with self.assertRaises(Exception):
+            oc.describe()
+
+        oc.fit(self.dataframe, mu_m=0.05, sigma_m=0.35, r=0.02)
+
+        index = ['Ticker of first stock', 'Ticker of second stock',
+                 'lambda_1', 'lambda_2', 'b_squared', 'sigma_squared',
+                 'beta']
+
+        data = ['GLD', 'GDX', 0, 0, 0, 0, 0]
+
+        # Testing the output of describe method
+        pd.testing.assert_series_equal(pd.Series(index=index,data=data), oc.describe(), check_exact=False, atol=1e-3)
+
+
     def test_unconstrained_continuous(self):
 
         oc = OptimalConvergence()
-        oc.fit(self.dataframe)
+        oc.fit(self.dataframe, mu_m=0.05, sigma_m=0.35, r=0.02)
 
-        oc.b_squared = 0.3 ** 2
-        oc.sigma_squared = 0.15 ** 2
-        oc.beta = 0.5
+        phi_1, phi_2, phi_m = oc.unconstrained_portfolio_weights_continuous(self.dataframe, gamma=4)
 
-        phi_1, phi_2, phi_m = oc.unconstrained_portfolio_weights_continuous(self.dataframe, mu_m=0.05, sigma_m=0.35, gamma=4, r=0.02)
+        print(phi_m)
+
+
+    def test_delta_neutral_continuous(self):
+
+        oc = OptimalConvergence()
+        oc.fit(self.dataframe, mu_m=0.05, sigma_m=0.35, r=0.02)
+
+        phi_1, phi_2, phi_m = oc.delta_neutral_portfolio_weights_continuous(self.dataframe, gamma=4)
 
         print(phi_m)
