@@ -63,6 +63,13 @@ This project is licensed under an all rights reserved licence.
 
 .. toctree::
     :maxdepth: 2
+    :caption: Visualization
+    :hidden:
+
+    tearsheet/tearsheet
+
+.. toctree::
+    :maxdepth: 2
     :caption: Distance Approach
     :hidden:
 
@@ -157,14 +164,6 @@ This project is licensed under an all rights reserved licence.
     ml_approach/threshold_ar
     ml_approach/neural_networks
     ml_approach/filters
-
-.. toctree::
-    :maxdepth: 2
-    :caption: Visualization
-    :hidden:
-
-    tearsheet/tearsheet
-
 
 .. toctree::
     :maxdepth: 3
