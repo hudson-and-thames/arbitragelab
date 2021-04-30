@@ -17,7 +17,7 @@ Pearson Approach
 After the distance approach was introduced in the paper by Gatev et al. (2006), a lot of research has been
 conducted to further develop the original distance approach. One of the adjustments is the Pearson correlation
 approach proposed by Chen et al.(2012). In this paper, the authors use the same data set and time frame as
-in the work by Gatev et al.(2006) but they used Pearson correlation on return level for forming pairs.
+in the work by Gatev et al.(2006), but they used Pearson correlation on return level for forming pairs.
 In the formation period(5 years in the paper), pairwise return correlations for all pairs in the universe
 are calculated based on monthly return data. Then the authors construct a new variable, Return Divergence
 (:math:`D_{i j t}`), to capture the return divergence between a single stock’s return and its pairs-portfolio returns:
@@ -28,13 +28,13 @@ are calculated based on monthly return data. Then the authors construct a new va
 
 
 where :math:`\beta` denotes the regression coefficient of stock's monthly return :math:`R_{i t}` on its
-pairs-portfolio return :math:`R_{j t}`, and :math:`R_{f}` is the risk-free rate
+pairs-portfolio return :math:`R_{j t}`, and :math:`R_{f}` is the risk-free rate.
 
 The hypothesis in this approach is that if a stock’s return deviates from its pairs portfolio returns more
 than usual, this divergence is expected to be reversed in the next month. And the returns of this stock are
 expected to be abnormally high/low in comparison to other stocks.
 
-Therefore, after calculating the return divergence of all the stocks,  a long-short portfolio is constructed
+Therefore, after calculating the return divergence of all the stocks, a long-short portfolio is constructed
 based on the long and short ratio given by the user.
 
 
@@ -79,7 +79,7 @@ and one of its pairs.
 After pairs portfolio returns are calculated, the method derives beta from the monthly return of the stock and
 its pairs portfolio. By using linear regression, setting stock return as independent variable and pairs portfolio
 return as the dependent variable, the methods set beta as a regression coefficient. Then the beta is stored in a
-dictionary for future uses in trading. Below is a figure showing two stocks with high beta(ENPH) and low beta(RE).
+dictionary for future uses in trading. Below is a figure showing two stocks with high beta (`ENPH`) and low beta (`RE`).
 
 .. figure:: images/pearson_approach_beta_stocks.png
     :scale: 100 %
@@ -95,18 +95,20 @@ Implementation
 
 .. automethod:: PearsonStrategy.form_portfolio
 
+
 Trading Signal Generation
 #########################
+
 After calculating the betas for all of the stocks in the formation period, the next step is to generate trading
 signals by calculating the return divergence for each of the stocks. In this method, test data is not necessarily
-required if only a trading signal for the last month of formation period is needed. However, if one wants to
+required if only a trading signal for the last month of the formation period is needed. However, if one wants to
 see the backtesting results of the method and test with test data, a successive dataset after the formation period
 is required to generate the proper trading signals. The steps are as follows:
 
 1. **Data Preprocessing**
 
 The same data preprocessing is done with the formation period as the data needs to be in the same format. As in
-the formation period, risk free rate can be given in the form of either a float number of a series of data.
+the formation period, the risk-free rate can be given in the form of either a float number or a series of data.
 
 2. **Calculating the Return Divergence**
 
@@ -199,7 +201,7 @@ Code Example
 Research Notebooks
 ******************
 
-The following research notebook can be used to better understand the pearson approach described above.
+The following research notebook can be used to better understand the Pearson approach described above.
 
 * `Pearson Distance Approach`_
 
@@ -208,6 +210,6 @@ The following research notebook can be used to better understand the pearson app
 References
 ##########
 
-* `Empirical investigation of an equity pairs trading strategy <http://www.pbcsf.tsinghua.edu.cn/research/chenzhuo/paper/Empirical%20Investigation%20of%20an%20Equity%20Pairs%20Trading%20Strategy.pdf>`_
-* `Evaluation of pairs-trading strategy at the Brazilian financial market <https://link.springer.com/article/10.1057/jdhf.2009.4>`_
-* `Statistical arbitrage pairs trading strategies: Review and outlook <https://www.econstor.eu/bitstream/10419/116783/1/833997289.pdf>`_
+* `Chen, H., Chen, S., Chen, Z. and Li, F., 2019. Empirical investigation of an equity pairs trading strategy. Management Science, 65(1), pp.370-389. <http://www.pbcsf.tsinghua.edu.cn/research/chenzhuo/paper/Empirical%20Investigation%20of%20an%20Equity%20Pairs%20Trading%20Strategy.pdf>`_
+* `Perlin, M.S., 2009. Evaluation of pairs-trading strategy at the Brazilian financial market. Journal of Derivatives & Hedge Funds, 15(2), pp.122-136. <https://link.springer.com/article/10.1057/jdhf.2009.4>`_
+* `Krauss, C., 2017. Statistical arbitrage pairs trading strategies: Review and outlook. Journal of Economic Surveys, 31(2), pp.513-545. <https://www.econstor.eu/bitstream/10419/116783/1/833997289.pdf>`_
