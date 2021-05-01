@@ -11,7 +11,7 @@
 C-vine Copula Strategy
 ======================
 
-With the power of vine copula, we are able to model the relation among several random variables. Speficifally
+With the power of vine copula, we are able to model the relation among several random variables. Specifically
 we aim to trade based on the information generated from the vine copula model.
 Similar to traditional bivariate approaches, we use the conditional (cumulative) probability to gauge whether
 the target stock is underpriced or overpriced against other stocks, and generate trading signal based on them
@@ -82,7 +82,7 @@ We work with stocks' **daily returns data** exclusively.
     For more details in implementation, please refer to :ref:`Vine Copula Partner Selection<copula_approach-partner_selection>`.
     
 
-Suppose we have chosen a few cohorts and in each cohort it has a key stock element. We then need to turn the translate
+Suppose we have chosen a few cohorts and in each cohort it has a key stock element. We then need to translate the
 the stocks' returns data into its quantiles (pseudo-observations) using empirical CDFs (ECDFs).
 We denote the pseudo-observations as :math:`u_i`'s, and they are all uniform in :math:`[0, 1]`.
 
@@ -155,10 +155,10 @@ Step 3: Probability Density
 ***************************
 
 We aim to calculate :math:`f(u_1, u_2, u_3, u_4)`.
-This is straightforward once we fit the C-vine to training data. Now we are working on the trading priod data. At first
+This is straightforward once we fit the C-vine to training data. Now we are working on the trading period data. At first
 we should map them into quantiles using the ECDFs trained in the training period. Then we can calculate directly the probability
 density for pseudo-observations, say :math:`(u_1, u_2, u_3, u_4)`, by calculating every node at every level of the tree.
-Note that each node constitues a probability density, either marginal density (top of the tree) or the copula density (not
+Note that each node constitutes a probability density, either marginal density (top of the tree) or the copula density (not
 top of the tree). And the final probability density is their product.
 
 .. figure:: images/workflow_vinecop_density.png
@@ -256,16 +256,16 @@ Comments
 
 Vine copula provides a very flexible approach in modeling multi-variate dependencies. The C-vine structure specifically
 highlights a dominant component at every level of the tree, ideal for our "1-vs-the rest" trading strategy for capturing
-statistical arbitrage among multiple stocks, which non-quant strategies often omit or are still primative.
+statistical arbitrage among multiple stocks, which non-quant strategies often omit or are still primitive.
 
 As promising as it looks, just like any other methods it inevitably bears the some drawbacks:
 
     1. High start-up cost: to understand this method, the user needs to understand copula modeling from scratch, and
-       also how to interprete vine copula models from end to end.
+       also how to interpret vine copula models from end to end.
 
     2. High computation cost: For a cohort of 4 stocks and 3 years of daily training data + 1 year of test data, it takes about
        30 seconds to fit and generate positions. This can hardly be optimized further since the fitting algorithm is already
-       written in an optimized C++ library. And the compuation time should scale up in :math:`O(N!)`. This is just for fitting and
+       written in an optimized C++ library. And the computation time should scale up in :math:`O(N!)`. This is just for fitting and
        generating positions without factoring into the time for stocks selection.
        
     3. Interpretability: Since the exact fitting algorithms are quite complicated, the interpretability may suffer in
