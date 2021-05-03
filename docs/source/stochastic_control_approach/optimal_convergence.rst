@@ -109,15 +109,20 @@ where,
     \end{array}
 
 
+In this paper, the authors considered two cases for both the unconstrained and constrained(delta neutral) portfolios.
+The first case deals with recurring arbitrage oppurtunities, the price differential, :math:`x_t` , only spends an
+infinitesimally small time at zero, is characterized at all times by the dynamics in the above equation and so follows
+a stationary process.
+In the second case (“nonrecurring arbitrage opportunities”),
+any price difference is temporary and gets permanently eliminated the first time
+the two prices converge and :math:`x_t = 0`. In this case, the price dynamics is subject
+to the additional restriction that :math:`x_{\tau + \delta} = 0` for all :math:`\delta ≥ 0`, where :math:`\tau = min(t : x_t = 0)`
+is a stopping time. In this case, prices remain identical after they converge.The optimal portfolio weights are different for these cases.
 
 
 
 
-
-
-
-
-
+In the absence of intermediate consumption, the investor’s wealth, :math:`W_t` , evolves according to the process,
 
 .. math::
 
@@ -128,10 +133,25 @@ where,
     &\left.+\phi_{2 t}\left(\sigma d Z_{t}+b d Z_{2 t}+\lambda_{2} x_{t} d t\right)\right) .
     \end{aligned}
 
+We assume that the investor maximizes the expected value of a power utility
+function defined over terminal wealth, :math:`W_T`. The investor’s value function is given by
+
 .. math::
 
     J(t, x, W)=\frac{1}{1-\gamma} \mathrm{E}_{t}\left[W_{T}^{*(1-\gamma)}\right]
 
+where :math:`W^{*}_T` is the wealth at time :math:`T` obtained by the optimal trading strategy with
+:math:`W_t = W` and :math:`x_t = x` at time :math:`t`.
+
+
+Unconstrained Optimal Investment Strategies
+*******************************************
+
+For the continuing cointegrated price process (recurring arbitrage opportunities), we get a closed-form solutions
+for the optimal portfolio weights.
+
+The optimal weights on the market portfolio, :math:`\phi_{m t}^{*}` , and the individual assets,
+:math:`(\phi_{1 t}^{*}, \phi_{2 t}^{*})`, are given by
 
 .. math::
 
@@ -150,12 +170,32 @@ where,
     \end{array}
 
 
+STOPPED COINTEGRATED PROCESS
+
+
+ADD THINGS HERE.
+
+Optimal Delta Neutral Strategy
+******************************
+
+In the model considered in the paper, where the two stocks are assumed to have identical market betas,
+delta neutrality directly translates into the constraint :math:`\phi_{1t} = −\phi_{2t}`.
+
+
+ADD THINGS HERE.
+
+
+For the continuing cointegrated price process (recurring arbitrage opportunities), we get a closed-form solutions.
+
 .. math::
 
     \begin{array}{l}
     \check{\phi}_{m t}^{*}=\frac{\mu_{m}}{\gamma \sigma_{m}^{2}}, \\
     \check{\phi}_{1 t}^{*}=\frac{-\left(\lambda_{1}+\lambda_{2}\right) \ln \left(\frac{P_{1 t}}{P_{2 t}}\right)+2 b^{2} D(t) \ln \left(\frac{P_{1 t}}{P_{2 t}}\right)}{2 \gamma b^{2}}
     \end{array}
+
+.. note::
+    The optimal strategy is delta neutral if :math:`\lambda_1 = \lambda_2`.
 
 
 Implementation
