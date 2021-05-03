@@ -14,7 +14,8 @@ Introduction
 ############
 
 Convergence trades resemble the standard long-short arbitrage strategy
-popular in industry and assumed in academic studies. Conventionally, such strategies take positions of equal size but opposite signs
+popular in industry and assumed in academic studies. Conventionally,
+such strategies take positions of equal size but opposite signs
 either in portfolio weight or in number of shares. This seems intuitively
 reasonable and ensures that future liabilities offset. However, such strategies
 will typically not be optimal.
@@ -40,6 +41,121 @@ boundary conditions when solving for the optimal portfolio weights.
 
 Modelling
 #########
+
+In the paper, the authors assume that there is a riskless asset that pays a constant rate of return, :math:`r`. A
+risky asset trading at the price :math:`P_{mt}` represents the market index. This follows a
+geometric random walk process,
+
+.. math::
+    \frac{d P_{m t}}{P_{m l}}=\left(r+\mu_{m}\right) d t+\sigma_{m} d B_{t}
+
+where the market risk premium, :math:`\mu_{m}`, and market volatility, \sigma_{m}`, are both constant,
+and :math:`B_t` is a standard Brownian motion.
+
+
+In addition to the risk-free asset and the market index, the authors assume the presence
+of two risky assets whose prices :math:`P_{it}, i = 1,2`, evolve according to the equations
+
+.. math::
+    \begin{array}{l}
+    \frac{d P_{1 t}}{P_{1 t}}=\left(r+\beta \mu_{m}\right) d t+\beta \sigma_{m} d B_{t}+\sigma d Z_{t}+b d Z_{1 t}-\lambda_{1} x_{1} d t \\
+    \frac{d P_{2 t}}{P_{2 t}}=\left(r+\beta \mu_{m}\right) d t+\beta \sigma_{m} d B_{t}+\sigma d Z_{t}+b d Z_{2 t}+\lambda_{2} x_{t} d t
+    \end{array}
+
+where :math:`\lambda_1`, :math:`\lambda_2`, :math:`\beta`, :math:`b`, and :math:`\sigma` are constant parameters. :math:`Z_t` and :math:`Z_{it}` are standard
+Brownian motions, and :math:`B_t` , :math:`Z_t` , and :math:`Z_{it}` are all mutually independent for :math:`i = 1,2`.
+
+In the above equations, :math:`\beta \sigma_m d B_t` represents exposure to the market risk,
+whereas :math:`\sigma d Z_{t}+b d Z_{t}` represents idiosyncratic risks. It is standard to assume
+that idiosyncratic risks are independent across different stocks with the market
+risk representing the only source of correlation among different assets.
+
+
+:math:`x_t` represents pricing errors in our model and is the difference between the
+logarithms of the two asset prices, :math:`p_{it} = \ln P_{it}` ,
+
+.. math::
+    x_t = p_{1t} − p_{2t} =\ln\bigg(\frac{P_{1t}}{P_{2t}}\bigg)
+
+The authors make a key assumption here, that :math:`\lambda_1 + \lambda_2 > 0`. This implies that :math:`x_t` is stationary
+and the logarithms of the prices are cointegrated with cointegrating vector :math:`(1,−1)`.
+
+The cointegration setup captures the feature that two assets with identical
+payoffs can trade at different prices. Examples include pairs of stocks that have
+the same claim to dividends and identical voting rights but are traded in different
+markets and two stocks with the same payoffs, such as the target and acquirer
+stocks in a merger.
+
+:math:`−\lambda_1 x_t` and :math:`−\lambda_2 x_t` capture the absolute mispricing of each asset relative to CAPM.
+For further information regarding the utility of :math:`\lambda`'s, interested readers can refer Section 1.1 in the paper.
+
+Cointegration and relative mispricing
+*************************************
+
+:math:`x_t` represents the relative mispricing between both assets. This is considered stationary and the dynamics of this term
+is given by,
+
+.. math::
+    d x_{t}=-\lambda_{x} x_{t} d t+b_{x} d Z_{x t}
+
+where,
+
+.. math::
+
+    \begin{array}{c}
+    \lambda_{x}=\lambda_{1}+\lambda_{2}, \\
+    b_{x} d Z_{x t}=b d Z_{1 t}-b d Z_{2 t}, \\
+    b_x = \sqrt 2 b
+    \end{array}
+
+
+
+
+
+
+
+
+
+
+
+
+.. math::
+
+    \begin{aligned}
+    d W_{t}=& W_{t}\left(r d t+\phi_{m t}\left(\frac{d P_{m t}}{P_{m t}}-r d t\right)+\phi_{1 t}\left(\frac{d P_{1 t}}{P_{1 t}}-r d t\right)+\phi_{2 t}\left(\frac{d P_{2 t}}{P_{2 t}}-r d t\right)\right) \\
+    =& W_{t}\left(r d t+\left(\phi_{m t}+\beta\left(\phi_{1 t}+\phi_{2 t}\right)\right)\left(\mu_{m} d t+\sigma_{m} d B_{t}\right)\right.\\
+    &+\phi_{1 t}\left(\sigma d Z_{t}+b d Z_{1 t}-\lambda_{1} x_{t} d t\right) \\
+    &\left.+\phi_{2 t}\left(\sigma d Z_{t}+b d Z_{2 t}+\lambda_{2} x_{t} d t\right)\right) .
+    \end{aligned}
+
+.. math::
+
+    J(t, x, W)=\frac{1}{1-\gamma} \mathrm{E}_{t}\left[W_{T}^{*(1-\gamma)}\right]
+
+
+.. math::
+
+    \begin{array}{c}
+    \phi_{m t}^{*}=\frac{\mu_{m}}{\gamma \sigma_{m}^{2}}-\left(\phi_{1 t}^{*}+\phi_{2 t}^{*}\right) \beta \\
+    \left(\begin{array}{c}
+    \phi_{1 t}^{*} \\
+    \phi_{2 t}^{*}
+    \end{array}\right)=\frac{1}{\gamma\left(2 \sigma^{2}+b^{2}\right) b^{2}}\left(\begin{array}{cc}
+    \sigma^{2}+b^{2} & -\sigma^{2} \\
+    -\sigma^{2} & \sigma^{2}+b^{2}
+    \end{array}\right)\left(\begin{array}{c}
+    -\lambda_{1}+b^{2} C(t) \\
+    \lambda_{2}-b^{2} C(t)
+    \end{array}\right) \ln \left(\frac{P_{1 t}}{P_{2 t}}\right)
+    \end{array}
+
+
+.. math::
+
+    \begin{array}{l}
+    \check{\phi}_{m t}^{*}=\frac{\mu_{m}}{\gamma \sigma_{m}^{2}}, \\
+    \check{\phi}_{1 t}^{*}=\frac{-\left(\lambda_{1}+\lambda_{2}\right) \ln \left(\frac{P_{1 t}}{P_{2 t}}\right)+2 b^{2} D(t) \ln \left(\frac{P_{1 t}}{P_{2 t}}\right)}{2 \gamma b^{2}}
+    \end{array}
 
 
 Implementation
