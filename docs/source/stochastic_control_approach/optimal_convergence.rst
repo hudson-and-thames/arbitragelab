@@ -180,9 +180,10 @@ Optimal Delta Neutral Strategy
 
 In the model considered in the paper, where the two stocks are assumed to have identical market betas,
 delta neutrality directly translates into the constraint :math:`\phi_{1t} = −\phi_{2t}`.
-
-
-ADD THINGS HERE.
+The authors suggest that the best way to achieve a delta neutral position
+is to use the market index to hedge away the market exposure in the mispriced
+assets. Using mispriced assets alone to achieve delta neutrality will necessarily
+underexploit opportunities offered by mispricing in the individual stocks.
 
 
 For the continuing cointegrated price process (recurring arbitrage opportunities), we get a closed-form solutions.
@@ -198,8 +199,12 @@ For the continuing cointegrated price process (recurring arbitrage opportunities
     The optimal strategy is delta neutral if :math:`\lambda_1 = \lambda_2`.
 
 
-Implementation
-##############
+How to use this submodule
+#########################
+
+This submodule contains five public methods, of which two methods are necessary to calculate the optimal weights.
+The first method ``fit`` is for estimating the parameters of the model
+using training data, and the second method is for calculating the final optimal portfolio weights using evaluation data.
 
 Model fitting
 *************
@@ -256,8 +261,9 @@ Implementation
 .. automethod:: OptimalConvergence.delta_neutral_portfolio_weights_continuous
 
 
-Example
-#######
+Examples
+########
+
 
 
 Research Notebook
