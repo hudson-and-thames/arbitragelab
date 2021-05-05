@@ -47,7 +47,7 @@ class TestBasicCopulaStrategy(unittest.TestCase):
                     'col3': [np.nan, 1/5, 2/5, 3/5, 4/5, 1]}
         expected_df = pd.DataFrame.from_dict(expected)
         # Compare with expected result, up to 4 digits
-        pd.testing.assert_frame_equal(quantile_df, expected_df, check_dtype=False, check_less_precise=4)
+        pd.testing.assert_frame_equal(quantile_df, expected_df, check_dtype=False, atol=4)
 
         # Checking the cdfs
         test_input = pd.Series([-100, -1, 1.5, 2, 3, 10, np.nan])
@@ -55,8 +55,8 @@ class TestBasicCopulaStrategy(unittest.TestCase):
         quantiles_2 = test_input.map(cdfs[1])
         expec_qt1 = pd.Series([0, 1e-5, 0.416667, 0.5, 0.666667, 1 - 1e-5, np.nan])
         expec_qt2 = pd.Series([1e-5, 0.1, 0.35, 0.4, 0.5, 1 - 1e-5, np.nan])
-        pd.testing.assert_series_equal(expec_qt1, quantiles_1, check_dtype=False, check_less_precise=4)
-        pd.testing.assert_series_equal(expec_qt2, quantiles_2, check_dtype=False, check_less_precise=4)
+        pd.testing.assert_series_equal(expec_qt1, quantiles_1, check_dtype=False, atol=4)
+        pd.testing.assert_series_equal(expec_qt2, quantiles_2, check_dtype=False, atol=4)
 
     def test_exit_trigger_or(self):
         """

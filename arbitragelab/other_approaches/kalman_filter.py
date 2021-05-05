@@ -67,6 +67,7 @@ class KalmanFilterStrategy:
         # Helper variables from Kalman filter
         self.R = None  # Prediction variance-covariance
         self.beta = np.array([0, 0])  # Starting state prediction
+
         devadarsh.track('KalmanFilterStrategy')
 
     def update(self, x: float, y: float):

@@ -12,9 +12,11 @@ Module that uses copula for trading strategy based on (cumulative) mispricing in
 from typing import Callable, Sequence, Union
 import numpy as np
 import pandas as pd
+
 from arbitragelab.copula_approach.copula_strategy_basic import BasicCopulaStrategy
 import arbitragelab.copula_approach.copula_generate as cg
 import arbitragelab.copula_approach.copula_generate_mixedcopula as cgmix
+from arbitragelab.util import devadarsh
 
 
 class CopulaStrategyMPI(BasicCopulaStrategy):
@@ -61,6 +63,8 @@ class CopulaStrategyMPI(BasicCopulaStrategy):
         self._long_count = 0
         self._short_count = 0
         self._exit_count = 0
+
+        devadarsh.track('CopulaStrategyMPI')
 
     @staticmethod
     def to_returns(pair_prices: pd.DataFrame, fill_init_nan: Sequence[float] = (0, 0)) -> pd.DataFrame:

@@ -46,6 +46,7 @@ class CoxIngersollRoss(OrnsteinUhlenbeck):
 
         super().__init__()
         self.B_value = None
+
         devadarsh.track('CoxIngersollRoss')
 
     def fit(self, data: pd.DataFrame, data_frequency: str, discount_rate: tuple, transaction_cost: tuple,

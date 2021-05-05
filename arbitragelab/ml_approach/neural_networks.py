@@ -15,6 +15,8 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 import matplotlib.pyplot as plt
 
+from arbitragelab.util import devadarsh
+
 class BaseNeuralNetwork:
     """
     Skeleton Class to be inherited by child neural network implementations.
@@ -98,6 +100,8 @@ class MultiLayerPerceptron(BaseNeuralNetwork):
         self.hidden_layer_activation_function = hidden_layer_activation_function
         self.output_layer_activation_function = output_layer_act_func
 
+        devadarsh.track('MultiLayerPerceptron')
+
     def build(self):
         """
         Builds and compiles model architecture.
@@ -162,6 +166,8 @@ class RecurrentNeuralNetwork(BaseNeuralNetwork):
         self.hidden_layer_activation_function = hidden_layer_activation_function
         self.output_layer_activation_function = output_layer_act_func
 
+        devadarsh.track('RecurrentNeuralNetwork')
+
     def build(self):
         """
         Builds and compiles model architecture.
@@ -224,6 +230,8 @@ class PiSigmaNeuralNetwork(BaseNeuralNetwork):
         self.metrics = metrics
         self.hidden_layer_activation_function = hidden_layer_activation_function
         self.output_layer_activation_function = output_layer_act_func
+
+        devadarsh.track('PiSigmaNeuralNetwork')
 
     def build(self):
         """
