@@ -75,11 +75,11 @@ Implementation
 
 .. automodule:: arbitragelab.ml_approach
 
-.. autoclass:: PairsSelector
+.. autoclass:: DBSCANPairsClustering
    :members: __init__
 
-.. automethod:: PairsSelector.dimensionality_reduction_by_components
-.. automethod:: PairsSelector.plot_pca_matrix
+.. automethod:: DBSCANPairsClustering.dimensionality_reduction_by_components
+.. automethod:: DBSCANPairsClustering.plot_pca_matrix
 
 Unsupervised Learning
 #####################
@@ -112,19 +112,17 @@ suitable :math:`\epsilon` by observing the global curve turning point.
 Implementation
 **************
 
-.. automethod:: PairsSelector.cluster_using_optics
-.. automethod:: PairsSelector.cluster_using_dbscan
-.. automethod:: PairsSelector.plot_clustering_info
-.. automethod:: PairsSelector.plot_knee_plot
+.. automethod:: DBSCANPairsClustering.cluster_using_optics
+.. automethod:: DBSCANPairsClustering.cluster_using_dbscan
+.. automethod:: DBSCANPairsClustering.plot_clustering_info
+.. automethod:: DBSCANPairsClustering.plot_knee_plot
+.. automethod:: DBSCANPairsClustering.get_pairs_by_sector
 
 Select Pairs 
 ############
 
-.. figure:: images/pairs_selection_rules_diagram.png
-    :align: center
-
-    The rules selection flow diagram from `A Machine Learning based Pairs Trading Investment Strategy <http://premio-vidigal.inesc.pt/pdf/SimaoSarmentoMSc-resumo.pdf>`__.
-    by Simão Moraes Sarmento and Nuno Horta.
+The rules selection flow diagram from `A Machine Learning based Pairs Trading Investment Strategy <http://premio-vidigal.inesc.pt/pdf/SimaoSarmentoMSc-resumo.pdf>`__.
+by Simão Moraes Sarmento and Nuno Horta.
 
 The rules that each pair needs to pass are:
 
@@ -149,7 +147,11 @@ A better solution is proposed and implemented, based on `Gregory et al. (2011) <
 to use orthogonal regression – also referred to as Total Least Squares (TLS) – in which the residuals 
 of both dependent and independent variables are taken into account. That way, we incorporate the volatility 
 of both legs of the spread when estimating the relationship so that hedge ratios are consistent, and thus 
-the cointegration estimates will be unaffected by the ordering of variables. 
+the cointegration estimates will be unaffected by the ordering of variables.
+
+Hudson & Thames research team has also found out that optimal (in terms of cointegration tests statistics) hedge ratios
+are obtained by minimizng spread's half-life of mean-reversion. As a result, the user may specify hedge ratio calculation
+method: TLS, OLS or Minimum Half-Life.
 
 Secondly, an additional validation step is also implemented to provide more confidence in the mean-reversion
 character of the pairs’ spread. The condition imposed is that the Hurst exponent associated with the spread
@@ -172,19 +174,29 @@ thus providing enough opportunities to exit a position.
 .. warning::
     The pairs selection function is very computationally heavy, so execution is going to be long and might slow down your system.
 
+.. note::
+    The user may specify thresholds for each pair selector rule from the framework described above. For example, Engle-Granger test 99%
+    threshold may seem too strict in pair selection which can be decreased to either 95% or 90%. On the other hand,
+    the user may impose more strict thresholds on half life of mean reversion.
 
 Implementation
 **************
 
-.. automethod:: PairsSelector.get_pairs_by_sector
-.. automethod:: PairsSelector.unsupervised_candidate_pair_selector
-.. automethod:: PairsSelector.plot_selected_pairs
+
+.. automodule:: arbitragelab.pairs_selection.cointegration
+
+.. autoclass:: CointegrationPairsSelector
+   :members: __init__
+
+
+.. automethod:: CointegrationPairsSelector.select_pairs
+.. automethod:: CointegrationPairsSelector.plot_selected_pairs
 
 Following methods describe the results of the selector in various ways.
 
-.. automethod:: PairsSelector.describe
-.. automethod:: PairsSelector.describe_extra
-.. automethod:: PairsSelector.describe_pairs_sectoral_info
+.. automethod:: CointegrationPairsSelector.describe
+.. automethod:: CointegrationPairsSelector.describe_extra
+.. automethod:: CointegrationPairsSelector.describe_pairs_sectoral_info
 
 
 Examples
@@ -195,30 +207,32 @@ Examples
     # Importing packages
     import pandas as pd
     import numpy as np
-    from arbitragelab.ml_approach import PairsSelector
+    from arbitragelab.ml_approach import DBSCANPairsClustering
+    from arbitragelab.pairs_selection import CointegrationPairsSelector
 
     # Getting the dataframe with time series of asset returns
     data = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])
 
-    ps = PairsSelector(data)
+    pairs_clusterer = DBSCANPairsClustering(data)
 
     # Price data is reduced to its component features using PCA
-    ps.dimensionality_reduction_by_components(5)
+    pairs_clusterer.dimensionality_reduction_by_components(5)
 
     # Clustering is performed over feature vector
-    ps.cluster_using_optics({'min_samples': 3})
+    clustered_pairs = pairs_clusterer.cluster_using_optics({'min_samples': 3})
 
     # Generated Pairs are processed through the rules mentioned above
-    ps.unsupervised_candidate_pair_selector()
+    pairs_selector = CointegrationPairsSelector(prices_df=data, pairs_to_filter=clustered_pairs)
+    filtered_pairs = pairs_selector.select_pairs()
 
     # Generate a Panel of information of the selected pairs
-    final_pairs_info = ps.describe_extra()
+    final_pairs_info = pairs_selector.describe_extra()
 
     # Import the ticker sector info csv
     sectoral_info = pd.read_csv('X_FILE_PATH.csv')
 
     # Generate a sector/industry relationship Panel of each pair
-    ps.describe_pairs_sectoral_info(final_pairs_info['leg_1'],
+    pairs_selector.describe_pairs_sectoral_info(final_pairs_info['leg_1'],
                                     final_pairs_info['leg_2'],
                                     sectoral_info)
 

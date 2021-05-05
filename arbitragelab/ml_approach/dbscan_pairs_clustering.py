@@ -28,8 +28,7 @@ class DBSCANPairsClustering:
     `"A Machine Learning based Pairs Trading Investment Strategy."
     <http://premio-vidigal.inesc.pt/pdf/SimaoSarmentoMSc-resumo.pdf>`__.
 
-    The method consists of three parts: dimensionality reduction, clustering of features and
-    finally the selection of pairs with the use of a set of heuristics.
+    The method consists of 2 parts: dimensionality reduction and clustering of features.
     """
 
     def __init__(self, universe: pd.DataFrame):
@@ -44,11 +43,6 @@ class DBSCANPairsClustering:
         self.cluster_pairs_combinations = []
         self.spreads_df = None
 
-        self.coint_pass_pairs = pd.Series({}, dtype=object)
-        self.hurst_pass_pairs = pd.Series({}, dtype=object)
-        self.hl_pass_pairs = pd.Series({}, dtype=object)
-
-        self.final_pairs = []
         self.clust_labels_ = []
 
         devadarsh.track('PairsSelector')
