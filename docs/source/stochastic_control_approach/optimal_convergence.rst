@@ -14,7 +14,7 @@ Introduction
 ############
 
 Convergence trades resemble the standard long-short arbitrage strategy
-popular in industry and assumed in academic studies. Conventionally,
+popular in industry and covered in academic studies. Conventionally,
 such strategies take positions of equal size but opposite signs
 either in portfolio weight or in number of shares. This seems intuitively
 reasonable and ensures that future liabilities offset. However, such strategies
@@ -22,9 +22,9 @@ will typically not be optimal.
 
 The objective of optimally trading off risk and returns can lead to quite different solutions compared
 with the standard arbitrage objective assumed in convergence trades.
-Standard arbitrage strategies and/or delta neutral convergence trades are
-designed to explore long-term arbitrage opportunities but do typically not
-optimally exploit the short-run risk return trade-off. By placing arbitrage
+Traditional arbitrage strategies and/or delta neutral convergence trades are
+designed to explore long-term arbitrage opportunities but usually do not
+exploit the short-run risk-return trade-off optimally. By placing arbitrage
 opportunities in the context of a portfolio maximization problem, the
 optimal convergence strategy accounts for both arbitrage opportunities and
 diversification benefits.
@@ -87,7 +87,7 @@ markets and two stocks with the same payoffs, such as the target and acquirer
 stocks in a merger.
 
 :math:`−\lambda_1 x_t` and :math:`−\lambda_2 x_t` capture the absolute mispricing of each asset relative to CAPM.
-For further information regarding the utility of :math:`\lambda`'s, interested readers can refer Section 1.1 in the paper.
+For further information regarding the utility of :math:`\lambda`'s, interested readers can refer to Section 1.1 in the paper.
 
 Cointegration and relative mispricing
 *************************************
@@ -110,16 +110,15 @@ where,
 
 
 In this paper, the authors considered two cases for both the unconstrained and constrained(delta neutral) portfolios.
-The first case deals with recurring arbitrage oppurtunities, the price differential, :math:`x_t` , only spends an
-infinitesimally small time at zero, is characterized at all times by the dynamics in the above equation and so follows
+The first case deals with recurring arbitrage opportunities, the price differential, :math:`x_t` , only spends an
+infinitesimally short time at zero, is characterized at all times by the dynamics in the above equation, and so follows
 a stationary process.
 In the second case (“nonrecurring arbitrage opportunities”),
 any price difference is temporary and gets permanently eliminated the first time
 the two prices converge and :math:`x_t = 0`. In this case, the price dynamics is subject
 to the additional restriction that :math:`x_{\tau + \delta} = 0` for all :math:`\delta ≥ 0`, where :math:`\tau = min(t : x_t = 0)`
-is a stopping time. In this case, prices remain identical after they converge.The optimal portfolio weights are different for these cases.
-
-
+is a stopping time. In this case, prices remain identical after they converge.
+The optimal portfolio weights are different for these cases.
 
 
 In the absence of intermediate consumption, the investor’s wealth, :math:`W_t` , evolves according to the process,
@@ -186,7 +185,7 @@ assets. Using mispriced assets alone to achieve delta neutrality will necessaril
 underexploit opportunities offered by mispricing in the individual stocks.
 
 
-For the continuing cointegrated price process (recurring arbitrage opportunities), we get a closed-form solutions.
+For the continuing cointegrated price process (recurring arbitrage opportunities), we get closed-form solutions.
 
 .. math::
 
@@ -209,7 +208,7 @@ using training data, and the second method is for calculating the final optimal 
 Model fitting
 *************
 
-We input the training data to the fit method which calculates the spread
+We input the training data to the fit method, which calculates the spread
 and the estimators of the parameters of the model.
 
 Implementation
