@@ -17,7 +17,7 @@ Convergence trades resemble the standard long-short arbitrage strategy
 popular in industry and assumed in academic studies. Conventionally,
 such strategies take positions of equal size but opposite signs
 either in portfolio weight or in number of shares. This seems intuitively
-reasonable and ensures that future liabilities offset. However, such strategies
+reasonable and ensures that future liabilities offset. However, as shown in the paper, such delta neutral strategies
 will typically not be optimal.
 
 The objective of optimally trading off risk and returns can lead to quite different solutions compared
@@ -28,15 +28,6 @@ optimally exploit the short-run risk return trade-off. By placing arbitrage
 opportunities in the context of a portfolio maximization problem, the
 optimal convergence strategy accounts for both arbitrage opportunities and
 diversification benefits.
-
-ADD THIS LATER : In some cases the price difference between two assets in a convergence
-trade will disappear permanently after it reaches zero. To capture this, we use
-a stopped cointegration process whereby asset prices follow a cointegrated
-process before the difference reaches zero and the difference remains at zero
-afterwards. Stopped cointegrated prices can also be used to model the strategies
-of convergence traders who close out their position when prices converge. This case with
-nonrecurring arbitrage opportunities gives rise to a set of very different
-boundary conditions when solving for the optimal portfolio weights.
 
 
 Modelling
@@ -58,11 +49,14 @@ of two risky assets whose prices :math:`P_{it}, i = 1,2`, evolve according to th
 
 .. math::
     \begin{array}{l}
-    \frac{d P_{1 t}}{P_{1 t}}=\left(r+\beta \mu_{m}\right) d t+\beta \sigma_{m} d B_{t}+\sigma d Z_{t}+b d Z_{1 t}-\lambda_{1} x_{1} d t \\
-    \frac{d P_{2 t}}{P_{2 t}}=\left(r+\beta \mu_{m}\right) d t+\beta \sigma_{m} d B_{t}+\sigma d Z_{t}+b d Z_{2 t}+\lambda_{2} x_{t} d t
+    \frac{d P_{1 t}}{P_{1 t}}=\left(r+\beta \mu_{m}\right) d t+\beta \sigma_{m} d B_{t}+\sigma d Z_{t}+b d Z_{1 t}
+    -\lambda_{1} x_{1} d t \\
+    \frac{d P_{2 t}}{P_{2 t}}=\left(r+\beta \mu_{m}\right) d t+\beta \sigma_{m} d B_{t}+\sigma d Z_{t}+b d Z_{2 t}
+    +\lambda_{2} x_{t} d t
     \end{array}
 
-where :math:`\lambda_1`, :math:`\lambda_2`, :math:`\beta`, :math:`b`, and :math:`\sigma` are constant parameters. :math:`Z_t` and :math:`Z_{it}` are standard
+where :math:`\lambda_1`, :math:`\lambda_2`, :math:`\beta`, :math:`b`, and :math:`\sigma` are constant parameters.
+:math:`Z_t` and :math:`Z_{it}` are standard
 Brownian motions, and :math:`B_t` , :math:`Z_t` , and :math:`Z_{it}` are all mutually independent for :math:`i = 1,2`.
 
 In the above equations, :math:`\beta \sigma_m d B_t` represents exposure to the market risk,
@@ -116,8 +110,9 @@ a stationary process.
 In the second case (“nonrecurring arbitrage opportunities”),
 any price difference is temporary and gets permanently eliminated the first time
 the two prices converge and :math:`x_t = 0`. In this case, the price dynamics is subject
-to the additional restriction that :math:`x_{\tau + \delta} = 0` for all :math:`\delta ≥ 0`, where :math:`\tau = min(t : x_t = 0)`
-is a stopping time. In this case, prices remain identical after they converge.The optimal portfolio weights are different for these cases.
+to the additional restriction that :math:`x_{\tau + \delta} = 0` for all :math:`\delta ≥ 0`,
+where :math:`\tau = min(t : x_t = 0)` is a stopping time. In this case, prices remain identical after they converge.
+The optimal portfolio weights are different for these cases.
 
 
 
@@ -127,8 +122,10 @@ In the absence of intermediate consumption, the investor’s wealth, :math:`W_t`
 .. math::
 
     \begin{aligned}
-    d W_{t}=& W_{t}\left(r d t+\phi_{m t}\left(\frac{d P_{m t}}{P_{m t}}-r d t\right)+\phi_{1 t}\left(\frac{d P_{1 t}}{P_{1 t}}-r d t\right)+\phi_{2 t}\left(\frac{d P_{2 t}}{P_{2 t}}-r d t\right)\right) \\
-    =& W_{t}\left(r d t+\left(\phi_{m t}+\beta\left(\phi_{1 t}+\phi_{2 t}\right)\right)\left(\mu_{m} d t+\sigma_{m} d B_{t}\right)\right.\\
+    d W_{t}=& W_{t}\left(r d t+\phi_{m t}\left(\frac{d P_{m t}}{P_{m t}}-r d t\right)+\phi_{1 t}
+    \left(\frac{d P_{1 t}}{P_{1 t}}-r d t\right)+\phi_{2 t}\left(\frac{d P_{2 t}}{P_{2 t}}-r d t\right)\right) \\
+    =& W_{t}\left(r d t+\left(\phi_{m t}+\beta\left(\phi_{1 t}+\phi_{2 t}\right)\right)\left(\mu_{m} d t+\sigma_{m}
+    d B_{t}\right)\right.\\
     &+\phi_{1 t}\left(\sigma d Z_{t}+b d Z_{1 t}-\lambda_{1} x_{t} d t\right) \\
     &\left.+\phi_{2 t}\left(\sigma d Z_{t}+b d Z_{2 t}+\lambda_{2} x_{t} d t\right)\right) .
     \end{aligned}
@@ -192,7 +189,8 @@ For the continuing cointegrated price process (recurring arbitrage opportunities
 
     \begin{array}{l}
     \check{\phi}_{m t}^{*}=\frac{\mu_{m}}{\gamma \sigma_{m}^{2}}, \\
-    \check{\phi}_{1 t}^{*}=\frac{-\left(\lambda_{1}+\lambda_{2}\right) \ln \left(\frac{P_{1 t}}{P_{2 t}}\right)+2 b^{2} D(t) \ln \left(\frac{P_{1 t}}{P_{2 t}}\right)}{2 \gamma b^{2}}
+    \check{\phi}_{1 t}^{*}=\frac{-\left(\lambda_{1}+\lambda_{2}\right) \ln \left(\frac{P_{1 t}}{P_{2 t}}\right)+2 b^{2}
+    D(t) \ln \left(\frac{P_{1 t}}{P_{2 t}}\right)}{2 \gamma b^{2}}
     \end{array}
 
 .. note::
@@ -264,6 +262,56 @@ Implementation
 Examples
 ########
 
+We use GLD and GDX tickers from Yahoo Finance as the dataset for this example.
+
+.. code-block::
+
+    import yfinance as yf
+
+    data1 =  yf.download("GLD GDX", start="2009-03-25", end="2019-03-25")
+    data2 =  yf.download("GLD GDX", start="2019-03-27", end="2020-03-27")
+
+    data_train_dataframe = data1["Adj Close"][["GLD", "GDX"]]
+    data_test_dataframe = data2["Adj Close"][["GLD", "GDX"]]
+
+Example 1
+*********
+
+In the following code block, after initializing the class firstly,
+we use the fit method to generate the parameters of the model.
+Then, we call ``describe`` to view the estimated parameters.
+Finally, we use the out-of-sample test data to calculate the optimal portfolio weights using the fitted model.
+
+.. code-block::
+
+    from arbitragelab.stochastic_control_approach.optimal_convergence import OptimalConvergence
+
+    oc = OptimalConvergence()
+    oc.fit(data_train_dataframe, r = 0.02, mu_m = 0.05, sigma_m = 0.10)
+
+    print(oc.describe())
+
+    phi_1, phi_2, phi_m = oc.unconstrained_portfolio_weights_continuous(data_test_dataframe, mu_m=0.05, sigma_m=0.35, gamma=4, r=0.02)
+
+
+Example 2
+*********
+
+In the following code block, after initializing the class firstly,
+we use the fit method to generate the parameters of the model.
+Then, we call ``describe`` to view the estimated parameters.
+Finally, we use the out-of-sample test data to calculate the delta neutral portfolio weights using the fitted model.
+
+.. code-block::
+
+    from arbitragelab.stochastic_control_approach.optimal_convergence import OptimalConvergence
+
+    oc = OptimalConvergence()
+    oc.fit(data_train_dataframe, r = 0.02, mu_m = 0.05, sigma_m = 0.10)
+
+    print(oc.describe())
+
+    phi_1, phi_2, phi_m = oc.delta_neutral_portfolio_weights_continuous(data_test_dataframe, mu_m=0.05, sigma_m=0.35, gamma=4, r=0.02)
 
 
 Research Notebook
