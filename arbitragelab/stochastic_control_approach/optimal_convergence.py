@@ -84,11 +84,11 @@ class OptimalConvergence:
 
         lr.fit(x[:-1].reshape(-1,1), y_1)
 
-        self.lambda_1 = -lr.coef_
+        self.lambda_1 = -lr.coef_[0]
         beta_1 = (lr.intercept_ - self.r) / self.mu_m
 
         lr.fit(x[:-1].reshape(-1,1), y_2)
-        self.lambda_2 = lr.coef_
+        self.lambda_2 = lr.coef_[0]
         beta_2 = (lr.intercept_ - self.r) / self.mu_m
 
         self.beta = (beta_1 + beta_2) / 2

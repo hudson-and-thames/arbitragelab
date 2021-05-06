@@ -80,7 +80,7 @@ the same claim to dividends and identical voting rights but are traded in differ
 markets and two stocks with the same payoffs, such as the target and acquirer
 stocks in a merger.
 
-:math:`−\lambda_1 x_t` and :math:`−\lambda_2 x_t` capture the absolute mispricing of each asset relative to CAPM.
+:math:`−\lambda_1 x_t` and :math:`\lambda_2 x_t` capture the absolute mispricing of each asset relative to CAPM.
 For further information regarding the utility of :math:`\lambda`'s, interested readers can refer to Section 1.1 in the paper.
 
 Cointegration and relative mispricing

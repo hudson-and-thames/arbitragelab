@@ -50,7 +50,16 @@ class TestOptimalConvergence(unittest.TestCase):
         """
 
         # Creating an object of the class
-        pass
+        oc = OptimalConvergence()
+
+        oc.fit(self.dataframe, mu_m=0.05, sigma_m=0.35, r=0.02)
+
+        # Checking parameter values.
+        self.assertAlmostEqual(oc.lambda_1, 0, delta=1e-4)
+        self.assertAlmostEqual(oc.lambda_2, 0, delta=1e-4)
+        self.assertAlmostEqual(oc.b_squared, 0, delta=1e-3)
+        self.assertAlmostEqual(oc.sigma_squared, 0, delta=1e-4)
+        self.assertAlmostEqual(oc.beta, 0, delta=1e-4)
 
 
     def test_describe(self):
@@ -79,19 +88,95 @@ class TestOptimalConvergence(unittest.TestCase):
 
     def test_unconstrained_continuous(self):
 
+        # Creating an object of the class
         oc = OptimalConvergence()
+
+        # Testing for the run fit before this method exception
+        with self.assertRaises(Exception):
+            oc.unconstrained_portfolio_weights_continuous(self.dataframe, gamma=4)
+
         oc.fit(self.dataframe, mu_m=0.05, sigma_m=0.35, r=0.02)
+
+        # Testing for the positive gamma exception
+        with self.assertRaises(Exception):
+            oc.unconstrained_portfolio_weights_continuous(self.dataframe, gamma=-4)
 
         phi_1, phi_2, phi_m = oc.unconstrained_portfolio_weights_continuous(self.dataframe, gamma=4)
 
-        print(phi_m)
+        # Checking the values of phi_1 weights
+        self.assertAlmostEqual(np.mean(phi_1), 0, delta=1e-5)
+        self.assertAlmostEqual(phi_1[7],  0, delta=1e-4)
+        self.assertAlmostEqual(phi_1[28], 0, delta=1e-4)
+        self.assertAlmostEqual(phi_1[-1], 0, delta=1e-4)
+
+        # Checking the values of phi_2 weights
+        self.assertAlmostEqual(np.mean(phi_2), 0, delta=1e-5)
+        self.assertAlmostEqual(phi_2[7],  0, delta=1e-4)
+        self.assertAlmostEqual(phi_2[28], 0, delta=1e-4)
+        self.assertAlmostEqual(phi_2[-1], 0, delta=1e-4)
+
+        # Checking the values of phi_m weights
+        self.assertAlmostEqual(np.mean(phi_m), 0, delta=1e-5)
+        self.assertAlmostEqual(phi_m[7],  0, delta=1e-4)
+        self.assertAlmostEqual(phi_m[28], 0, delta=1e-4)
+        self.assertAlmostEqual(phi_m[-1], 0, delta=1e-4)
 
 
     def test_delta_neutral_continuous(self):
 
+        # Creating an object of the class
         oc = OptimalConvergence()
+
+        # Testing for the run fit before this method exception
+        with self.assertRaises(Exception):
+            oc.delta_neutral_portfolio_weights_continuous(self.dataframe, gamma=4)
+
         oc.fit(self.dataframe, mu_m=0.05, sigma_m=0.35, r=0.02)
+
+        # Testing for the positive gamma exception
+        with self.assertRaises(Exception):
+            oc.delta_neutral_portfolio_weights_continuous(self.dataframe, gamma=-4)
 
         phi_1, phi_2, phi_m = oc.delta_neutral_portfolio_weights_continuous(self.dataframe, gamma=4)
 
-        print(phi_m)
+        # Checking the values of phi_1 weights
+        self.assertAlmostEqual(np.mean(phi_1), 0, delta=1e-5)
+        self.assertAlmostEqual(phi_1[7], 0, delta=1e-4)
+        self.assertAlmostEqual(phi_1[28], 0, delta=1e-4)
+        self.assertAlmostEqual(phi_1[-1], 0, delta=1e-4)
+
+        # Checking the values of phi_2 weights
+        self.assertAlmostEqual(np.mean(phi_2), 0, delta=1e-5)
+        self.assertAlmostEqual(phi_2[7], 0, delta=1e-4)
+        self.assertAlmostEqual(phi_2[28], 0, delta=1e-4)
+        self.assertAlmostEqual(phi_2[-1], 0, delta=1e-4)
+
+        # Checking the values of phi_m weights
+        self.assertAlmostEqual(np.mean(phi_m), 0, delta=1e-5)
+        self.assertAlmostEqual(phi_m[7], 0, delta=1e-4)
+        self.assertAlmostEqual(phi_m[28], 0, delta=1e-4)
+        self.assertAlmostEqual(phi_m[-1], 0, delta=1e-4)
+
+
+    def test_wealth_gain_continuous(self):
+
+        # Creating an object of the class
+        oc = OptimalConvergence()
+
+        # Testing for the run fit before this method exception
+        with self.assertRaises(Exception):
+            oc.wealth_gain_continuous(self.dataframe, gamma=4)
+
+        oc.fit(self.dataframe, mu_m=0.05, sigma_m=0.35, r=0.02)
+
+        # Testing for the positive gamma exception
+        with self.assertRaises(Exception):
+            oc.wealth_gain_continuous(self.dataframe, gamma=-4)
+
+        R = oc.wealth_gain_continuous(self.dataframe, gamma=4)
+
+        # Checking the values of phi_1 weights
+        self.assertAlmostEqual(np.mean(R), 0, delta=1e-5)
+        self.assertAlmostEqual(R[7], 0, delta=1e-4)
+        self.assertAlmostEqual(R[28], 0, delta=1e-4)
+        self.assertAlmostEqual(R[-1], 0, delta=1e-4)
