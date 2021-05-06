@@ -5,9 +5,7 @@
 """
 Test functions for the Optimal Convergence models in the Stochastic Control Approach module.
 """
-# pylint: disable=protected-access
 
-import warnings
 import unittest
 import os
 
@@ -50,16 +48,16 @@ class TestOptimalConvergence(unittest.TestCase):
         """
 
         # Creating an object of the class
-        oc = OptimalConvergence()
+        sc_liu = OptimalConvergence()
 
-        oc.fit(self.dataframe, mu_m=0.05, sigma_m=0.35, r=0.02)
+        sc_liu.fit(self.dataframe, mu_m=0.05, sigma_m=0.35, r=0.02)
 
         # Checking parameter values.
-        self.assertAlmostEqual(oc.lambda_1, 0, delta=1e-4)
-        self.assertAlmostEqual(oc.lambda_2, 0, delta=1e-4)
-        self.assertAlmostEqual(oc.b_squared, 0, delta=1e-3)
-        self.assertAlmostEqual(oc.sigma_squared, 0, delta=1e-4)
-        self.assertAlmostEqual(oc.beta, 0, delta=1e-4)
+        self.assertAlmostEqual(sc_liu.lambda_1, 0, delta=1e-4)
+        self.assertAlmostEqual(sc_liu.lambda_2, 0, delta=1e-4)
+        self.assertAlmostEqual(sc_liu.b_squared, 0, delta=1e-3)
+        self.assertAlmostEqual(sc_liu.sigma_squared, 0, delta=1e-4)
+        self.assertAlmostEqual(sc_liu.beta, 0, delta=1e-4)
 
 
     def test_describe(self):
@@ -68,13 +66,13 @@ class TestOptimalConvergence(unittest.TestCase):
         """
 
         # Creating an object of the class
-        oc = OptimalConvergence()
+        sc_liu = OptimalConvergence()
 
         # Testing for the run fit before this method exception
         with self.assertRaises(Exception):
-            oc.describe()
+            sc_liu.describe()
 
-        oc.fit(self.dataframe, mu_m=0.05, sigma_m=0.35, r=0.02)
+        sc_liu.fit(self.dataframe, mu_m=0.05, sigma_m=0.35, r=0.02)
 
         index = ['Ticker of first stock', 'Ticker of second stock',
                  'lambda_1', 'lambda_2', 'b_squared', 'sigma_squared',
@@ -83,25 +81,28 @@ class TestOptimalConvergence(unittest.TestCase):
         data = ['GLD', 'GDX', 0, 0, 0, 0, 0]
 
         # Testing the output of describe method
-        pd.testing.assert_series_equal(pd.Series(index=index,data=data), oc.describe(), check_exact=False, atol=1e-3)
+        pd.testing.assert_series_equal(pd.Series(index=index,data=data), sc_liu.describe(), check_exact=False, atol=1e-3)
 
 
     def test_unconstrained_continuous(self):
+        """
+        Tests the method which returns optimal portfolio weights in continuous case.
+        """
 
         # Creating an object of the class
-        oc = OptimalConvergence()
+        sc_liu = OptimalConvergence()
 
         # Testing for the run fit before this method exception
         with self.assertRaises(Exception):
-            oc.unconstrained_portfolio_weights_continuous(self.dataframe, gamma=4)
+            sc_liu.unconstrained_portfolio_weights_continuous(self.dataframe, gamma=4)
 
-        oc.fit(self.dataframe, mu_m=0.05, sigma_m=0.35, r=0.02)
+        sc_liu.fit(self.dataframe, mu_m=0.05, sigma_m=0.35, r=0.02)
 
         # Testing for the positive gamma exception
         with self.assertRaises(Exception):
-            oc.unconstrained_portfolio_weights_continuous(self.dataframe, gamma=-4)
+            sc_liu.unconstrained_portfolio_weights_continuous(self.dataframe, gamma=-4)
 
-        phi_1, phi_2, phi_m = oc.unconstrained_portfolio_weights_continuous(self.dataframe, gamma=4)
+        phi_1, phi_2, phi_m = sc_liu.unconstrained_portfolio_weights_continuous(self.dataframe, gamma=4)
 
         # Checking the values of phi_1 weights
         self.assertAlmostEqual(np.mean(phi_1), 0, delta=1e-5)
@@ -123,21 +124,24 @@ class TestOptimalConvergence(unittest.TestCase):
 
 
     def test_delta_neutral_continuous(self):
+        """
+        Tests the method which returns delta neutral portfolio weights in continuous case.
+        """
 
         # Creating an object of the class
-        oc = OptimalConvergence()
+        sc_liu = OptimalConvergence()
 
         # Testing for the run fit before this method exception
         with self.assertRaises(Exception):
-            oc.delta_neutral_portfolio_weights_continuous(self.dataframe, gamma=4)
+            sc_liu.delta_neutral_portfolio_weights_continuous(self.dataframe, gamma=4)
 
-        oc.fit(self.dataframe, mu_m=0.05, sigma_m=0.35, r=0.02)
+        sc_liu.fit(self.dataframe, mu_m=0.05, sigma_m=0.35, r=0.02)
 
         # Testing for the positive gamma exception
         with self.assertRaises(Exception):
-            oc.delta_neutral_portfolio_weights_continuous(self.dataframe, gamma=-4)
+            sc_liu.delta_neutral_portfolio_weights_continuous(self.dataframe, gamma=-4)
 
-        phi_1, phi_2, phi_m = oc.delta_neutral_portfolio_weights_continuous(self.dataframe, gamma=4)
+        phi_1, phi_2, phi_m = sc_liu.delta_neutral_portfolio_weights_continuous(self.dataframe, gamma=4)
 
         # Checking the values of phi_1 weights
         self.assertAlmostEqual(np.mean(phi_1), 0, delta=1e-5)
@@ -159,24 +163,27 @@ class TestOptimalConvergence(unittest.TestCase):
 
 
     def test_wealth_gain_continuous(self):
+        """
+        Tests the method which returns wealth gain in continuous case.
+        """
 
         # Creating an object of the class
-        oc = OptimalConvergence()
+        sc_liu = OptimalConvergence()
 
         # Testing for the run fit before this method exception
         with self.assertRaises(Exception):
-            oc.wealth_gain_continuous(self.dataframe, gamma=4)
+            sc_liu.wealth_gain_continuous(self.dataframe, gamma=4)
 
-        oc.fit(self.dataframe, mu_m=0.05, sigma_m=0.35, r=0.02)
+        sc_liu.fit(self.dataframe, mu_m=0.05, sigma_m=0.35, r=0.02)
 
         # Testing for the positive gamma exception
         with self.assertRaises(Exception):
-            oc.wealth_gain_continuous(self.dataframe, gamma=-4)
+            sc_liu.wealth_gain_continuous(self.dataframe, gamma=-4)
 
-        R = oc.wealth_gain_continuous(self.dataframe, gamma=4)
+        wealth_gain = sc_liu.wealth_gain_continuous(self.dataframe, gamma=4)
 
         # Checking the values of phi_1 weights
-        self.assertAlmostEqual(np.mean(R), 0, delta=1e-5)
-        self.assertAlmostEqual(R[7], 0, delta=1e-4)
-        self.assertAlmostEqual(R[28], 0, delta=1e-4)
-        self.assertAlmostEqual(R[-1], 0, delta=1e-4)
+        self.assertAlmostEqual(np.mean(wealth_gain), 0, delta=1e-5)
+        self.assertAlmostEqual(wealth_gain[7], 0, delta=1e-4)
+        self.assertAlmostEqual(wealth_gain[28], 0, delta=1e-4)
+        self.assertAlmostEqual(wealth_gain[-1], 0, delta=1e-4)
