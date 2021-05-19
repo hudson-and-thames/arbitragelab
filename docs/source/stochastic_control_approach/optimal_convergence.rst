@@ -289,7 +289,9 @@ Finally, we use the out-of-sample test data to calculate the optimal portfolio w
 
     print(oc.describe())
 
-    phi_1, phi_2, phi_m = oc.unconstrained_portfolio_weights_continuous(data_test_dataframe, mu_m=0.05, sigma_m=0.35, gamma=4, r=0.02)
+    phi_1, phi_2, phi_m = oc.unconstrained_portfolio_weights_continuous(data_test_dataframe,
+                                                                        mu_m=0.05, sigma_m=0.35,
+                                                                        gamma=4, r=0.02)
 
 
 Example 2
@@ -309,7 +311,9 @@ Finally, we use the out-of-sample test data to calculate the delta neutral portf
 
     print(oc.describe())
 
-    phi_1, phi_2, phi_m = oc.delta_neutral_portfolio_weights_continuous(data_test_dataframe, mu_m=0.05, sigma_m=0.35, gamma=4, r=0.02)
+    phi_1, phi_2, phi_m = oc.delta_neutral_portfolio_weights_continuous(data_test_dataframe,
+                                                                        mu_m=0.05, sigma_m=0.35,
+                                                                        gamma=4, r=0.02)
 
 
 Research Notebook
