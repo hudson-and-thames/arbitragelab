@@ -16,13 +16,13 @@ from arbitragelab.stochastic_control_approach.optimal_convergence import Optimal
 
 class TestOptimalConvergence(unittest.TestCase):
     """
-    Test Optimal Convergence model in Stochastic Control Approach module
+    Test Optimal Convergence model in Stochastic Control Approach module.
     """
 
     @classmethod
     def setUpClass(cls):
         """
-        Set up data and parameters
+        Set up data and parameters.
         """
 
         np.random.seed(0)
@@ -81,7 +81,7 @@ class TestOptimalConvergence(unittest.TestCase):
         data = ['GLD', 'GDX', 0, 0, 0, 0, 0]
 
         # Testing the output of describe method
-        pd.testing.assert_series_equal(pd.Series(index=index,data=data), sc_liu.describe(), check_exact=False, atol=1e-3)
+        pd.testing.assert_series_equal(pd.Series(index=index, data=data), sc_liu.describe(), check_exact=False, atol=1e-3)
 
 
     def test_unconstrained_continuous(self):

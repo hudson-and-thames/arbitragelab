@@ -12,18 +12,20 @@ import numpy as np
 import pandas as pd
 from sklearn.linear_model import LinearRegression
 
+from arbitragelab.util import devadarsh
+
 class OptimalConvergence:
     """
-     This module models the optimal convergence trades under both recurring and nonrecurring arbitrage opportunities
-     represented by continuing and “stopped” co-integrated price processes.
+    This module models the optimal convergence trades under both recurring and nonrecurring arbitrage opportunities
+    represented by continuing and “stopped” co-integrated price processes.
 
-     Along with delta neutral portfolios, this module also considers unconstrained optimal portfolios where the portfolio weights
-     of both the stocks in the spread are calculated dynamically. Conventional long-short delta neutral strategies
-     are generally suboptimal and it can be optimal to simultaneously go long (or short) in two mis-priced assets.
-     Standard arbitrage strategies and/or delta neutral convergence trades are designed to explore long-term arbitrage
-     opportunities but do typically not optimally exploit the short-run risk return trade-off. By placing arbitrage
-     opportunities in the context of a portfolio maximization problem, this optimal convergence strategy accounts
-     for both arbitrage opportunities and diversification benefits.
+    Along with delta neutral portfolios, this module also considers unconstrained optimal portfolios where the portfolio weights
+    of both the stocks in the spread are calculated dynamically. Conventional long-short delta neutral strategies
+    are generally suboptimal and it can be optimal to simultaneously go long (or short) in two mis-priced assets.
+    Standard arbitrage strategies and/or delta neutral convergence trades are designed to explore long-term arbitrage
+    opportunities but do typically not optimally exploit the short-run risk return trade-off. By placing arbitrage
+    opportunities in the context of a portfolio maximization problem, this optimal convergence strategy accounts
+    for both arbitrage opportunities and diversification benefits.
     """
 
     def __init__(self):
@@ -49,15 +51,17 @@ class OptimalConvergence:
         self.mu_m = None
         self.sigma_m = None
 
+        devadarsh.track('OptimalConvergence')
+
 
     def fit(self, prices: pd.DataFrame, mu_m: float, sigma_m: float, r: float, delta_t: float = 1 / 252):
         """
-        This method estimates the error-correction terms(lambda) using the inputted pricing data.
+        This method estimates the error-correction terms (lambda) using the inputted pricing data.
 
-        :param r: (float) Interest Rate.
-        :param sigma_m: (float) Market Volatility.
-        :param mu_m: (float) Market Risk Premium.
         :param prices: (pd.DataFrame) Contains price series of both stocks in spread.
+        :param mu_m: (float) Market Risk Premium.
+        :param sigma_m: (float) Market Volatility.
+        :param r: (float) Interest Rate.
         :param delta_t: (float) Time difference between each index of data, calculated in years.
         """
 
@@ -69,7 +73,7 @@ class OptimalConvergence:
         self.sigma_m = sigma_m
         self.r = r
 
-        # Using Equation (1) and (2) to calculate lambda's and beta term
+        # Using Equations (1) and (2) to calculate lambda's and beta term
 
         x, _ = self._x_tau_calc(prices)
         prices = self._data_preprocessing(prices)
@@ -82,12 +86,12 @@ class OptimalConvergence:
         y_1 = returns_df.iloc[:, 0].to_numpy()
         y_2 = returns_df.iloc[:, 1].to_numpy()
 
-        lr.fit(x[:-1].reshape(-1,1), y_1)
+        lr.fit(x[:-1].reshape(-1, 1), y_1)
 
         self.lambda_1 = -lr.coef_[0]
         beta_1 = (lr.intercept_ - self.r) / self.mu_m
 
-        lr.fit(x[:-1].reshape(-1,1), y_2)
+        lr.fit(x[:-1].reshape(-1, 1), y_2)
         self.lambda_2 = lr.coef_[0]
         beta_2 = (lr.intercept_ - self.r) / self.mu_m
 
@@ -155,9 +159,9 @@ class OptimalConvergence:
         If lambda_1 = lambda_2, from the portfolio weights outputted from this method phi_2 + phi_1 = 0,
         which implies delta neutrality. This follows Proposition 3 in the paper.
 
-        :param gamma: (float) signifies investor's attitude towards risk.
         :param prices: (pd.DataFrame) Contains price series of both stocks in spread.
-        :return: (tuple) Consists of three numpy arrays: weights for asset 1, asset 2, and market portfolio
+        :param gamma: (float) Signifies investor's attitude towards risk (positive float value).
+        :return: (tuple) Consists of three numpy arrays: weights for asset 1, asset 2, and market portfolio.
         """
 
         if self.beta is None:
@@ -172,7 +176,7 @@ class OptimalConvergence:
 
         C_t = self._C_calc(tau)
 
-        matrix = np.zeros((2,2))
+        matrix = np.zeros((2, 2))
         matrix[0, 0] = self.sigma_squared + self.b_squared
         matrix[0, 1] = - self.sigma_squared
         matrix[1, 0] = matrix[0, 1]
@@ -202,9 +206,9 @@ class OptimalConvergence:
         in the spread is zero. We also assume a continuing cointegrated price process (recurring arbitrage opportunities),
         which gives closed-form solutions for the optimal portfolio weights.
 
-        :param gamma: (float) signifies investor's attitude towards risk.
         :param prices: (pd.DataFrame) Contains price series of both stocks in spread.
-        :return: (tuple) Consists of three numpy arrays: weights for asset 1, asset 2, and market portfolio
+        :param gamma: (float) Signifies investor's attitude towards risk (positive float value).
+        :return: (tuple) Consists of three numpy arrays: weights for asset 1, asset 2, and market portfolio.
         """
 
         if self.beta is None:
@@ -235,9 +239,9 @@ class OptimalConvergence:
         This method calculates the expected wealth gain of the unconstrained optimal strategy relative to the
         delta neutral strategy assuming a mis-pricing of the spread.
 
-        :param gamma: (float) signifies investor's attitude towards risk.
         :param prices: (pd.DataFrame) Contains price series of both stocks in spread.
-        :return: (tuple) Consists of three numpy arrays: weights for asset 1, asset 2, and market portfolio
+        :param gamma: (float) Signifies investor's attitude towards risk (positive float value).
+        :return: (tuple) Consists of three numpy arrays: weights for asset 1, asset 2, and market portfolio.
         """
 
         if self.beta is None:
@@ -275,7 +279,7 @@ class OptimalConvergence:
         prices = self._data_preprocessing(prices).to_numpy()
 
         t = np.arange(0, len(prices)) * self.delta_t
-        tau = t[-1] - t  # Stores time remaining till closure (In years)
+        tau = t[-1] - t  # Stores time remaining till closure (in years)
 
         x = np.log(prices[:, 0] / prices[:, 1])
 
@@ -290,6 +294,7 @@ class OptimalConvergence:
         """
 
         lambda_x = self.lambda_1 + self.lambda_2  # This should be always positive
+
         return lambda_x
 
 
