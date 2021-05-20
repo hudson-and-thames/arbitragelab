@@ -10,6 +10,7 @@ This module is a realization of the methodology in the following paper:
 
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 
 from arbitragelab.util import devadarsh
@@ -232,33 +233,44 @@ class OptimalConvergence:
         return phi_1, phi_2, phi_m
 
 
-    def wealth_gain_continuous(self, prices: pd.DataFrame, gamma: float = 4) -> np.array:
+    def wealth_gain_continuous(self, gamma: float = 4) -> np.array:
         """
         Implementation of Proposition 4.
 
         This method calculates the expected wealth gain of the unconstrained optimal strategy relative to the
         delta neutral strategy assuming a mis-pricing of the spread.
 
-        :param prices: (pd.DataFrame) Contains price series of both stocks in spread.
         :param gamma: (float) Signifies investor's attitude towards risk (positive float value).
         :return: (tuple) Consists of three numpy arrays: weights for asset 1, asset 2, and market portfolio.
         """
-
-        if self.beta is None:
-            raise Exception("Please run fit before calling this method.")
 
         if gamma <= 0:
             raise Exception("The value of gamma should be positive.")
 
         self.gamma = gamma
 
-        x, tau = self._x_tau_calc(prices)
+        # x, tau = self._x_tau_calc(prices)
+
+
+        x = np.linspace(0, 0.2, 252)
+        t = np.arange(0, len(x)) * self.delta_t
+        tau = t[-1] - t  # Stores time remaining till closure (in years)
+
+        #σ = 0.15, b = 0.30, μm = 0.05, σm = 0.35, and r = 0.02
+        self.sigma_squared = 0.15 ** 2
+        self.b_squared = 0.30 ** 2
+        self.mu_m = 0.05
+        self.sigma_m = 0.35
+        self.r = 0.02
+        self.lambda_1 = 0.52
+        self.lambda_2 = -0.35
 
         u_x_t = self._u_func_continuous_calc(x, tau)
         v_x_t = self._v_func_continuous_calc(x, tau)
 
         R = np.exp((u_x_t - v_x_t) / (1 - self.gamma))
-
+        plt.plot(x, R)
+        plt.show()
         return R
 
 
