@@ -45,7 +45,7 @@ class DBSCANPairsClustering:
 
         self.clust_labels_ = []
 
-        devadarsh.track('PairsSelector')
+        devadarsh.track('DBSCANPairsClustering')
 
     def dimensionality_reduction_by_components(self, num_features: int = 10):
         """

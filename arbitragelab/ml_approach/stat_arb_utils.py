@@ -102,15 +102,15 @@ def _outer_ou_loop(spreads_df: pd.DataFrame, test_period: str,
     return pd.DataFrame(ou_results, index=molecule, columns=['hl', 'crossovers'])
 
 
-# pylint: disable=protected-access
 def _outer_cointegration_loop(prices_df: pd.DataFrame, molecule: list, hedge_ratio_calculation: str) -> pd.DataFrame:
+    # pylint: disable=protected-access
     """
     This function calculates the Engle-Granger test for each pair in the molecule.
 
     :param prices_df: (pd.DataFrame) Price Universe.
     :param molecule: (list) Indices of pairs.
     :param hedge_ratio_calculation: (str) Defines how hedge ratio is calculated. Can be either 'OLS,
-                                        'TLS' (Total Least Squares) or 'min_half_life'.
+        'TLS' (Total Least Squares) or 'min_half_life'.
     :return: (pd.DataFrame) Cointegration statistics.
     """
 
@@ -131,7 +131,7 @@ def _outer_cointegration_loop(prices_df: pd.DataFrame, molecule: list, hedge_rat
                                                               dependent_variable=pair[0])
             hedge_ratio = fit.x[0]
         else:
-            raise ValueError('Unknown hedge ratio calculation parameter value')
+            raise ValueError('Unknown hedge ratio calculation parameter value.')
 
         constant = residuals.mean()
         eg_port._perform_eg_test(residuals)

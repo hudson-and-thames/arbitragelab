@@ -1,3 +1,7 @@
+# Copyright 2019, Hudson and Thames Quantitative Research
+# All rights reserved
+# Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
+
 """
 Abstract pair selector class.
 """
@@ -21,8 +25,9 @@ class AbstractPairsSelector(ABC):
     @abstractmethod
     def select_pairs(self):
         """
-        Method which selects pairs based on some predefined criterions.
+        Method which selects pairs based on some predefined criteria.
         """
+
         raise NotImplementedError('Must implement select_pairs() method.')
 
     @staticmethod
@@ -47,15 +52,15 @@ class AbstractPairsSelector(ABC):
         :param leg_1: (list) Vector of asset names.
         :param leg_2: (list) Vector of asset names.
         :param sectoral_info_df: (pd.DataFrame) DataFrame with two columns [ticker, sector] to be used in the output.
-        :return: (pd.DataFrame) Dataframe of pair sectoral statistics.
+        :return: (pd.DataFrame) DataFrame of pair sectoral statistics.
         """
 
         leg_1_info = self._loop_through_sectors(leg_1, sectoral_info_df)
         leg_2_info = self._loop_through_sectors(leg_2, sectoral_info_df)
 
         info_df = pd.concat([leg_1_info, leg_2_info], axis=1)
-        info_df.columns = ['Leg 1 Ticker', 'Industry',
-                           'Sector', 'Leg 2 Ticker', 'Industry', 'Sector']
+        info_df.columns = ['Leg 1 Ticker', 'Industry', 'Sector',
+                           'Leg 2 Ticker', 'Industry', 'Sector']
 
         return info_df
 
@@ -65,7 +70,7 @@ class AbstractPairsSelector(ABC):
 
         :param tickers: (list) Vector of asset names.
         :param sectoral_info_df: (pd.DataFrame) DataFrame with two columns [ticker, sector] to be used in the output.
-        :return: (pd.DataFrame) Dataframe of ticker sectoral statistics.
+        :return: (pd.DataFrame) DataFrame of ticker sectoral statistics.
         """
 
         tck_info = []
@@ -114,6 +119,7 @@ class AbstractPairsSelector(ABC):
         :param pair: (tuple) Tuple of asset names.
         :return: (Axes) Axes object.
         """
+
         _, ax_object = plt.subplots(1, figsize=(15, 3))
 
         rets_asset_one = np.log(self.prices_df.loc[:, pair[0]]).diff()
