@@ -73,6 +73,8 @@ class Golem:
         import arbitragelab.util as util
         import arbitragelab.optimal_mean_reversion as optimal_mean_reversion
         import arbitragelab.time_series_approach as time_series_approach
+        import arbitragelab.hedge_ratios as hedge_ratios
+        import arbitragelab.pairs_selection as pairs_selection
         devadarsh.track('Import')
 
     # pylint: disable=missing-function-docstring
