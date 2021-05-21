@@ -31,7 +31,7 @@ from arbitragelab.util import devadarsh
 
 class TearSheet:
     """
-    This class implements an interactive visualization tool in the form of a Dash-based web-application for
+    This class implements an interactive visualization tool in the form of a Dash-based web application for
     showcasing analytics for a provided pair of assets using modules and techniques implemented in the ArbitrageLab
     package.
 
@@ -52,8 +52,8 @@ class TearSheet:
         self.light_grey = '#F2F3F4'  # Alice Blue brand color
         self.black = '#0B0D13'  # Rich Black brand color
         self.white = '#ffffff'  # White brand color
-        self.text_font = 'Roboto'  # Font used for test outputs
-        self.header_font = 'Josefin Sans'  # Font used for headers
+        self.text_font = 'Arial'  # Font used for test outputs
+        self.header_font = 'Arial'  # Font used for headers
 
         devadarsh.track('TearSheet')
 
@@ -63,7 +63,7 @@ class TearSheet:
         Sets the default space for building the visualization app.
 
         :param app_display: (str) Parameter that signifies whether to open a web app in a separate tab or inside
-            a jupyter notebook
+            a jupyter notebook ['default' or 'jupyter'].
         :return: (Dash) The Dash app object, which can be run using run_server.
         """
 
@@ -130,6 +130,7 @@ class TearSheet:
         half-life, skewness, kurtosis, Shapiro-Wilk normality test results, QQ-plot data,
         result of ACF and PACF calculations, and returns it in a form of a tuple.
 
+        :param residuals: (np.array) Residuals results from the Engle-Granger test.
         :return: (tuple) Combined results of the analysis of residuals.
         """
 
@@ -148,7 +149,7 @@ class TearSheet:
         else:
             shapiro_wilk = 'Failed'
 
-        # Creating a representative dataframe for all statistical charachteristics
+        # Creating a representative dataframe for all statistical characteristics
         residuals_dataframe = pd.DataFrame(data={
             'Characteristic': ['Standard Deviation', 'Half-life', 'Skewness', 'Kurtosis',
                                'Shapiro-Wilk normality test'],
@@ -172,7 +173,7 @@ class TearSheet:
 
     def _get_engle_granger_data(self, data):
         """
-        Calculates all the data connected to a portfolio created with Engle-Granger approach,
+        Calculates all the data connected to a portfolio created with the Engle-Granger approach,
         such as: ADF test result, ADF test statistic, cointegration vector, portfolio returns,
         portfolio price, residuals, residual analysis results.
 
@@ -182,9 +183,6 @@ class TearSheet:
 
         # Calculating the data returns
         data_returns = (data / data.shift(1) - 1)[1:]
-
-        # Adding weights to take initial prices of given assets into account
-        weights = data.iloc[0] / abs(data.iloc[0]).sum()
 
         # Initializing an instance of EngleGrangerPortfolio class
         portfolio = EngleGrangerPortfolio()
@@ -209,7 +207,7 @@ class TearSheet:
         scaled_vector = (cointegration_vector.loc[0] / abs(cointegration_vector.loc[0]).sum())
 
         # Calculating the portfolio returns
-        portfolio_returns = (data_returns * scaled_vector * weights).sum(axis=1)
+        portfolio_returns = (data * scaled_vector).sum(axis=1)
 
         # Calculating the portfolio price
         portfolio_price = (portfolio_returns + 1).cumprod()
@@ -240,9 +238,6 @@ class TearSheet:
 
         # Calculating the data returns
         data_returns = (data / data.shift(1) - 1)[1:]
-
-        # Adding weights to take initial prices of given assets into account
-        weights = data.iloc[0] / abs(data.iloc[0]).sum()
 
         # Initializing an instance of JohansenPortfolio class
         portfolio = JohansenPortfolio()
@@ -284,12 +279,12 @@ class TearSheet:
                            abs(portfolio.cointegration_vectors.loc[1]).sum()).round(5)
 
         # Calculating portfolio returns and portfolio price for the first cointegration vector
-        portfolio_returns_1 = (data_returns * scaled_vector_1 * weights).sum(axis=1)
+        portfolio_returns_1 = (data_returns * scaled_vector_1).sum(axis=1)
 
         portfolio_price_1 = (portfolio_returns_1 + 1).cumprod()
 
         # Calculating portfolio returns and portfolio price for the second cointegration vector
-        portfolio_returns_2 = (data_returns * scaled_vector_2 * weights).sum(axis=1)
+        portfolio_returns_2 = (data_returns * scaled_vector_2).sum(axis=1)
 
         portfolio_price_2 = (portfolio_returns_2 + 1).cumprod()
 
@@ -347,7 +342,7 @@ class TearSheet:
         :param dataframe: (pd.DataFrame) Dataframe that contains the result of the ADF test.
         :param test_statistic_1: (float) Test statistic value for the first asset.
         :param test_statistic_2: (float) Test statistic value for the first asset.
-        :return: (tuple)
+        :return: (tuple) A combined tuple with test interpretation message, color and font.
         """
 
         # Setting the default message font and color
@@ -585,7 +580,7 @@ class TearSheet:
                            eigen_test_statistic_1, eigen_test_statistic_2, trace_test_statistic_1,
                            trace_test_statistic_2):
         """
-        Creates a web-application layout for the Johansen cointegration tests segment.
+        Creates a web application layout for the Johansen cointegration tests segment.
 
         :param asset_1: (str) The name of the first asset.
         :param asset_2: (str) The name of the second asset.
@@ -827,7 +822,7 @@ class TearSheet:
 
     def _jh_div(self, asset_1, asset_2, coint_vector, portfolio_price, portfolio_return):
         """
-        Creates a web-application layout for the Johansen cointegrated portfolio depiction segment.
+        Creates a web application layout for the Johansen cointegrated portfolio depiction segment.
 
         :param asset_1: (str) The name of the first asset.
         :param asset_2: (str) The name of the second asset.
@@ -948,7 +943,7 @@ class TearSheet:
     def _eg_div(self, asset_1, asset_2, cointegration_test, test_statistic, beta, portfolio_price, portfolio_return,
                 pacf_data, acf_data, residuals, qq_y_data, qq_x_data, res_data):
         """
-        Creates a web-application layout for the Engel-Granger cointegrated portfolio analysis.
+        Creates a web application layout for the Engel-Granger cointegrated portfolio analysis.
 
         :param asset_1: (str) The name of the first asset.
         :param asset_2: (str) The name of the second asset.
@@ -1327,7 +1322,7 @@ class TearSheet:
 
     def cointegration_tearsheet(self, data, app_display='default'):
         """
-        Creates a web-application that visualizes the results of the cointegration analysis of the provided pair of
+        Creates a web application that visualizes the results of the cointegration analysis of the provided pair of
         assets. The mentioned pair is subjected to Engle-Granger and Johansen tests and residual analysis if possible.
 
         Engle-Granger analysis is provided for both combinations of assets:
@@ -1337,7 +1332,7 @@ class TearSheet:
 
         :param data: (pd.Dataframe) A dataframe of two asset prices with asset names as the names of the columns.
         :param app_display: (str) Parameter that signifies whether to open a web app in a separate tab or inside
-                                  the jupyter notebook
+            the jupyter notebook ['default' or 'jupyter'].
         :return: (Dash) The Dash app object, which can be run using run_server.
         """
 
@@ -1399,7 +1394,7 @@ class TearSheet:
                            'margin-left': 'auto',
                            'margin-right': 'auto'}),
 
-            # The charachteristics of teh two assets
+            # The characteristics of teh two assets
             html.Div(style={'margin-left': '5%',
                             'margin-right': '5%',
                             'margin-top': '5%',
@@ -1607,7 +1602,7 @@ class TearSheet:
                         self._jh_coint_test_div(name_1, name_2, j_test_eigen_dataframe, j_test_trace_dataframe,
                                                 j_eigen_test_statistic_1, j_eigen_test_statistic_2,
                                                 j_trace_test_statistic_1, j_trace_test_statistic_2)]),
-                    # Butttons representative of the coise of the respective cointegration vector
+                    # Buttons representative of the coise of the respective cointegration vector
                     html.Div(
 
                         style={'display': 'inline-block',
@@ -1668,7 +1663,7 @@ class TearSheet:
                         ])
                 ]),
 
-                # Cointegrated portfolio vizualization depending on chosen cointegration vector
+                # Cointegrated portfolio visualization depending on chosen cointegration vector
                 html.Div(id='johansen_container')
             ])
         ])
@@ -1762,6 +1757,7 @@ class TearSheet:
                 coint_vector = j_cointegration_vector_1
                 portfolio_price = j_portfolio_price_1
                 portfolio_return = j_portfolio_returns_1
+
             elif 'button-4' in changed_id:
                 # Assigning the values that correspond to the second cointegration vector
                 asset_1 = name_1
@@ -1769,6 +1765,7 @@ class TearSheet:
                 coint_vector = j_cointegration_vector_2
                 portfolio_price = j_portfolio_price_2
                 portfolio_return = j_portfolio_returns_2
+
             else:
                 # Assigning the values that correspond to the first cointegration vector
                 asset_1 = name_1
@@ -1791,7 +1788,7 @@ class TearSheet:
         containing models statistical characteristics (mean-reversion speed, long-term mean, standard deviation,
          max log-likelihood), normalized spread price, simulated OU-process with the same statistical characteristics.
 
-        :param model: (OrnsteinUhlenbeck()) OU model fitted to the optimized portfolio created from given data.
+        :param model: (OrnsteinUhlenbeck) OU model fitted to the optimized portfolio created from given data.
         :return: (tuple) Consolidated data connected to the fitted OU process.
         """
 
@@ -1807,14 +1804,14 @@ class TearSheet:
 
         theta = model.theta
 
-        sigma_square = model.sigma_square
+        sigma = model.sigma_square ** (1/2)
 
         mll = model.mll
 
         # Creating a representative dataframe for models parameters
         spread_dataframe = pd.DataFrame(data={
             'Characteristic': ['Mean-reversion speed', 'Long-term mean', 'Standard deviation', 'Max log-likelihood'],
-            'Value': [round(mu, 5), round(theta, 5), round(sigma_square, 5), round(mll, 5)]})
+            'Value': [round(mu, 5), round(theta, 5), round(sigma, 5), round(mll, 5)]})
 
         # Calculating coefficients for the portfolio price calculation
         alpha = 1 / model.data[asset_1][0]
@@ -1843,6 +1840,7 @@ class TearSheet:
         :param d_sl: (float) An optimal entry level that accounts for stop-loss.
         :return: (go.Figure) Plot of the optimal entry/exit levels alongside the spread price.
         """
+
         # Creating a figure
         asset_prices = go.Figure()
 
@@ -1910,6 +1908,7 @@ class TearSheet:
         :param name_2: (str) The name of the second asset.
         :return: (go.Figure) Plot of the normalized prices.
         """
+
         asset_prices = go.Figure()
         asset_prices.add_trace(
             go.Scatter(x=self.data.index,
@@ -1943,9 +1942,10 @@ class TearSheet:
 
         :param spread_price: (pd.Series) Spread price series.
         :param ou_modelled_process: (pd.Series) Simulated ou process that possesses the same statistical
-                                    characteristics as the fitted model.
+            characteristics as the fitted model.
         :return: (go.Figure) Plot of the spread prices and simulated OU process.
         """
+
         # Creating a figure
         asset_prices = go.Figure()
 
@@ -1980,7 +1980,7 @@ class TearSheet:
 
     def _optimal_levels_div(self, data, spread_price, b, d, b_sl, d_sl):
         """
-        Creates a web-application layout for the optimal entry and exit levels alongside with the spread price.
+        Creates a web application layout for the optimal entry and exit levels alongside with the spread price.
 
         :param data: (pd.DataFrame) A dataframe of two assets.
         :param spread_price: (pd.Series) The series of spread price.
@@ -2034,10 +2034,11 @@ class TearSheet:
 
     def _optimal_levels_error_div(self):
         """
-        Creates a web-application layout for the error message.
+        Creates a web application layout for the error message.
 
-        :return: (html.Div) Div for the error message in case there is no optimal soultion.
+        :return: (html.Div) Div for the error message in case there is no optimal solution.
         """
+
         output = html.Div(
             style={'padding-left': 0,
                    'padding-right': 0,
@@ -2094,7 +2095,7 @@ class TearSheet:
     def _ou_div(self, spread_price, ou_modelled_process, spread_dataframe, model, cointegration_test, test_statistic,
                 norm_1, norm_2, name_1, name_2):
         """
-        Creates a web-application layout for the OU-model analysis and optimal portfolio creation.
+        Creates a web application layout for the OU-model analysis and optimal portfolio creation.
 
         :param spread_price: (pd.Series) The series of an optimal spread portfolio price.
         :param ou_modelled_process: (pd.Series) The series of simulated OU process.
@@ -2108,6 +2109,7 @@ class TearSheet:
         :param name_2: (str) The name of the second asset.
         :return: (html.Div) Div for the OU optimal portfolio analysis.
         """
+
         # Getting the asset names
         asset_1 = model.data.columns[0]
         asset_2 = model.data.columns[1]
@@ -2374,7 +2376,7 @@ class TearSheet:
 
     def ou_tearsheet(self, data, app_display='default'):
         """
-        Creates a web-application that visualizes the results of the OU model analysis of the provided pair of
+        Creates a web application that visualizes the results of the OU model analysis of the provided pair of
         assets. The mentioned pair is subjected to Engle-Granger test and optimal portfolio creation.
 
         OU model analysis is provided for both combinations of assets:
@@ -2382,10 +2384,11 @@ class TearSheet:
 
         :param data: (pd.Dataframe) A dataframe of two asset prices with asset names as the names of the columns.
         :param app_display: (str) Parameter that signifies whether to open a web app in a separate tab or inside
-                                  the jupyter notebook
+            the jupyter notebook ['default' or 'jupyter'].
         :return: (Dash) The Dash app object, which can be run using run_server.
         """
-        # Setting the data class atribute
+
+        # Setting the data class attribute
         self.data = data
 
         # Setting the parameter that refers to the first asset combination
@@ -2696,6 +2699,7 @@ class TearSheet:
             :param btn2: (int) Prop parameter that represents the second button.
             :return: (html.Div) OU model analysis div.
             """
+
             changed_id = [p['prop_id'] for p in dash.callback_context.triggered][0]
             if 'button-1' in changed_id:
                 asset_1 = name_1
@@ -2748,6 +2752,7 @@ class TearSheet:
             :param stop_loss: (int) Prop parameter that represents the stop loss field input.
             :return: (html.Div) OU model analysis div.
             """
+
             changed_id = [p['prop_id'] for p in dash.callback_context.triggered][0]
             if 'button-1' in changed_id:
                 spread_price = spread_price_1

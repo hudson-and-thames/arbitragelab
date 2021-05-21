@@ -310,7 +310,7 @@ class TestTearSheet(unittest.TestCase):
         self.assertAlmostEqual(spread_dataframe.loc[spread_dataframe['Characteristic'] == 'Long-term mean',
                                                     'Value'].iloc[0], 0.71758, places=5)
         self.assertAlmostEqual(spread_dataframe.loc[spread_dataframe['Characteristic'] == 'Standard deviation',
-                                                    'Value'].iloc[0], 0.00698, places=5)
+                                                    'Value'].iloc[0], 0.08354, places=5)
         self.assertAlmostEqual(spread_dataframe.loc[spread_dataframe['Characteristic'] == 'Max log-likelihood',
                                                     'Value'].iloc[0], 3.84064, places=5)
 
