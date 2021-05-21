@@ -161,8 +161,8 @@ class TearSheet:
         qq_plot_x = np.array([qq_plot_y[0][0][0], qq_plot_y[0][0][-1]])
 
         # Calculate auto-correlation and partial auto-correlation function
-        pacf_result = pacf(residuals.diff()[1:], nlags=20)
-        acf_result = acf(residuals.diff()[1:], nlags=20, fft=True)
+        pacf_result = pacf(residuals.diff()[1:], nlags=20)[1:]
+        acf_result = acf(residuals.diff()[1:], nlags=20, fft=True)[1:]
 
         # Combining the output tuple
         output = (residuals, residuals_dataframe,
@@ -207,7 +207,7 @@ class TearSheet:
         scaled_vector = (cointegration_vector.loc[0] / abs(cointegration_vector.loc[0]).sum())
 
         # Calculating the portfolio returns
-        portfolio_returns = (data * scaled_vector).sum(axis=1)
+        portfolio_returns = (data_returns * scaled_vector).sum(axis=1)
 
         # Calculating the portfolio price
         portfolio_price = (portfolio_returns + 1).cumprod()
@@ -466,7 +466,7 @@ class TearSheet:
         """
 
         # Establishing the data for a PACF graph
-        trace = {"name": "PACF", "type": "bar", "marker_color": self.blue, "y": pacf_data}
+        trace = {"name": "PACF", "type": "bar", "marker_color": self.blue, "y": pacf_data, "x": np.arange(1, 20)}
 
         # Creating a figure with established data
         pacf_plot = go.Figure(data=trace)
@@ -493,7 +493,7 @@ class TearSheet:
         """
 
         # Establishing the data for a ACF graph
-        trace = {"name": "ACF", "type": "bar", "marker_color": self.blue, "y": acf_data}
+        trace = {"name": "ACF", "type": "bar", "marker_color": self.blue, "y": acf_data, "x": np.arange(1, 20)}
 
         # Creating a figure with established data
         acf_plot = go.Figure(data=trace)

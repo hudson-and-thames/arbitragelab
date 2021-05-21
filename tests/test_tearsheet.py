@@ -138,8 +138,8 @@ class TestTearSheet(unittest.TestCase):
         self.assertAlmostEqual(qq_plot_x.mean(), 1, places=5)
 
         # PACF and ACF
-        self.assertAlmostEqual(pacf_result.mean(), -0.081438, places=5)
-        self.assertAlmostEqual(acf_result.mean(), 0.024990, places=5)
+        self.assertAlmostEqual(pacf_result.mean(), -0.135510, places=5)
+        self.assertAlmostEqual(acf_result.mean(), -0.023760, places=5)
 
         # Testing statistics for beta dataset
         (_, residuals_dataframe, _, _, _, _) = results_beta
