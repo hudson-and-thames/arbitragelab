@@ -10,7 +10,7 @@ bringing an interactive approach to the data visualization with `Plotly's Dash <
 
 .. Note::
 
-    Running run_server() will produce the warning
+    Running `run_server()` will produce the warning
 
     "Warning: This is a development server. Do not use app.run_server
     in production, use a production WSGI server like gunicorn instead."
@@ -75,6 +75,9 @@ Code Example
 
 .. code-block::
 
+    # Import ArbitrageLab tools
+    from arbitragelab.tearsheet import TearSheet
+
     # Initialize TearSheet class
     tearsheet = TearSheet()
 
@@ -127,6 +130,9 @@ Code Example
 
 .. code-block::
 
+    # Import ArbitrageLab tools
+    from arbitragelab.tearsheet import TearSheet
+
     # Initialize TearSheet class
     tearsheet = TearSheet()
 
@@ -144,9 +150,15 @@ You can easily run a Dash server within Jupyter Notebook. The `Jupyter Dash libr
 
 When you initialize the server by using either `cointegration_tearsheet` or `ou_tearsheet` functions, you must add argument ``app_display='jupyter'``.
 
+.. Warning::
+    Jupyter layout may not be optimal for all devices as it depends on the screen ratio, resolution and scaling.
+
 To run the visualizations in Jupyter, replace:
 
 .. code-block::
+
+    # Import ArbitrageLab tools
+    from arbitragelab.tearsheet import TearSheet
 
     # Initialize TearSheet class
     tearsheet = TearSheet()
@@ -160,6 +172,9 @@ To run the visualizations in Jupyter, replace:
 With:
 
 .. code-block::
+
+    # Import ArbitrageLab tools
+    from arbitragelab.tearsheet import TearSheet
 
     # Initialize TearSheet class
     tearsheet = TearSheet()
