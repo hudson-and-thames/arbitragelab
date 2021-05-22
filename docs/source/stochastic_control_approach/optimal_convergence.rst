@@ -43,14 +43,13 @@ geometric random walk process,
 where the market risk premium, :math:`\mu_{m}`, and market volatility, \sigma_{m}`, are both constant,
 and :math:`B_t` is a standard Brownian motion.
 
-
 In addition to the risk-free asset and the market index, the authors assume the presence
 of two risky assets whose prices :math:`P_{it}, i = 1,2`, evolve according to the equations
 
 .. math::
     \begin{array}{l}
     \frac{d P_{1 t}}{P_{1 t}}=\left(r+\beta \mu_{m}\right) d t+\beta \sigma_{m} d B_{t}+\sigma d Z_{t}+b d Z_{1 t}
-    -\lambda_{1} x_{1} d t \\
+    -\lambda_{1} x_{t} d t \\
     \frac{d P_{2 t}}{P_{2 t}}=\left(r+\beta \mu_{m}\right) d t+\beta \sigma_{m} d B_{t}+\sigma d Z_{t}+b d Z_{2 t}
     +\lambda_{2} x_{t} d t
     \end{array}
@@ -251,10 +250,19 @@ In this step we input the evaluation data and specify the utility function param
     Please make sure the value of ``gamma`` is positive.
 
 
+Wealth gain in continuous case
+******************************
+
+In this step we specify the utility function parameter :math:`\gamma`.
+
+.. warning::
+    Please make sure the value of ``gamma`` is positive.
+
+
 Implementation
 ==============
 
-.. automethod:: OptimalConvergence.delta_neutral_portfolio_weights_continuous
+.. automethod:: OptimalConvergence.wealth_gain_continuous
 
 
 Examples
@@ -265,10 +273,10 @@ We use GLD and GDX tickers from Yahoo Finance as the dataset for this example.
 .. code-block::
 
     import yfinance as yf
-
+    
     data1 =  yf.download("GLD GDX", start="2009-03-25", end="2019-03-25")
     data2 =  yf.download("GLD GDX", start="2019-03-27", end="2020-03-27")
-
+    
     data_train_dataframe = data1["Adj Close"][["GLD", "GDX"]]
     data_test_dataframe = data2["Adj Close"][["GLD", "GDX"]]
 
@@ -283,15 +291,13 @@ Finally, we use the out-of-sample test data to calculate the optimal portfolio w
 .. code-block::
 
     from arbitragelab.stochastic_control_approach.optimal_convergence import OptimalConvergence
-
+    
     oc = OptimalConvergence()
     oc.fit(data_train_dataframe, r = 0.02, mu_m = 0.05, sigma_m = 0.10)
-
+    
     print(oc.describe())
-
-    phi_1, phi_2, phi_m = oc.unconstrained_portfolio_weights_continuous(data_test_dataframe,
-                                                                        mu_m=0.05, sigma_m=0.35,
-                                                                        gamma=4, r=0.02)
+    
+    phi_1, phi_2, phi_m = oc.unconstrained_portfolio_weights_continuous(data_test_dataframe, gamma=4)
 
 
 Example 2
@@ -305,15 +311,13 @@ Finally, we use the out-of-sample test data to calculate the delta neutral portf
 .. code-block::
 
     from arbitragelab.stochastic_control_approach.optimal_convergence import OptimalConvergence
-
+    
     oc = OptimalConvergence()
     oc.fit(data_train_dataframe, r = 0.02, mu_m = 0.05, sigma_m = 0.10)
-
+    
     print(oc.describe())
-
-    phi_1, phi_2, phi_m = oc.delta_neutral_portfolio_weights_continuous(data_test_dataframe,
-                                                                        mu_m=0.05, sigma_m=0.35,
-                                                                        gamma=4, r=0.02)
+    
+    phi_1, phi_2, phi_m = oc.delta_neutral_portfolio_weights_continuous(data_test_dataframe, gamma=4)
 
 
 Research Notebook

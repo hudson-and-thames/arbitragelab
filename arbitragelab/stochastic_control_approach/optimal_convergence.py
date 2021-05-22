@@ -8,9 +8,9 @@ This module is a realization of the methodology in the following paper:
 """
 # pylint: disable=invalid-name, too-many-instance-attributes
 
+import warnings
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 
 from arbitragelab.util import devadarsh
@@ -116,10 +116,16 @@ class OptimalConvergence:
 
         sigma_squared_1 = (np.var(y_1, ddof=1) / self.delta_t) - self.b_squared - (self.beta ** 2) * (self.sigma_m ** 2)
         sigma_squared_2 = (np.var(y_2, ddof=1) / self.delta_t) - self.b_squared - (self.beta ** 2) * (self.sigma_m ** 2)
-        #print(sigma_squared_1, sigma_squared_2)
+
+        if sigma_squared_1 < 0 or sigma_squared_2 < 0:
+            sigma_squared_1 = max(0, sigma_squared_1)
+            sigma_squared_2 = max(0, sigma_squared_2)
+
+            warnings.warn("The value of sigma estimated from the inputted data is poor. "
+                          "This pricing data might be not be well-suited for this particular model. "
+                          "Possible solution would be to use a longer time period, and use pairs suited for exploiting arbitrage mis-pricings.")
 
         self.sigma_squared = (sigma_squared_1 + sigma_squared_2) / 2
-        #TODO: Fix the sigma parameter estimation
 
 
     def describe(self) -> pd.Series:
@@ -240,8 +246,10 @@ class OptimalConvergence:
         This method calculates the expected wealth gain of the unconstrained optimal strategy relative to the
         delta neutral strategy assuming a mis-pricing of the spread.
 
+        We take fixed values of spread between [0, 0.2]. The time to maturity is assumed to be 1 year for each value of spread.
+
         :param gamma: (float) Signifies investor's attitude towards risk (positive float value).
-        :return: (tuple) Consists of three numpy arrays: weights for asset 1, asset 2, and market portfolio.
+        :return: (np.array) wealth gain numpy array.
         """
 
         if gamma <= 0:
@@ -249,12 +257,8 @@ class OptimalConvergence:
 
         self.gamma = gamma
 
-        # x, tau = self._x_tau_calc(prices)
-
-
         x = np.linspace(0, 0.2, 252)
-        t = np.arange(0, len(x)) * self.delta_t
-        tau = t[-1] - t  # Stores time remaining till closure (in years)
+        tau = np.ones(len(x))
 
         #σ = 0.15, b = 0.30, μm = 0.05, σm = 0.35, and r = 0.02
         self.sigma_squared = 0.15 ** 2
@@ -269,15 +273,7 @@ class OptimalConvergence:
         v_x_t = self._v_func_continuous_calc(x, tau)
 
         R = np.exp((u_x_t - v_x_t) / (1 - self.gamma))
-        plt.plot(x, R)
-        plt.show()
         return R
-
-
-    # def wealth_process(self):
-    #     # TODO : To construct the final wealth from portfolio weights, we would need the market index data.
-    #     #  Refer Section 2 in paper.
-    #     pass
 
 
     def _x_tau_calc(self, prices: pd.DataFrame) -> tuple:
