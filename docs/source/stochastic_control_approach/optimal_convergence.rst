@@ -70,6 +70,16 @@ logarithms of the two asset prices, :math:`p_{it} = \ln P_{it}` ,
 .. math::
     x_t = p_{1t} − p_{2t} =\ln\bigg(\frac{P_{1t}}{P_{2t}}\bigg)
 
+
+.. figure:: images/oc_spread.png
+    :scale: 100 %
+    :align: center
+    :figclass: align-center
+
+    Constructed spread for the Royal Dutch - Shell pair.
+
+
+
 The authors make a key assumption here, that :math:`\lambda_1 + \lambda_2 > 0`. This implies that :math:`x_t` is stationary
 and the logarithms of the prices are cointegrated with cointegrating vector :math:`(1,−1)`.
 
@@ -164,10 +174,23 @@ The optimal weights on the market portfolio, :math:`\phi_{m t}^{*}` , and the in
     \end{array}
 
 
-STOPPED COINTEGRATED PROCESS
+.. figure:: images/oc_optimal_first.png
+    :scale: 100 %
+    :align: center
+    :figclass: align-center
+
+    Optimal Portfolio Weights for the first asset in the Royal Dutch - Shell pair.
 
 
-ADD THINGS HERE.
+.. figure:: images/oc_optimal_second.png
+    :scale: 100 %
+    :align: center
+    :figclass: align-center
+
+    Optimal Portfolio Weights for the second asset in the Royal Dutch - Shell pair.
+
+
+
 
 Optimal Delta Neutral Strategy
 ******************************
@@ -192,6 +215,24 @@ For the continuing cointegrated price process (recurring arbitrage opportunities
 
 .. note::
     The optimal strategy is delta neutral if :math:`\lambda_1 = \lambda_2`.
+
+
+
+.. figure:: images/oc_delta_neutral_first.png
+    :scale: 100 %
+    :align: center
+    :figclass: align-center
+
+    Delta Neutral Portfolio Weights for the first asset in the Royal Dutch - Shell pair.
+
+.. figure:: images/oc_delta_neutral_second.png
+    :scale: 100 %
+    :align: center
+    :figclass: align-center
+
+    Delta Neutral Portfolio Weights for the second asset in the Royal Dutch - Shell pair.
+
+
 
 
 How to use this submodule
@@ -224,6 +265,12 @@ Implementation
     To view the estimated model parameters from training data, call the ``describe`` function.
 
     .. automethod:: OptimalConvergence.describe
+
+    .. figure:: images/oc_describe.png
+        :scale: 100 %
+        :align: center
+        :figclass: align-center
+
 
 
 Optimal Unconstrained Portfolio Weights with recurring arbitrage opportunities
