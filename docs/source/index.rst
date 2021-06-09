@@ -63,6 +63,13 @@ This project is licensed under an all rights reserved licence.
 
 .. toctree::
     :maxdepth: 2
+    :caption: Visualization
+    :hidden:
+
+    visualization/tearsheet
+
+.. toctree::
+    :maxdepth: 2
     :caption: Distance Approach
     :hidden:
 
