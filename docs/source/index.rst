@@ -66,7 +66,7 @@ This project is licensed under an all rights reserved licence.
     :caption: Visualization
     :hidden:
 
-    tearsheet/tearsheet
+    visualization/tearsheet
 
 .. toctree::
     :maxdepth: 2
