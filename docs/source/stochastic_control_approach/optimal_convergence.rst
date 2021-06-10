@@ -190,10 +190,16 @@ The optimal weights on the market portfolio, :math:`\phi_{m t}^{*}` , and the in
     Optimal Portfolio Weights for the second asset in the Royal Dutch - Shell pair.
 
 
+.. figure:: images/oc_wealth_optimal.png
+    :scale: 100 %
+    :align: center
+    :figclass: align-center
+
+    Total wealth of the portfolio with Optimal Portfolio Weights strategy.
 
 
-Optimal Delta Neutral Strategy
-******************************
+Delta Neutral Strategy
+**********************
 
 In the model considered in the paper, where the two stocks are assumed to have identical market betas,
 delta neutrality directly translates into the constraint :math:`\phi_{1t} = −\phi_{2t}`.
@@ -232,6 +238,13 @@ For the continuing cointegrated price process (recurring arbitrage opportunities
 
     Delta Neutral Portfolio Weights for the second asset in the Royal Dutch - Shell pair.
 
+
+.. figure:: images/oc_wealth_delta_neutral.png
+    :scale: 100 %
+    :align: center
+    :figclass: align-center
+
+    Total wealth of the portfolio with Delta Neutral strategy.
 
 
 
@@ -297,6 +310,12 @@ In this step we input the evaluation data and specify the utility function param
     Please make sure the value of ``gamma`` is positive.
 
 
+Implementation
+==============
+
+.. automethod:: OptimalConvergence.delta_neutral_portfolio_weights_continuous
+
+
 Wealth gain in continuous case
 ******************************
 
@@ -312,8 +331,8 @@ Implementation
 .. automethod:: OptimalConvergence.wealth_gain_continuous
 
 
-Wealth gain in continuous case
-******************************
+Plotting the total wealth of portfolio
+**************************************
 
 In this step we can plot the wealth process using the calculated portfolio weights.
 We input the pricing data along with the calculated portfolio weights.
