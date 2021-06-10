@@ -239,7 +239,8 @@ class OptimalConvergence:
         return phi_1, phi_2, phi_m
 
 
-    def wealth_gain_continuous(self, gamma: float = 4) -> np.array:
+    def wealth_gain_continuous(self, gamma: float = 4, sigma: float = 0.15, b: float = 0.30, mu_m: float = 0.05,
+                               sigma_m: float = 0.35, r: float = 0.02, lambda_1: float = 0.52, lambda_2: float = -0.35 ) -> np.array:
         """
         Implementation of Proposition 4.
 
@@ -248,7 +249,16 @@ class OptimalConvergence:
 
         We take fixed values of spread between [0, 0.2]. The time to maturity is assumed to be 1 year for each value of spread.
 
+        The default values of the input parameters are taken according to the paper.
+
         :param gamma: (float) Signifies investor's attitude towards risk (positive float value).
+        :param b: (float) Model Parameter found in Equation (2-3) in the paper.
+        :param mu_m: (float) Market Risk Premium.
+        :param sigma_m: (float) Market Volatility.
+        :param r: (float) Interest Rate.
+        :param lambda_1: (float) parameter signifies relative liquidity of asset 1.
+        :param lambda_2: (float) parameter signifies relative liquidity of asset 2.
+        :param sigma: (float) Model Parameter found in Equation (2-3) in the paper.
         :return: (np.array) wealth gain numpy array.
         """
 
@@ -260,14 +270,13 @@ class OptimalConvergence:
         x = np.linspace(0, 0.2, 252)
         tau = np.ones(len(x))
 
-        #σ = 0.15, b = 0.30, μm = 0.05, σm = 0.35, and r = 0.02
-        self.sigma_squared = 0.15 ** 2
-        self.b_squared = 0.30 ** 2
-        self.mu_m = 0.05
-        self.sigma_m = 0.35
-        self.r = 0.02
-        self.lambda_1 = 0.52
-        self.lambda_2 = -0.35
+        self.sigma_squared = sigma ** 2
+        self.b_squared = b ** 2
+        self.mu_m = mu_m
+        self.sigma_m = sigma_m
+        self.r = r
+        self.lambda_1 = lambda_1
+        self.lambda_2 = lambda_2
 
         u_x_t = self._u_func_continuous_calc(x, tau)
         v_x_t = self._v_func_continuous_calc(x, tau)
