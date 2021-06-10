@@ -8,6 +8,7 @@ Test functions for the Optimal Convergence models in the Stochastic Control Appr
 
 import unittest
 import os
+from unittest import mock
 
 import numpy as np
 import pandas as pd
@@ -185,3 +186,24 @@ class TestOptimalConvergence(unittest.TestCase):
         self.assertAlmostEqual(wealth_gain[7], 1.030627, delta=1e-4)
         self.assertAlmostEqual(wealth_gain[28], 1.030783, delta=1e-4)
         self.assertAlmostEqual(wealth_gain[-1], 1.044104, delta=1e-4)
+
+
+    @mock.patch("arbitragelab.stochastic_control_approach.optimal_convergence.plt")
+    def test_plotting(self, mock_plt):
+        """
+        Tests the plot_results method in the class.
+        """
+
+        data_train_dataframe = self.shell_rdp_data['1994':'2002']
+        data_test_dataframe = self.shell_rdp_data['2003':'2004']
+
+        oc = OptimalConvergence()
+
+        oc.fit(data_train_dataframe, r=0.05, mu_m=0.20, sigma_m=0.3)
+
+        phi_1, phi_2, phi_m = oc.unconstrained_portfolio_weights_continuous(data_test_dataframe, gamma=4)
+
+        oc.plot_wealth_process(data_test_dataframe, phi_1, phi_2, 0.05)
+
+        # Assert plt.figure got called
+        assert mock_plt.show.called

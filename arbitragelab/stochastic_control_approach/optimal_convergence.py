@@ -11,6 +11,7 @@ This module is a realization of the methodology in the following paper:
 import warnings
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 
 from arbitragelab.util import devadarsh
@@ -283,6 +284,38 @@ class OptimalConvergence:
 
         R = np.exp((u_x_t - v_x_t) / (1 - self.gamma))
         return R
+
+
+    @staticmethod
+    def plot_wealth_process(prices: pd.DataFrame, phi_1: np.array, phi_2: np.array, r: float, delta_t: float = 1/252):
+        """
+        Function for plotting the wealth process.
+        """
+
+        returns_df = prices.ffill().pct_change()
+        returns_df = returns_df.replace([np.inf, -np.inf], np.nan).ffill().dropna()
+        phi_1, phi_2 = phi_1[1:], phi_2[1:]
+
+        phi_1_ = phi_1 / (abs(phi_1) + abs(phi_2))
+        phi_2_ = phi_2 / (abs(phi_1) + abs(phi_2))
+        phi_1, phi_2 = phi_1_, phi_2_
+
+        V = np.ones(len(prices) - 1)
+
+        for i in range(len(prices) - 2):
+            # Calculating the wealth process from optimal weights.
+            # Follows Section 2 in the paper.
+
+            V[i + 1] = V[i] + V[i] * (r * delta_t + phi_1[i] * (returns_df.iloc[i, 0] - r * delta_t)
+                                      + phi_2[i] * (returns_df.iloc[i, 1] - r * delta_t))
+
+        # Plotting
+        plt.figure(figsize=(10, 6))
+        plt.plot(prices.index[1:], V, 'c-')
+        plt.title("Wealth process with initial wealth normalized to 1")
+        plt.ylabel("Wealth")
+        plt.xlabel("Date")
+        plt.show()
 
 
     def _x_tau_calc(self, prices: pd.DataFrame) -> tuple:

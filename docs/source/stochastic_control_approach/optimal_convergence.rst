@@ -238,7 +238,7 @@ For the continuing cointegrated price process (recurring arbitrage opportunities
 How to use this submodule
 #########################
 
-This submodule contains five public methods, of which two methods are necessary to calculate the optimal weights.
+This submodule contains six public methods, of which two methods are necessary to calculate the optimal weights.
 The first method ``fit`` is for estimating the parameters of the model
 using training data, and the second method is for calculating the final optimal portfolio weights using evaluation data.
 
@@ -310,6 +310,19 @@ Implementation
 ==============
 
 .. automethod:: OptimalConvergence.wealth_gain_continuous
+
+
+Wealth gain in continuous case
+******************************
+
+In this step we can plot the wealth process using the calculated portfolio weights.
+We input the pricing data along with the calculated portfolio weights.
+
+
+Implementation
+==============
+
+.. automethod:: OptimalConvergence.plot_wealth_process
 
 
 Examples
