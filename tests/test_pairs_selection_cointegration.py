@@ -5,6 +5,8 @@
 Tests function of Pairs Selection module:
 pairs_selection/cointegration.py
 """
+# pylint: disable=protected-access
+
 import os
 import unittest
 import pandas as pd
@@ -12,9 +14,6 @@ import numpy as np
 import matplotlib
 
 from arbitragelab.pairs_selection import CointegrationPairsSelector
-
-
-# pylint: disable=protected-access
 
 
 class TestCointegrationSelector(unittest.TestCase):
@@ -38,6 +37,7 @@ class TestCointegrationSelector(unittest.TestCase):
         """
         Verifies private hurst processing method.
         """
+
         idx = [('A', 'AVB'), ('ABMD', 'AZO')]
         pairs_selector = CointegrationPairsSelector(prices_df=self.data, pairs_to_filter=idx)
         # Setup needed information to validate the hurst criterion return.

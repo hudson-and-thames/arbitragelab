@@ -5,6 +5,8 @@
 Tests function of ML Pairs Selection module:
 ml_approach/pairs_selector.py
 """
+# pylint: disable=protected-access
+
 import os
 import unittest
 import pandas as pd
@@ -12,9 +14,6 @@ import numpy as np
 import matplotlib
 
 from arbitragelab.ml_approach import DBSCANPairsClustering
-
-
-# pylint: disable=protected-access
 
 
 class TestDBSCANClustering(unittest.TestCase):
