@@ -399,15 +399,6 @@ Finally, we use the out-of-sample test data to calculate the delta neutral portf
     phi_1, phi_2, phi_m = oc.delta_neutral_portfolio_weights_continuous(data_test_dataframe, gamma=4)
 
 
-Research Notebook
-#################
-
-The following research notebook can be used to better understand the approach described above.
-
-* `Optimal Convergence Trade Strategies`_
-
-.. _`Optimal Convergence Trade Strategies`:
-
 References
 ##########
 

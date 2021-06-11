@@ -190,6 +190,7 @@ class TestOptimalConvergence(unittest.TestCase):
 
     @mock.patch("arbitragelab.stochastic_control_approach.optimal_convergence.plt")
     def test_plotting(self, mock_plt):
+        # pylint: disable=invalid-name
         """
         Tests the plot_results method in the class.
         """
@@ -201,7 +202,7 @@ class TestOptimalConvergence(unittest.TestCase):
 
         oc.fit(data_train_dataframe, r=0.05, mu_m=0.20, sigma_m=0.3)
 
-        phi_1, phi_2, phi_m = oc.unconstrained_portfolio_weights_continuous(data_test_dataframe, gamma=4)
+        phi_1, phi_2, _ = oc.unconstrained_portfolio_weights_continuous(data_test_dataframe, gamma=4)
 
         oc.plot_wealth_process(data_test_dataframe, phi_1, phi_2, 0.05)
 

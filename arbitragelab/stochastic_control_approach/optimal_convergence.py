@@ -133,7 +133,7 @@ class OptimalConvergence:
         """
         Method returns values of instance attributes calculated from training data.
 
-        :return: (pd.Series) series describing parameter values.
+        :return: (pd.Series) Series describing parameter values.
         """
 
         if self.beta is None:
@@ -257,10 +257,10 @@ class OptimalConvergence:
         :param mu_m: (float) Market Risk Premium.
         :param sigma_m: (float) Market Volatility.
         :param r: (float) Interest Rate.
-        :param lambda_1: (float) parameter signifies relative liquidity of asset 1.
-        :param lambda_2: (float) parameter signifies relative liquidity of asset 2.
+        :param lambda_1: (float) Parameter signifies relative liquidity of asset 1.
+        :param lambda_2: (float) Parameter signifies relative liquidity of asset 2.
         :param sigma: (float) Model Parameter found in Equation (2-3) in the paper.
-        :return: (np.array) wealth gain numpy array.
+        :return: (np.array) Wealth gain numpy array.
         """
 
         if gamma <= 0:
@@ -290,6 +290,12 @@ class OptimalConvergence:
     def plot_wealth_process(prices: pd.DataFrame, phi_1: np.array, phi_2: np.array, r: float, delta_t: float = 1/252):
         """
         Function for plotting the wealth process.
+
+        :param prices: (pd.DataFrame) Contains price series of both stocks in spread.
+        :param phi_1: (np.array) Weights for asset 1.
+        :param phi_2: (np.array) Weights for asset 2.
+        :param r: (float) Interest Rate.
+        :param delta_t: (float) Time difference between each index of data, calculated in years.
         """
 
         returns_df = prices.ffill().pct_change()
