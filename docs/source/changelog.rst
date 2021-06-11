@@ -12,6 +12,11 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+* :feature:`48` ML Approach Pairs Selection Module made more flexible - clustering and selection steps are now separate.
+* :support:`48` ML Approach Pairs Selection Module documentation updated.
+* :feature:`48` Hedge Ratio Estimation Module added with OLS, TLS, and Minimum HL Methods.
+* :support:`48` Hedge Ratio Estimation Module documentation.
+* :bug:`48` Fixed bug in ML Approach Pairs Selector hedge ratio calculation (previously had included intercept).
 * :feature:`43` OU Model Jurek and OU Model Mudchanatongsuk added to the Stochastic Control Approach Module.
 * :support:`43` OU Model Jurek and OU Model Mudchanatongsuk documentation.
 * :feature:`44` CVine Copula and CVine Copula Strategy added to the Copula Approach Module.
