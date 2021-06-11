@@ -12,6 +12,8 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+* :feature:`46` Optimal Convergence Model added to the Stochastic Control Approach Module.
+* :support:`46` Optimal Convergence Model documentation.
 * :support:`50` Updated documentation theme to hudsonthames-sphinx-docs.
 
 * :release:`0.4.10 <2021-04-15>`
