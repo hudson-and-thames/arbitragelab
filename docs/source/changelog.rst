@@ -14,9 +14,11 @@ Changelog
 
 * :feature:`46` Optimal Convergence Model added to the Stochastic Control Approach Module.
 * :support:`46` Optimal Convergence Model documentation.
+* :feature:`49` Cointegration and OU Model Tear Sheets added to the Visualization Module.
+* :support:`49` Cointegration and OU Model Tear Sheets documentation.
 * :support:`50` Updated documentation theme to hudsonthames-sphinx-docs.
 
-* :release:`0.4.10 <2021-04-15>`
+* :release:`0.4.1 <2021-04-15>`
 * :feature:`43` OU Model Jurek and OU Model Mudchanatongsuk added to the Stochastic Control Approach Module.
 * :support:`43` OU Model Jurek and OU Model Mudchanatongsuk documentation.
 * :feature:`44` CVine Copula and CVine Copula Strategy added to the Copula Approach Module.
