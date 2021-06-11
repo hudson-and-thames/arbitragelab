@@ -233,8 +233,8 @@ Examples
 
     # Generate a sector/industry relationship Panel of each pair
     pairs_selector.describe_pairs_sectoral_info(final_pairs_info['leg_1'],
-                                    final_pairs_info['leg_2'],
-                                    sectoral_info)
+                                                final_pairs_info['leg_2'],
+                                                sectoral_info)
 
 Research Notebooks
 ##################
