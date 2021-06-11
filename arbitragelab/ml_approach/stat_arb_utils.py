@@ -8,6 +8,7 @@ This module houses utility functions used by the PairsSelector.
 import sys
 import numpy as np
 import pandas as pd
+
 from arbitragelab.hedge_ratios import get_tls_hedge_ratio, get_ols_hedge_ratio, get_minimum_hl_hedge_ratio
 from arbitragelab.cointegration_approach import EngleGrangerPortfolio, get_half_life_of_mean_reversion
 
@@ -17,6 +18,7 @@ def _print_progress(iteration, max_iterations, prefix='', suffix='', decimals=1,
     """
     Calls in a loop to create a terminal progress bar.
     https://gist.github.com/aubricus/f91fb55dc6ba5557fbab06119420dd6a
+
     :param iteration: (int) Current iteration.
     :param max_iterations: (int) Maximum number of iterations.
     :param prefix: (str) Prefix string.
@@ -24,6 +26,7 @@ def _print_progress(iteration, max_iterations, prefix='', suffix='', decimals=1,
     :param decimals: (int) Positive number of decimals in percent completed.
     :param bar_length: (int) Character length of the bar.
     """
+
     str_format = "{0:." + str(decimals) + "f}"
     # Calculate the percent completed.
     percents = str_format.format(100 * (iteration / float(max_iterations)))
@@ -109,7 +112,7 @@ def _outer_cointegration_loop(prices_df: pd.DataFrame, molecule: list, hedge_rat
 
     :param prices_df: (pd.DataFrame) Price Universe.
     :param molecule: (list) Indices of pairs.
-    :param hedge_ratio_calculation: (str) Defines how hedge ratio is calculated. Can be either 'OLS,
+    :param hedge_ratio_calculation: (str) Defines how hedge ratio is calculated. Can be either 'OLS',
         'TLS' (Total Least Squares) or 'min_half_life'.
     :return: (pd.DataFrame) Cointegration statistics.
     """

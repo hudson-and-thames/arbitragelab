@@ -7,6 +7,7 @@ Sarmento and Nuno Horta in `"A Machine Learning based Pairs Trading Investment S
 """
 
 import pandas as pd
+
 from arbitragelab.ml_approach.stat_arb_utils import _outer_cointegration_loop, _outer_ou_loop
 from arbitragelab.util import devadarsh
 from arbitragelab.util.hurst import get_hurst_exponent
@@ -19,7 +20,6 @@ class CointegrationPairsSelector(AbstractPairsSelector):
     Implementation of the Proposed Pairs Selection Framework in the following paper:
     `"A Machine Learning based Pairs Trading Investment Strategy."
     <http://premio-vidigal.inesc.pt/pdf/SimaoSarmentoMSc-resumo.pdf>`__.
-
     """
 
     def __init__(self, prices_df: pd.DataFrame, pairs_to_filter: tuple):
@@ -30,6 +30,7 @@ class CointegrationPairsSelector(AbstractPairsSelector):
         :param prices_df: (pd.DataFrame) Asset prices universe.
         :param pairs_to_filter: (tuple) Tuple of pairs which need to be filtered.
         """
+
         self.prices_df = prices_df
         self.pairs_to_filter = pairs_to_filter
         self.spreads_df = None
