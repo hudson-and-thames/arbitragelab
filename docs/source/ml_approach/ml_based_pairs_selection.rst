@@ -75,11 +75,11 @@ Implementation
 
 .. automodule:: arbitragelab.ml_approach
 
-.. autoclass:: DBSCANPairsClustering
+.. autoclass:: OPTICSDBSCANPairsClustering
    :members: __init__
 
-.. automethod:: DBSCANPairsClustering.dimensionality_reduction_by_components
-.. automethod:: DBSCANPairsClustering.plot_pca_matrix
+.. automethod:: OPTICSDBSCANPairsClustering.dimensionality_reduction_by_components
+.. automethod:: OPTICSDBSCANPairsClustering.plot_pca_matrix
 
 Unsupervised Learning
 #####################
@@ -112,11 +112,11 @@ suitable :math:`\epsilon` by observing the global curve turning point.
 Implementation
 **************
 
-.. automethod:: DBSCANPairsClustering.cluster_using_optics
-.. automethod:: DBSCANPairsClustering.cluster_using_dbscan
-.. automethod:: DBSCANPairsClustering.plot_clustering_info
-.. automethod:: DBSCANPairsClustering.plot_knee_plot
-.. automethod:: DBSCANPairsClustering.get_pairs_by_sector
+.. automethod:: OPTICSDBSCANPairsClustering.cluster_using_optics
+.. automethod:: OPTICSDBSCANPairsClustering.cluster_using_dbscan
+.. automethod:: OPTICSDBSCANPairsClustering.plot_clustering_info
+.. automethod:: OPTICSDBSCANPairsClustering.plot_knee_plot
+.. automethod:: OPTICSDBSCANPairsClustering.get_pairs_by_sector
 
 Select Pairs 
 ############
@@ -130,6 +130,9 @@ The rules that each pair needs to pass are:
 - The pair’s spread Hurst exponent reveals a mean-reverting character. Extra layer of validation.
 - The pair’s spread diverges and converges within convenient periods.
 - The pair’s spread reverts to the mean with enough frequency.
+
+.. figure:: images/pairs_selection_rules_diagram.png
+    :align: center
 
 To test for cointegration, the framework proposes the application of the Engle-Granger test, due 
 to its simplicity. One critic `Armstrong (2001) <http://doi.org/10.1007/978-0-306-47630-3>`__ points 
@@ -198,6 +201,11 @@ Following methods describe the results of the selector in various ways.
 .. automethod:: CointegrationPairsSelector.describe_extra
 .. automethod:: CointegrationPairsSelector.describe_pairs_sectoral_info
 
+.. note::
+    In the original paper Pairs Selection module was a part of ML Pairs Trading approach. However, the user may want to use pairs selection
+    rules without applying DBSCAN/OPTICS clustering. That is why, we decided to split pairs selection and clustering into different objects
+    which can be used separately or together if the user wants to repeat results from the original paper.
+
 
 Examples
 ########
@@ -207,13 +215,13 @@ Examples
     # Importing packages
     import pandas as pd
     import numpy as np
-    from arbitragelab.ml_approach import DBSCANPairsClustering
+    from arbitragelab.ml_approach import OPTICSDBSCANPairsClustering
     from arbitragelab.pairs_selection import CointegrationPairsSelector
 
     # Getting the dataframe with time series of asset returns
     data = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])
 
-    pairs_clusterer = DBSCANPairsClustering(data)
+    pairs_clusterer = OPTICSDBSCANPairsClustering(data)
 
     # Price data is reduced to its component features using PCA
     pairs_clusterer.dimensionality_reduction_by_components(5)

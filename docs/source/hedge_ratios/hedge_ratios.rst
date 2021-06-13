@@ -60,4 +60,25 @@ We have implemented the algorithm which finds the hedge ratio by minimizing half
 .. py:currentmodule:: arbitragelab.hedge_ratios.half_life
 .. autofunction:: get_minimum_hl_hedge_ratio
 
+.. code-block::
+
+    # Importing packages
+    import pandas as pd
+    import numpy as np
+    from arbitragelab.hedge_ratios import get_ols_hedge_ratio, get_tls_hedge_ratio, get_minimum_hl_hedge_ratio
+
+    # Getting the dataframe with time series of asset prices.
+    data = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])
+    data = data[['SPY', 'QQQ']] # Filter out to 2 pairs.
+
+    ols_model, _, _, _ = get_ols_hedge_ratio(data, dependent_variable='SPY', add_constant=False)
+    print(f'OLS hedge ratio for SPY/QQQ spred is {ols_model.coef_[0]})
+
+    tls_model, _, _, _ = get_tls_hedge_ratio(data, dependent_variable='SPY')
+    print(f'TLS hedge ratio for SPY/QQQ spred is {tls_model.beta[0]})
+
+    half_life_fit, _, _, _ = get_tls_hedge_ratio(data, dependent_variable='SPY')
+    print(f'Minimum HL hedge ratio for SPY/QQQ spred is {half_life_fit.x[0]})
+
+
 

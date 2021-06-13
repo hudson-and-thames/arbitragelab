@@ -2,7 +2,7 @@
 This module houses the ML Based Approaches.
 """
 
-from arbitragelab.ml_approach.dbscan_pairs_clustering import DBSCANPairsClustering
+from arbitragelab.ml_approach.optics_dbscan_pairs_clustering import OPTICSDBSCANPairsClustering
 from arbitragelab.ml_approach.tar import TAR
 from arbitragelab.ml_approach.feature_expander import FeatureExpander
 from arbitragelab.ml_approach.regressor_committee import RegressorCommittee

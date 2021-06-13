@@ -22,7 +22,7 @@ from arbitragelab.util import devadarsh
 from arbitragelab.util.indexed_highlight import IndexedHighlight
 
 
-class DBSCANPairsClustering:
+class OPTICSDBSCANPairsClustering:
     """
     Implementation of the Proposed Pairs Selection Framework in the following paper:
     `"A Machine Learning based Pairs Trading Investment Strategy."
@@ -45,7 +45,7 @@ class DBSCANPairsClustering:
 
         self.clust_labels_ = []
 
-        devadarsh.track('DBSCANPairsClustering')
+        devadarsh.track('OPTICSDBSCANPairsClustering')
 
     def dimensionality_reduction_by_components(self, num_features: int = 10):
         """

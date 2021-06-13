@@ -13,17 +13,17 @@ import pandas as pd
 import numpy as np
 import matplotlib
 
-from arbitragelab.ml_approach import DBSCANPairsClustering
+from arbitragelab.ml_approach import OPTICSDBSCANPairsClustering
 
 
 class TestDBSCANClustering(unittest.TestCase):
     """
-    Tests DBSCANPairsClustering class.
+    Tests OPTICSDBSCANPairsClustering class.
     """
 
     def setUp(self):
         """
-        Loads price universe and instantiates the DBSCANPairsClustering selection class.
+        Loads price universe and instantiates the OPTICSDBSCANPairsClustering selection class.
         """
 
         np.random.seed(0)
@@ -32,7 +32,7 @@ class TestDBSCANClustering(unittest.TestCase):
         data_path = project_path + '/test_data/sp100_prices.csv'
         self.data = pd.read_csv(data_path, parse_dates=True, index_col="Date")
         self.data.dropna(inplace=True)
-        self.pair_selector = DBSCANPairsClustering(self.data)
+        self.pair_selector = OPTICSDBSCANPairsClustering(self.data)
 
     def test_dimensionality_reduction(self):
         """
@@ -57,22 +57,22 @@ class TestDBSCANClustering(unittest.TestCase):
 
         # Test dimensionality reduction when inputting invalid data.
         with self.assertRaises(Exception):
-            pair_selector = DBSCANPairsClustering(None)
+            pair_selector = OPTICSDBSCANPairsClustering(None)
             pair_selector.dimensionality_reduction_by_components(15)
 
     def test_clustering(self):
         """
-        Verifies generated clusters from both techniques in the DBSCANPairsClustering class.
+        Verifies generated clusters from both techniques in the OPTICSDBSCANPairsClustering class.
         """
 
         # Test Optics clustering without any price data.
         with self.assertRaises(Exception):
-            pair_selector = DBSCANPairsClustering(None)
+            pair_selector = OPTICSDBSCANPairsClustering(None)
             pair_selector.cluster_using_optics()
 
         # Test Dbscan clustering without any price data.
         with self.assertRaises(Exception):
-            pair_selector = DBSCANPairsClustering(None)
+            pair_selector = OPTICSDBSCANPairsClustering(None)
             pair_selector.cluster_using_dbscan()
 
         self.pair_selector.dimensionality_reduction_by_components(2)
@@ -87,7 +87,7 @@ class TestDBSCANClustering(unittest.TestCase):
 
     def test_generate_pairwise_combinations(self):
         """
-        Verifies pairs generator in the DBSCANPairsClustering class.
+        Verifies pairs generator in the OPTICSDBSCANPairsClustering class.
         """
 
         # Setup initial variables needed for the test.
