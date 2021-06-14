@@ -53,14 +53,14 @@ class TestPearsonStrategy(unittest.TestCase):
         strategy_corr_weight.form_portfolio(self.train_data, weight="correlation")
 
         # Testing the last month data of the formation period
-        self.assertAlmostEqual(strategy_basic.last_month.mean(), 1.017491, delta=1e-5)
-        self.assertAlmostEqual(strategy_risk_free.last_month.mean(), 1.017491, delta=1e-5)
-        self.assertAlmostEqual(strategy_corr_weight.last_month.mean(), 1.017491, delta=1e-5)
+        self.assertAlmostEqual(strategy_basic.last_month.mean(), 0.017491, delta=1e-5)
+        self.assertAlmostEqual(strategy_risk_free.last_month.mean(), 0.017491, delta=1e-5)
+        self.assertAlmostEqual(strategy_corr_weight.last_month.mean(), 0.017491, delta=1e-5)
 
         # Testing the monthly return for the formation period
-        self.assertAlmostEqual(strategy_basic.monthly_return.mean().mean(), 0.999993, delta=1e-5)
-        self.assertAlmostEqual(strategy_risk_free.monthly_return.mean().mean(), 0.999993, delta=1e-5)
-        self.assertAlmostEqual(strategy_corr_weight.monthly_return.mean().mean(), 0.999993, delta=1e-5)
+        self.assertAlmostEqual(strategy_basic.monthly_return.mean().mean(), -6.14258e-06, delta=1e-5)
+        self.assertAlmostEqual(strategy_risk_free.monthly_return.mean().mean(), -6.14258e-06, delta=1e-5)
+        self.assertAlmostEqual(strategy_corr_weight.monthly_return.mean().mean(), -6.14258e-06, delta=1e-5)
 
         # Testing the risk free rate for the formation period
         self.assertAlmostEqual(strategy_basic.risk_free.mean(), 0.0, delta=1e-5)
@@ -105,7 +105,7 @@ class TestPearsonStrategy(unittest.TestCase):
         self.assertAlmostEqual(strategy_test.trading_signal.mean().mean(), -0.043478, delta=1e-5)
 
         # Testing monthly return and risk free rate in test period
-        self.assertAlmostEqual(strategy_test.test_monthly_return.mean().mean(), 1.007467, delta=1e-5)
+        self.assertAlmostEqual(strategy_test.test_monthly_return.mean().mean(), 0.007467, delta=1e-5)
         self.assertAlmostEqual(strategy_test.risk_free.mean().mean(), 0.01, delta=1e-5)
 
     def test_get_trading_signal(self):

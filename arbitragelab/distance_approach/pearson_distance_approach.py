@@ -254,6 +254,9 @@ class PearsonStrategy:
         # Calculate monthly return for the given data
         monthly_return = daily_return.groupby([daily_return.index.year, daily_return.index.month]).prod()
 
+        # Rescale the monthly return
+        monthly_return = monthly_return - 1
+
         # Rename the multi index
         monthly_return.index.names = ["Year", "Month"]
 
@@ -323,7 +326,7 @@ class PearsonStrategy:
                 portfolio_return = np.matmul(pairs_return, corr_values).reshape((-1, 1))
 
             # Use linear regression to get regression coefficient of two returns
-            model = LinearRegression().fit(portfolio_return, stock_return - 1)
+            model = LinearRegression().fit(portfolio_return, stock_return)
             stock_coefficient = model.coef_[0]
 
             # Save the beta in a dictionary
