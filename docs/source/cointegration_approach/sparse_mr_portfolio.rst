@@ -703,7 +703,12 @@ portfolio selection module.
 
 * `Sparse Mean-reverting Portfolio Selection`_
 
-.. _`Sparse Mean-reverting Portfolio Selection`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Cointegration%20Approach/sparse_mean-reverting_portfolio_selection.ipynb
+.. _`Sparse Mean-reverting Portfolio Selection`: https://hudsonthames.org/notebooks/arblab/sparse_mean-reverting_portfolio_selection.html
+
+.. raw:: html
+
+    <a href="https://hudthames.tech/3iIGDvv"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
+    <a href="https://hudthames.tech/2S03R58"><button style="margin: 20px; margin-top: 0px">Download Sample Data</button></a>
 
 References
 ##########

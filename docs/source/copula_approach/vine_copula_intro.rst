@@ -401,7 +401,13 @@ The following research notebook can be used to better understand the vine copula
 
 * `C-Vine Copula Strategy`_
 
-.. _`C-Vine Copula Strategy`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Copula%20Approach/CVine_Copula_Strategy.ipynb
+.. _`C-Vine Copula Strategy`: https://hudsonthames.org/notebooks/arblab/CVine_Copula_Strategy.html
+
+.. raw:: html
+
+    <a href="https://hudthames.tech/3xsu5ws"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
+    <a href="https://hudthames.tech/2S03R58"><button style="margin: 20px; margin-top: 0px">Download Sample Data</button></a>
+
 
 References
 ##########
