@@ -1,5 +1,5 @@
 .. image:: _static/logo_black.png
-   :scale: 15 %
+   :scale: 50 %
    :align: center
    :target: https://hudsonthames.org/
 
@@ -60,6 +60,13 @@ This project is licensed under an all rights reserved licence.
 
     data/data_importer
     data/futures_rollover
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Visualization
+    :hidden:
+
+    visualization/tearsheet
 
 .. toctree::
     :maxdepth: 2
