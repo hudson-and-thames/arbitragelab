@@ -12,6 +12,7 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+* :bug:`52` Fixed issue with too many function calls in web analytics.
 * :feature:`49` Cointegration and OU Model Tear Sheets added to the Visualization Module.
 * :support:`49` Cointegration and OU Model Tear Sheets documentation.
 * :support:`50` Updated documentation theme to hudsonthames-sphinx-docs.
