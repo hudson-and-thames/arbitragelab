@@ -63,6 +63,13 @@ This project is licensed under an all rights reserved licence.
 
 .. toctree::
     :maxdepth: 2
+    :caption: Visualization
+    :hidden:
+
+    visualization/tearsheet
+
+.. toctree::
+    :maxdepth: 2
     :caption: Distance Approach
     :hidden:
 
@@ -119,6 +126,7 @@ This project is licensed under an all rights reserved licence.
     stochastic_control_approach/introduction
     stochastic_control_approach/ou_model_jurek
     stochastic_control_approach/ou_model_mudchanatongsuk
+    stochastic_control_approach/optimal_convergence
 
 .. toctree::
     :maxdepth: 2
