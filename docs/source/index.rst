@@ -75,6 +75,7 @@ This project is licensed under an all rights reserved licence.
 
     distance_approach/introduction
     distance_approach/distance_approach
+    distance_approach/pearson_approach
 
 .. toctree::
     :maxdepth: 2
@@ -125,6 +126,7 @@ This project is licensed under an all rights reserved licence.
     stochastic_control_approach/introduction
     stochastic_control_approach/ou_model_jurek
     stochastic_control_approach/ou_model_mudchanatongsuk
+    stochastic_control_approach/optimal_convergence
 
 .. toctree::
     :maxdepth: 2
@@ -164,6 +166,13 @@ This project is licensed under an all rights reserved licence.
     ml_approach/threshold_ar
     ml_approach/neural_networks
     ml_approach/filters
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Hedge Ratios
+    :hidden:
+
+    hedge_ratios/hedge_ratios
 
 .. toctree::
     :maxdepth: 3

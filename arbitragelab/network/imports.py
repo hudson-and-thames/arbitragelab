@@ -74,6 +74,8 @@ class Golem:
         import arbitragelab.stochastic_control_approach as stochastic_control_approach
         import arbitragelab.tearsheet as tearsheet
         import arbitragelab.time_series_approach as time_series_approach
+        import arbitragelab.hedge_ratios as hedge_ratios
+        import arbitragelab.pairs_selection as pairs_selection
         import arbitragelab.util as util
         devadarsh.track('Import')
 
