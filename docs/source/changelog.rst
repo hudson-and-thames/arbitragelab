@@ -12,6 +12,8 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+* :feature:`46` Optimal Convergence Model added to the Stochastic Control Approach Module.
+* :support:`46` Optimal Convergence Model documentation.
 * :feature:`49` Cointegration and OU Model Tear Sheets added to the Visualization Module.
 * :support:`49` Cointegration and OU Model Tear Sheets documentation.
 * :support:`50` Updated documentation theme to hudsonthames-sphinx-docs.
