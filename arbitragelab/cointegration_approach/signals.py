@@ -12,6 +12,7 @@ from sklearn.linear_model import LinearRegression
 
 from arbitragelab.util import devadarsh
 
+
 def get_half_life_of_mean_reversion(data: pd.Series) -> float:
     """
     Get half-life of mean-reversion under the assumption that data follows the Ornstein-Uhlenbeck process.

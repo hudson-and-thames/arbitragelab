@@ -66,7 +66,9 @@ def page(url):
 # pylint: disable=missing-function-docstring
 def track(func):
     if not IS_DEV:
-        analytics.track(USER, func, {'time': dt.now()})
+        if func not in TRACK_CALLS:
+            TRACK_CALLS[func] = True
+            analytics.track(USER, func, {'time': dt.now()})
 
 
 # Env Var
@@ -77,6 +79,7 @@ IP = None
 LOCATION = None
 USER = get_user()
 IS_DEV = validate_alum()
+TRACK_CALLS = {}
 
 # pylint: disable=bare-except
 try:

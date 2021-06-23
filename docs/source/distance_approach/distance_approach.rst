@@ -135,7 +135,7 @@ to select top :math:`n` pairs with the highest variance of the spread.
 Implementation
 **************
 
-.. automodule:: arbitragelab.distance_approach
+.. automodule:: arbitragelab.distance_approach.basic_distance_approach
 
 .. autoclass:: DistanceStrategy
    :members: __init__

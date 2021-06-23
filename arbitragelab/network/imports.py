@@ -64,15 +64,19 @@ class Golem:
     @staticmethod
     def __import_libraries():
         # pylint: disable=import-outside-toplevel, unused-import
-        import arbitragelab.ml_approach as ml_approach
         import arbitragelab.codependence as codependence
         import arbitragelab.cointegration_approach as cointegration_approach
         import arbitragelab.copula_approach as copula_approach
         import arbitragelab.distance_approach as distance_approach
-        import arbitragelab.other_approaches as other_approaches
-        import arbitragelab.util as util
+        import arbitragelab.ml_approach as ml_approach
         import arbitragelab.optimal_mean_reversion as optimal_mean_reversion
+        import arbitragelab.other_approaches as other_approaches
+        import arbitragelab.stochastic_control_approach as stochastic_control_approach
+        import arbitragelab.tearsheet as tearsheet
         import arbitragelab.time_series_approach as time_series_approach
+        import arbitragelab.hedge_ratios as hedge_ratios
+        import arbitragelab.pairs_selection as pairs_selection
+        import arbitragelab.util as util
         devadarsh.track('Import')
 
     # pylint: disable=missing-function-docstring
