@@ -205,7 +205,12 @@ The following research notebook can be used to better understand the Pearson app
 
 * `Pearson Distance Approach`_
 
-.. _`Pearson Distance Approach`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Distance%20Approach/basic_distance_approach.ipynb
+.. _`Pearson Distance Approach`: https://hudsonthames.org/notebooks/arblab/pearson_distance_approach.html
+
+.. raw:: html
+
+    <a href="https://hudthames.tech/3gCzomb"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
+    <a href="https://hudthames.tech/2S03R58"><button style="margin: 20px; margin-top: 0px">Download Sample Data</button></a>
 
 References
 ##########

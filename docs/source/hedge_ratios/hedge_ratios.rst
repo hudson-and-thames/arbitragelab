@@ -77,7 +77,8 @@ Examples
     # Importing packages
     import pandas as pd
     import numpy as np
-    from arbitragelab.hedge_ratios import get_ols_hedge_ratio, get_tls_hedge_ratio, get_minimum_hl_hedge_ratio
+    from arbitragelab.hedge_ratios import (get_ols_hedge_ratio, get_tls_hedge_ratio,
+                                           get_minimum_hl_hedge_ratio)
 
     # Getting the dataframe with time series of asset prices
     data = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])
