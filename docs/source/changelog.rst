@@ -12,6 +12,7 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+* :bug:`52` Fixed issue with too many function calls in web analytics.
 * :feature:`48` ML Approach Pairs Selection Module made more flexible - clustering and selection steps are now separate.
 * :support:`48` ML Approach Pairs Selection Module documentation updated.
 * :feature:`48` Hedge Ratio Estimation Module added with OLS, TLS, and Minimum HL Methods.
