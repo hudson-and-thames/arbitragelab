@@ -12,6 +12,8 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+* :feature:`45` Pearson Strategy added to the Distance Approach Module.
+* :support:`45` Pearson Strategy documentation.
 * :feature:`46` Optimal Convergence Model added to the Stochastic Control Approach Module.
 * :support:`46` Optimal Convergence Model documentation.
 * :feature:`49` Cointegration and OU Model Tear Sheets added to the Visualization Module.

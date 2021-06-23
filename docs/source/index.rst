@@ -75,6 +75,7 @@ This project is licensed under an all rights reserved licence.
 
     distance_approach/introduction
     distance_approach/distance_approach
+    distance_approach/pearson_approach
 
 .. toctree::
     :maxdepth: 2
