@@ -12,6 +12,11 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+* :feature:`48` ML Approach Pairs Selection Module made more flexible - clustering and selection steps are now separate.
+* :support:`48` ML Approach Pairs Selection Module documentation updated.
+* :feature:`48` Hedge Ratio Estimation Module added with OLS, TLS, and Minimum HL Methods.
+* :support:`48` Hedge Ratio Estimation Module documentation.
+* :bug:`48` Fixed bug in ML Approach Pairs Selector hedge ratio calculation (previously had included intercept).
 * :feature:`45` Pearson Strategy added to the Distance Approach Module.
 * :support:`45` Pearson Strategy documentation.
 * :feature:`46` Optimal Convergence Model added to the Stochastic Control Approach Module.

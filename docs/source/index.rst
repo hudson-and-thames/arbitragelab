@@ -168,6 +168,13 @@ This project is licensed under an all rights reserved licence.
     ml_approach/filters
 
 .. toctree::
+    :maxdepth: 2
+    :caption: Hedge Ratios
+    :hidden:
+
+    hedge_ratios/hedge_ratios
+
+.. toctree::
     :maxdepth: 3
     :caption: Developer Guide
     :hidden:
