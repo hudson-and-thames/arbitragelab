@@ -8,8 +8,7 @@ import numpy as np
 import pandas as pd
 from typing import Union, Callable
 from scipy import optimize, special
-from sympy import symbols, gamma, sqrt, factorial, Sum, oo, digamma
-from sympy.utilities.lambdify import lambdify
+from mpmath import nsum, inf, gamma, digamma, fac
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 
@@ -101,52 +100,43 @@ class OUModelOptimalThresholdBertram:
         """
 
         args = (c, self.theta, self.mu, self.sigma, self._erfi_scaler)
-        initial_guess = self.theta - 2*self.sigma
+        initial_guess = self.theta - self.sigma
         root = optimize.fsolve(self._equation_13, initial_guess, args = args)[0]
 
-        return root, 2*self.mu - root
+        return root, 2*self.theta - root
 
     def get_threshold_by_maximize_sharpe_ratio(self, c: Union[float, int], rf: Union[float, int]):
         """
-        Minimize -1 * equation (16) in the paper to get the optimal trading thresholds.
+        Minimize -1 * Sharpe ratio to get the optimal trading thresholds.
 
         :param c: (float/int) The transaction costs of the trading strategy
         :param rf: (float/int) The risk free rate
         :return: (tuple) The value of the optimal trading thresholds
         """
 
-        args = (c, rf, self.theta, self.mu, self.sigma, self._erfi_scaler, self._w1, self._w2)
-        initial_guess = self.theta - 2 * self.sigma
-        sol = optimize.minimize(self._negative_equation_16, initial_guess, args = args)
+        args = (c, rf, self.theta, self.mu, self.sigma, self._erfi_scaler, np.vectorize(self._w1), np.vectorize(self._w2))
+        initial_guess = self.theta - self.sigma
+        sol = optimize.minimize(self._negative_sharpe_ratio, initial_guess, args = args).x[0]
 
-        return sol, 2*self.mu - sol
+        return sol, 2*self.theta - sol
 
     def _erfi_scaler(self, const):
         return special.erfi((const - self.theta) * np.sqrt(self.mu) / self.sigma)
 
     def _w1(self, const):
-        z = symbols('z')
-        k = symbols('k')
+        common_term = lambda k: gamma(k / 2) * ((1.414 * const) ** k) / fac(k)
+        term_1 = (nsum(common_term, [1, inf]) / 2) ** 2
+        term_2 = (nsum(lambda k: common_term(k) * ((-1) ** k), [1, inf]) / 2) ** 2
+        w1 = term_1 - term_2
 
-        common_term = gamma(k / 2) * ((sqrt(2) * z) ** k) / factorial(k)
-        term_1 = ((Sum(common_term, (k, 1, oo)) / 2) ** 2)
-        term_2 = ((Sum(common_term * ((-1) ** k), (k, 1, oo)) / 2) ** 2)
-        w1 = (term_1 - term_2).doit()
-
-        w1 = lambdify(z, w1, 'numpy')
-        return w1(const)
+        return float(w1)
 
     def _w2(self, const):
-        z = symbols('z')
-        k = symbols('k')
+        middle_term = lambda k: (digamma((2 * k - 1) / 2) - digamma(1)) * gamma((2 * k - 1) / 2) * (
+                    (1.414 * const) ** (2 * k - 1)) / fac((2 * k - 1))
+        w2 = nsum(middle_term, [1, inf])
 
-        k_21 = 2 * k - 1
-        phi = digamma(k_21 / 2) - digamma(1)
-        middle_term = gamma(k_21 / 2) * phi * ((sqrt(2) * z) ** k_21) / factorial(k_21)
-        w2 = Sum(middle_term, (k, 1, oo)).doit()
-
-        w2 = lambdify(z, w2, 'numpy')
-        return w2(const)
+        return float(w2)
 
     @staticmethod
     def _equation_13(a, *args):
@@ -162,9 +152,9 @@ class OUModelOptimalThresholdBertram:
         return np.exp(mu * ((a - theta) ** 2) / (sigma ** 2)) * (2 * (a - theta) + c) - sigma * np.sqrt(np.pi / mu) * scaler_func(a)
 
     @staticmethod
-    def _negative_equation_16(a, *args):
+    def _negative_sharpe_ratio(a, *args):
         """
-        Equation (16) in the paper.
+        Negative Sharpe ratio
 
         :param a: The entry threshold of the trading strategy
         :param args: Other parameters needed for the equation
@@ -172,30 +162,79 @@ class OUModelOptimalThresholdBertram:
         """
 
         c, rf, theta, mu, sigma, scaler_func, w1, w2 = args
+        m = 2*theta - a
 
-        const_1 = (a - theta) * np.sqrt(2 * mu) / sigma
+        const_1 = (m - theta) * np.sqrt(2 * mu) / sigma
+        const_2 = (a - theta) * np.sqrt(2 * mu) / sigma
 
-        term_1 = - (2 * (a - theta) + c + rf)
-        term_2 = np.sqrt(-mu * np.pi * scaler_func(a))
-        term_3 = (2 * (a - theta) + c) ** 2
-        term_4 = -1 * w1(const_1) + w2(const_1)
+        term_1 = m - a - c - rf
+        term_2 = np.sqrt((m - a - c)**2)
+        term_3 = mu*np.pi*(scaler_func(m) - scaler_func(a))
+        term_4 = w1(const_1) - w1(const_2) - w2(const_1) + w2(const_2)
 
-        return -1 * term_1 * term_2 / np.sqrt(term_3 * term_4)
+        return -1 * term_1 / term_2 * np.sqrt(term_3 / term_4)
 
-    def plot_threshold_vs_cost(self):
-        pass
+    def plot_fig4(self, c_list: list):
+        """
+        Plot Fig. 4 in the paper.
+
+        :param c_list: (list) A list contains transaction costs
+        """
+
+        a_list = []
+        m_list = []
+        for c in c_list:
+            a, m = self.get_threshold_by_maximize_expected_return(c)
+            a_list.append(a)
+            m_list.append(m)
+
+        plt.plot(c_list, a_list)
+        plt.title("Optimal Trade Entry vs Trans. Costs")  # title
+        plt.ylabel("a")  # y label
+        plt.xlabel("c")  # x label
+
+        plt.show()
+
+        func = np.vectorize(self.expected_return)
+        plt.plot(c_list, func(a_list, m_list, c_list))
+        plt.title("Max E[Return] vs Trans. Costs")  # title
+        plt.ylabel("E[Return]")  # y label
+        plt.xlabel("c")  # x label
+
+        plt.show()
+
+    def plot_fig5(self, c: Union[float, int], rf_list: list):
+        """
+        Plot Fig. 5 in the paper.
+
+        :param c: (float/int) The transaction costs of the trading strategy
+        :param rf_list: (list) A list contains risk free rates
+        """
+
+        a_list = []
+        m_list = []
+        s_list = []
+        for rf in rf_list:
+            a, m = self.get_threshold_by_maximize_sharpe_ratio(c, rf)
+            a_list.append(a)
+            m_list.append(m)
+            s_list.append((self.expected_return(a, m, c) - rf) / self.variance(a, m, c))
+
+        plt.plot(rf_list, a_list)
+        plt.title("Optimal Trade Entry vs Risk−free Rate")  # title
+        plt.ylabel("a")  # y label
+        plt.xlabel("rf")  # x label
+
+        plt.show()
+
+        plt.plot(rf_list, s_list)
+        plt.title("Max Sharpe Ratio vs Risk−free Rate")  # title
+        plt.ylabel("Sharpe Ratio")  # y label
+        plt.xlabel("rf")  # x label
+
+        plt.show()
 
 
-    def plot_expected_retrun_vs_cost(self):
-        pass
-
-
-    def plot_variance_vs_cost(self):
-        pass
-
-
-    def plot_sharpe_ratio_vs_cost(self):
-        pass
 
 
 
