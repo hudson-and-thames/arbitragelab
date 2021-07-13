@@ -38,7 +38,7 @@ class OUModelOptimalThresholdBertram(OUModelOptimalThreshold):
 
         super().__init__()
 
-        # devadarsh.track('OUModelOptimalThresholdBertram')
+        devadarsh.track('OUModelOptimalThresholdBertram')
 
     def expected_trade_length(self, a: float, m: float):
         """
@@ -90,7 +90,7 @@ class OUModelOptimalThresholdBertram(OUModelOptimalThreshold):
         :return: (float) The variance of return of the trading strategy
         """
 
-        return (m - a - c)**2 * self.trade_length_variance(a, m) / (self.expected_trade_length(a, m) ** 3)
+        return (m - a - c) ** 2 * self.trade_length_variance(a, m) / (self.expected_trade_length(a, m) ** 3)
 
     def sharpe_ratio(self, a: float, m: float, c: float, rf: float):
         """
@@ -109,18 +109,22 @@ class OUModelOptimalThresholdBertram(OUModelOptimalThreshold):
 
 
 
-    def get_threshold_by_maximize_expected_return(self, c: float):
+    def get_threshold_by_maximize_expected_return(self, c: float, initial_guess: float = None):
         """
         Solves equation (13) in the paper to get the optimal trading thresholds.
 
         :param c: (float) The transaction costs of the trading strategy
+        :param initial_guess: (float) The initial guess of the entry threshold.
         :return: (tuple) The value of the optimal trading thresholds
         """
 
         # equation (13) in the paper
         equation = lambda a: np.exp(self.mu * ((a - self.theta) ** 2) / (self.sigma ** 2)) * (2 * (a - self.theta) + c) - self.sigma * np.sqrt(np.pi / self.mu) * self._erfi_scaler(a)
         
-        initial_guess = self.theta - c - 1e-2 
+        # Setting up the initial guess
+        if initial_guess == None:
+            initial_guess = self.theta - c - 1e-2
+
         root = optimize.fsolve(equation, initial_guess)[0]
 
         return root, 2 * self.theta - root
@@ -152,123 +156,179 @@ class OUModelOptimalThresholdBertram(OUModelOptimalThreshold):
 
         return special.erfi((const - self.theta) * np.sqrt(self.mu) / self.sigma)
 
-    def _w1(self, const: float):
+    def plot_target_vs_c(self, target: str, method: str, c_list: list, rf: float = 0):
         """
-        A helper function for simplifing equation expression
+        Plots target versus transaction costs.
 
-        :param const: (float) The input value of the function
-        :return: (float) The output value of the function
-        """
-
-        common_term = lambda k: gamma(k / 2) * ((1.414 * const) ** k) / fac(k)
-        term_1 = (nsum(common_term, [1, inf]) / 2) ** 2
-        term_2 = (nsum(lambda k: common_term(k) * ((-1) ** k), [1, inf]) / 2) ** 2
-        w1 = term_1 - term_2
-
-        return float(w1)
-
-    def _w2(self, const: float):
-        """
-        A helper function for simplifing equation expression
-
-        :param const: (float) The input value of the function
-        :return: (float) The output value of the function
-        """
-
-        middle_term = lambda k: (digamma((2 * k - 1) / 2) - digamma(1)) * gamma((2 * k - 1) / 2) * ((1.414 * const) ** (2 * k - 1)) / fac((2 * k - 1))
-        w2 = nsum(middle_term, [1, inf])
-
-        return float(w2)
-
-    def plot_optimal_trading_thresholds_c(self, c_list: list):
-        """
-        Calculates optimal trading thresholds by maximizing expected return and plots optimal trading thresholds versus transaction costs.
-
-        :param c_list: (list) A list contains transaction costs
-        :return: (plt.Figure) Figure that plots optimal trading thresholds versus transaction costs
-        """
-
-        a_list = []
-        for c in c_list:
-            a, m = self.get_threshold_by_maximize_expected_return(c)
-            a_list.append(a)
-
-        fig = plt.figure()
-        plt.plot(c_list, a_list)
-        plt.title("Optimal Trade Entry vs Trans. Costs")  # title
-        plt.ylabel("a")  # y label
-        plt.xlabel("c")  # x label
-
-        return fig
-
-    def plot_maximum_expected_return(self, c_list: list):
-        """
-        Plots maximum expected returns versus transaction costs.
-
-        :param c_list: (list) A list contains transaction costs
-        :return: (plt.Figure) Figure that plots maximum expected returns versus transaction costs
+        :param target: (str) The target values to plot. The options are 
+            ["a", "m", "expected_return", "return_variance", "sharpe_ratio", "expected_trade_length", "trade_length_variance"].
+        :param method: (str) The method for calculating the optimal thresholds. The options are
+            ["maximize_expected_return", "maximize_sharpe_ratio"]
+        :param c_list: (list) A list contains transaction costs.
+        :param rf: (float) The risk free rate. It is only needed when the target is "sharpe_ratio" 
+            or when the method is "maximize_sharpe_ratio".        
+        :return: (plt.Figure) Figure that plots target versus transaction costs.
         """
 
         a_list = []
         m_list = []
-        for c in c_list:
-            a, m = self.get_threshold_by_maximize_expected_return(c)
-            a_list.append(a)
-            m_list.append(m)
+        rf_list = [rf] * len(c_list)
 
-        func = np.vectorize(self.expected_return)
+        if method == "maximize_expected_return":
+            for c in c_list:
+                a, m = self.get_threshold_by_maximize_expected_return(c)
+                a_list.append(a)
+                m_list.append(m)
+
+        elif method == "maximize_sharpe_ratio":
+            for c in c_list:
+                a, m = self.get_threshold_by_maximize_sharpe_ratio(c, rf)
+                a_list.append(a)
+                m_list.append(m)
+
+        else:
+            raise Exception("Incorrect method. "
+                            "Please use one of the options "
+                            "[\"maximize_expected_return\", \"maximize_sharpe_ratio\"].")
 
         fig = plt.figure()
-        plt.plot(c_list, func(a_list, m_list, c_list))
-        plt.title("Max E[Return] vs Trans. Costs")  # title
-        plt.ylabel(r'${\mu}^* (a, c)$')  # y label
-        plt.xlabel("c")  # x label
+
+        if target == "a":
+            plt.plot(c_list, a_list)
+            plt.title("Optimal Entry Thresholds vs Trans. Costs")
+            plt.ylabel("a")
+
+        elif target == "m":
+            plt.plot(c_list, m_list)
+            plt.title("Optimal Exit Thresholds vs Trans. Costs")
+            plt.ylabel("m")
+
+        elif target == "expected_return":
+            func = np.vectorize(self.expected_return)
+            plt.plot(c_list, func(a_list, m_list, c_list))
+            plt.title("Expected Returns vs Trans. Costs")
+            plt.ylabel("Expected Return")
+
+        elif target == "return_variance":
+            func = np.vectorize(self.return_variance)
+            plt.plot(c_list, func(a_list, m_list, c_list))
+            plt.title("Variances of Return vs Trans. Costs")
+            plt.ylabel("Variances of Return")
+
+        elif target == "sharpe_ratio":
+            func = np.vectorize(self.sharpe_ratio)
+            plt.plot(c_list, func(a_list, m_list, c_list, rf_list))
+            plt.title("Sharpe Ratios vs Trans. Costs")
+            plt.ylabel("Sharpe Ratio")
+
+        elif target == "expected_trade_length":
+            func = np.vectorize(self.expected_trade_length)
+            plt.plot(c_list, func(a_list, m_list))
+            plt.title("Expected Trade Lengths vs Trans. Costs")
+            plt.ylabel("Expected Trade Length")
+
+        elif target == "trade_length_variance":
+            func = np.vectorize(self.trade_length_variance)
+            plt.plot(c_list, func(a_list, m_list))
+            plt.title("Variance of Trade Lengths vs Trans. Costs")
+            plt.ylabel("Variance of Trade Length")
+
+        else:
+            raise Exception("Incorrect target. "
+                            "Please use one of the options "
+                            "[\"a\", \"m\", \"expected_return\", \"return_variance\","
+                            "\"sharpe_ratio\", \"expected_trade_length\", \"trade_length_variance\"].")
+
+        plt.xlabel("Transaction Cost c")  # x label
 
         return fig
 
-    def plot_optimal_trading_thresholds_rf(self, c: float, rf_list: list):
+    def plot_target_vs_rf(self, target: str, method: str, rf_list: list, c: float):
         """
-        Calculates optimal trading thresholds by maximizing Sharpe ratio and plots optimal trading thresholds versus risk free rates.
+        Plots target versus risk free rates.
 
-        :param c: (float) The transaction costs of the trading strategy
-        :param rf_list: (list) A list contains risk free rates
-        :return: (plt.Figure) Figure that plots optimal trading thresholds versus risk free rates
+        :param target: (str) The target values to plot. The options are 
+            ["a", "m", "expected_return", "return_variance", "sharpe_ratio", "expected_trade_length", "trade_length_variance"].
+        :param method: (str) The method for calculating the optimal thresholds. The options are
+            ["maximize_expected_return", "maximize_sharpe_ratio"].
+        :param rf_list: (list) A list contains risk free rates.
+        :param c: (float) The transaction costs of the trading strategy.
+        :return: (plt.Figure) Figure that plots target versus risk free rates.
         """
 
         a_list = []
-        for rf in rf_list:
-            a, m = self.get_threshold_by_maximize_sharpe_ratio(c, rf)
-            a_list.append(a)
+        m_list = []
+        c_list = [c] * len(rf_list)
+
+        if method == "maximize_expected_return":
+            a, m = self.get_threshold_by_maximize_expected_return(c)
+            a_list = [a] * len(rf_list)
+            m_list = [m] * len(rf_list)
+
+        elif method == "maximize_sharpe_ratio":
+            for rf in rf_list:
+                a, m = self.get_threshold_by_maximize_sharpe_ratio(c, rf)
+                a_list.append(a)
+                m_list.append(m)
+
+        else:
+            raise Exception("Incorrect method. "
+                            "Please use one of the options "
+                            "[\"maximize_expected_return\", \"maximize_sharpe_ratio\"].")
 
         fig = plt.figure()
-        plt.plot(rf_list, a_list)
-        plt.title("Optimal Trade Entry vs Risk−free Rate")  # title
-        plt.ylabel("a")  # y label
-        plt.xlabel("rf")  # x label
+
+        if target == "a":
+            plt.plot(rf_list, a_list)
+            plt.title("Optimal Entry Thresholds vs Risk−free Rates")
+            plt.ylabel("a")
+
+        elif target == "m":
+            plt.plot(rf_list, m_list)
+            plt.title("Optimal Exit Thresholds vs Risk−free Rates")
+            plt.ylabel("m")
+
+        elif target == "expected_return":
+            func = np.vectorize(self.expected_return)
+            plt.plot(rf_list, func(a_list, m_list, c_list))
+            plt.title("Expected Returns vs Risk−free Rates")
+            plt.ylabel("Expected Return")
+
+        elif target == "return_variance":
+            func = np.vectorize(self.return_variance)
+            plt.plot(rf_list, func(a_list, m_list, c_list))
+            plt.title("Variances of Return vs Risk−free Rates")
+            plt.ylabel("Variances of Return")
+
+        elif target == "sharpe_ratio":
+            func = np.vectorize(self.sharpe_ratio)
+            plt.plot(rf_list, func(a_list, m_list, c_list, rf_list))
+            plt.title("Sharpe Ratios vs Risk−free Rates")
+            plt.ylabel("Sharpe Ratio")
+
+        elif target == "expected_trade_length":
+            func = np.vectorize(self.expected_trade_length)
+            plt.plot(rf_list, func(a_list, m_list))
+            plt.title("Expected Trade Lengths vs Risk−free Rates")
+            plt.ylabel("Expected Trade Length")
+
+        elif target == "trade_length_variance":
+            func = np.vectorize(self.trade_length_variance)
+            plt.plot(rf_list, func(a_list, m_list))
+            plt.title("Variance of Trade Lengths vs Risk−free Rates")
+            plt.ylabel("Variance of Trade Length")
+
+        else:
+            raise Exception("Incorrect target. "
+                            "Please use one of the options "
+                            "[\"a\", \"m\", \"expected_return\", \"return_variance\","
+                            "\"sharpe_ratio\", \"expected_trade_length\", \"trade_length_variance\"].")
+
+        plt.xlabel("Risk−free Rate rf")  # x label
 
         return fig
 
-    def plot_maximum_sharpe_ratio(self, c: float, rf_list: list):
-        """
-        Plots maximum Sharpe ratios versus risk free rates.
 
-        :param c: (float) The transaction costs of the trading strategy
-        :param rf_list: (list) A list contains risk free rates
-        :return: (plt.Figure) Figure that plots maximum Sharpe ratios versus risk free rates
-        """
-
-        s_list = []
-        for rf in rf_list:
-            a, m = self.get_threshold_by_maximize_sharpe_ratio(c, rf)
-            s_list.append(self.sharpe_ratio(a, m, c, rf))
-
-        fig = plt.figure()
-        plt.plot(rf_list, s_list)
-        plt.title("Max Sharpe Ratio vs Risk−free Rate")  # title
-        plt.ylabel("r'$S^* (a, c, r)$'")  # y label
-        plt.xlabel("rf")  # x label
-
-        return fig
 
 
 

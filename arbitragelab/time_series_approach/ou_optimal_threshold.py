@@ -72,10 +72,9 @@ class OUModelOptimalThreshold:
 
         # Checking the data type
         if isinstance(self.data, np.ndarray):
-            self.data = self.data.transpose()
-            data = self.data
+            data = self.data.transpose()
         else:
-            data = data.to_numpy().transpose()
+            data = self.data.to_numpy().transpose()
 
         return np.log(data)
 
@@ -160,7 +159,7 @@ class OUModelOptimalThreshold:
         """
         Finds the O-U process coefficients.
 
-        :param portfolio: (np.array) A time series to fit.
+        :param series: (np.array) A time series to fit.
         :return: (tuple) O-U process coefficients (theta, mu, sigma)
         """
 
@@ -173,13 +172,15 @@ class OUModelOptimalThreshold:
         # Initial guesses for theta, mu, sigma
         initial_guess = np.array((theta_init, 100, 100))
 
-        result = so.minimize(self._compute_log_likelihood, initial_guess,
-                             args=(portfolio, self.delta_t), bounds=bounds)
+        result = optimize.minimize(self._compute_log_likelihood, initial_guess, args=(series, self.delta_t), bounds=bounds)
 
         # Unpacking optimal values
         theta, mu, sigma = result.x
 
-        return theta, mu, sigma
+        # Undo negation
+        max_log_likelihood = -result.fun
+
+        return theta, mu, sigma, max_log_likelihood
 
     @staticmethod
     def _compute_log_likelihood(params: tuple, *args: tuple):
@@ -208,3 +209,31 @@ class OUModelOptimalThreshold:
                          + summation_term
 
         return -log_likelihood
+
+    def _w1(self, const: float):
+        """
+        A helper function for simplifing equation expression
+
+        :param const: (float) The input value of the function
+        :return: (float) The output value of the function
+        """
+
+        common_term = lambda k: gamma(k / 2) * ((1.414 * const) ** k) / fac(k)
+        term_1 = (nsum(common_term, [1, inf]) / 2) ** 2
+        term_2 = (nsum(lambda k: common_term(k) * ((-1) ** k), [1, inf]) / 2) ** 2
+        w1 = term_1 - term_2
+
+        return float(w1)
+
+    def _w2(self, const: float):
+        """
+        A helper function for simplifing equation expression
+
+        :param const: (float) The input value of the function
+        :return: (float) The output value of the function
+        """
+
+        middle_term = lambda k: (digamma((2 * k - 1) / 2) - digamma(1)) * gamma((2 * k - 1) / 2) * ((1.414 * const) ** (2 * k - 1)) / fac((2 * k - 1))
+        w2 = nsum(middle_term, [1, inf])
+
+        return float(w2)
