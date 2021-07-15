@@ -2,15 +2,10 @@
 # All rights reserved
 # Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 
-# pylint: disable=missing-module-docstring, invalid-name
-import warnings
+# pylint: disable=missing-module-docstring, invalid-name, too-many-branches, too-many-statements
 import numpy as np
-import pandas as pd
-from typing import Union, Callable
 from scipy import optimize, special
-from mpmath import nsum, inf, gamma, digamma, fac
 import matplotlib.pyplot as plt
-from matplotlib.figure import Figure
 
 from arbitragelab.time_series_approach.ou_optimal_threshold import OUModelOptimalThreshold
 from arbitragelab.util import devadarsh
@@ -64,7 +59,7 @@ class OUModelOptimalThresholdBertram(OUModelOptimalThreshold):
         const_2 = (a - self.theta) * np.sqrt(2 * self.mu) / self.sigma
 
         term_1 = self._w1(const_1) - self._w1(const_2) - self._w2(const_1) + self._w2(const_2)
-        term_2 = (self.mu)**2 
+        term_2 = (self.mu) ** 2
 
         return term_1 / term_2
 
@@ -119,17 +114,18 @@ class OUModelOptimalThresholdBertram(OUModelOptimalThreshold):
         """
 
         # equation (13) in the paper
-        equation = lambda a: np.exp(self.mu * ((a - self.theta) ** 2) / (self.sigma ** 2)) * (2 * (a - self.theta) + c) - self.sigma * np.sqrt(np.pi / self.mu) * self._erfi_scaler(a)
-        
+        equation = lambda a: np.exp(self.mu * ((a - self.theta) ** 2) / (self.sigma ** 2)) * (2 * (a - self.theta) + c) \
+                            - self.sigma * np.sqrt(np.pi / self.mu) * self._erfi_scaler(a)
+
         # Setting up the initial guess
-        if initial_guess == None:
+        if initial_guess is None:
             initial_guess = self.theta - c - 1e-2
 
         root = optimize.fsolve(equation, initial_guess)[0]
 
         return root, 2 * self.theta - root
 
-    def get_threshold_by_maximize_sharpe_ratio(self, c: float, rf: float):
+    def get_threshold_by_maximize_sharpe_ratio(self, c: float, rf: float, initial_guess: float = None):
         """
         Minimize -1 * Sharpe ratio to get the optimal trading thresholds.
 
@@ -137,11 +133,14 @@ class OUModelOptimalThresholdBertram(OUModelOptimalThreshold):
         :param rf: (float) The risk free rate
         :return: (tuple) The value of the optimal trading thresholds
         """
-        
+
         negative_sharpe_ratio = lambda a: -1 * self.sharpe_ratio(a, 2 * self.theta - a, c, rf)
         negative_sharpe_ratio = np.vectorize(negative_sharpe_ratio)
 
-        initial_guess = self.theta - rf - c
+        # Setting up the initial guess
+        if initial_guess is None:
+            initial_guess = self.theta - rf - c - 1e-2
+
         sol = optimize.minimize(negative_sharpe_ratio, initial_guess, method="Nelder-Mead").x[0]
 
         return sol, 2 * self.theta - sol
@@ -160,14 +159,14 @@ class OUModelOptimalThresholdBertram(OUModelOptimalThreshold):
         """
         Plots target versus transaction costs.
 
-        :param target: (str) The target values to plot. The options are 
+        :param target: (str) The target values to plot. The options are
             ["a", "m", "expected_return", "return_variance", "sharpe_ratio", "expected_trade_length", "trade_length_variance"].
         :param method: (str) The method for calculating the optimal thresholds. The options are
             ["maximize_expected_return", "maximize_sharpe_ratio"]
         :param c_list: (list) A list contains transaction costs.
-        :param rf: (float) The risk free rate. It is only needed when the target is "sharpe_ratio" 
-            or when the method is "maximize_sharpe_ratio".        
-        :return: (plt.Figure) Figure that plots target versus transaction costs.
+        :param rf: (float) The risk free rate. It is only needed when the target is "sharpe_ratio"
+            or when the method is "maximize_sharpe_ratio".
+        :return: (plt.figure) Figure that plots target versus transaction costs.
         """
 
         a_list = []
@@ -247,13 +246,13 @@ class OUModelOptimalThresholdBertram(OUModelOptimalThreshold):
         """
         Plots target versus risk free rates.
 
-        :param target: (str) The target values to plot. The options are 
+        :param target: (str) The target values to plot. The options are
             ["a", "m", "expected_return", "return_variance", "sharpe_ratio", "expected_trade_length", "trade_length_variance"].
         :param method: (str) The method for calculating the optimal thresholds. The options are
             ["maximize_expected_return", "maximize_sharpe_ratio"].
         :param rf_list: (list) A list contains risk free rates.
         :param c: (float) The transaction costs of the trading strategy.
-        :return: (plt.Figure) Figure that plots target versus risk free rates.
+        :return: (plt.figure) Figure that plots target versus risk free rates.
         """
 
         a_list = []
@@ -327,9 +326,3 @@ class OUModelOptimalThresholdBertram(OUModelOptimalThreshold):
         plt.xlabel("Risk−free Rate rf")  # x label
 
         return fig
-
-
-
-
-
-

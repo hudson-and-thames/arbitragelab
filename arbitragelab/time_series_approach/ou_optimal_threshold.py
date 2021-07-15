@@ -2,15 +2,12 @@
 # All rights reserved
 # Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 
-# pylint: disable=missing-module-docstring, invalid-name
-import warnings
+# pylint: disable=missing-module-docstring, invalid-name, too-many-branches, too-many-statements
+from typing import Union
 import numpy as np
 import pandas as pd
-from typing import Union, Callable
-from scipy import optimize, special
+from scipy import optimize
 from mpmath import nsum, inf, gamma, digamma, fac
-import matplotlib.pyplot as plt
-from matplotlib.figure import Figure
 
 from arbitragelab.util import devadarsh
 
@@ -29,15 +26,20 @@ class OUModelOptimalThreshold:
         self.mu = None  # The speed at which the values will regroup around the long-term mean
         self.sigma = None  # The amplitude of randomness of the O-U process
 
-        # devadarsh.track('OUModelOptimalThreshold')
+        # Parameters for fitting function
+        self.data = None # Fitting data provided by the user
+        self.delta_t = None # Delta between observations, calculated in years
+        self.beta = None # Optimal ratio between two assets
+
+        devadarsh.track('OUModelOptimalThreshold')
 
     def construct_ou_model_from_given_parameters(self, theta: float, mu: float, sigma: float):
         """
         Initializes the O-U process from given parameters.
 
-        :param theta: (float/int) The long-term mean of the O-U process
-        :param mu: (float/int) The speed at which the values will regroup around the long-term mean
-        :param sigma: (float/int) The amplitude of randomness of the O-U process
+        :param theta: (float/int) The long-term mean of the O-U process.
+        :param mu: (float/int) The speed at which the values will regroup around the long-term mean.
+        :param sigma: (float/int) The amplitude of randomness of the O-U process.
         """
 
         self.theta = theta
@@ -48,17 +50,20 @@ class OUModelOptimalThreshold:
         """
         Fits the O-U process to log values of the given data.
 
-        :param data: (np.array/pd.DataFrame) It could be a single time series or a time series of two assets prices. The dimensions should be either n x 1 or n x 2.
+        :param data: (np.array/pd.DataFrame) It could be a single time series or a time series of two assets prices.
+            The dimensions should be either n x 1 or n x 2.
         :param data_frequency: (str) Data frequency ["D" - daily, "M" - monthly, "Y" - yearly].
         """
 
         # Setting delta parameter using data frequency
         self._fit_delta(data_frequency=data_frequency)
 
-        if len(data.shape) == 1:  # If the input is a single time series
+        if len(data.shape) == 1:  # The input is a single time series
             self._fit_to_single_time_series(data=data)
-        elif data.shape[1] == 2:  # If the input is time series of two assets prices
+
+        elif data.shape[1] == 2:  # The input is time series of two assets prices
             self._fit_to_assets(data=data)
+
         else:
             raise Exception("The number of dimensions for input data is incorrect. "
                             "Please provide a 1 or 2-dimensional array or dataframe.")
@@ -87,25 +92,27 @@ class OUModelOptimalThreshold:
 
         if data_frequency == "D":
             self.delta_t = 1 / 252
+
         elif data_frequency == "M":
             self.delta_t = 1 / 12
+
         elif data_frequency == "Y":
             self.delta_t = 1
+
         else:
             raise Exception("Incorrect data frequency. "
                             "Please use one of the options [\"D\", \"M\", \"Y\"].")
 
-    def _fit_to_single_time_series(self, data: Union[np.array, pd.DataFrame] = None):
+    def _fit_to_single_time_series(self, data: Union[np.array, pd.DataFrame]):
         """
         Fits the O-U process to a single time series.
 
         :param data: (np.array/pd.DataFrame) A single time series with dimensions n x 1.
         """
 
-        if data is not None:
-            self.data = data
+        self.data = data
 
-        # Fitting the model
+        # Fitting the process
         parameters = self._optimal_coefficients(self._fit_data())
 
         # Setting the O-U process parameters
@@ -128,15 +135,14 @@ class OUModelOptimalThreshold:
 
         return spread
 
-    def _fit_to_assets(self, data: Union[np.array, pd.DataFrame] = None):
+    def _fit_to_assets(self, data: Union[np.array, pd.DataFrame]):
         """
         Fits the O-U process to a time series of two assets prices.
 
         :param data: (np.array/pd.DataFrame) A Time series of two assets prices with dimensions n x 2.
         """
 
-        if data is not None:
-            self.data = data
+        self.data = data
 
         # Lambda function that calculates the O-U process coefficients
         compute_coefficients = lambda x: self._optimal_coefficients(self._get_spread(self._fit_data(), x))
@@ -160,7 +166,7 @@ class OUModelOptimalThreshold:
         Finds the O-U process coefficients.
 
         :param series: (np.array) A time series to fit.
-        :return: (tuple) O-U process coefficients (theta, mu, sigma)
+        :return: (tuple) O-U process coefficients (theta, mu, sigma).
         """
 
         # Setting bounds
@@ -185,11 +191,11 @@ class OUModelOptimalThreshold:
     @staticmethod
     def _compute_log_likelihood(params: tuple, *args: tuple):
         """
-        Computes the average Log Likelihood. (p.13)
+        Computes the average Log Likelihood.
 
-        :param params: (tuple) A tuple of three elements representing theta, mu and sigma_squared.
-        :param args: (tuple) All other values that to be passed to self._compute_log_likelihood()
-        :return: (float) The average log likelihood from given parameters.
+        :param params: (tuple) A tuple of three elements representing theta, mu and sigma.
+        :param args: (tuple) All other values that to be passed to self._compute_log_likelihood().
+        :return: (float) The value of log likelihood.
         """
 
         # Setting given parameters
@@ -204,18 +210,17 @@ class OUModelOptimalThreshold:
 
         summation_term = -summation_term / (2 * n * sigma_tilde_squared)
 
-        log_likelihood = (-np.log(2 * np.pi) / 2) \
-                         + (-np.log(np.sqrt(sigma_tilde_squared))) \
-                         + summation_term
+        log_likelihood = (-np.log(2 * np.pi) / 2) + (-np.log(np.sqrt(sigma_tilde_squared))) + summation_term
 
         return -log_likelihood
 
-    def _w1(self, const: float):
+    @staticmethod
+    def _w1(const: float):
         """
-        A helper function for simplifing equation expression
+        A helper function for simplifing equation expression.
 
-        :param const: (float) The input value of the function
-        :return: (float) The output value of the function
+        :param const: (float) The input value of the function.
+        :return: (float) The output value of the function.
         """
 
         common_term = lambda k: gamma(k / 2) * ((1.414 * const) ** k) / fac(k)
@@ -225,12 +230,13 @@ class OUModelOptimalThreshold:
 
         return float(w1)
 
-    def _w2(self, const: float):
+    @staticmethod
+    def _w2(const: float):
         """
-        A helper function for simplifing equation expression
+        A helper function for simplifing equation expression.
 
-        :param const: (float) The input value of the function
-        :return: (float) The output value of the function
+        :param const: (float) The input value of the function.
+        :return: (float) The output value of the function.
         """
 
         middle_term = lambda k: (digamma((2 * k - 1) / 2) - digamma(1)) * gamma((2 * k - 1) / 2) * ((1.414 * const) ** (2 * k - 1)) / fac((2 * k - 1))
