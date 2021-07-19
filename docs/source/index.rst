@@ -137,6 +137,8 @@ This project is licensed under an all rights reserved licence.
 
     time_series_approach/introduction
     time_series_approach/quantile_time_series_strategy
+    time_series_approach/ou_optimal_threshold_bertram
+    time_series_approach/ou_optimal_threshold_zeng
 
 .. toctree::
     :maxdepth: 2
