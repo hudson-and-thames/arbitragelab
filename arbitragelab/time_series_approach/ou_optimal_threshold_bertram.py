@@ -15,15 +15,9 @@ class OUModelOptimalThresholdBertram(OUModelOptimalThreshold):
     """
     This class implements the analytic solutions of the optimal trading thresholds for the series
     with mean-reverting properties. The methods are described in the following publication:
-    Bertram, W. K. (2010). Analytic solutions for optimal statistical arbitrage trading.
-    Physica A: Statistical Mechanics and its Applications, 389(11):2234–2243.
-    Link: http://www.stagirit.org/sites/default/files/articles/a_0340_ssrn-id1505073.pdf
-
-    Assumptions of the method:
-    1. The series Xt = ln(Pt) follows a Ornstein-Uhlenbeck process, where Pt is a price series of a asset or a spread.
-    2. A Trading strategy is defined by entering a trade when Xt = a, exiting the trade at Xt = m,
-       and waiting until the process returns to Xt = a, to complete the trading cycle.
-    3. a < m
+    `Bertram, W. K. (2010). Analytic solutions for optimal statistical arbitrage trading.
+    Physica A: Statistical Mechanics and its Applications, 389(11): 2234–2243.
+    <http://www.stagirit.org/sites/default/files/articles/a_0340_ssrn-id1505073.pdf>`_
     """
 
     def __init__(self):
@@ -108,9 +102,9 @@ class OUModelOptimalThresholdBertram(OUModelOptimalThreshold):
         """
         Solves equation (13) in the paper to get the optimal trading thresholds.
 
-        :param c: (float) The transaction costs of the trading strategy
+        :param c: (float) The transaction costs of the trading strategy.
         :param initial_guess: (float) The initial guess of the entry threshold.
-        :return: (tuple) The value of the optimal trading thresholds
+        :return: (tuple) The values of the optimal trading thresholds.
         """
 
         # equation (13) in the paper
@@ -129,9 +123,10 @@ class OUModelOptimalThresholdBertram(OUModelOptimalThreshold):
         """
         Minimize -1 * Sharpe ratio to get the optimal trading thresholds.
 
-        :param c: (float) The transaction costs of the trading strategy
-        :param rf: (float) The risk free rate
-        :return: (tuple) The value of the optimal trading thresholds
+        :param c: (float) The transaction costs of the trading strategy.
+        :param rf: (float) The risk free rate.
+        :param initial_guess: (float) The initial guess of the entry threshold.
+        :return: (tuple) The values of the optimal trading thresholds.
         """
 
         negative_sharpe_ratio = lambda a: -1 * self.sharpe_ratio(a, 2 * self.theta - a, c, rf)

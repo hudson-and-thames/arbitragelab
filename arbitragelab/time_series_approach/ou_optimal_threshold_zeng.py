@@ -16,16 +16,9 @@ class OUModelOptimalThresholdZeng(OUModelOptimalThreshold):
     """
     This class implements the analytic solutions of the optimal trading thresholds for the series
     with mean-reverting properties. The methods are described in the following publication:
-    Zeng, Z. and Lee, C.-G. (2014).  Pairs trading: 
-    optimal thresholds and profitability.QuantitativeFinance, 14(11):1881–1893.
-    Link: https://www.tandfonline.com/doi/pdf/10.1080/14697688.2014.917806
-
-    Assumptions of the method:
-    1. The series Xt = ln(Pt) follows a Ornstein-Uhlenbeck process, where Pt is a price series of a asset or a spread.
-    2. A Trading strategy is defined by entering a trade when Yt = a or -a, exiting the trade at Yt = b or -b,
-       where Yt is a dimensionless series transformed from the original time series Xt.
-    3. A trading cycle is defined as the time needed for Yt to change from -a to a, then to b.
-    4. 0 <= b <= a or -a <= b <= 0
+    `Zeng, Z. and Lee, C.-G. (2014). Pairs trading: optimal thresholds and profitability. 
+    Quantitative Finance, 14(11): 1881–1893
+    <https://www.tandfonline.com/doi/pdf/10.1080/14697688.2014.917806>`_.
     """
 
     def __init__(self):
