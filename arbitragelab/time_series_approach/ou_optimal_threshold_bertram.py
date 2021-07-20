@@ -1,8 +1,11 @@
 # Copyright 2019, Hudson and Thames Quantitative Research
 # All rights reserved
 # Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
+"""
+The module implements the Bertram class for OU Optimal Threshold Model.
+"""
+# pylint: disable=invalid-name
 
-# pylint: disable=missing-module-docstring, invalid-name, too-many-branches, too-many-statements
 import numpy as np
 from scipy import optimize, special
 import matplotlib.pyplot as plt
@@ -29,18 +32,18 @@ class OUModelOptimalThresholdBertram(OUModelOptimalThreshold):
 
         devadarsh.track('OUModelOptimalThresholdBertram')
 
-    def expected_trade_length(self, a: float, m: float):
+    def expected_trade_length(self, a: float, m: float) -> float:
         """
         Calculates equation (9) in the paper to get the expected trade length.
 
         :param a: (float) The entry threshold of the trading strategy.
         :param m: (float) The exit threshold of the trading strategy.
-        :return: (float) The expected trade length of the trading strategy
+        :return: (float) The expected trade length of the trading strategy.
         """
 
         return (np.pi / self.mu) * (self._erfi_scaler(m) - self._erfi_scaler(a))
 
-    def trade_length_variance(self, a: float, m: float):
+    def trade_length_variance(self, a: float, m: float) -> float:
         """
         Calculates equation (10) in the paper to get the variance of trade length.
 
@@ -57,7 +60,7 @@ class OUModelOptimalThresholdBertram(OUModelOptimalThreshold):
 
         return term_1 / term_2
 
-    def expected_return(self, a: float, m: float, c: float):
+    def expected_return(self, a: float, m: float, c: float) -> float:
         """
         Calculates equation (5) in the paper to get the expected return.
 
@@ -69,7 +72,7 @@ class OUModelOptimalThresholdBertram(OUModelOptimalThreshold):
 
         return (m - a - c) / self.expected_trade_length(a, m)
 
-    def return_variance(self, a: float, m: float, c: float):
+    def return_variance(self, a: float, m: float, c: float) -> float:
         """
         Calculates equation (6) in the paper to get the variance of return.
 
@@ -81,7 +84,7 @@ class OUModelOptimalThresholdBertram(OUModelOptimalThreshold):
 
         return (m - a - c) ** 2 * self.trade_length_variance(a, m) / (self.expected_trade_length(a, m) ** 3)
 
-    def sharpe_ratio(self, a: float, m: float, c: float, rf: float):
+    def sharpe_ratio(self, a: float, m: float, c: float, rf: float) -> float:
         """
         Calculates equation (15) in the paper to get the Sharpe ratio.
 
@@ -94,11 +97,9 @@ class OUModelOptimalThresholdBertram(OUModelOptimalThreshold):
 
         r = rf / self.expected_trade_length(a, m)
 
-        return (self.expected_return(a, m, c) - r) / np.sqrt(self.return_variance(a, m ,c))
+        return (self.expected_return(a, m, c) - r) / np.sqrt(self.return_variance(a, m, c))
 
-
-
-    def get_threshold_by_maximize_expected_return(self, c: float, initial_guess: float = None):
+    def get_threshold_by_maximize_expected_return(self, c: float, initial_guess: float = None) -> tuple:
         """
         Solves equation (13) in the paper to get the optimal trading thresholds.
 
@@ -107,7 +108,7 @@ class OUModelOptimalThresholdBertram(OUModelOptimalThreshold):
         :return: (tuple) The values of the optimal trading thresholds.
         """
 
-        # equation (13) in the paper
+        # Equation (13) in the paper
         equation = lambda a: np.exp(self.mu * ((a - self.theta) ** 2) / (self.sigma ** 2)) * (2 * (a - self.theta) + c) \
                             - self.sigma * np.sqrt(np.pi / self.mu) * self._erfi_scaler(a)
 
@@ -119,7 +120,7 @@ class OUModelOptimalThresholdBertram(OUModelOptimalThreshold):
 
         return root, 2 * self.theta - root
 
-    def get_threshold_by_maximize_sharpe_ratio(self, c: float, rf: float, initial_guess: float = None):
+    def get_threshold_by_maximize_sharpe_ratio(self, c: float, rf: float, initial_guess: float = None) -> tuple:
         """
         Minimize -1 * Sharpe ratio to get the optimal trading thresholds.
 
@@ -140,9 +141,9 @@ class OUModelOptimalThresholdBertram(OUModelOptimalThreshold):
 
         return sol, 2 * self.theta - sol
 
-    def _erfi_scaler(self, const: float):
+    def _erfi_scaler(self, const: float) -> float:
         """
-        A helper function for simplifing equation expression.
+        A helper function for simplifying equation expression.
 
         :param const: (float) The input value of the function.
         :return: (float) The output value of the function.
@@ -150,12 +151,12 @@ class OUModelOptimalThresholdBertram(OUModelOptimalThreshold):
 
         return special.erfi((const - self.theta) * np.sqrt(self.mu) / self.sigma)
 
-    def plot_target_vs_c(self, target: str, method: str, c_list: list, rf: float = 0):
+    def plot_target_vs_c(self, target: str, method: str, c_list: list, rf: float = 0) -> plt.figure:
         """
         Plots target versus transaction costs.
 
-        :param target: (str) The target values to plot. The options are
-            ["a", "m", "expected_return", "return_variance", "sharpe_ratio", "expected_trade_length", "trade_length_variance"].
+        :param target: (str) The target values to plot. The options are ["a", "m", "expected_return",
+            "return_variance", "sharpe_ratio", "expected_trade_length", "trade_length_variance"].
         :param method: (str) The method for calculating the optimal thresholds. The options are
             ["maximize_expected_return", "maximize_sharpe_ratio"].
         :param c_list: (list) A list contains transaction costs.
@@ -220,16 +221,16 @@ class OUModelOptimalThresholdBertram(OUModelOptimalThreshold):
                             "[\"a\", \"m\", \"expected_return\", \"return_variance\","
                             "\"sharpe_ratio\", \"expected_trade_length\", \"trade_length_variance\"].")
 
-        plt.xlabel("Transaction Cost c") # x label
+        plt.xlabel("Transaction Cost c")  # x label
 
         return fig
 
-    def plot_target_vs_rf(self, target: str, method: str, rf_list: list, c: float):
+    def plot_target_vs_rf(self, target: str, method: str, rf_list: list, c: float) -> plt.figure:
         """
         Plots target versus risk free rates.
 
-        :param target: (str) The target values to plot. The options are
-            ["a", "m", "expected_return", "return_variance", "sharpe_ratio", "expected_trade_length", "trade_length_variance"].
+        :param target: (str) The target values to plot. The options are ["a", "m", "expected_return",
+            "return_variance", "sharpe_ratio", "expected_trade_length", "trade_length_variance"].
         :param method: (str) The method for calculating the optimal thresholds. The options are
             ["maximize_expected_return", "maximize_sharpe_ratio"].
         :param rf_list: (list) A list contains risk free rates.
@@ -292,6 +293,6 @@ class OUModelOptimalThresholdBertram(OUModelOptimalThreshold):
                             "[\"a\", \"m\", \"expected_return\", \"return_variance\","
                             "\"sharpe_ratio\", \"expected_trade_length\", \"trade_length_variance\"].")
 
-        plt.xlabel("Risk−free Rate rf") # x label
+        plt.xlabel("Risk−free Rate rf")  # x label
 
         return fig

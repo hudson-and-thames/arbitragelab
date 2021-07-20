@@ -1,9 +1,13 @@
 # Copyright 2019, Hudson and Thames Quantitative Research
 # All rights reserved
 # Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
+"""
+The module implements the base class for OU Optimal Threshold Model.
+"""
+# pylint: disable=invalid-name
 
-# pylint: disable=missing-module-docstring, invalid-name, too-many-branches, too-many-statements
 from typing import Union
+
 import numpy as np
 import pandas as pd
 from scipy import optimize
@@ -14,7 +18,8 @@ from arbitragelab.util import devadarsh
 
 class OUModelOptimalThreshold:
     """
-    This class contains base functions for modules that calculate optimal O-U model trading thresholds through time-series approaches.
+    This class contains base functions for modules that calculate optimal O-U model trading thresholds
+    through time-series approaches.
     """
 
     def __init__(self):
@@ -27,9 +32,9 @@ class OUModelOptimalThreshold:
         self.sigma = None  # The amplitude of randomness of the O-U process
 
         # Parameters for fitting function
-        self.data = None # Fitting data provided by the user
-        self.delta_t = None # Delta between observations, calculated in years
-        self.beta = None # Optimal ratio between two assets
+        self.data = None  # Fitting data provided by the user
+        self.delta_t = None  # Delta between observations, calculated in years
+        self.beta = None  # Optimal ratio between two assets
 
         devadarsh.track('OUModelOptimalThreshold')
 
@@ -37,9 +42,9 @@ class OUModelOptimalThreshold:
         """
         Initializes the O-U process from given parameters.
 
-        :param theta: (float/int) The long-term mean of the O-U process.
-        :param mu: (float/int) The speed at which the values will regroup around the long-term mean.
-        :param sigma: (float/int) The amplitude of randomness of the O-U process.
+        :param theta: (float) The long-term mean of the O-U process.
+        :param mu: (float) The speed at which the values will regroup around the long-term mean.
+        :param sigma: (float) The amplitude of randomness of the O-U process.
         """
 
         self.theta = theta
@@ -68,7 +73,7 @@ class OUModelOptimalThreshold:
             raise Exception("The number of dimensions for input data is incorrect. "
                             "Please provide a 1 or 2-dimensional array or dataframe.")
 
-    def _fit_data(self):
+    def _fit_data(self) -> np.array:
         """
         Checks the type of input data and returns its log values.
 
@@ -121,11 +126,11 @@ class OUModelOptimalThreshold:
         self.sigma = parameters[2]
 
     @staticmethod
-    def _get_spread(assets: np.array, beta: float):
+    def _get_spread(assets: np.array, beta: float) -> np.array:
         """
         Constructs a time series of spread based on log values of two given asset prices.
 
-        :param prices: (np.array) A time series contains log values of two assets prices with dimensions n x 2.
+        :param assets: (np.array) A time series contains log values of two assets prices with dimensions n x 2.
         :param beta: (float) A coefficient representing the weight of the second asset.
         :return: (np.array) A time series of spread with dimensions n x 1.
         """
@@ -139,7 +144,7 @@ class OUModelOptimalThreshold:
         """
         Fits the O-U process to a time series of two assets prices.
 
-        :param data: (np.array/pd.DataFrame) A Time series of two assets prices with dimensions n x 2.
+        :param data: (np.array/pd.DataFrame) A time series of two assets prices with dimensions n x 2.
         """
 
         self.data = data
@@ -161,7 +166,7 @@ class OUModelOptimalThreshold:
         self.sigma = result[2][index]
         self.beta = linspace[index]
 
-    def _optimal_coefficients(self, series: np.array):
+    def _optimal_coefficients(self, series: np.array) -> tuple:
         """
         Finds the O-U process coefficients.
 
@@ -178,7 +183,8 @@ class OUModelOptimalThreshold:
         # Initial guesses for theta, mu, sigma
         initial_guess = np.array((theta_init, 100, 100))
 
-        result = optimize.minimize(self._compute_log_likelihood, initial_guess, args=(series, self.delta_t), bounds=bounds)
+        result = optimize.minimize(self._compute_log_likelihood, initial_guess,
+                                   args=(series, self.delta_t), bounds=bounds)
 
         # Unpacking optimal values
         theta, mu, sigma = result.x
@@ -189,7 +195,7 @@ class OUModelOptimalThreshold:
         return theta, mu, sigma, max_log_likelihood
 
     @staticmethod
-    def _compute_log_likelihood(params: tuple, *args: tuple):
+    def _compute_log_likelihood(params: tuple, *args: tuple) -> float:
         """
         Computes the average Log Likelihood.
 
@@ -215,9 +221,9 @@ class OUModelOptimalThreshold:
         return -log_likelihood
 
     @staticmethod
-    def _w1(const: float):
+    def _w1(const: float) -> float:
         """
-        A helper function for simplifing equation expression.
+        A helper function for simplifying equation expression.
 
         :param const: (float) The input value of the function.
         :return: (float) The output value of the function.
@@ -231,15 +237,16 @@ class OUModelOptimalThreshold:
         return float(w1)
 
     @staticmethod
-    def _w2(const: float):
+    def _w2(const: float) -> float:
         """
-        A helper function for simplifing equation expression.
+        A helper function for simplifying equation expression.
 
         :param const: (float) The input value of the function.
         :return: (float) The output value of the function.
         """
 
-        middle_term = lambda k: (digamma((2 * k - 1) / 2) - digamma(1)) * gamma((2 * k - 1) / 2) * ((1.414 * const) ** (2 * k - 1)) / fac((2 * k - 1))
+        middle_term = lambda k: (digamma((2 * k - 1) / 2) - digamma(1)) * gamma((2 * k - 1) / 2) *\
+                                ((1.414 * const) ** (2 * k - 1)) / fac((2 * k - 1))
         w2 = nsum(middle_term, [1, inf])
 
         return float(w2)
