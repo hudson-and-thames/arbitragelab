@@ -6,12 +6,11 @@ This module houses utility functions used by the PairsSelector.
 """
 
 import sys
-from scipy.odr import ODR, Model, RealData
 import numpy as np
 import pandas as pd
-import statsmodels.api as sm
-from statsmodels.tsa.adfvalues import mackinnonp
-from statsmodels.tsa.stattools import adfuller
+
+from arbitragelab.hedge_ratios import get_tls_hedge_ratio, get_ols_hedge_ratio, get_minimum_hl_hedge_ratio
+from arbitragelab.cointegration_approach import EngleGrangerPortfolio, get_half_life_of_mean_reversion
 
 
 def _print_progress(iteration, max_iterations, prefix='', suffix='', decimals=1, bar_length=50):
@@ -19,6 +18,7 @@ def _print_progress(iteration, max_iterations, prefix='', suffix='', decimals=1,
     """
     Calls in a loop to create a terminal progress bar.
     https://gist.github.com/aubricus/f91fb55dc6ba5557fbab06119420dd6a
+
     :param iteration: (int) Current iteration.
     :param max_iterations: (int) Maximum number of iterations.
     :param prefix: (str) Prefix string.
@@ -26,6 +26,7 @@ def _print_progress(iteration, max_iterations, prefix='', suffix='', decimals=1,
     :param decimals: (int) Positive number of decimals in percent completed.
     :param bar_length: (int) Character length of the bar.
     """
+
     str_format = "{0:." + str(decimals) + "f}"
     # Calculate the percent completed.
     percents = str_format.format(100 * (iteration / float(max_iterations)))
@@ -65,16 +66,7 @@ def _outer_ou_loop(spreads_df: pd.DataFrame, test_period: str,
     ou_results = []
 
     for iteration, pair in enumerate(molecule):
-
         spread = spreads_df.loc[:, str(pair)]
-        lagged_spread = spread.shift(1).dropna(0)
-
-        # Setup regression parameters.
-        lagged_spread_c = sm.add_constant(lagged_spread)
-        delta_y_t = np.diff(spread)
-
-        model = sm.OLS(delta_y_t, lagged_spread_c)
-        res = model.fit()
 
         # Split the spread in two periods. The training data is used to
         # extract the long term mean of the spread. Then the mean is used
@@ -98,10 +90,14 @@ def _outer_ou_loop(spreads_df: pd.DataFrame, test_period: str,
 
         # Check that the number of crossovers are in accordance with the given selection
         # criteria.
-        cross_overs = len(cross_overs_counts[cross_overs_counts['counts'] > cross_overs_per_delta]) > 0
+        if cross_overs_per_delta is not None:
+            cross_overs = len(cross_overs_counts[cross_overs_counts['counts'] >= cross_overs_per_delta]) > 0
+        else:
+            cross_overs = True
 
         # Append half-life and number of cross overs.
-        ou_results.append([np.log(2) / abs(res.params[0]), cross_overs])
+        half_life = get_half_life_of_mean_reversion(data=spread)
+        ou_results.append([half_life, cross_overs])
 
         _print_progress(iteration + 1, len(molecule), prefix='Outer OU Loop Progress:',
                         suffix='Complete')
@@ -109,51 +105,50 @@ def _outer_ou_loop(spreads_df: pd.DataFrame, test_period: str,
     return pd.DataFrame(ou_results, index=molecule, columns=['hl', 'crossovers'])
 
 
-def _linear_f(beta: np.array, x_variable: np.array) -> np.array:
+def _outer_cointegration_loop(prices_df: pd.DataFrame, molecule: list, hedge_ratio_calculation: str) -> pd.DataFrame:
+    # pylint: disable=protected-access
     """
-    This is the helper linear model that is going to be used in the Orthogonal Regression.
-
-    :param beta: (np.array) Model beta coefficient.
-    :param x_variable: (np.array) Model X vector.
-    :return: (np.array) Vector result of equation calculation.
-    """
-
-    return beta[0]*x_variable + beta[1]
-
-
-def _outer_cointegration_loop(prices_df: pd.DataFrame, molecule: list) -> pd.DataFrame:
-    """
-    This function calculates the Engle-Granger test for each pair in the molecule. Uses the Total
-    Least Squares approach to take into consideration the variance of both price series.
+    This function calculates the Engle-Granger test for each pair in the molecule.
 
     :param prices_df: (pd.DataFrame) Price Universe.
     :param molecule: (list) Indices of pairs.
+    :param hedge_ratio_calculation: (str) Defines how hedge ratio is calculated. Can be either 'OLS',
+        'TLS' (Total Least Squares) or 'min_half_life'.
     :return: (pd.DataFrame) Cointegration statistics.
     """
 
     cointegration_results = []
 
     for iteration, pair in enumerate(molecule):
-        maxlag = None
-        autolag = "aic"
-        trend = "c"
+        eg_port = EngleGrangerPortfolio()
+        if hedge_ratio_calculation == 'OLS':
+            fit, _, _, residuals = get_ols_hedge_ratio(price_data=prices_df.loc[:, [pair[0], pair[1]]],
+                                                       dependent_variable=pair[0])
+            hedge_ratio = fit.coef_[0]
+        elif hedge_ratio_calculation == 'TLS':
+            fit, _, _, residuals = get_tls_hedge_ratio(price_data=prices_df.loc[:, [pair[0], pair[1]]],
+                                                       dependent_variable=pair[0])
+            hedge_ratio = fit.beta[0]
+        elif hedge_ratio_calculation == 'min_half_life':
+            fit, _, _, residuals = get_minimum_hl_hedge_ratio(price_data=prices_df.loc[:, [pair[0], pair[1]]],
+                                                              dependent_variable=pair[0])
+            hedge_ratio = fit.x[0]
+        else:
+            raise ValueError('Unknown hedge ratio calculation parameter value.')
 
-        linear = Model(_linear_f)
-        mydata = RealData(prices_df.loc[:, pair[0]], prices_df.loc[:, pair[1]])
-        myodr = ODR(mydata, linear, beta0=[1., 2.])
-        res_co = myodr.run()
+        constant = residuals.mean()
+        eg_port._perform_eg_test(residuals)
+        statistic_value = eg_port.adf_statistics.loc['statistic_value'].iloc[0]
+        p_value_99 = eg_port.adf_statistics.loc['99%'].iloc[0]
+        p_value_95 = eg_port.adf_statistics.loc['95%'].iloc[0]
+        p_value_90 = eg_port.adf_statistics.loc['90%'].iloc[0]
 
-        res_adf = adfuller(res_co.delta - res_co.eps, maxlag=maxlag,
-                           autolag=autolag, regression="nc")
-
-        pval_asy = mackinnonp(res_adf[0], regression=trend)
-
-        cointegration_results.append((res_adf[0], pval_asy,
-                                      res_co.beta[0], res_co.beta[1]))
-
+        cointegration_results.append(
+            [statistic_value, p_value_99, p_value_95, p_value_90, hedge_ratio,
+             constant])
         _print_progress(iteration + 1, len(molecule), prefix='Outer Cointegration Loop Progress:',
                         suffix='Complete')
 
     return pd.DataFrame(cointegration_results,
                         index=molecule,
-                        columns=['coint_t', 'pvalue', 'hedge_ratio', 'constant'])
+                        columns=['coint_t', 'p_value_99%', 'p_value_95%', 'p_value_90%', 'hedge_ratio', 'constant'])

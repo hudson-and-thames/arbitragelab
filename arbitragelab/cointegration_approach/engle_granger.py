@@ -9,10 +9,10 @@ This module implements Engle-Granger cointegration approach.
 import numpy as np
 import pandas as pd
 from statsmodels.tsa.stattools import adfuller
-from sklearn.linear_model import LinearRegression
 
 from arbitragelab.cointegration_approach.base import CointegratedPortfolio
 from arbitragelab.util import devadarsh
+from arbitragelab.hedge_ratios.linear import get_ols_hedge_ratio
 
 
 class EngleGrangerPortfolio(CointegratedPortfolio):
@@ -20,6 +20,7 @@ class EngleGrangerPortfolio(CointegratedPortfolio):
     The class implements the construction of a mean-reverting portfolio using the two-step Engle-Granger method.
     It also tests model residuals for unit-root (presence of cointegration).
     """
+
     # pylint: disable=invalid-name
     def __init__(self):
         """
@@ -34,6 +35,17 @@ class EngleGrangerPortfolio(CointegratedPortfolio):
         self.adf_statistics = None  # ADF statistics.
 
         devadarsh.track('EngleGrangerPortfolio')
+
+    def _perform_eg_test(self, residuals: pd.Series):
+        """
+        Perform Engle-Granger test on model residuals and generate test statistics and p values.
+
+        :param residuals: (pd.Series) OLS residuals.
+        """
+        test_result = adfuller(residuals)
+        critical_values = test_result[4]
+        self.adf_statistics = pd.DataFrame(index=['99%', '95%', '90%'], data=critical_values.values())
+        self.adf_statistics.loc['statistic_value', 0] = test_result[0]
 
     def fit(self, price_data: pd.DataFrame, add_constant: bool = False):
         """
@@ -52,22 +64,12 @@ class EngleGrangerPortfolio(CointegratedPortfolio):
         self.dependent_variable = price_data.columns[0]
 
         # Fit the regression
-        self.ols_model = LinearRegression(fit_intercept=add_constant)
-
-        X = price_data.copy()
-        X.drop(columns=self.dependent_variable, axis=1, inplace=True)
-        if X.shape[1] == 1:
-            X = X.values.reshape(-1, 1)
-
-        y = price_data[self.dependent_variable].copy()
-
-        self.ols_model.fit(X, y)
+        self.ols_model, _, _, residuals = get_ols_hedge_ratio(price_data=price_data,
+                                                              dependent_variable=self.dependent_variable,
+                                                              add_constant=add_constant)
         self.cointegration_vectors = pd.DataFrame([np.append(1, -1 * self.ols_model.coef_)],
                                                   columns=price_data.columns)
 
         # Get model residuals
-        self.residuals = y - self.ols_model.predict(X)
-        test_result = adfuller(self.residuals)
-        critical_values = test_result[4]
-        self.adf_statistics = pd.DataFrame(index=['99%', '95%', '90%'], data=critical_values.values())
-        self.adf_statistics.loc['statistic_value', 0] = test_result[0]
+        self.residuals = residuals
+        self._perform_eg_test(self.residuals)
