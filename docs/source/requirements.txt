@@ -8,7 +8,7 @@ scipy==1.6.0
 statsmodels==0.12.2
 cython==0.29.17
 POT==0.7.0
-yfinance==0.1.55
+yfinance==0.1.63
 yahoo-fin==0.8.6
 mpldatacursor==0.7.1
 lxml==4.6.2
