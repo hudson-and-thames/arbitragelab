@@ -5,9 +5,9 @@
    `Analytic solutions for optimal statistical arbitrage trading. Physica A: Statistical Mechanics and its Applications, 389(11): 2234–2243
    <http://www.stagirit.org/sites/default/files/articles/a_0340_ssrn-id1505073.pdf>`_.
 
-==========================================
+===========================================
 OU Model Optimal Trading Thresholds Bertram
-==========================================
+===========================================
 
 For statistical arbitrage strategies, determining the trading thresholds is an essential issue, and one of the solutions for this is to maximize performance per unit of time. To do so, the investor should choose the proper entry and exit thresholds. If the thresholds are narrow, then the time it needs to complete a trade is short, but the profit is small. In contrast, if thresholds are wide, the profit in each trade is big, but the time it needs to complete a trade is long. The interplay between the profit per trade and the trade length gives rise to an optimization problem.
 
@@ -116,6 +116,9 @@ Getting Optimal Thresholds
 **************************
 
 This paper examines the problem of choosing an optimal strategy under two different objective functions: the expected return; and the Sharpe ratio. One can choose either to get the thresholds. The following functions will return a tuple contains :math:`a` and :math:`m`, where :math:`a` is the optimal entry thresholds, and :math:`m` is the optimal exit threshold.
+
+.. note::
+    :code:`initial_guess` is used to speed up the process and ensure the target equation can be solved by :code:`scipy.optimize`. If the value of :code:`initial_guess` is not given, the default value will be :math:`\theta - c - 10^{-2}`. From our experiment, the default value is suited for most of the cases. If you observe that the thresholds got by the functions is odd or the running time is larger than 5 second, please try a :code:`initial_guess` on different scales.
 
 .. automethod:: OUModelOptimalThresholdBertram.get_threshold_by_maximize_expected_return
 

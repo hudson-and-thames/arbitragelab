@@ -33,8 +33,8 @@ class OUModelOptimalThresholdBertram(OUModelOptimalThreshold):
         """
         Calculates equation (9) in the paper to get the expected trade length.
 
-        :param a: (float) The entry threshold of the trading strategy
-        :param m: (float) The exit threshold of the trading strategy
+        :param a: (float) The entry threshold of the trading strategy.
+        :param m: (float) The exit threshold of the trading strategy.
         :return: (float) The expected trade length of the trading strategy
         """
 
@@ -44,9 +44,9 @@ class OUModelOptimalThresholdBertram(OUModelOptimalThreshold):
         """
         Calculates equation (10) in the paper to get the variance of trade length.
 
-        :param a: (float) The entry threshold of the trading strategy
-        :param m: (float) The exit threshold of the trading strategy
-        :return: (float) The variance of trade length of the trading strategy
+        :param a: (float) The entry threshold of the trading strategy.
+        :param m: (float) The exit threshold of the trading strategy.
+        :return: (float) The variance of trade length of the trading strategy.
         """
 
         const_1 = (m - self.theta) * np.sqrt(2 * self.mu) / self.sigma
@@ -61,10 +61,10 @@ class OUModelOptimalThresholdBertram(OUModelOptimalThreshold):
         """
         Calculates equation (5) in the paper to get the expected return.
 
-        :param a: (float) The entry threshold of the trading strategy
-        :param m: (float) The exit threshold of the trading strategy
-        :param c: (float) The transaction costs of the trading strategy
-        :return: (float) The expected return of the trading strategy
+        :param a: (float) The entry threshold of the trading strategy.
+        :param m: (float) The exit threshold of the trading strategy.
+        :param c: (float) The transaction costs of the trading strategy.
+        :return: (float) The expected return of the trading strategy.
         """
 
         return (m - a - c) / self.expected_trade_length(a, m)
@@ -73,10 +73,10 @@ class OUModelOptimalThresholdBertram(OUModelOptimalThreshold):
         """
         Calculates equation (6) in the paper to get the variance of return.
 
-        :param a: (float) The entry threshold of the trading strategy
-        :param m: (float) The exit threshold of the trading strategy
-        :param c: (float) The transaction costs of the trading strategy
-        :return: (float) The variance of return of the trading strategy
+        :param a: (float) The entry threshold of the trading strategy.
+        :param m: (float) The exit threshold of the trading strategy.
+        :param c: (float) The transaction costs of the trading strategy.
+        :return: (float) The variance of return of the trading strategy.
         """
 
         return (m - a - c) ** 2 * self.trade_length_variance(a, m) / (self.expected_trade_length(a, m) ** 3)
@@ -85,11 +85,11 @@ class OUModelOptimalThresholdBertram(OUModelOptimalThreshold):
         """
         Calculates equation (15) in the paper to get the Sharpe ratio.
 
-        :param a: (float) The entry threshold of the trading strategy
-        :param m: (float) The exit threshold of the trading strategy
-        :param c: (float) The transaction costs of the trading strategy
-        :param rf: (float) The risk free rate
-        :return: (float) The Sharpe ratio of the strategy
+        :param a: (float) The entry threshold of the trading strategy.
+        :param m: (float) The exit threshold of the trading strategy.
+        :param c: (float) The transaction costs of the trading strategy.
+        :param rf: (float) The risk free rate.
+        :return: (float) The Sharpe ratio of the strategy.
         """
 
         r = rf / self.expected_trade_length(a, m)
@@ -142,10 +142,10 @@ class OUModelOptimalThresholdBertram(OUModelOptimalThreshold):
 
     def _erfi_scaler(self, const: float):
         """
-        A helper function for simplifing equation expression
+        A helper function for simplifing equation expression.
 
-        :param const: (float) The input value of the function
-        :return: (float) The output value of the function
+        :param const: (float) The input value of the function.
+        :return: (float) The output value of the function.
         """
 
         return special.erfi((const - self.theta) * np.sqrt(self.mu) / self.sigma)
@@ -157,7 +157,7 @@ class OUModelOptimalThresholdBertram(OUModelOptimalThreshold):
         :param target: (str) The target values to plot. The options are
             ["a", "m", "expected_return", "return_variance", "sharpe_ratio", "expected_trade_length", "trade_length_variance"].
         :param method: (str) The method for calculating the optimal thresholds. The options are
-            ["maximize_expected_return", "maximize_sharpe_ratio"]
+            ["maximize_expected_return", "maximize_sharpe_ratio"].
         :param c_list: (list) A list contains transaction costs.
         :param rf: (float) The risk free rate. It is only needed when the target is "sharpe_ratio"
             or when the method is "maximize_sharpe_ratio".
@@ -185,47 +185,34 @@ class OUModelOptimalThresholdBertram(OUModelOptimalThreshold):
                             "Please use one of the options "
                             "[\"maximize_expected_return\", \"maximize_sharpe_ratio\"].")
 
+        # Mapping target to the setting of the plot
+        mapping = {
+        "a": (a_list, "Optimal Entry Thresholds vs Trans. Costs", "a"),
+        "m": (m_list, "Optimal Exit Thresholds vs Trans. Costs", "m"),
+
+        "expected_return": (np.vectorize(self.expected_return)(a_list, m_list, c_list),
+                            "Expected Returns vs Trans. Costs", "Expected Return"),
+
+        "return_variance": (np.vectorize(self.return_variance)(a_list, m_list, c_list),
+                            "Variances of Return vs Trans. Costs", "Variances of Return"),
+
+        "sharpe_ratio": (np.vectorize(self.sharpe_ratio)(a_list, m_list, c_list, rf_list),
+                         "Sharpe Ratios vs Trans. Costs", "Sharpe Ratio"),
+
+        "expected_trade_length": (np.vectorize(self.expected_trade_length)(a_list, m_list),
+                                  "Expected Trade Lengths vs Trans. Costs", "Expected Trade Length"),
+
+        "trade_length_variance": (np.vectorize(self.trade_length_variance)(a_list, m_list),
+                                  "Variance of Trade Lengths vs Trans. Costs", "Variance of Trade Length")
+        }
+
         fig = plt.figure()
 
-        if target == "a":
-            plt.plot(c_list, a_list)
-            plt.title("Optimal Entry Thresholds vs Trans. Costs")
-            plt.ylabel("a")
-
-        elif target == "m":
-            plt.plot(c_list, m_list)
-            plt.title("Optimal Exit Thresholds vs Trans. Costs")
-            plt.ylabel("m")
-
-        elif target == "expected_return":
-            func = np.vectorize(self.expected_return)
-            plt.plot(c_list, func(a_list, m_list, c_list))
-            plt.title("Expected Returns vs Trans. Costs")
-            plt.ylabel("Expected Return")
-
-        elif target == "return_variance":
-            func = np.vectorize(self.return_variance)
-            plt.plot(c_list, func(a_list, m_list, c_list))
-            plt.title("Variances of Return vs Trans. Costs")
-            plt.ylabel("Variances of Return")
-
-        elif target == "sharpe_ratio":
-            func = np.vectorize(self.sharpe_ratio)
-            plt.plot(c_list, func(a_list, m_list, c_list, rf_list))
-            plt.title("Sharpe Ratios vs Trans. Costs")
-            plt.ylabel("Sharpe Ratio")
-
-        elif target == "expected_trade_length":
-            func = np.vectorize(self.expected_trade_length)
-            plt.plot(c_list, func(a_list, m_list))
-            plt.title("Expected Trade Lengths vs Trans. Costs")
-            plt.ylabel("Expected Trade Length")
-
-        elif target == "trade_length_variance":
-            func = np.vectorize(self.trade_length_variance)
-            plt.plot(c_list, func(a_list, m_list))
-            plt.title("Variance of Trade Lengths vs Trans. Costs")
-            plt.ylabel("Variance of Trade Length")
+        if target in mapping.keys():
+            y_values, title, label = mapping[target]
+            plt.plot(c_list, y_values)
+            plt.title(title)
+            plt.ylabel(label)
 
         else:
             raise Exception("Incorrect target. "
@@ -233,7 +220,7 @@ class OUModelOptimalThresholdBertram(OUModelOptimalThreshold):
                             "[\"a\", \"m\", \"expected_return\", \"return_variance\","
                             "\"sharpe_ratio\", \"expected_trade_length\", \"trade_length_variance\"].")
 
-        plt.xlabel("Transaction Cost c")  # x label
+        plt.xlabel("Transaction Cost c") # x label
 
         return fig
 
@@ -270,47 +257,34 @@ class OUModelOptimalThresholdBertram(OUModelOptimalThreshold):
                             "Please use one of the options "
                             "[\"maximize_expected_return\", \"maximize_sharpe_ratio\"].")
 
+        # Mapping target to the setting of the plot
+        mapping = {
+        "a": (a_list, "Optimal Entry Thresholds vs Trans. Costs", "a"),
+        "m": (m_list, "Optimal Exit Thresholds vs Trans. Costs", "m"),
+
+        "expected_return": (np.vectorize(self.expected_return)(a_list, m_list, c_list),
+                            "Expected Returns vs Trans. Costs", "Expected Return"),
+
+        "return_variance": (np.vectorize(self.return_variance)(a_list, m_list, c_list),
+                            "Variances of Return vs Trans. Costs", "Variances of Return"),
+
+        "sharpe_ratio": (np.vectorize(self.sharpe_ratio)(a_list, m_list, c_list, rf_list),
+                         "Sharpe Ratios vs Trans. Costs", "Sharpe Ratio"),
+
+        "expected_trade_length": (np.vectorize(self.expected_trade_length)(a_list, m_list),
+                                  "Expected Trade Lengths vs Trans. Costs", "Expected Trade Length"),
+
+        "trade_length_variance": (np.vectorize(self.trade_length_variance)(a_list, m_list),
+                                  "Variance of Trade Lengths vs Trans. Costs", "Variance of Trade Length")
+        }
+
         fig = plt.figure()
 
-        if target == "a":
-            plt.plot(rf_list, a_list)
-            plt.title("Optimal Entry Thresholds vs Risk−free Rates")
-            plt.ylabel("a")
-
-        elif target == "m":
-            plt.plot(rf_list, m_list)
-            plt.title("Optimal Exit Thresholds vs Risk−free Rates")
-            plt.ylabel("m")
-
-        elif target == "expected_return":
-            func = np.vectorize(self.expected_return)
-            plt.plot(rf_list, func(a_list, m_list, c_list))
-            plt.title("Expected Returns vs Risk−free Rates")
-            plt.ylabel("Expected Return")
-
-        elif target == "return_variance":
-            func = np.vectorize(self.return_variance)
-            plt.plot(rf_list, func(a_list, m_list, c_list))
-            plt.title("Variances of Return vs Risk−free Rates")
-            plt.ylabel("Variances of Return")
-
-        elif target == "sharpe_ratio":
-            func = np.vectorize(self.sharpe_ratio)
-            plt.plot(rf_list, func(a_list, m_list, c_list, rf_list))
-            plt.title("Sharpe Ratios vs Risk−free Rates")
-            plt.ylabel("Sharpe Ratio")
-
-        elif target == "expected_trade_length":
-            func = np.vectorize(self.expected_trade_length)
-            plt.plot(rf_list, func(a_list, m_list))
-            plt.title("Expected Trade Lengths vs Risk−free Rates")
-            plt.ylabel("Expected Trade Length")
-
-        elif target == "trade_length_variance":
-            func = np.vectorize(self.trade_length_variance)
-            plt.plot(rf_list, func(a_list, m_list))
-            plt.title("Variance of Trade Lengths vs Risk−free Rates")
-            plt.ylabel("Variance of Trade Length")
+        if target in mapping.keys():
+            y_values, title, label = mapping[target]
+            plt.plot(rf_list, y_values)
+            plt.title(title)
+            plt.ylabel(label)
 
         else:
             raise Exception("Incorrect target. "
@@ -318,6 +292,6 @@ class OUModelOptimalThresholdBertram(OUModelOptimalThreshold):
                             "[\"a\", \"m\", \"expected_return\", \"return_variance\","
                             "\"sharpe_ratio\", \"expected_trade_length\", \"trade_length_variance\"].")
 
-        plt.xlabel("Risk−free Rate rf")  # x label
+        plt.xlabel("Risk−free Rate rf") # x label
 
         return fig

@@ -25,7 +25,7 @@ class TestOUModelOptimalThresholdZeng(unittest.TestCase):
         """
 
         # List with testing values for plotting function
-        self.test_target = ["a", "b", "expected_return", "return_variance", "sharpe_ratio",
+        self.test_target = ["a_s", "b_s", "a_l", "b_l", "expected_return", "return_variance", "sharpe_ratio",
                             "expected_trade_length", "trade_length_variance", "error"]
         self.test_method = ["conventional_optimal_rule", "new_optimal_rule", "error"]
 

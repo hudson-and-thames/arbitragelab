@@ -16,7 +16,7 @@ class OUModelOptimalThresholdZeng(OUModelOptimalThreshold):
     """
     This class implements the analytic solutions of the optimal trading thresholds for the series
     with mean-reverting properties. The methods are described in the following publication:
-    `Zeng, Z. and Lee, C.-G. (2014). Pairs trading: optimal thresholds and profitability. 
+    `Zeng, Z. and Lee, C.-G. (2014). Pairs trading: optimal thresholds and profitability.
     Quantitative Finance, 14(11): 1881–1893
     <https://www.tandfonline.com/doi/pdf/10.1080/14697688.2014.917806>`_.
     """
@@ -34,9 +34,9 @@ class OUModelOptimalThresholdZeng(OUModelOptimalThreshold):
         """
         Calculates the expected trade length.
 
-        :param a: (float) The entry threshold of the trading strategy
-        :param b: (float) The exit threshold of the trading strategy
-        :return: (float) The expected trade length of the trading strategy
+        :param a: (float) The entry threshold of the trading strategy.
+        :param b: (float) The exit threshold of the trading strategy.
+        :return: (float) The expected trade length of the trading strategy.
         """
 
         a_trans = self._transform_to_dimensionless(a)
@@ -55,9 +55,9 @@ class OUModelOptimalThresholdZeng(OUModelOptimalThreshold):
         """
         Calculates the expected trade length.
 
-        :param a: (float) The entry threshold of the trading strategy
-        :param b: (float) The exit threshold of the trading strategy
-        :return: (float) The expected trade length of the trading strategy
+        :param a: (float) The entry threshold of the trading strategy.
+        :param b: (float) The exit threshold of the trading strategy.
+        :return: (float) The expected trade length of the trading strategy.
         """
 
         a_trans = self._transform_to_dimensionless(a)
@@ -80,10 +80,10 @@ class OUModelOptimalThresholdZeng(OUModelOptimalThreshold):
         """
         Calculates the expected return.
 
-        :param a: (float) The entry threshold of the trading strategy
-        :param b: (float) The exit threshold of the trading strategy
-        :param c: (float) The transaction costs of the trading strategy
-        :return: (float) The expected return of the trading strategy
+        :param a: (float) The entry threshold of the trading strategy.
+        :param b: (float) The exit threshold of the trading strategy.
+        :param c: (float) The transaction costs of the trading strategy.
+        :return: (float) The expected return of the trading strategy.
         """
 
         return (abs(a - b) - c) / self.expected_trade_length(a, b)
@@ -92,10 +92,10 @@ class OUModelOptimalThresholdZeng(OUModelOptimalThreshold):
         """
         Calculates the variance of return.
 
-        :param a: (float) The entry threshold of the trading strategy
-        :param b: (float) The exit threshold of the trading strategy
-        :param c: (float) The transaction costs of the trading strategy
-        :return: (float) The variance of return of the trading strategy
+        :param a: (float) The entry threshold of the trading strategy.
+        :param b: (float) The exit threshold of the trading strategy.
+        :param c: (float) The transaction costs of the trading strategy.
+        :return: (float) The variance of return of the trading strategy.
         """
 
         return (abs(a - b) - c) ** 2 * self.trade_length_variance(a, b) / (self.expected_trade_length(a, b) ** 3)
@@ -104,11 +104,11 @@ class OUModelOptimalThresholdZeng(OUModelOptimalThreshold):
         """
         Calculates the Sharpe ratio.
 
-        :param a: (float) The entry threshold of the trading strategy
-        :param b: (float) The exit threshold of the trading strategy
-        :param c: (float) The transaction costs of the trading strategy
-        :param rf: (float) The risk free rate
-        :return: (float) The Sharpe ratio of the strategy
+        :param a: (float) The entry threshold of the trading strategy.
+        :param b: (float) The exit threshold of the trading strategy.
+        :param c: (float) The transaction costs of the trading strategy.
+        :param rf: (float) The risk free rate.
+        :return: (float) The Sharpe ratio of the strategy.
         """
 
         r = rf / self.expected_trade_length(a, b)
@@ -119,9 +119,10 @@ class OUModelOptimalThresholdZeng(OUModelOptimalThreshold):
         """
         Solves equation (20) in the paper to get the optimal trading thresholds.
 
-        :param c: (float) The transaction costs of the trading strategy
-        :param initial_guess: (float) The initial guess of the entry threshold.
-        :return: (tuple) The values of the optimal trading thresholds
+        :param c: (float) The transaction costs of the trading strategy.
+        :param initial_guess: (float) The initial guess of the entry threshold
+            for a short position in the dimensionless system.
+        :return: (tuple) The values of the optimal trading thresholds.
         """
 
         c_trans = c * np.sqrt((2 * self.mu)) / self.sigma
@@ -141,9 +142,10 @@ class OUModelOptimalThresholdZeng(OUModelOptimalThreshold):
         """
         Solves equation (23) in the paper to get the optimal trading thresholds.
 
-        :param c: (float) The transaction costs of the trading strategy
-        :param initial_guess: (float) The initial guess of the entry threshold.
-        :return: (tuple) The values of the optimal trading thresholds
+        :param c: (float) The transaction costs of the trading strategy.
+        :param initial_guess: (float) The initial guess of the entry threshold
+            for a short position in the dimensionless system.
+        :return: (tuple) The values of the optimal trading thresholds.
         """
 
         c_trans = c * np.sqrt((2 * self.mu)) / self.sigma
@@ -161,20 +163,20 @@ class OUModelOptimalThresholdZeng(OUModelOptimalThreshold):
 
     def _transform_to_dimensionless(self, const: float):
         """
-        Transforms input value to dimensionless system.
+        Transforms input value to the dimensionless system.
 
-        :param const: Value to transform
-        :return: (float) Value in dimensionless system
+        :param const: The value to transform.
+        :return: (float) The value in the dimensionless system.
         """
 
         return (const - self.theta) * np.sqrt((2 * self.mu)) / self.sigma
 
     def _back_transform_from_dimensionless(self, const: float):
         """
-        Back transforms input value from dimensionless system.
+        Back transforms input value from the dimensionless system.
 
-        :param const: Value in dimensionless system.
-        :return: (float) Original Value
+        :param const: The value in the dimensionless system.
+        :return: (float) The original Value.
         """
 
         return const / np.sqrt((2 * self.mu)) * self.sigma + self.theta
@@ -182,11 +184,11 @@ class OUModelOptimalThresholdZeng(OUModelOptimalThreshold):
     @staticmethod
     def _equation_term(const: float, index: int):
         """
-        A helper function for simplifing equation expression
+        A helper function for simplifing equation expression.
 
-        :param const: (float) The input value of the function
+        :param const: (float) The input value of the function.
         :param index: (int) It could be 0 or 1.
-        :return: (float) The output value of the function
+        :return: (float) The output value of the function.
         """
 
         middle_term = lambda k: gamma((2 * k + 1) / 2) * ((1.414 * const) ** (2 * k + index)) / fac(2 * k + index)
@@ -199,9 +201,9 @@ class OUModelOptimalThresholdZeng(OUModelOptimalThreshold):
         """
         Equation (20) in the paper.
 
-        :param a: (float) The entry threshold of the trading strategy
-        :param args: (tuple) Other parameters needed for the equation
-        :return: (float) The value of the equation
+        :param a: (float) The entry threshold of the trading strategy.
+        :param args: (tuple) Other parameters needed for the equation.
+        :return: (float) The value of the equation.
         """
 
         c, equation_term = args
@@ -212,9 +214,9 @@ class OUModelOptimalThresholdZeng(OUModelOptimalThreshold):
         """
         Equation (23) in the paper.
 
-        :param a: (float) The entry threshold of the trading strategy
-        :param args: (tuple) Other parameters needed for the equation
-        :return: (float) The value of the equation
+        :param a: (float) The entry threshold of the trading strategy.
+        :param args: (tuple) Other parameters needed for the equation.
+        :return: (float) The value of the equation.
         """
 
         c, equation_term = args
@@ -223,10 +225,10 @@ class OUModelOptimalThresholdZeng(OUModelOptimalThreshold):
     @staticmethod
     def _m(const: float):
         """
-        A helper function for calculating the variance of trade length
+        A helper function for calculating the variance of trade length.
 
-        :param const: (float) The input value of the function
-        :return: (float) The output value of the function
+        :param const: (float) The input value of the function.
+        :return: (float) The output value of the function.
         """
 
         return 2 * np.exp(-(const ** 2) / 4)
@@ -234,10 +236,10 @@ class OUModelOptimalThresholdZeng(OUModelOptimalThreshold):
     @staticmethod
     def _m_first_order(const: float):
         """
-        A helper function for calculating the variance of trade length
+        A helper function for calculating the variance of trade length.
 
-        :param const: (float) The input value of the function
-        :return: (float) The output value of the function
+        :param const: (float) The input value of the function.
+        :return: (float) The output value of the function.
         """
 
         middle_term = lambda k: ln(k) * exp(-(k ** 2) / 2) * cos(const * k)
@@ -248,10 +250,10 @@ class OUModelOptimalThresholdZeng(OUModelOptimalThreshold):
     @staticmethod
     def _m_second_order(const: float):
         """
-        A helper function for calculating the variance of trade length
+        A helper function for calculating the variance of trade length.
 
-        :param const: (float) The input value of the function
-        :return: (float) The output value of the function
+        :param const: (float) The input value of the function.
+        :return: (float) The output value of the function.
         """
 
         middle_term = lambda k: (ln(k) ** 2) * exp(-(k ** 2) / 2) * cos(const * k)
@@ -261,11 +263,11 @@ class OUModelOptimalThresholdZeng(OUModelOptimalThreshold):
 
     def _g_1(self, const_1: float, const_2: float):
         """
-        A helper function for calculating the variance of trade length
+        A helper function for calculating the variance of trade length.
 
-        :param const_1: (float) The first input value of the function
-        :param const_2: (float) The second input value of the function
-        :return: (float) The output value of the function
+        :param const_1: (float) The first input value of the function.
+        :param const_2: (float) The second input value of the function.
+        :return: (float) The output value of the function.
         """
 
         numerator = self._m_second_order(const_2) * self._m(const_1) - self._m_first_order(const_1) * self._m_first_order(const_2)
@@ -275,11 +277,11 @@ class OUModelOptimalThresholdZeng(OUModelOptimalThreshold):
 
     def _g_2(self, const_1: float, const_2: float):
         """
-        A helper function for calculating the variance of trade length
+        A helper function for calculating the variance of trade length.
 
-        :param const_1: (float) The first input value of the function
-        :param const_2: (float) The second input value of the function
-        :return: (float) The output value of the function
+        :param const_1: (float) The first input value of the function.
+        :param const_2: (float) The second input value of the function.
+        :return: (float) The output value of the function.
         """
 
         numerator_1 = self._m_second_order(const_1) * self._m(const_2) + self._m_first_order(const_1) * self._m_first_order(const_2)
@@ -295,7 +297,7 @@ class OUModelOptimalThresholdZeng(OUModelOptimalThreshold):
         Plots target versus transaction costs.
 
         :param target: (str) The target values to plot. The options are
-            ["a", "b", "expected_return", "return_variance", "sharpe_ratio", "expected_trade_length", "trade_length_variance"].
+            ["a_s", "b_s", "a_l", "b_l", "expected_return", "return_variance", "sharpe_ratio", "expected_trade_length", "trade_length_variance"].
         :param method: (str) The method for calculating the optimal thresholds. The options are
             ["conventional_optimal_rule", "new_optimal_rule"]
         :param c_list: (list) A list contains transaction costs.
@@ -303,68 +305,63 @@ class OUModelOptimalThresholdZeng(OUModelOptimalThreshold):
         :return: (plt.Figure) Figure that plots target versus transaction costs.
         """
 
-        a_list = []
-        b_list = []
+        a_s_list = []
+        b_s_list = []
+        a_l_list = []
+        b_l_list = []
         rf_list = [rf] * len(c_list)
 
         if method == "conventional_optimal_rule":
             for c in c_list:
-                a, b, _, _ = self.get_threshold_by_conventional_optimal_rule(c)
-                a_list.append(a)
-                b_list.append(b)
+                a_s, b_s, a_l, b_l = self.get_threshold_by_conventional_optimal_rule(c)
+                a_s_list.append(a_s)
+                b_s_list.append(b_s)
+                a_l_list.append(a_l)
+                b_l_list.append(b_l)
 
         elif method == "new_optimal_rule":
             for c in c_list:
-                a, b, _, _ = self.get_threshold_by_new_optimal_rule(c)
-                a_list.append(a)
-                b_list.append(b)
+                a_s, b_s, a_l, b_l = self.get_threshold_by_new_optimal_rule(c)
+                a_s_list.append(a_s)
+                b_s_list.append(b_s)
+                a_l_list.append(a_l)
+                b_l_list.append(b_l)
 
         else:
             raise Exception("Incorrect method. "
                             "Please use one of the options "
                             "[\"conventional_optimal_rule\", \"new_optimal_rule\"].")
 
+        # Mapping target to the setting of the plot
+        mapping = {
+        "a_s": (a_s_list, "Optimal Entry Thresholds For a Short Position vs Trans. Costs", "a_s"),
+        "b_s": (b_s_list, "Optimal Exit Thresholds For a Short Position vs Trans. Costs", "b_s"),
+        "a_l": (a_l_list, "Optimal Exit Thresholds For a Long Position vs Trans. Costs", "a_l"),
+        "b_l": (b_l_list, "Optimal Entry Thresholds For a Long Position vs Trans. Costs", "b_l"),
+
+        "expected_return": (np.vectorize(self.expected_return)(a_s_list, b_s_list, c_list),
+                            "Expected Returns vs Trans. Costs", "Expected Return"),
+
+        "return_variance": (np.vectorize(self.return_variance)(a_s_list, b_s_list, c_list),
+                            "Variances of Return vs Trans. Costs", "Variances of Return"),
+
+        "sharpe_ratio": (np.vectorize(self.sharpe_ratio)(a_s_list, b_s_list, c_list, rf_list),
+                         "Sharpe Ratios vs Trans. Costs", "Sharpe Ratio"),
+
+        "expected_trade_length": (np.vectorize(self.expected_trade_length)(a_s_list, b_s_list),
+                                  "Expected Trade Lengths vs Trans. Costs", "Expected Trade Length"),
+
+        "trade_length_variance": (np.vectorize(self.trade_length_variance)(a_s_list, b_s_list),
+                                  "Variance of Trade Lengths vs Trans. Costs", "Variance of Trade Length")
+        }
+
         fig = plt.figure()
 
-        if target == "a":
-            plt.plot(c_list, a_list)
-            plt.title("Optimal Entry Thresholds vs Trans. Costs")
-            plt.ylabel("a")
-
-        elif target == "b":
-            plt.plot(c_list, b_list)
-            plt.title("Optimal Exit Thresholds vs Trans. Costs")
-            plt.ylabel("m")
-
-        elif target == "expected_return":
-            func = np.vectorize(self.expected_return)
-            plt.plot(c_list, func(a_list, b_list, c_list))
-            plt.title("Expected Returns vs Trans. Costs")
-            plt.ylabel("Expected Return")
-
-        elif target == "return_variance":
-            func = np.vectorize(self.return_variance)
-            plt.plot(c_list, func(a_list, b_list, c_list))
-            plt.title("Variances of Return vs Trans. Costs")
-            plt.ylabel("Variances of Return")
-
-        elif target == "sharpe_ratio":
-            func = np.vectorize(self.sharpe_ratio)
-            plt.plot(c_list, func(a_list, b_list, c_list, rf_list))
-            plt.title("Sharpe Ratios vs Trans. Costs")
-            plt.ylabel("Sharpe Ratio")
-
-        elif target == "expected_trade_length":
-            func = np.vectorize(self.expected_trade_length)
-            plt.plot(c_list, func(a_list, b_list))
-            plt.title("Expected Trade Lengths vs Trans. Costs")
-            plt.ylabel("Expected Trade Length")
-
-        elif target == "trade_length_variance":
-            func = np.vectorize(self.trade_length_variance)
-            plt.plot(c_list, func(a_list, b_list))
-            plt.title("Variance of Trade Lengths vs Trans. Costs")
-            plt.ylabel("Variance of Trade Length")
+        if target in mapping.keys():
+            y_values, title, label = mapping[target]
+            plt.plot(c_list, y_values)
+            plt.title(title)
+            plt.ylabel(label)
 
         else:
             raise Exception("Incorrect target. "
@@ -372,13 +369,13 @@ class OUModelOptimalThresholdZeng(OUModelOptimalThreshold):
                             "[\"a\", \"b\", \"expected_return\", \"return_variance\","
                             "\"sharpe_ratio\", \"expected_trade_length\", \"trade_length_variance\"].")
 
-        plt.xlabel("Transaction Cost c")  # x label
+        plt.xlabel("Transaction Cost c") # x label
 
         return fig
 
     def plot_sharpe_ratio_vs_rf(self, method: str, rf_list: list, c: float):
         """
-        Plots target versus risk free rates.
+        Plots the Sharpe ratio versus risk free rates.
 
         :param method: (str) The method for calculating the optimal thresholds. The options are
             ["conventional_optimal_rule", "new_optimal_rule"]

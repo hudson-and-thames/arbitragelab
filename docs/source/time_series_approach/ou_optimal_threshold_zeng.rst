@@ -112,7 +112,9 @@ Mean and Variance of the Return per Unit of Time
 .. math::
     \sigma_s(a,\ b,\ c) = \frac{{r(a,\ b,\ c)}^2{V[T]}}{{E[T]}^3}
 
-where :math:`r(a,\ b,\ c) = (a − b − c)` gives the continuously compound rate of return for a single trade accounting for transaction cost.
+where :math:`r(a,\ b,\ c) = (|a − b| − c)` gives the continuously compound rate of return for a single trade accounting for transaction cost,
+
+where :math:`a`, :math:`b` denotes the entry and exit thresholds, respectively.
 
 Optimal Strategies
 ##################
@@ -174,6 +176,9 @@ Getting Optimal Thresholds
 **************************
 
 This paper examines the problem of choosing an optimal strategy under two different cases. Case 1 corresponds to the ‘Conventional Optimal Rule’, and case 2 corresponds to the ‘New Optimal Rule’. One can choose either to get the thresholds. The following functions will return a tuple contains :math:`a_s`, :math:`b_s`, :math:`a_l` and :math:`a_l`, where :math:`a_s`, :math:`b_s` denotes the entry and exit thresholds for a short position, :math:`a_l`, :math:`b_l` denotes the entry and exit thresholds for a long position.
+
+.. note::
+    :code:`initial_guess` is used to speed up the process and ensure the target equation can be solved by :code:`scipy.optimize`. If the value of :code:`initial_guess` is not given, the default value will be :math:`(c + 10^{-2})\sqrt{2\mu} / \sigma`. From our experiment, the default value is suited for most of the cases. If you observe that the thresholds got by the functions is odd or the running time is larger than 5 second, please try a :code:`initial_guess` on different scales.
 
 .. automethod:: OUModelOptimalThresholdZeng.get_threshold_by_conventional_optimal_rule
 
@@ -244,9 +249,6 @@ Code Example
     # Getting optimal thresholds by New Optimal Rule.
     a_s, b_s, a_l, b_l = OUOTZ.get_threshold_by_new_optimal_rule(c = 0.02)
 
-    # Getting the Sharpe ratio
-    S = OUOTB.sharpe_ratio(a = a, m = m, c = 0.001, rf = 0.01)
-
     print("Entering a short position when Xt =", a_s)
     print("Exiting a short position when Xt =", b_s)
     print("Entering a long position when Xt =", a_l)
@@ -297,4 +299,4 @@ The following research notebook can be used to better understand the method desc
 References
 ##########
 
-* `Zeng, Z. and Lee, C.-G., Pairs trading: optimal thresholds and profitability.Quantitative Finance, 14(11): 1881–1893. <https://www.tandfonline.com/doi/pdf/10.1080/14697688.2014.917806>`_.
+* `Zeng, Z. and Lee, C.-G., Pairs trading: optimal thresholds and profitability. Quantitative Finance, 14(11): 1881–1893 <https://www.tandfonline.com/doi/pdf/10.1080/14697688.2014.917806>`_.
