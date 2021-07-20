@@ -26,14 +26,14 @@ class TestOUModelOptimalThreshold(unittest.TestCase):
         """
 
         project_path = os.path.dirname(__file__)
-        self.path = project_path + '/test_data/gld_gdx_data.csv' # Data Path
+        self.path = project_path + '/test_data/gld_gdx_data.csv'  # Data Path
 
         data = pd.read_csv(self.path)
         data = data.set_index('Date')
         self.dataframe = data[['GLD', 'GDX']]
 
         self.assets = np.array(self.dataframe)
-        self.assets_incorrect = np.zeros((4, 3)) # Data with incorrect dimensions
+        self.assets_incorrect = np.zeros((4, 3))  # Data with incorrect dimensions
 
         asset_trans = self.assets.transpose()
         self.spread_series = (asset_trans[0][:] - asset_trans[0][0]) - 0.2 * \
@@ -82,7 +82,6 @@ class TestOUModelOptimalThreshold(unittest.TestCase):
         # Testing for wrong data frequency
         with self.assertRaises(Exception):
             test.fit_ou_model_to_data(self.dataframe, self.test_data_frequency[3])
-
 
     def test_numerical(self):
         """

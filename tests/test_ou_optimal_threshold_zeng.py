@@ -38,27 +38,27 @@ class TestOUModelOptimalThresholdZeng(unittest.TestCase):
         test = OUModelOptimalThresholdZeng()
 
         # Initializing OU-process parameter
-        test.construct_ou_model_from_given_parameters(theta = 3.4241, mu = 0.0237, sigma = 0.0081)
+        test.construct_ou_model_from_given_parameters(theta=3.4241, mu=0.0237, sigma=0.0081)
 
         # Getting optimal thresholds by Conventional Optimal Rule.
-        a_s, b_s, a_l, b_l = test.get_threshold_by_conventional_optimal_rule(c = 0.02)
+        a_s, b_s, a_l, b_l = test.get_threshold_by_conventional_optimal_rule(c=0.02)
 
         # Testing
-        self.assertAlmostEqual(test.return_variance(a = a_s, b = b_s, c = 0.02), 2.5454987392050962e-05, places=7)
-        self.assertAlmostEqual(test.expected_return(a = a_s, b = b_s, c = 0.02), 0.0003012195, places=6)
-        self.assertAlmostEqual(test.return_variance(a = a_l, b = b_l, c = 0.02), 2.207110248316157e-05, places=7)
-        self.assertAlmostEqual(test.expected_return(a = a_l, b = b_l, c = 0.02), 0.0003012195, places=6)
+        self.assertAlmostEqual(test.return_variance(a=a_s, b=b_s, c=0.02), 2.5454987392050962e-05, places=7)
+        self.assertAlmostEqual(test.expected_return(a=a_s, b=b_s, c=0.02), 0.0003012195, places=6)
+        self.assertAlmostEqual(test.return_variance(a=a_l, b=b_l, c=0.02), 2.207110248316157e-05, places=7)
+        self.assertAlmostEqual(test.expected_return(a=a_l, b=b_l, c=0.02), 0.0003012195, places=6)
 
         # Getting optimal thresholds by New Optimal Rule.
-        a_s, b_s, a_l, b_l = test.get_threshold_by_new_optimal_rule(c = 0.02)
+        a_s, b_s, a_l, b_l = test.get_threshold_by_new_optimal_rule(c=0.02)
 
         # Testing
-        self.assertAlmostEqual(test.return_variance(a = a_s, b = b_s, c = 0.02), 3.467078460345948e-05, places=7)
-        self.assertAlmostEqual(test.expected_return(a = a_s, b = b_s, c = 0.02), 0.00043061662, places=6)
-        self.assertAlmostEqual(test.sharpe_ratio(a = a_s, b = b_s, c = 0.02, rf = 0), 0.073132, places=4)
-        self.assertAlmostEqual(test.return_variance(a = a_l, b = b_l, c = 0.02), 3.467078460345948e-05, places=7)
-        self.assertAlmostEqual(test.expected_return(a = a_l, b = b_l, c = 0.02), 0.00043061662, places=6)
-        self.assertAlmostEqual(test.sharpe_ratio(a = a_l, b = b_l, c = 0.02, rf = 0), 0.073132, places=4)
+        self.assertAlmostEqual(test.return_variance(a=a_s, b=b_s, c=0.02), 3.467078460345948e-05, places=7)
+        self.assertAlmostEqual(test.expected_return(a=a_s, b=b_s, c=0.02), 0.00043061662, places=6)
+        self.assertAlmostEqual(test.sharpe_ratio(a=a_s, b=b_s, c=0.02, rf=0), 0.073132, places=4)
+        self.assertAlmostEqual(test.return_variance(a=a_l, b=b_l, c=0.02), 3.467078460345948e-05, places=7)
+        self.assertAlmostEqual(test.expected_return(a=a_l, b=b_l, c=0.02), 0.00043061662, places=6)
+        self.assertAlmostEqual(test.sharpe_ratio(a=a_l, b=b_l, c=0.02, rf=0), 0.073132, places=4)
 
     def test_plot(self):
         """
@@ -69,19 +69,19 @@ class TestOUModelOptimalThresholdZeng(unittest.TestCase):
         test = OUModelOptimalThresholdZeng()
 
         # Initializing OU-process parameter
-        test.construct_ou_model_from_given_parameters(theta = 3.4241, mu = 0.0237, sigma = 0.0081)
+        test.construct_ou_model_from_given_parameters(theta=3.4241, mu=0.0237, sigma=0.0081)
 
         # Testing all valid options
         c_list = np.linspace(0, 0.01, 2)
         for t in self.test_target[:-1]:
             for m in self.test_method[:-1]:
-                fig = test.plot_target_vs_c(target = t, method = m, c_list = c_list)
+                fig = test.plot_target_vs_c(target=t, method=m, c_list=c_list)
                 self.assertEqual(type(fig), type(plt.figure()))
             plt.close("all")
 
         rf_list = np.linspace(0, 0.05, 2)
         for m in self.test_method[:-1]:
-            fig = test.plot_sharpe_ratio_vs_rf(method = m, rf_list = rf_list, c = 0)
+            fig = test.plot_sharpe_ratio_vs_rf(method=m, rf_list=rf_list, c=0)
             self.assertEqual(type(fig), type(plt.figure()))
             plt.close("all")
 
@@ -94,19 +94,19 @@ class TestOUModelOptimalThresholdZeng(unittest.TestCase):
         test = OUModelOptimalThresholdZeng()
 
         # Initializing OU-process parameter
-        test.construct_ou_model_from_given_parameters(theta = 3.4241, mu = 0.0237, sigma = 0.0081)
+        test.construct_ou_model_from_given_parameters(theta=3.4241, mu=0.0237, sigma=0.0081)
 
         # Testing invalid options
         c_list = np.linspace(0, 0.01, 2)
         with self.assertRaises(Exception):
-            test.plot_target_vs_c(target = self.test_target[-1], method = self.test_method[0], c_list = c_list)
+            test.plot_target_vs_c(target=self.test_target[-1], method=self.test_method[0], c_list=c_list)
 
         with self.assertRaises(Exception):
-            test.plot_target_vs_c(target = self.test_target[0], method = self.test_method[-1], c_list = c_list)
+            test.plot_target_vs_c(target=self.test_target[0], method=self.test_method[-1], c_list=c_list)
 
         rf_list = np.linspace(0, 0.05, 2)
         with self.assertRaises(Exception):
-            test.plot_sharpe_ratio_vs_rf(method = self.test_method[-1], rf_list = rf_list, c = 0)
+            test.plot_sharpe_ratio_vs_rf(method=self.test_method[-1], rf_list=rf_list, c=0)
 
     def test_numerical(self):
         """
@@ -117,7 +117,7 @@ class TestOUModelOptimalThresholdZeng(unittest.TestCase):
         test = OUModelOptimalThresholdZeng()
 
         # Initializing OU-process parameter
-        test.construct_ou_model_from_given_parameters(theta = 3.4241, mu = 0.0237, sigma = 0.0081)
+        test.construct_ou_model_from_given_parameters(theta=3.4241, mu=0.0237, sigma=0.0081)
 
         # Testing whether the output value is correct
         self.assertAlmostEqual(test._transform_to_dimensionless(0), -92.034486, places=2)
@@ -153,16 +153,16 @@ class TestOUModelOptimalThresholdZeng(unittest.TestCase):
         test = OUModelOptimalThresholdZeng()
 
         # Initializing OU-process parameter
-        test.construct_ou_model_from_given_parameters(theta = 3.4241, mu = 0.0237, sigma = 0.0081)
+        test.construct_ou_model_from_given_parameters(theta=3.4241, mu=0.0237, sigma=0.0081)
 
         # Setting initial guess
         c_trans = 0.02 * np.sqrt((2 * test.mu)) / test.sigma
         initial_guess = c_trans + 1e-2 * np.sqrt((2 * test.mu)) / test.sigma
 
         # Getting optimal thresholds by Conventional Optimal Rule.
-        a_s, b_s, a_l, b_l = test.get_threshold_by_conventional_optimal_rule(c = 0.02, initial_guess = initial_guess)
-        self.assertAlmostEqual(test.expected_return(a = a_s, b = b_s, c = 0.02), 0.0003012195, places=6)
+        a_s, b_s, a_l, b_l = test.get_threshold_by_conventional_optimal_rule(c=0.02, initial_guess=initial_guess)
+        self.assertAlmostEqual(test.expected_return(a=a_s, b=b_s, c=0.02), 0.0003012195, places=6)
 
         # Getting optimal thresholds by New Optimal Rule.
-        a_s, b_s, a_l, b_l = test.get_threshold_by_new_optimal_rule(c = 0.02, initial_guess = initial_guess)
-        self.assertAlmostEqual(test.expected_return(a = a_l, b = b_l, c = 0.02), 0.00043061662, places=6)
+        a_s, b_s, a_l, b_l = test.get_threshold_by_new_optimal_rule(c=0.02, initial_guess=initial_guess)
+        self.assertAlmostEqual(test.expected_return(a=a_l, b=b_l, c=0.02), 0.00043061662, places=6)
