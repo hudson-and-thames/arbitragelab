@@ -146,8 +146,8 @@ class DataImporter:
 
         tckr_info = []
 
-        for i, tckr in enumerate(tickers):
-            ticker_info = tckrs.tickers[i].info
+        for tckr in tickers:
+            ticker_info = tckrs.tickers[tckr].info
             tckr_tuple = (tckr, ticker_info['industry'], ticker_info['sector'])
             tckr_info.append(tckr_tuple)
 
