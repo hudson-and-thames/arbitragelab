@@ -134,7 +134,7 @@ Decide the trade based on the signal at time :math:`t` and the position at :math
      - :math:`Close\ a\ long\ trade`
      - :math:`Open\ a\ short\ trade`
      - :math:`Close\ a\ short\ trade`
-     - :math:`Trade Action`
+     - :math:`Trade\ Action`
      - :math:`Position_{t}`
    * - 0
      - True
