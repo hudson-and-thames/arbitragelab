@@ -36,10 +36,12 @@ class CointegratedPortfolio(ABC):
         """
         This function returns the scaled values of the cointegration vector in terms of how many units of other
         cointegrated assets should be bought if we buy one unit of one asset - according to default coefficients.
+
         :param cointegration_vector: (pd.Series) Cointegration vector used to form a mean-reverting portfolio.
             If None, a cointegration vector with maximum eigenvalue from fit() method is used.
         :return: (pd.Series) The scaled cointegration vector values.
         """
+
         if cointegration_vector is None:
             cointegration_vector = self.cointegration_vectors.iloc[0]  # Use eigenvector with biggest eigenvalue.
 
