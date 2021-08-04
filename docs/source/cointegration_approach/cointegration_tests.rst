@@ -54,6 +54,13 @@ simultaneously going long on one asset and short on the other, with an appropria
 for each asset. This approach is also called a "pairs trading strategy". However, the approach can be
 extended to three and more assets.
 
+.. warning::
+
+    From the mathematical standpoint, cointegration testing strives to prove that there exists at least
+    one linear combination of given time series that is stationary. Hence sometimes during the testing,
+    the cointegration vector might have only positive coefficients, making it not suitable for making a spread,
+    while being completely theoretically sound.
+
 .. Note::
 
     Another set of tools for pairs trading strategies is available in our Optimal Mean Reversion Module.
