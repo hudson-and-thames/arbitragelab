@@ -97,7 +97,7 @@ class TestCointegration(unittest.TestCase):
         # Test scaled cointegration vector values
         scaled_cointegration_1 = port.get_scaled_cointegration_vector()
         scaled_cointegration_2 = port.get_scaled_cointegration_vector(cointegration_vector=port.cointegration_vectors.iloc[0])
-        
+
         self.assertEqual(scaled_cointegration_1.iloc[1], 1)
         self.assertEqual(scaled_cointegration_2.iloc[1], 1)
         self.assertAlmostEqual(scaled_cointegration_1.iloc[1], scaled_cointegration_2.iloc[1], delta=1e-2)
