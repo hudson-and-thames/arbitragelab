@@ -310,41 +310,30 @@ class HSelection:
             [H-inversion statistic, Threshold of the H-construction, Tuple contains the column names of two selected assets].
         """
 
+        if method not in ['highest', 'lowest']:
+            raise Exception("Incorrect method. "
+                            "Please use one of the options "
+                            "[\"highest\", \"lowest\"].")
+
         if allow_repeat:
-            if method == "highest":
-                chose_pairs =  self.results[:num]
-
-            elif method == "lowest":
-                chose_pairs = self.results[-num:]
-
-            else:
-                raise Exception("Incorrect method. "
-                                "Please use one of the options "
-                                "[\"highest\", \"lowest\"].")
+            chose_pairs =  self.results[:num] if method == "highest" else self.results[-num:]
 
         else:
             chose_tickers = []
             chose_pairs = []
 
-            if method == "highest":
-                results =  self.results
+            results =  self.results.copy()
 
-            elif method == "lowest":
-                results =  self.results.copy()
+            if method == "lowest":
                 results.reverse()
 
-            else:
-                raise Exception("Incorrect method. "
-                                "Please use one of the options "
-                                "[\"highest\", \"lowest\"].")
-
-            for i in results:
-                tickers = i[1]
+            i = 0
+            while len(chose_pairs) < num and i < len(results):
+                tickers = results[i][2]
                 if tickers[0] not in chose_tickers and tickers[1] not in chose_tickers:
                     chose_tickers.extend(tickers)
-                    chose_pairs.append(i)
+                    chose_pairs.append(results[i])
 
-                if len(chose_pairs) == num:
-                    break
+                i += 1
 
         return chose_pairs
