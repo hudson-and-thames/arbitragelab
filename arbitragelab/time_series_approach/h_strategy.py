@@ -38,10 +38,10 @@ class HConstruction:
         self.threshold = threshold
         self.method = method
 
-        self.tao_a_index = None
-        self.tao_b_index = None
-        self.tao_a_direction = None
-        self.tao_b_direction = None
+        self.tau_a_index = None
+        self.tau_b_index = None
+        self.tau_a_direction = None
+        self.tau_b_direction = None
         self.signals_contrarian = None
         self.signals_momentum = None
 
@@ -50,8 +50,8 @@ class HConstruction:
             "h_series": [self.series[0]],
             "direction": [0],
             "index": [0],
-            "tao_a": [False],
-            "tao_b": [False]
+            "tau_a": [False],
+            "tau_b": [False]
         }
 
         # Building the H-construction
@@ -113,15 +113,15 @@ class HConstruction:
             price = self.results["h_series"][-1] + direction * self.threshold
 
         # Marking turning point if reverse == True
-        # tao_a indicates whether it is a turning point, and tao_b indicates whether it is a confirmation point for turning point
+        # tau_a indicates whether it is a turning point, and tau_b indicates whether it is a confirmation point for turning point
         if reverse:
-            self.results["tao_a"][-1] = True
-            self.results["tao_a"].append(False)
-            self.results["tao_b"].append(True)
+            self.results["tau_a"][-1] = True
+            self.results["tau_a"].append(False)
+            self.results["tau_b"].append(True)
 
         else:
-            self.results["tao_a"].append(False)
-            self.results["tao_b"].append(False)
+            self.results["tau_a"].append(False)
+            self.results["tau_b"].append(False)
 
         # Appending other informations
         self.results["h_series"].append(price)
@@ -139,24 +139,24 @@ class HConstruction:
 
         index = self.results["index"]
         direction = self.results["direction"]
-        tao_a = self.results["tao_a"]
-        tao_b = self.results["tao_b"]
+        tau_a = self.results["tau_a"]
+        tau_b = self.results["tau_b"]
 
         # Determining the index values and the directions of turning points and confirmation points
-        self.tao_a_index = list(compress(index, tao_a))
-        self.tao_b_index = list(compress(index, tao_b))
-        self.tao_a_direction = list(compress(direction, tao_a))
-        self.tao_b_direction = list(compress(direction, tao_b))
+        self.tau_a_index = list(compress(index, tau_a))
+        self.tau_b_index = list(compress(index, tau_b))
+        self.tau_a_direction = list(compress(direction, tau_a))
+        self.tau_b_direction = list(compress(direction, tau_b))
 
         # Determining the signals
         self.signals_contrarian = pd.Series(0, index = self.series.index)
         self.signals_momentum = pd.Series(0, index = self.series.index)
 
         # The signals will be opposite to the directions of the turning confirmation points
-        self.signals_contrarian[self.tao_b_index] = [-d for d in self.tao_b_direction]
+        self.signals_contrarian[self.tau_b_index] = [-d for d in self.tau_b_direction]
 
         # The signals will be same to the directions of the turning confirmation points
-        self.signals_momentum[self.tao_b_index] = self.tao_b_direction
+        self.signals_momentum[self.tau_b_index] = self.tau_b_direction
 
     def h_inversion(self) -> int:
         """
@@ -166,7 +166,7 @@ class HConstruction:
         """
 
         # The number of times the series changes its direction will equal to the number of the confirmation points
-        return len(self.tao_b_index)
+        return len(self.tau_b_index)
 
     def h_distances(self, p: int = 1) -> float:
         """
@@ -177,8 +177,8 @@ class HConstruction:
         """
 
         summation = 0
-        for i in range(1, len(self.tao_a_index)):
-            diff = self.series[self.tao_a_index[i]] - self.series[self.tao_a_index[i - 1]]
+        for i in range(1, len(self.tau_a_index)):
+            diff = self.series[self.tau_a_index[i]] - self.series[self.tau_a_index[i - 1]]
             summation += abs(diff) ** p
 
         return summation
