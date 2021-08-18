@@ -69,10 +69,24 @@ class HConstruction:
         # Calculating the gap between the current price and the latest price of the H-construction.
         gap = (self.series[i] - self.results["h_series"][-1])
         direction = np.sign(gap)
+        pre_direction = self.results["direction"][-1]
 
         if self.method == "Kagi":
             over_thresholds = abs(gap) >= self.threshold
-            same_direction = (self.results["direction"][-1] == direction)
+            same_direction = (pre_direction == direction)
+
+            # Handling tau_a0 and tau_b0
+            if pre_direction == 0:
+                if self.series[:i + 1].max() - self.series[:i + 1].min() >= self.threshold:
+                    argmax = self.series[:i + 1].argmax()
+                    argmin = self.series[:i + 1].argmin()
+                    tau_a0 = min(argmin, argmax)
+                    tau_b0 = max(argmin, argmax)
+                    a_direction = 1 if tau_a0 == argmax else -1
+                    self._append(tau_a0, a_direction, False)
+                    self._append(tau_b0, -a_direction, True)
+
+                return
 
             # Do nothing if the direction is turned, but the amount is not enough
             if not same_direction and not over_thresholds:
@@ -88,7 +102,7 @@ class HConstruction:
 
             # Appending each bricks to the results
             for brick in range(int(num_bricks)):
-                reverse = (self.results["direction"][-1] != direction)
+                reverse = (pre_direction != direction)
                 self._append(i, direction, reverse)
 
         else:

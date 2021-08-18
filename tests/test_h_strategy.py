@@ -55,9 +55,9 @@ class TestHConstruction(unittest.TestCase):
 
         # Testing functions for H-statistics
         test = HConstruction(self.series, self.thresholds, self.test_construction_types[0])
-        self.assertEqual(test.h_inversion(), 3)
-        self.assertAlmostEqual(test.h_distances(p=1), 0.3077, places=4)
-        self.assertAlmostEqual(test.h_volatility(p=1), 0.10258, places=5)
+        self.assertEqual(test.h_inversion(), 7)
+        self.assertAlmostEqual(test.h_distances(p=1), 0.6463, places=4)
+        self.assertAlmostEqual(test.h_volatility(p=1), 0.09233, places=5)
 
         test = HConstruction(self.series, self.thresholds, self.test_construction_types[1])
         self.assertEqual(test.h_inversion(), 3)
@@ -125,12 +125,12 @@ class TestHSelection(unittest.TestCase):
         self.assertEqual(pairs[1][0], 36)
         self.assertEqual(pairs[2][0], 29)
         self.assertEqual(pairs[3][0], 29)
-        self.assertEqual(pairs[4][0], 28)
+        self.assertEqual(pairs[4][0], 29)
 
         pairs = test.get_pairs(5, self.test_getting_types[0], False)
         self.assertEqual(pairs[0][0], 43)
-        self.assertEqual(pairs[1][0], 28)
-        self.assertEqual(pairs[2][0], 21)
+        self.assertEqual(pairs[1][0], 29)
+        self.assertEqual(pairs[2][0], 22)
         self.assertEqual(pairs[3][0], 19)
         self.assertEqual(pairs[4][0], 19)
 
