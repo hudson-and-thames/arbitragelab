@@ -29,7 +29,7 @@ Changelog
 * :feature:`51` OU Optimal Threshold Model Zeng added to the Time Series Approach Module.
 * :support:`51` OU Optimal Threshold Model Bertram documentation.
 * :support:`51` OU Optimal Threshold Model Zeng documentation.
-* :support:`35` Updated requirements - new package (mpmath==1.2.1).
+* :support:`51` Updated requirements - new package (mpmath==1.2.1).
 
 * :release:`0.4.1 <2021-04-15>`
 * :feature:`43` OU Model Jurek and OU Model Mudchanatongsuk added to the Stochastic Control Approach Module.

@@ -9,11 +9,17 @@
 OU Model Optimal Trading Thresholds Zeng
 ========================================
 
-In this paper, the authors enhance the work in `Bertram(2010) <http://www.stagirit.org/sites/default/files/articles/a_0340_ssrn-id1505073.pdf>`_, which assumes no short selling of the synthetic asset when finding the optimal trading thresholds. To resolve the assumption, they derive a polynomial expression for the expectation of the first-passage time of an O-U process with two-sided boundary. Then they simplify the problem of optimizing the expected return per unit of time for choosing optimal trading thresholds to an equation solving problem.
+In this paper, the authors enhance the work in `Bertram(2010)
+<http://www.stagirit.org/sites/default/files/articles/a_0340_ssrn-id1505073.pdf>`_, which assumes no short selling
+of the synthetic asset when finding the optimal trading thresholds. To resolve the assumption, they derive
+a polynomial expression for the expectation of the first-passage time of an O-U process with two-sided boundary.
+Then they simplify the problem of optimizing the expected return per unit of time for choosing optimal trading
+thresholds to an equation solving problem.
 
 .. warning::
 
-    We use :math:`\theta` for long-term mean, :math:`\mu` for mean-reversion speed and :math:`\sigma` for amplitude of randomness of the O-U process, which is different from the reference paper. 
+    We use :math:`\theta` for long-term mean, :math:`\mu` for mean-reversion speed and :math:`\sigma` for amplitude
+    of randomness of the O-U process, which is different from the reference paper.
 
 Assumptions
 ###########
@@ -31,8 +37,8 @@ where :math:`X_t` satisfies the following stochastic differential equation,
 .. math::
     {dX_t = {\mu}({\theta} - X_t)dt + {\sigma}dW_t}
 
-where
-:math:`\theta` is the long-term mean, :math:`\mu` is speed at which the values will regroup around the long-term mean and :math:`\sigma` is the amplitude of randomness of the O-U process.
+where :math:`\theta` is the long-term mean, :math:`\mu` is the speed at which the values will regroup around the
+long-term mean and :math:`\sigma` is the amplitude of randomness of the O-U process.
 
 Trading Strategy
 ****************
@@ -54,7 +60,8 @@ where :math:`Y_t` is a dimensionless series transformed from the original time s
 Trading Cycle
 *************
 
-The trading cycle is completed as :math:`Y_t` change from :math:`a_d` to :math:`b_d`, then back to :math:`a_d` or :math:`-a_d`, and the trade length :math:`T` is defined as the time needed to complete a trading cycle.
+The trading cycle is completed as :math:`Y_t` change from :math:`a_d` to :math:`b_d`, then back to :math:`a_d` or
+:math:`-a_d`, and the trade length :math:`T` is defined as the time needed to complete a trading cycle.
 
 Analytic Formulae
 #################
@@ -112,28 +119,32 @@ Mean and Variance of the Return per Unit of Time
 .. math::
     \sigma_s(a,\ b,\ c) = \frac{{r(a,\ b,\ c)}^2{V[T]}}{{E[T]}^3}
 
-where :math:`r(a,\ b,\ c) = (|a − b| − c)` gives the continuously compound rate of return for a single trade accounting for transaction cost,
+where :math:`r(a,\ b,\ c) = (|a − b| − c)` gives the continuously compound rate of return for a single trade
+accounting for transaction cost,
 
 where :math:`a`, :math:`b` denotes the entry and exit thresholds, respectively.
 
 Optimal Strategies
 ##################
 
-To calculate an optimal trading strategy, we seek to choose a optimal entry and exit thresholds that maximise the expected return per unit of time for a given transaction cost.
+To calculate an optimal trading strategy, we seek to choose optimal entry and exit thresholds that maximise
+the expected return per unit of time for a given transaction cost.
 
 Get Optimal Thresholds by Maximizing the Expected Return
 ********************************************************
 
 :math:`Case\ 1 \ \ 0 \leqslant b_d \leqslant a_d`
 
-This paper shows that the maximum expected return occurs when :math:`b_d = 0`. Therefore, for a given transaction cost, the following equation can be solved to find optimal :math:`a_d`.
+This paper shows that the maximum expected return occurs when :math:`b_d = 0`. Therefore, for a given transaction cost,
+the following equation can be solved to find optimal :math:`a_d`.
 
 .. math::
     \frac{1}{2}\sum_{k=0}^{\infty} \Gamma(\frac{2k + 1}{2})((\sqrt{2}a_d)^{2k + 1} / (2k + 1)! = (a - c) \frac{\sqrt{2}}{2}\sum_{k=0}^{\infty} \Gamma(\frac{2k}{2})((\sqrt{2}a_d)^{2k} / (2k + 1)!
 
 :math:`Case\ 2 \ \ -a_d \leqslant b_d \leqslant 0`
 
-This paper shows that the maximum expected return occurs when :math:`b_d = -a_d`. Therefore, for a given transaction cost, the following equation can be solved to find optimal :math:`a_d`.
+This paper shows that the maximum expected return occurs when :math:`b_d = -a_d`. Therefore, for a given transaction cost,
+the following equation can be solved to find optimal :math:`a_d`.
 
 .. math::
     \frac{1}{2}\sum_{k=0}^{\infty} \Gamma(\frac{2k + 1}{2})((\sqrt{2}a_d)^{2k + 1} / (2k + 1)! = (a - \frac{c}{2}) \frac{\sqrt{2}}{2}\sum_{k=0}^{\infty} \Gamma(\frac{2k}{2})((\sqrt{2}a_d)^{2k} / (2k + 1)!
@@ -161,7 +172,10 @@ Implementation
 Initializing OU-Process Parameters
 **********************************
 
-One can initialize the O-U process by directly setting its parameters or by fitting the process to the given data. The fitting method can refer to pp. 12-13 in the following book: `Tim Leung and Xin Li, Optimal Mean reversion Trading: Mathematical Analysis and Practical Applications <https://www.amazon.com/Optimal-Mean-Reversion-Trading-Mathematical/dp/9814725919>`_.
+One can initialize the O-U process by directly setting its parameters or by fitting the process to the given data.
+The fitting method can refer to pp. 12-13 in the following book:
+`Tim Leung and Xin Li, Optimal Mean reversion Trading: Mathematical Analysis and Practical Applications
+<https://www.amazon.com/Optimal-Mean-Reversion-Trading-Mathematical/dp/9814725919>`_.
 
 .. py:currentmodule:: arbitragelab.time_series_approach.ou_optimal_threshold_zeng
 
@@ -175,10 +189,18 @@ One can initialize the O-U process by directly setting its parameters or by fitt
 Getting Optimal Thresholds
 **************************
 
-This paper examines the problem of choosing an optimal strategy under two different cases. Case 1 corresponds to the ‘Conventional Optimal Rule’, and case 2 corresponds to the ‘New Optimal Rule’. One can choose either to get the thresholds. The following functions will return a tuple contains :math:`a_s`, :math:`b_s`, :math:`a_l` and :math:`a_l`, where :math:`a_s`, :math:`b_s` denotes the entry and exit thresholds for a short position, :math:`a_l`, :math:`b_l` denotes the entry and exit thresholds for a long position.
+This paper examines the problem of choosing an optimal strategy under two different cases. Case 1 corresponds to
+the ‘Conventional Optimal Rule’, and case 2 corresponds to the ‘New Optimal Rule’. One can choose either to get the
+thresholds. The following functions will return a tuple contains :math:`a_s`, :math:`b_s`, :math:`a_l` and :math:`a_l`,
+where :math:`a_s`, :math:`b_s` denotes the entry and exit thresholds for a short position, :math:`a_l`, :math:`b_l`
+denotes the entry and exit thresholds for a long position.
 
 .. note::
-    :code:`initial_guess` is used to speed up the process and ensure the target equation can be solved by :code:`scipy.optimize`. If the value of :code:`initial_guess` is not given, the default value will be :math:`(c + 10^{-2})\sqrt{2\mu} / \sigma`. From our experiment, the default value is suited for most of the cases. If you observe that the thresholds got by the functions is odd or the running time is larger than 5 second, please try a :code:`initial_guess` on different scales.
+    :code:`initial_guess` is used to speed up the process and ensure the target equation can be solved by
+    :code:`scipy.optimize`. If the value of :code:`initial_guess` is not given, the default value will be
+    :math:`(c + 10^{-2})\sqrt{2\mu} / \sigma`. From our experiment, the default value is suited for most of the cases.
+    If you observe that the thresholds got by the functions is odd or the running time is larger than 5 second,
+    please try a :code:`initial_guess` on different scales.
 
 .. automethod:: OUModelOptimalThresholdZeng.get_threshold_by_conventional_optimal_rule
 
@@ -202,7 +224,8 @@ One can calculate performance metrics for the trading strategy using the followi
 Plotting Comparison
 *******************
 
-One can use the following functions to observe the impact of transaction costs and risk-free rates on the optimal thresholds and performance metrics under the optimal thresholds.
+One can use the following functions to observe the impact of transaction costs and risk-free rates on
+the optimal thresholds and performance metrics under the optimal thresholds.
 
 .. automethod:: OUModelOptimalThresholdZeng.plot_target_vs_c
 
@@ -270,8 +293,12 @@ Code Example
 
     # Comparison of the expected return between the Conventional Optimal Rule and New Optimal Rule.
     c_list = np.linspace(0, 0.02, 30)
-    fig_con = OUOTZ.plot_target_vs_c(target = "expected_return", method = "conventional_optimal_rule", c_list = c_list)
-    fig_new = OUOTZ.plot_target_vs_c(target = "expected_return", method = "new_optimal_rule", c_list = c_list)
+    fig_con = OUOTZ.plot_target_vs_c(target = "expected_return",
+                                     method = "conventional_optimal_rule",
+                                     c_list = c_list)
+    fig_new = OUOTZ.plot_target_vs_c(target = "expected_return",
+                                     method = "new_optimal_rule",
+                                     c_list = c_list)
     plt.show()
 
     # Combining two figures.

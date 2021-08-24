@@ -9,13 +9,27 @@
 OU Model Optimal Trading Thresholds Bertram
 ===========================================
 
-For statistical arbitrage strategies, determining the trading thresholds is an essential issue, and one of the solutions for this is to maximize performance per unit of time. To do so, the investor should choose the proper entry and exit thresholds. If the thresholds are narrow, then the time it needs to complete a trade is short, but the profit is small. In contrast, if thresholds are wide, the profit in each trade is big, but the time it needs to complete a trade is long. The interplay between the profit per trade and the trade length gives rise to an optimization problem.
+For statistical arbitrage strategies, determining the trading thresholds is an essential issue,
+and one of the solutions for this is to maximize performance per unit of time. To do so, the
+investor should choose the proper entry and exit thresholds. If the thresholds are narrow, then
+the time it needs to complete a trade is short, but the profit is small. In contrast, if thresholds
+are wide, the profit in each trade is big, but the time it needs to complete a trade is long.
+The interplay between the profit per trade and the trade length gives rise to an optimization problem.
 
-In this paper, the author derives analytic formulae for statistical arbitrage trading where the security price follows an exponential Ornstein-Uhlenbeck process. By framing the problem in terms of the first-passage time of the process, he first derives the expressions for the mean and the variance of the trade length. Then he derives the formulae for the expected return and the variance of the return per unit of time. Finally, he resolves the problem of choosing optimal trading thresholds by maximizing the expected return and the Sharpe ratio.
+In this paper, the author derives analytic formulae for statistical arbitrage trading where
+the security price follows an exponential Ornstein-Uhlenbeck process. By framing the problem
+in terms of the first-passage time of the process, he first derives the expressions for the
+mean and the variance of the trade length. Then he derives the formulae for the expected
+return and the variance of the return per unit of time. Finally, he resolves the problem
+of choosing optimal trading thresholds by maximizing the expected return and the Sharpe ratio.
 
 .. warning::
 
-    Although the paper assumes that the long-term mean of the O-U process is zero, we still extend the results so that the O-U process whose mean is not zero can also use this method. We use :math:`\theta` for long-term mean, :math:`\mu` for mean-reversion speed and :math:`\sigma` for amplitude of randomness of the O-U process, which is different from the reference paper. 
+    Although the paper assumes that the long-term mean of the O-U process is zero, we still extend
+    the results so that the O-U process whose mean is not zero can also use this method.
+    We use :math:`\theta` for long-term mean, :math:`\mu` for mean-reversion speed and
+    :math:`\sigma` for amplitude of randomness of the O-U process, which is different from
+    the reference paper.
 
 Assumptions
 ###########
@@ -33,8 +47,8 @@ where :math:`X_t` satisfies the following stochastic differential equation,
 .. math::
     {dX_t = {\mu}({\theta} - X_t)dt + {\sigma}dW_t}
 
-where
-:math:`\theta` is the long-term mean, :math:`\mu` is speed at which the values will regroup around the long-term mean and :math:`\sigma` is the amplitude of randomness of the O-U process.
+where :math:`\theta` is the long-term mean, :math:`\mu` is the speed at which the values will regroup around
+the long-term mean and :math:`\sigma` is the amplitude of randomness of the O-U process.
 
 Trading Strategy
 ****************
@@ -44,7 +58,8 @@ The trading strategy is defined by entering a trade when :math:`X_t = a`, exitin
 Trading Cycle
 *************
 
-The trading cycle is completed as :math:`X_t` change from :math:`a` to :math:`m`, then back to :math:`a`, and the trade length :math:`T` is defined as the time needed to complete a trading cycle.
+The trading cycle is completed as :math:`X_t` change from :math:`a` to :math:`m`, then back to :math:`a`,
+and the trade length :math:`T` is defined as the time needed to complete a trading cycle.
 
 Analytic Formulae
 #################
@@ -77,14 +92,18 @@ Mean and Variance of the Return per Unit of Time
 .. math::
     \sigma_s(a,\ m,\ c) = \frac{{r(a,\ m,\ c)}^2{V[T]}}{{E[T]}^3}
 
-where :math:`r(a,\ m,\ c) = (m − a − c)` gives the continuously compound rate of return for a single trade accounting for transaction cost.
+where :math:`r(a,\ m,\ c) = (m − a − c)` gives the continuously compound rate of return for a single trade
+accounting for transaction cost.
 
 Optimal Strategies
 ##################
 
-To calculate an optimal trading strategy, we seek to choose a optimal entry and exit thresholds that maximise the expected return or the Sharpe ratio per unit of time for a given transaction cost/risk free rate.
+To calculate an optimal trading strategy, we seek to choose optimal entry and exit thresholds that maximise
+the expected return or the Sharpe ratio per unit of time for a given transaction cost/risk-free rate.
 
-This paper shows that the maximum expected return/Sharpe ratio occurs when :math:`(m - \theta)^2 = (a - \theta)^2`. Since we have assumed that :math:`a < m`, this implies that :math:`m = 2\theta − a`. Therefore, for a given transaction cost/risk free rate, the following equation can be maximized to find optimal :math:`a` and :math:`m`.
+This paper shows that the maximum expected return/Sharpe ratio occurs when :math:`(m - \theta)^2 = (a - \theta)^2`.
+Since we have assumed that :math:`a < m`, this implies that :math:`m = 2\theta − a`. Therefore, for a given
+transaction cost/risk-free rate, the following equation can be maximized to find optimal :math:`a` and :math:`m`.
 
 .. math::
     \mu^*_s(a, c) = \frac{r(a, 2\theta − a, c)}{E [T]}
@@ -101,7 +120,10 @@ Implementation
 Initializing OU-Process Parameters
 **********************************
 
-One can initialize the O-U process by directly setting its parameters or by fitting the process to the given data. The fitting method can refer to pp. 12-13 in the following book: `Tim Leung and Xin Li, Optimal Mean reversion Trading: Mathematical Analysis and Practical Applications <https://www.amazon.com/Optimal-Mean-Reversion-Trading-Mathematical/dp/9814725919>`_.
+One can initialize the O-U process by directly setting its parameters or by fitting the process to the given data.
+The fitting method can refer to pp. 12-13 in the following book:
+`Tim Leung and Xin Li, Optimal Mean reversion Trading: Mathematical Analysis and Practical Applications
+<https://www.amazon.com/Optimal-Mean-Reversion-Trading-Mathematical/dp/9814725919>`_.
 
 .. py:currentmodule:: arbitragelab.time_series_approach.ou_optimal_threshold_bertram
 
@@ -115,10 +137,17 @@ One can initialize the O-U process by directly setting its parameters or by fitt
 Getting Optimal Thresholds
 **************************
 
-This paper examines the problem of choosing an optimal strategy under two different objective functions: the expected return; and the Sharpe ratio. One can choose either to get the thresholds. The following functions will return a tuple contains :math:`a` and :math:`m`, where :math:`a` is the optimal entry thresholds, and :math:`m` is the optimal exit threshold.
+This paper examines the problem of choosing an optimal strategy under two different objective functions:
+the expected return; and the Sharpe ratio. One can choose either to get the thresholds.
+The following functions will return a tuple contains :math:`a` and :math:`m`, where :math:`a` is the optimal
+entry thresholds, and :math:`m` is the optimal exit threshold.
 
 .. note::
-    :code:`initial_guess` is used to speed up the process and ensure the target equation can be solved by :code:`scipy.optimize`. If the value of :code:`initial_guess` is not given, the default value will be :math:`\theta - c - 10^{-2}`. From our experiment, the default value is suited for most of the cases. If you observe that the thresholds got by the functions is odd or the running time is larger than 5 second, please try a :code:`initial_guess` on different scales.
+    :code:`initial_guess` is used to speed up the process and ensure the target equation can be solved by
+    :code:`scipy.optimize`. If the value of :code:`initial_guess` is not given, the default value will be
+    :math:`\theta - c - 10^{-2}`. From our experiment, the default value is suited for most of the cases.
+    If you observe that the thresholds got by the functions is odd or the running time is larger than 5 second,
+    please try a :code:`initial_guess` on different scales.
 
 .. automethod:: OUModelOptimalThresholdBertram.get_threshold_by_maximize_expected_return
 
@@ -142,7 +171,8 @@ One can calculate performance metrics for the trading strategy using the followi
 Plotting Comparison
 *******************
 
-One can use the following functions to observe the impact of transaction costs and risk-free rates on the optimal thresholds and performance metrics under the optimal thresholds.
+One can use the following functions to observe the impact of transaction costs and risk-free rates on the optimal
+thresholds and performance metrics under the optimal thresholds.
 
 .. automethod:: OUModelOptimalThresholdBertram.plot_target_vs_c
 
@@ -193,14 +223,16 @@ Code Example
     c_list = np.linspace(0, 0.01, 30)
 
     # Plotting the impact of transaction costs on the optimal entry threshold
-    fig = OUOTB.plot_target_vs_c(target = "a", method = "maximize_expected_return", c_list = c_list)
+    fig = OUOTB.plot_target_vs_c(target = "a", method = "maximize_expected_return",
+                                 c_list = c_list)
     plt.show()
 
     # Setting a array contains risk-free rates. 
     rf_list = np.linspace(0, 0.05, 30)
 
     # Plotting the impact of risk-free rates on the optimal entry threshold
-    fig = OUOTB.plot_target_vs_rf(target = "a", method = "maximize_sharpe_ratio", rf_list = rf_list, c = 0.001)
+    fig = OUOTB.plot_target_vs_rf(target = "a", method = "maximize_sharpe_ratio",
+                                  rf_list = rf_list, c = 0.001)
     plt.show()
 
 Research Notebooks
