@@ -9,7 +9,12 @@
 H-Strategy
 ==========
 
-In this paper, the author proposes a new nonparametric approach to pairs trading based on the idea of Renko and Kagi charts. This approach exploits statistical information about the variability of the tradable process. The approach does not aim to find a long-run mean of the process and trade towards it like other methods of pairs trading. Instead, it manages the problem of how far the process should move in one direction before trading in the opposite direction becomes potentially profitable by measure the variability of the process.
+In this paper, the author proposes a new nonparametric approach to pairs trading based on the idea of
+Renko and Kagi charts. This approach exploits statistical information about the variability of the
+tradable process. The approach does not aim to find a long-run mean of the process and trade towards it
+like other methods of pairs trading. Instead, it manages the problem of how far the process should move
+in one direction before trading in the opposite direction becomes potentially profitable by measure the
+variability of the process.
 
 H-construction
 ##############
@@ -38,7 +43,7 @@ for some arbitrary :math:`H > 0`, :math:`\tau_0 = 0` and :math:`P(\tau_0) = P(0)
     \tau_i = inf\{u \in [\tau_{i - 1}, T] : |P(u) − P(\tau_{i - 1})| = H\}.
 
 Step 2: Determine Turning Points
--------------------------------------
+--------------------------------
 
 We create another sequence of time moments :math:`\{(\tau^a_n, \tau^b_n), n = 0, 1, ..., M\}` based on the
 sequence :math:`{\tau_i}`. The sequence :math:`\{\tau^a_n\}` defines time moments when the renko process :math:`X(i)` has a local
@@ -56,7 +61,13 @@ More precisely, when take :math:`\tau^a_0 = \tau_0` and :math:`\tau^b_0 = \tau_1
 Kagi construction
 *****************
 
-The Kagi construction is similar to the Renko construction with the only difference being that to create the sequence of time moments :math:`\{(\tau^a_n, \tau^b_n), n = 0, 1, ..., M\}` for the Kagi construction we use local maximums and minimums of the process :math:`P(t)` rather than the process :math:`X(i)` derived from it. The sequence :math:`\{\tau^a_n\}` then defines the time moments when the price process :math:`P(t)` has a local maximum or minimum and the sequence :math:`\{\tau^b_n\}` defines the time moments when that local maximum or minimum is recognized, that is, the time when the process :math:`P(t)` moves away from its last local maximum or minimum by a distance equal to :math:`H`.
+The Kagi construction is similar to the Renko construction with the only difference being that to create the sequence
+of time moments :math:`\{(\tau^a_n, \tau^b_n), n = 0, 1, ..., M\}` for the Kagi construction we use local maximums
+and minimums of the process :math:`P(t)` rather than the process :math:`X(i)` derived from it. The sequence
+:math:`\{\tau^a_n\}` then defines the time moments when the price process :math:`P(t)` has a local maximum or
+minimum and the sequence :math:`\{\tau^b_n\}` defines the time moments when that local maximum or minimum is recognized,
+that is, the time when the process :math:`P(t)` moves away from its last local maximum or minimum by a
+distance equal to :math:`H`.
 
 More precisely, :math:`\tau^a_0`, :math:`\tau^b_0` and :math:`S_0` is defined as,
 
@@ -71,7 +82,8 @@ More precisely, :math:`\tau^a_0`, :math:`\tau^b_0` and :math:`S_0` is defined as
 
 where :math:`S_0` can take two values: :math:`1` for a local maximum and :math:`−1` for a local minimum.
 
-Then we define :math:`(\tau^a_n, \tau^b_n)`, :math:`n > 0` recursively. The construction of the full sequence :math:`\{(\tau^a_n, \tau^b_n), n = 0, 1, ..., M\}` is done inductively by alternating the following cases.
+Then we define :math:`(\tau^a_n, \tau^b_n)`, :math:`n > 0` recursively. The construction of the full sequence
+:math:`\{(\tau^a_n, \tau^b_n), n = 0, 1, ..., M\}` is done inductively by alternating the following cases.
 
 :math:`Case\ 1: \ \ S_{n-1} = -1`
 
@@ -106,12 +118,13 @@ H-statistics
 H-inversion
 ***********
 
-H-inversion counts the number of times the process :math:`P(t)` changes its direction for selected :math:`H`, :math:`T` and :math:`P(t)`. It is given by
+H-inversion counts the number of times the process :math:`P(t)` changes its direction for selected :math:`H`,
+:math:`T` and :math:`P(t)`. It is given by
 
 .. math::
     N_T (H, P) = \max \{n : \tau^{b}_{n} = T\} = N,
 
-where :math:`H` denotes the threshold of the H-construction, and :math:`P` dnotes the process :math:`P(t)`.
+where :math:`H` denotes the threshold of the H-construction, and :math:`P` denotes the process :math:`P(t)`.
 
 H-distances
 ***********
@@ -135,7 +148,9 @@ Strategies
 Momentum Strategy
 *****************
 
-The investor buys (sells) an asset at a stopping time :math:`\tau^b_n` when he or she recognizes that the process passed its previous local minimum (maximum)and the investor expects a continuation of the movement. The signal :math:`s_t` is given by
+The investor buys (sells) an asset at a stopping time :math:`\tau^b_n` when he or she recognizes that the process
+passed its previous local minimum (maximum)and the investor expects a continuation of the movement.
+The signal :math:`s_t` is given by
 
 .. math::
     s_t = \left\{\begin{array}{l}
@@ -144,7 +159,8 @@ The investor buys (sells) an asset at a stopping time :math:`\tau^b_n` when he o
     0,\ otherwise
     \end{array}\right.
 
-where :math:`+1` indicates opening a long trade or closeing a short trade, :math:`-1` indicates opening a short trade or closeing a long trade and :math:`0` indicates holding the previous position.
+where :math:`+1` indicates opening a long trade or closing a short trade, :math:`-1` indicates opening a short trade
+or closing a long trade and :math:`0` indicates holding the previous position.
 
 The profit from one trade according to the momentum H-strategy over time from :math:`\tau^b_{n−1}` to :math:`\tau^b_{n}` is
 
@@ -159,7 +175,9 @@ and the total profit from time :math:`0` till time :math:`T` is
 Contrarian Strategy
 *******************
 
-The investor sells (buys) an asset at a stopping time :math:`\tau^b_n` when he or she decides that the process has passed far enough from its previous local minimum (maximum), and the investor expects a movement reversion. The signal :math:`s_t` is given by
+The investor sells (buys) an asset at a stopping time :math:`\tau^b_n` when he or she decides that the process
+has passed far enough from its previous local minimum (maximum), and the investor expects a movement reversion.
+The signal :math:`s_t` is given by
 
 .. math::
     s_t = \left\{\begin{array}{l}
@@ -168,7 +186,8 @@ The investor sells (buys) an asset at a stopping time :math:`\tau^b_n` when he o
     0,\ otherwise
     \end{array}\right.
 
-where :math:`+1` indicates opening a long trade or closeing a short trade, :math:`-1` indicates opening a short trade or closeing a long trade and :math:`0` indicates holding the previous position.
+where :math:`+1` indicates opening a long trade or closing a short trade, :math:`-1` indicates opening a short
+trade or closing a long trade and :math:`0` indicates holding the previous position.
 
 The profit from one trade according to the momentum H-strategy over time from :math:`\tau^b_{n−1}` to :math:`\tau^b_{n}` is
 
@@ -183,36 +202,43 @@ and the total profit from time $0$ till time $T$ is
 Properties
 **********
 
-It is clear that the choice of H-strategy depends on the value of H-volatility. if :math:`\xi^1_T > 2H`, then to achieve a positive profit the investor should
-employ a momentum H -strategy; if :math:`\xi^1_T < 2H` then the investor should use a contrarian H-strategy.
+It is clear that the choice of H-strategy depends on the value of H-volatility. If :math:`\xi^1_T > 2H`,
+then to achieve a positive profit the investor should
+employ a momentum H -strategy; If :math:`\xi^1_T < 2H` then the investor should use a contrarian H-strategy.
 
-Suppose :math:`P(t)` follows the Wiener process, the H-volatility :math:`\xi^1_T = 2H`. As a result, it is impossible to profit from the trading on the process :math:`P(t)`. We can also see that H-volatility :math:`\xi^1_T = 2H` is a property of a martingale. Likewise :math:`\xi^1_T > 2H` could be a property of a sub-martingale or a super-martingale or a process regularly switching over time from a sub-martingale to a super-martingale and back.
+Suppose :math:`P(t)` follows the Wiener process, the H-volatility :math:`\xi^1_T = 2H`. As a result,
+it is impossible to profit from the trading on the process :math:`P(t)`. We can also see that H-volatility
+:math:`\xi^1_T = 2H` is a property of a martingale. Likewise :math:`\xi^1_T > 2H` could be a property of a
+sub-martingale or a super-martingale or a process regularly switching over time from a sub-martingale to a
+super-martingale and back.
 
-In this paper, the author propose that for any mean-reverting process, regardless of its distribution, the H-volatility is less than :math:`2H`. Hence, theoretically, trading the mean-reverting process by the contrarian H-strategy is profitable for any choice of :math:`H`.
+In this paper, the author proposes that for any mean-reverting process, regardless of its distribution,
+the H-volatility is less than :math:`2H`. Hence, theoretically, trading the mean-reverting process by the
+contrarian H-strategy is profitable for any choice of :math:`H`.
 
 Pairs Selection
 ###############
 
-- Purpose: Select trading pairs from the assets pool by using the properties of the H-construction.
-- Algorithm:
+* Purpose: Select trading pairs from the assets pool by using the properties of the H-construction.
+* Algorithm:
 
-    - Determine the assets pool and the length of historical data.
+    1. Determine the assets pool and the length of historical data.
 
-    - Take log-prices of all assets based on the history, combine them in all possible pairs and build spread process for each pair.
+    2. Take log-prices of all assets based on the history, combine them in all possible pairs and build a spread process for each pair.
 
-        - :math:`spread_{ij} = log(P_i) - log(P_j)`
+        * :math:`spread_{ij} = log(P_i) - log(P_j)`
 
-    - For each spread process, calculate its standard deviation, and set it as the threshold of the H-construction.
+    3. For each spread process, calculate its standard deviation, and set it as the threshold of the H-construction.
 
-    - Determine the construction type of the H-construction.
+    4. Determine the construction type of the H-construction.
 
-        - It could be either Renko or Kagi.
+        * It could be either Renko or Kagi.
 
-    - Build the H-construction on the spread series formed by each possible pairs.
+    5. Build the H-construction on the spread series formed by each possible pair.
 
-    - The top N pairs with the highest/lowest H-inversion are used for pairs trading.
+    6. The top N pairs with the highest/lowest H-inversion are used for pairs trading.
 
-        - Mean-reverting process tends to have higher H-inversion.
+        * Mean-reverting process tends to have higher H-inversion.
 
 Implementation
 ##############
@@ -299,7 +325,7 @@ HSelection
 
     # Loading data
     tickers = "AAPL MFST AMZN FB GOOGL GOOG TSLA NVDA JPM"
-    data =  yf.download(tickers, start="2019-01-01", end="2020-12-31")["Adj Close"]
+    data = yf.download(tickers, start="2019-01-01", end="2020-12-31")["Adj Close"]
 
     # Creating a class object
     hs = HSelection(data)
@@ -308,7 +334,7 @@ HSelection
     # Getting pairs
     pairs = hs.get_pairs(5, "highest", False)
     for p in pairs:
-        print("H-inversion:", p[0], "Threshold for H-construction:", p[1],  "Pairs:", p[2])
+        print("H-inversion:", p[0], "Threshold for H-construction:", p[1], "Pairs:", p[2])
 
 Research Notebooks
 ******************
