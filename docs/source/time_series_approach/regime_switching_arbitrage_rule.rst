@@ -2,16 +2,21 @@
 
 .. note::
    The following implementations and documentation closely follow the publication by Bock, M. and Mestel, R:
-   `A regime-switching relative value arbitrage rule. Operations Research Proceedings 2008, pages 9–14. Springer.
+   `A regime-switching relative value arbitrage rule. Operations Research Proceedings 2008, pages 9–14. Springer.
    <http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.453.3576&rep=rep1&type=pdf>`_.
 
-=========================================================================
+===============================
 Regime-Switching Arbitrage Rule
-=========================================================================
+===============================
 
-The traditional pairs trading strategy usually fails when fundamental or economic reasons cause a structural break on one of the stocks in the pair. This break will cause the temporary spread deviations formed by the pair to become persistent spread deviations which will not revert. Under these circumstances, betting on the spread to revert to its historical mean would imply a loss.
+The traditional pairs trading strategy usually fails when fundamental or economic reasons cause a
+structural break on one of the stocks in the pair. This break will cause the temporary spread
+deviations formed by the pair to become persistent spread deviations which will not revert.
+Under these circumstances, betting on the spread to revert to its historical mean would imply a loss.
 
-To overcome the problem of detecting whether the deviations are temporary or longer-lasting, this paper bridges the literature on Markov regime-switching and the scientific work on statistical arbitrage to develop useful trading rules for pairs trading.
+To overcome the problem of detecting whether the deviations are temporary or longer-lasting,
+the paper by Bock and Mestel bridges the literature on Markov regime-switching and the
+scientific work on statistical arbitrage to develop useful trading rules for pairs trading.
 
 Assumptions
 ###########
@@ -31,7 +36,7 @@ where
 Markov Regime-Switching Model
 *****************************
 
-A two-state, first-order Markov-switching process for $s_t$ is considered with the following transition probabilities:
+A two-state, first-order Markov-switching process for :math:`s_t` is considered with the following transition probabilities:
 
 .. math::
     \Bigg\{ \begin{matrix}
@@ -71,7 +76,8 @@ where
 
 :math:`P(\cdot)` denotes the smoothed probabilities for each state, 
 
-:math:`\delta` and :math:`\rho` denote the standard deviation sensitivity parameter and the probability threshold of the trading strategy, respectively.
+:math:`\delta` and :math:`\rho` denote the standard deviation sensitivity parameter and the probability threshold
+of the trading strategy, respectively.
 
 To be more specific, the trading signal can be described as,
 
@@ -103,12 +109,16 @@ Steps to Execute the Strategy
 Step 1: Select a Trading Pair
 -----------------------------
 
-In this paper, they used the DJ STOXX 600 component as the asset pool and applied the cointegration test for the pairs selection. One can use the same method as the paper did or other pairs selection algorithms like the distance approach for finding trading pairs.
+In this paper, they used the DJ STOXX 600 component as the asset pool and applied the cointegration test
+for the pairs selection. One can use the same method as the paper did or other pairs selection algorithms
+like the distance approach for finding trading pairs.
 
 Step 2: Construct the Spread Series
 -----------------------------------
 
-In this paper, they used :math:`\frac{P^A_t}{P^B_t}` as the spread series. One can use the same method as the paper did or other formulae like :math:`(P^A_t/P^A_0) - \beta \cdot (P^B_t/P^B_0)` and :math:`ln(P^A_t/P^A_0) - \beta \cdot ln(P^B_t/P^B_0)` for constructing the spread series.
+In this paper, they used :math:`\frac{P^A_t}{P^B_t}` as the spread series. One can use the same method
+as the paper did or other formulae like :math:`(P^A_t/P^A_0) - \beta \cdot (P^B_t/P^B_0)` and
+:math:`ln(P^A_t/P^A_0) - \beta \cdot ln(P^B_t/P^B_0)` for constructing the spread series.
 
 Step 3: Estimate the Parameters of the Markov Regime-Switching Model
 --------------------------------------------------------------------
@@ -124,7 +134,8 @@ Determine the current signal based on the strategy and estimated parameters.
 Step 5: Decide the Trade
 ------------------------
 
-Decide the trade based on the signal at time :math:`t` and the position at :math:`t - 1`. Possible combinations are listed below:
+Decide the trade based on the signal at time :math:`t` and the position at :math:`t - 1`.
+Possible combinations are listed below:
 
 .. list-table::
    :header-rows: 1
@@ -222,7 +233,8 @@ Implementation
 
 .. tip::
 
-    If the user is not satisfied with the default trading strategy described in the paper, one can use :code:`change_strategy` to modify it.
+    If the user is not satisfied with the default trading strategy described in the paper, one can use
+    the :code:`change_strategy` method to modify it.
 
 Examples
 ########
@@ -252,14 +264,16 @@ Code Example
     window_size = 60
 
     # Getting current signal
-    signal = RSAR.get_signal(Ratt[-window_size:], switching_variance = False, silence_warnings = True)
+    signal = RSAR.get_signal(Ratt[-window_size:], switching_variance = False,
+                             silence_warnings = True)
     print("Open a long trade:", signal[0]) 
     print("Close a long trade:", signal[1]) 
     print("Open a short trade:", signal[2]) 
     print("Close a short trade:", signal[3])
 
     # Getting signals on a rolling basis
-    signals = RSAR.get_signals(Ratt, window_size, switching_variance = True, silence_warnings = True)
+    signals = RSAR.get_signals(Ratt, window_size, switching_variance = True,
+                               silence_warnings = True)
     print(signals.shape)
 
     # Deciding the trades based on the signals
@@ -278,7 +292,8 @@ Code Example
     RSAR.change_strategy("High", "Short", "Close", cs_rule)
 
     # Getting signals on a rolling basis
-    signals = RSAR.get_signals(Ratt, window_size, switching_variance = True, silence_warnings = True)
+    signals = RSAR.get_signals(Ratt, window_size, switching_variance = True,
+                               silence_warnings = True)
     print(signals.shape)
 
     # Deciding the trades based on the signals
