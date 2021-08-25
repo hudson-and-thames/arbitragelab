@@ -4,13 +4,13 @@
 """
 The module implements a statistical arbitrage strategy based on the Markov regime-switching model.
 """
+# pylint: disable=invalid-name
 
-# pylint: disable=missing-module-docstring, invalid-name
 from typing import Union, Callable
 import warnings
 
 import pandas as pd
-import numpy  as np
+import numpy as np
 import statsmodels.api as sm
 import matplotlib.pyplot as plt
 
@@ -38,51 +38,51 @@ class RegimeSwitchingArbitrageRule:
 
         # Default strategy as described in the paper
         self.strategy = {
-            "High" : {
-                "Long" : {"Open" : lambda Xt, mu, delta, sigma, prob, rho: Xt <= mu - delta * sigma and prob >= rho,
-                          "Close" : lambda Xt, mu, delta, sigma, prob, rho: Xt >= mu + delta * sigma},
-                "Short" : {"Open" : lambda Xt, mu, delta, sigma, prob, rho: Xt >= mu + delta * sigma,
-                           "Close" : lambda Xt, mu, delta, sigma, prob, rho: Xt <= mu - delta * sigma and prob >= rho}
+            "High": {
+                "Long": {"Open": lambda Xt, mu, delta, sigma, prob, rho: Xt <= mu - delta * sigma and prob >= rho,
+                         "Close": lambda Xt, mu, delta, sigma, prob, rho: Xt >= mu + delta * sigma},
+                "Short": {"Open": lambda Xt, mu, delta, sigma, prob, rho: Xt >= mu + delta * sigma,
+                          "Close": lambda Xt, mu, delta, sigma, prob, rho: Xt <= mu - delta * sigma and prob >= rho}
             },
-            "Low" : {
-                "Long" : {"Open" : lambda Xt, mu, delta, sigma, prob, rho: Xt <= mu - delta * sigma,
-                          "Close" : lambda Xt, mu, delta, sigma, prob, rho: Xt >= mu + delta * sigma and prob >= rho},
-                "Short" : {"Open" : lambda Xt, mu, delta, sigma, prob, rho: Xt >= mu + delta * sigma and prob >= rho,
-                           "Close" : lambda Xt, mu, delta, sigma, prob, rho: Xt <= mu - delta * sigma}
+            "Low": {
+                "Long": {"Open": lambda Xt, mu, delta, sigma, prob, rho: Xt <= mu - delta * sigma,
+                         "Close": lambda Xt, mu, delta, sigma, prob, rho: Xt >= mu + delta * sigma and prob >= rho},
+                "Short": {"Open": lambda Xt, mu, delta, sigma, prob, rho: Xt >= mu + delta * sigma and prob >= rho,
+                          "Close": lambda Xt, mu, delta, sigma, prob, rho: Xt <= mu - delta * sigma}
             }
         }
 
         # Mapping the signal to the actual trade based on the position at the previous timestamp
         self.long_entry_mapping = {
-            1 : {True : False, False : False},
+            1: {True: False, False: False},
 
-            -1 : {True : True, False : False},
+            -1: {True: True, False: False},
 
-            0 : {True : True, False : False}
+            0: {True: True, False: False}
         }
 
         self.long_exit_mapping = {
-            1 : {True : True, False : False},
+            1: {True: True, False: False},
 
-            -1 : {True : False, False : False},
+            -1: {True: False, False: False},
 
-            0 : {True : False, False : False}
+            0: {True: False, False: False}
         }
 
         self.short_entry_mapping = {
-            1 : {True : True, False : False},
+            1: {True: True, False: False},
 
-            -1 : {True : False, False : False},
+            -1: {True: False, False: False},
 
-            0 : {True : True, False : False}
+            0: {True: True, False: False}
         }
 
         self.short_exit_mapping = {
-            1 : {True : False, False : False},
+            1: {True: False, False: False},
 
-            -1 : {True : True, False : False},
+            -1: {True: True, False: False},
 
-            0 : {True : False, False : False}
+            0: {True: False, False: False}
         }
 
         devadarsh.track('RegimeSwitchingArbitrageRule')
@@ -106,7 +106,7 @@ class RegimeSwitchingArbitrageRule:
             raise Exception("Incorrect parameters of the rule. "
                             "Please use the subset of (Xt, mu, delta, sigma, prob, rho) as the parameters.")
 
-    def get_signal(self, data: Union[np.array, pd.Series, pd.DataFrame], switching_variance=False,
+    def get_signal(self, data: Union[np.array, pd.Series, pd.DataFrame], switching_variance: bool = False,
                    silence_warnings: bool = False) -> np.array:
         """
         The function will first fit the Markov regime-switching model to all the input data,
@@ -121,11 +121,11 @@ class RegimeSwitchingArbitrageRule:
             representing whether to open a long trade, close a long trade, open a short trade and close a short trade.
         """
 
-        data_npa = self._check_type(data) # Checking the type of the input data
+        data_npa = self._check_type(data)  # Checking the type of the input data
 
-        # Handling warning if the module fails to fit the Markov regime-switching model to the input data.
+        # Handling warning if the module fails to fit the Markov regime-switching model to the input data
         with warnings.catch_warnings():
-            if silence_warnings: # Silencing warnings if the user doesn't want them to show out.
+            if silence_warnings:  # Silencing warnings if the user doesn't want them to show out
                 warnings.filterwarnings('ignore')
 
             # Fitting the Markov regime-switching model
@@ -146,15 +146,14 @@ class RegimeSwitchingArbitrageRule:
 
         # Determining regime index
         low_regime = np.argmin(mu)
-        #high_regime = np.argmax(mu)
 
         current_regime = np.argmax(res.smoothed_marginal_probabilities[-1])
         smoothed_prob = res.smoothed_marginal_probabilities[-1][current_regime]
 
         # Mapping strategy parameters
         param = {
-            "Xt" : data_npa[-1], "mu" : mu[current_regime], "delta" : self.delta,
-            "sigma" : sigma[current_regime], "prob" : smoothed_prob, "rho" : self.rho
+            "Xt": data_npa[-1], "mu": mu[current_regime], "delta": self.delta,
+            "sigma": sigma[current_regime], "prob": smoothed_prob, "rho": self.rho
         }
 
         # Calculating the signal based on the strategy
@@ -172,7 +171,7 @@ class RegimeSwitchingArbitrageRule:
         return signal
 
     def get_signals(self, data: Union[np.array, pd.Series, pd.DataFrame], window_size: int,
-                    switching_variance=False, silence_warnings: bool = False) -> np.array:
+                    switching_variance: bool = False, silence_warnings: bool = False) -> np.array:
         """
         The function will fit the Markov regime-switching model with a rolling time window,
         then calculate the trading signal at the last timestamp of the window based on the strategy.
@@ -183,9 +182,9 @@ class RegimeSwitchingArbitrageRule:
         :param switching_variance: (bool) Whether the Markov regime-switching model has different variances in different regimes.
         :param silence_warnings: (bool) Flag to silence warnings from failing to fit
             the Markov regime-switching model to the input data.
-        :return: (np.array) The array containing the trading signals at each timestamp of the given data. A trading signal at any timestamp
-            will have four Boolean values, representing whether to open a long trade, close a long trade, open a short trade and close a short trade.
-            The returned array dimensions will be n x 4.
+        :return: (np.array) The array containing the trading signals at each timestamp of the given data.
+            A trading signal at any timestamp will have four Boolean values, representing whether to open a long trade,
+            close a long trade, open a short trade and close a short trade. The returned array dimensions will be n x 4.
         """
 
         signals = np.full((len(data), 4), False)
@@ -197,15 +196,15 @@ class RegimeSwitchingArbitrageRule:
 
     def get_trades(self, signals: np.array) -> np.array:
         """
-        The function will decide the trade actions at each timestamp based on the signal at time t and the position at time t - 1.
-        The position at time 0 is assumed to be 0.
+        The function will decide the trade actions at each timestamp based on the signal at time t
+        and the position at time t - 1. The position at time 0 is assumed to be 0.
 
-        :param signals: (np.array) The array containing the trading signals at each timestamp. A trading signal at any timestamp
-            should have four Boolean values, representing whether to open a long trade, close a long trade, open a short trade and close a short trade.
-            The input array dimensions should be n x 4.
+        :param signals: (np.array) The array containing the trading signals at each timestamp. A trading signal
+            at any timestamp should have four Boolean values, representing whether to open a long trade,
+            close a long trade, open a short trade and close a short trade. The input array dimensions should be n x 4.
         :return: (np.array) The array containing the trade actions at each timestamp. A trade action at any timestamp
-            will have four Boolean values, representing whether to open a long trade, close a long trade, open a short trade and close a short trade.
-            The returned array dimensions will be n x 4.
+            will have four Boolean values, representing whether to open a long trade, close a long trade,
+            open a short trade and close a short trade. The returned array dimensions will be n x 4.
         """
 
         long_entry = signals[:, 0].copy()
@@ -249,10 +248,10 @@ class RegimeSwitchingArbitrageRule:
 
         :param data: (np.array/pd.Series/pd.DataFrame) The time series to plot the trades on.
             The dimensions should be n x 1.
-        :param trades: (np.array) The array containing the trade actions at each timestamp of the given data. A trade action at any timestamp
-            should have four Boolean values, representing whether to open a long trade, close a long trade, open a short trade and close a short trade.
-            The input array dimensions will be n x 4.
-        :param marker_size: Marker size of the plot.
+        :param trades: (np.array) The array containing the trade actions at each timestamp of the given data.
+            A trade action at any timestamp should have four Boolean values, representing whether to open a long trade,
+            close a long trade, open a short trade and close a short trade. The input array dimensions will be n x 4.
+        :param marker_size: (int) Marker size of the plot.
         :return: (plt.figure) Figure that plots trades on the given data.
         """
 
@@ -281,7 +280,7 @@ class RegimeSwitchingArbitrageRule:
         return fig
 
     @staticmethod
-    def _check_type(data) -> np.array:
+    def _check_type(data: Union[np.array, pd.Series, pd.DataFrame]) -> np.array:
         """
         Checks the type of the input data and returns it in the type of np.array.
 

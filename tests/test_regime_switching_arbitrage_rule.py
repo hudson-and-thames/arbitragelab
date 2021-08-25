@@ -5,8 +5,8 @@
 """
 Tests functions from Regime Switching Arbitrage Rule module.
 """
+# pylint: disable=invalid-name
 
-# pylint: disable=missing-module-docstring, invalid-name
 import unittest
 import os
 import pandas as pd
@@ -16,8 +16,8 @@ from arbitragelab.time_series_approach.regime_switching_arbitrage_rule import Re
 
 
 class TestRegimeSwitchingArbitrageRule(unittest.TestCase):
-    """r
-    Tests the class of Regime Switching Arbitrage Rule module
+    """
+    Tests the class of Regime Switching Arbitrage Rule module.
     """
 
     def setUp(self):
@@ -46,15 +46,14 @@ class TestRegimeSwitchingArbitrageRule(unittest.TestCase):
 
         # Getting current signal and testing the results
         for i in [0, 1, 2]:
-            signal = test.get_signal(self.Ratts[i][-window_size:], switching_variance = False, silence_warnings = False)
+            signal = test.get_signal(self.Ratts[i][-window_size:], switching_variance=False, silence_warnings=False)
             self.assertEqual(signal.tolist(), [False, True, True, False])
 
-        signal = test.get_signal(self.Ratts[0][-window_size:], switching_variance = True, silence_warnings = True)
+        signal = test.get_signal(self.Ratts[0][-window_size:], switching_variance=True, silence_warnings=True)
         self.assertEqual(signal.tolist(), [False, True, True, False])
 
-
         # Getting signals on a rolling basis
-        signals = test.get_signals(self.Ratts[0], window_size, switching_variance = True, silence_warnings = True)
+        signals = test.get_signals(self.Ratts[0], window_size, switching_variance=True, silence_warnings=True)
 
         # Testing the result
         self.assertEqual(signals[0].tolist(), [False, False, False, False])
@@ -67,13 +66,13 @@ class TestRegimeSwitchingArbitrageRule(unittest.TestCase):
         """
 
         # Creating an object of class
-        test = RegimeSwitchingArbitrageRule(delta = 1.5, rho = 0.6)
+        test = RegimeSwitchingArbitrageRule(delta=1.5, rho=0.6)
 
         # Setting window size
         window_size = 60
 
         # Getting signals on a rolling basis
-        signals = test.get_signals(self.Ratts[0], window_size, switching_variance = True, silence_warnings = True)
+        signals = test.get_signals(self.Ratts[0], window_size, switching_variance=True, silence_warnings=True)
 
         # Deciding the trades based on the signals
         trades = test.get_trades(signals)
@@ -95,7 +94,7 @@ class TestRegimeSwitchingArbitrageRule(unittest.TestCase):
         """
 
         # Creating an object of class
-        test = RegimeSwitchingArbitrageRule(delta = 1.5, rho = 0.6)
+        test = RegimeSwitchingArbitrageRule(delta=1.5, rho=0.6)
 
         # Setting window size
         window_size = 60
@@ -135,7 +134,7 @@ class TestRegimeSwitchingArbitrageRule(unittest.TestCase):
         self.assertEqual(test.strategy["Low"]["Short"]["Close"], cs_rule)
 
         # Getting signals on a rolling basis
-        signals = test.get_signals(self.Ratts[0], window_size, switching_variance = True, silence_warnings = True)
+        signals = test.get_signals(self.Ratts[0], window_size, switching_variance=True, silence_warnings=True)
 
         # Deciding the trades based on the signals
         trades = test.get_trades(signals)
