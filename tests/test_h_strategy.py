@@ -44,7 +44,7 @@ class TestHConstruction(unittest.TestCase):
         Tests functions from H-construction module.
         """
 
-        # Testing different kinds of signal methods.
+        # Testing different kinds of signal methods
         test = HConstruction(self.series, self.thresholds, self.test_construction_types[0])
 
         signals = test.get_signals(self.test_signal_types[0])
@@ -116,7 +116,7 @@ class TestHSelection(unittest.TestCase):
         Tests functions from H-Selection module.
         """
 
-        # Testing different kinds of getting methods.
+        # Testing different kinds of getting methods
         test = HSelection(self.dataframe)
         test.select()
 

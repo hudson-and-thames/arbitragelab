@@ -6,7 +6,7 @@ This module implements the strategy described in
 `Bogomolov, T. (2013). Pairs trading based on statistical variability of the spread process. Quantitative Finance, 13(9): 1411–1430.
 <https://www.researchgate.net/publication/263339291_Pairs_trading_based_on_statistical_variability_of_the_spread_process>`_
 """
-# pylint: disable=invalid-name, unused-variable
+# pylint: disable=invalid-name
 
 from itertools import compress, combinations
 
@@ -66,7 +66,7 @@ class HConstruction:
         :param i: (int) The index of the element.
         """
 
-        # Calculating the gap between the current price and the latest price of the H-construction.
+        # Calculating the gap between the current price and the latest price of the H-construction
         gap = (self.series[i] - self.results["h_series"][-1])
         direction = np.sign(gap)
         pre_direction = self.results["direction"][-1]
@@ -101,7 +101,7 @@ class HConstruction:
             num_bricks = abs(gap) // self.threshold
 
             # Appending each bricks to the results
-            for brick in range(int(num_bricks)):
+            for _ in range(int(num_bricks)):
                 reverse = (pre_direction != direction)
                 self._append(i, direction, reverse)
 
@@ -127,7 +127,8 @@ class HConstruction:
             price = self.results["h_series"][-1] + direction * self.threshold
 
         # Marking turning point if reverse == True
-        # tau_a indicates whether it is a turning point, and tau_b indicates whether it is a confirmation point for turning point
+        # tau_a indicates whether it is a turning point
+        # and tau_b indicates whether it is a confirmation point for turning point
         if reverse:
             self.results["tau_a"][-1] = True
             self.results["tau_a"].append(False)
@@ -137,7 +138,7 @@ class HConstruction:
             self.results["tau_a"].append(False)
             self.results["tau_b"].append(False)
 
-        # Appending other informations
+        # Appending other information
         self.results["h_series"].append(price)
         self.results["direction"].append(direction)
         self.results["index"].append(i)
@@ -163,8 +164,8 @@ class HConstruction:
         self.tau_b_direction = list(compress(direction, tau_b))
 
         # Determining the signals
-        self.signals_contrarian = pd.Series(0, index = self.series.index)
-        self.signals_momentum = pd.Series(0, index = self.series.index)
+        self.signals_contrarian = pd.Series(0, index=self.series.index)
+        self.signals_momentum = pd.Series(0, index=self.series.index)
 
         # The signals will be opposite to the directions of the turning confirmation points
         self.signals_contrarian[self.tau_b_index] = [-d for d in self.tau_b_direction]
@@ -174,7 +175,8 @@ class HConstruction:
 
     def h_inversion(self) -> int:
         """
-        Calculates H-inversion statistic, which counts the number of times the series changes its direction for the selected threshold.
+        Calculates H-inversion statistic, which counts the number of times the series changes its direction
+        for the selected threshold.
 
         :return: (int) The value of the H-inversion.
         """
@@ -199,7 +201,8 @@ class HConstruction:
 
     def h_volatility(self, p: int = 1) -> float:
         """
-        Calculates H-volatility statistic of order p, which is a measure of the variability of the series for the selected threshold.
+        Calculates H-volatility statistic of order p, which is a measure of the variability of the series
+        for the selected threshold.
 
         :param p: (int) The order of H-volatility.
         :return: (float) The value of the H-volatility.
@@ -209,7 +212,8 @@ class HConstruction:
 
     def extend_series(self, series: pd.Series):
         """
-        Extends the original series used as input during initialization and and rebuilds the H-construction on the extended series
+        Extends the original series used as input during initialization and and rebuilds
+        the H-construction on the extended series.
 
         :param series: (pd.Series) A time series for extending the original series used as input during initialization.
             The dimensions should be n x 1.
@@ -227,7 +231,7 @@ class HConstruction:
         """
 
         if method == "contrarian":
-            signals =  self.signals_contrarian
+            signals = self.signals_contrarian
 
         elif method == "momentum":
             signals = self.signals_momentum
@@ -238,6 +242,7 @@ class HConstruction:
                             "[\"contrarian\", \"momentum\"].")
 
         return signals
+
 
 class HSelection:
     """
@@ -269,7 +274,7 @@ class HSelection:
     def _get_h_inversion(self, pair: tuple) -> tuple:
         """
         Calculates H-inversion statistic for the spread series formed by the specified pair,
-            which counts the number of times the series changes its direction for the selected threshold.
+        which counts the number of times the series changes its direction for the selected threshold.
 
         :param pair: (tuple) The tuple contains the column names of two selected assets.
         :return: (tuple) The tuple contains the value of the H-inversion and the threshold of the H-construction.
@@ -292,7 +297,7 @@ class HSelection:
 
         return hc.h_inversion(), std
 
-    def select(self, minimum_length:int = None):
+    def select(self, minimum_length: int = None):
         """
         Calculates H-inversion statistic for the spread series formed by each possible pair, and stores the results.
 
@@ -311,7 +316,7 @@ class HSelection:
                 results.append([h_inversion, std, pair])
 
         # Sorting the results by H-inversion statistic
-        self.results = sorted(results, key=lambda i:i[0], reverse=True)
+        self.results = sorted(results, key=lambda i: i[0], reverse=True)
 
     def get_pairs(self, num: int, method: str = "highest", allow_repeat: bool = False) -> list:
         """
@@ -330,13 +335,13 @@ class HSelection:
                             "[\"highest\", \"lowest\"].")
 
         if allow_repeat:
-            chose_pairs =  self.results[:num] if method == "highest" else self.results[-num:]
+            chose_pairs = self.results[:num] if method == "highest" else self.results[-num:]
 
         else:
             chose_tickers = []
             chose_pairs = []
 
-            results =  self.results.copy()
+            results = self.results.copy()
 
             if method == "lowest":
                 results.reverse()
