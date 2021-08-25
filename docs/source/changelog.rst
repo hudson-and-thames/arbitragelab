@@ -12,6 +12,7 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+* :feature:`55` Scaling function for cointegration vectors added to the Cointegration Approach Module.
 * :bug:`52` Fixed issue with too many function calls in web analytics.
 * :feature:`48` ML Approach Pairs Selection Module made more flexible - clustering and selection steps are now separate.
 * :support:`48` ML Approach Pairs Selection Module documentation updated.

@@ -43,7 +43,7 @@ class CointegratedPortfolio(ABC):
         """
 
         if cointegration_vector is None:
-            cointegration_vector = self.cointegration_vectors.iloc[0]  # Use eigenvector with biggest eigenvalue.
+            cointegration_vector = self.cointegration_vectors.iloc[0]  # Use eigenvector with biggest eigenvalue
 
         scaling_coefficient = 1 / cointegration_vector.iloc[0]  # Calculating the scaling coefficient
 
