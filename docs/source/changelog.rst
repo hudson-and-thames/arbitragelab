@@ -12,6 +12,8 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+* :feature:`56` H-Strategy (Renko and Kagi) Model added to the Time Series Approach Module.
+* :support:`56` H-Strategy (Renko and Kagi) Model documentation.
 * :bug:`52` Fixed issue with too many function calls in web analytics.
 * :feature:`48` ML Approach Pairs Selection Module made more flexible - clustering and selection steps are now separate.
 * :support:`48` ML Approach Pairs Selection Module documentation updated.
