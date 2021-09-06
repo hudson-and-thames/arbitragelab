@@ -1,5 +1,10 @@
+[html]
+directory = build/coverage/html
+
 [run]
-omit=*__init__*
+branch = True
+omit =
+     *__init__*
      arbitragelab/network/imports.py
      arbitragelab/util/segment.py
      tests/*
@@ -8,20 +13,15 @@ omit=*__init__*
      */.local/*
      # Temporary fix for YFinance issues
      arbitragelab/util/data_importer.py
-branch = True
+
 disable_warnings = no-data-collected
 
 [report]
-partial_branches=True
-show_missing=True
+partial_branches = True
+show_missing = True
 exclude_lines =
     pragma: no cover
     raise NotImplementedError
     @abc.abstractmethod
     @abc.abstractproperty
     def _dependencies(self):
-
-[html]
-directory=cover
-
-[xml]
