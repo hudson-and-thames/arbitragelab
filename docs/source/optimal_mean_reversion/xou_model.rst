@@ -360,7 +360,12 @@ The following research notebook can be used to better understand the concepts of
 
 * `Trading Under the Exponential Ornstein-Uhlenbeck Model`_
 
-.. _`Trading Under the Exponential Ornstein-Uhlenbeck Model`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Optimal%20Mean%20Reversion/xou_model.ipynb
+.. _`Trading Under the Exponential Ornstein-Uhlenbeck Model`: https://hudsonthames.org/notebooks/arblab/xou_model.html
+
+.. raw:: html
+
+    <a href="https://hudthames.tech/35pSG90"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
+    <a href="https://hudthames.tech/2S03R58"><button style="margin: 20px; margin-top: 0px">Download Sample Data</button></a>
 
 References
 ##########

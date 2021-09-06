@@ -342,7 +342,12 @@ The following research notebook can be used to better understand the partner sel
 
 * `Vine Copula Partner Selection Approaches`_
 
-.. _`Vine Copula Partner Selection Approaches`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Copula%20Approach/Vine_copula_partner_selection.ipynb
+.. _`Vine Copula Partner Selection Approaches`: https://hudsonthames.org/notebooks/arblab/Vine_copula_partner_selection.html
+
+.. raw:: html
+
+    <a href="https://hudthames.tech/3xsu5ws"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
+    <a href="https://hudthames.tech/2S03R58"><button style="margin: 20px; margin-top: 0px">Download Sample Data</button></a>
 
 References
 ##########

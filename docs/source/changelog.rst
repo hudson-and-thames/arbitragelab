@@ -12,12 +12,13 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
-* :bug:`52` Fixed issue with too many function calls in web analytics.
+* :release:`0.5.0 <2021-04-15>`
+* :bug:`52 major` Fixed issue with too many function calls in web analytics.
 * :feature:`48` ML Approach Pairs Selection Module made more flexible - clustering and selection steps are now separate.
 * :support:`48` ML Approach Pairs Selection Module documentation updated.
 * :feature:`48` Hedge Ratio Estimation Module added with OLS, TLS, and Minimum HL Methods.
 * :support:`48` Hedge Ratio Estimation Module documentation.
-* :bug:`48` Fixed bug in ML Approach Pairs Selector hedge ratio calculation (previously had included intercept).
+* :bug:`48 major` Fixed bug in ML Approach Pairs Selector hedge ratio calculation (previously had included intercept).
 * :feature:`45` Pearson Strategy added to the Distance Approach Module.
 * :support:`45` Pearson Strategy documentation.
 * :feature:`46` Optimal Convergence Model added to the Stochastic Control Approach Module.

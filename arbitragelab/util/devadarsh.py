@@ -35,10 +35,7 @@ def get_user():
 # pylint: disable=missing-function-docstring
 def validate_alum():
     try:
-        is_circle = bool(validate_env_variable('IS_CIRCLECI'))
-        is_rtd = bool(validate_env_variable('IS_RTD'))
-        is_alum = get_user()[-4:] == '62a0'
-        is_dev = is_circle or is_rtd or is_alum
+        is_dev = bool(validate_env_variable('IS_CIRCLECI'))
     except KeyError:
         is_dev = False
 

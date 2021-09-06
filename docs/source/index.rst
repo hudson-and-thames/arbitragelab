@@ -42,6 +42,14 @@ License
 
 This project is licensed under an all rights reserved licence.
 
+.. toctree::
+    :maxdepth: 2
+    :caption: Legal
+    :hidden:
+
+    additional_information/license
+    additional_information/analytics
+    additional_information/privacy_gdpr
 
 .. toctree::
     :maxdepth: 2
@@ -180,12 +188,3 @@ This project is licensed under an all rights reserved licence.
     :hidden:
 
     changelog
-
-
-.. toctree::
-    :maxdepth: 2
-    :caption: Additional Information
-    :hidden:
-
-    additional_information/analytics
-    additional_information/license

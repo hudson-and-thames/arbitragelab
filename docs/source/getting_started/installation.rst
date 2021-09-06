@@ -37,7 +37,7 @@ Ubuntu Linux
 
    .. code-block::
 
-       Example: "26303adb02cb759b2d484233162a0"
+       Example: "26303adb02cb759b2d484"
 
 6. Add API key as an environment variable:
 
@@ -47,7 +47,7 @@ Ubuntu Linux
 
       * Open the terminal and run: ``sudo gedit /etc/environment``
       * This will open a text editor.
-      * Add the following environment variable: ``ARBLAB_API_KEY="26303adb02cb759b2d48423"``
+      * Add the following environment variable: ``ARBLAB_API_KEY="26303adb02cb759b2d484"``
       * Note that you must add your own API key and not the one given in this example.
       * Save the file and Logout or restart your computer. (If you skip this step, it won't register the change)
       * To confirm your new env variable is active: ``echo $ARBLAB_API_KEY``
@@ -68,7 +68,7 @@ Ubuntu Linux
       .. code::
 
          import os
-         os.environ['ARBLAB_API_KEY'] = "426303b02cb7475984b2d4843"
+         os.environ['ARBLAB_API_KEY'] = "426303b02cb7475984b2d48431"
          import arbitragelab as al
 
       .. tip::
@@ -80,8 +80,9 @@ Ubuntu Linux
    Please make sure to use this exact statement:
 
    .. code-block::
-   
+
       pip install https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@raw.githubusercontent.com/hudson-and-thames-clients/arbitragelab/master/arbitragelab-0.4.0-py3-none-any.whl
+
 
 8. (Optional) **Only if you want to use the ML Approach Module**, install the TensorFlow and Keras packages.
    Note that you should have pip version "pip==20.1.1" to do this. Supported TensorFlow and Keras versions
@@ -144,7 +145,7 @@ Mac OS X
 
    .. code-block::
 
-      Example: "26303adb02cb759b2d48420"
+      Example: "26303adb02cb759b2d484"
 
 6. Add API key as an environment variable:
 
@@ -154,7 +155,7 @@ Mac OS X
 
       * Open the terminal and run: ``sudo nano ~/.bash_profile``. This will open a text editor.
       * Note: If there is no file named .bash_profile, then this above nano command will create a new file named .bash_profile.
-      * Add the following environment variable to the last line of the file: ``export ARBLAB_API_KEY="26303adb02cb759b2d484"``
+      * Add the following environment variable to the last line of the file: ``export ARBLAB_API_KEY="26303adb02cb759b2d48423"``
       * Note that you must add your own API key and not the one given in this example.
       * Press ctrl+X to exit the editor. Press ‘Y’ for saving the buffer, and you will return back to the terminal screen.
       * Restart your computer. (If you skip this step, it won't register the change). The following may work to refresh your environment: ``source ~/.bash_profile``
@@ -169,7 +170,7 @@ Mac OS X
       .. code::
 
          import os
-         os.environ['ARBLAB_API_KEY'] = "426303b02cb7475984b2d4"
+         os.environ['ARBLAB_API_KEY'] = "426303b02cb74784b2d4843"
          import arbitragelab as al
 
 7. Install cvxpy into your conda environment via the terminal.
@@ -251,7 +252,7 @@ Windows
 
    .. code-block::
 
-      Example: "26303adb02cb759b2"
+      Example: "26303adb02c59b2d484233"
 
 6. Add API key as an environment variable:
 
@@ -260,7 +261,7 @@ Windows
       By adding the API key as an environment variable, you won't need to constantly add the key every time you import the library.
 
       * Open command prompt as an administrator.
-      * Create the variable: ``setx ARBLAB_API_KEY  "26303adb02cb759b2d48423"``
+      * Create the variable: ``setx ARBLAB_API_KEY  "26303adb02cb79b2d4"``
       * Note that you must add your own API key and not the one given in this example.
       * Close and open a new command prompt
       * Validate that your variable has been added: ``echo %ARBLAB_API_KEY%``
