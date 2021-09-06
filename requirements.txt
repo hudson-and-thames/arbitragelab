@@ -23,6 +23,7 @@ analytics-python==1.2.9
 pyvinecopulib==0.5.5
 dash==1.19.0
 jupyter-dash==0.4.0
+getmac==0.8.2
 
 # Develop
 codecov==2.1.11
