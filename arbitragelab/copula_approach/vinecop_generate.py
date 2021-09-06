@@ -15,7 +15,7 @@ import pandas as pd
 import pyvinecopulib as pv
 import scipy.integrate as integrate
 
-from arbitragelab.util import devadarsh
+from arbitragelab.util import segment
 
 
 class RVineCop:
@@ -53,7 +53,7 @@ class CVineCop(RVineCop):
         # The pv.Vinecop being wrapped
         self.cvine_cop = cvine_cop
 
-        devadarsh.track('CVineCop')
+        segment.track('CVineCop')
 
     def fit_auto(self, data: pd.DataFrame, pv_target_idx: int = 1, if_renew: bool = True, alt_cvine_structure=False):
         """

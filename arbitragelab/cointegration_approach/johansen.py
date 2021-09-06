@@ -10,7 +10,7 @@ import pandas as pd
 from statsmodels.tsa.vector_ar.vecm import coint_johansen
 
 from arbitragelab.cointegration_approach.base import CointegratedPortfolio
-from arbitragelab.util import devadarsh
+from arbitragelab.util import segment
 
 
 class JohansenPortfolio(CointegratedPortfolio):
@@ -29,7 +29,7 @@ class JohansenPortfolio(CointegratedPortfolio):
         self.cointegration_vectors = None  # Johansen eigenvectors used to form mean-reverting portfolios.
         self.johansen_trace_statistic = None  # Trace statistic data frame for each asset used to test for cointegration.
         self.johansen_eigen_statistic = None  # Eigenvalue statistic data frame for each asset used to test for cointeg.
-        devadarsh.track('JohansenPortfolio')
+        segment.track('JohansenPortfolio')
 
     def fit(self, price_data: pd.DataFrame, det_order: int = 0, n_lags: int = 1):
         """

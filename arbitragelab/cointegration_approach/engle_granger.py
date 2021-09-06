@@ -11,7 +11,7 @@ import pandas as pd
 from statsmodels.tsa.stattools import adfuller
 
 from arbitragelab.cointegration_approach.base import CointegratedPortfolio
-from arbitragelab.util import devadarsh
+from arbitragelab.util import segment
 from arbitragelab.hedge_ratios.linear import get_ols_hedge_ratio
 
 
@@ -34,7 +34,7 @@ class EngleGrangerPortfolio(CointegratedPortfolio):
         self.cointegration_vectors = None  # Regression coefficients used as hedge-ratios.
         self.adf_statistics = None  # ADF statistics.
 
-        devadarsh.track('EngleGrangerPortfolio')
+        segment.track('EngleGrangerPortfolio')
 
     def _perform_eg_test(self, residuals: pd.Series):
         """
