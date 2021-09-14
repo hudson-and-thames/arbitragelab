@@ -83,7 +83,13 @@ Ubuntu Linux
 
       pip install https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@raw.githubusercontent.com/hudson-and-thames-clients/arbitragelab/master/arbitragelab-0.4.0-py3-none-any.whl
 
-8. (Optional) **Only if you want to use the ML Approach Module**, install the TensorFlow, Keras packages, and update the NumPy version.
+8. Install CVXPY (this library is used for convex optimization problems).
+
+    .. code-block::
+
+        pip install --no-cache-dir -I cvxpy==1.1.10
+
+9. (Optional) **Only if you want to use the ML Approach Module**, install the TensorFlow, Keras packages, and update the NumPy version.
    Note that you should have pip version "pip==20.1.1" to do this. Supported TensorFlow and Keras versions
    are "tensorflow==2.2.1" and "keras==2.3.1".
 
@@ -181,7 +187,13 @@ Mac OS X
 
       pip install https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@raw.githubusercontent.com/hudson-and-thames-clients/arbitragelab/master/arbitragelab-0.4.0-py3-none-any.whl
 
-8. (Optional) **Only if you want to use the ML Approach Module**, install the TensorFlow, Keras packages, and update the NumPy version.
+8. Install CVXPY (this library is used for convex optimization problems).
+
+    .. code-block::
+
+        pip install --no-cache-dir -I cvxpy==1.1.10
+
+9. (Optional) **Only if you want to use the ML Approach Module**, install the TensorFlow, Keras packages, and update the NumPy version.
    Note that you should have pip version "pip==20.1.1" to do this. Supported TensorFlow and Keras versions
    are "tensorflow==2.2.1" and "keras==2.3.1".
 
@@ -224,7 +236,7 @@ Windows
 
 .. warning::
 
-    Before installing PortfolioLab on Windows machines you should download and install
+    Before installing ArbitrageLab on Windows machines you should download and install
     `Visual Studio build tools for Python3 <https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=BuildTools&rel=16>`_.
     You can use this `installation guide <https://drive.google.com/file/d/0B4GsMXCRaSSIOWpYQkstajlYZ0tPVkNQSElmTWh1dXFaYkJr/view?usp=sharing>`_.
 
