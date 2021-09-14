@@ -11,6 +11,27 @@
 Distance Approach
 =================
 
+.. raw:: html
+
+    <div style="position: relative;
+                padding-bottom: 56.25%;
+                margin-bottom: 5%;
+                height: 0;
+                overflow: hidden;
+                max-width: 100%;
+                height: auto;">
+
+        <iframe src="https://www.youtube.com/embed/sKgDeqI39b4"
+                frameborder="0"
+                allowfullscreen
+                style="position: absolute;
+                       top: 0;
+                       left: 0;
+                       width: 100%;
+                       height: 100%;">
+        </iframe>
+    </div>
+
 The distance approach was introduced in the paper by Gatev et al. (2006), and it is one of the most cited
 pairs trading papers at the time of writing this documentation. The approach described in the paper is
 the following: First, a historical period is defined, cumulative returns for assets in this period are
