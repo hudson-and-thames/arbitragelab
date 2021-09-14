@@ -306,13 +306,13 @@ class TestTearSheet(unittest.TestCase):
 
         # Evaluating output statistics
         self.assertAlmostEqual(spread_dataframe.loc[spread_dataframe['Characteristic'] == 'Mean-reversion speed',
-                                                    'Value'].iloc[0], 6.306, places=5)
+                                                    'Value'].iloc[0], 6.306, places=2)
         self.assertAlmostEqual(spread_dataframe.loc[spread_dataframe['Characteristic'] == 'Long-term mean',
-                                                    'Value'].iloc[0], 0.71758, places=5)
+                                                    'Value'].iloc[0], 0.71758, places=2)
         self.assertAlmostEqual(spread_dataframe.loc[spread_dataframe['Characteristic'] == 'Standard deviation',
-                                                    'Value'].iloc[0], 0.08354, places=5)
+                                                    'Value'].iloc[0], 0.08354, places=2)
         self.assertAlmostEqual(spread_dataframe.loc[spread_dataframe['Characteristic'] == 'Max log-likelihood',
-                                                    'Value'].iloc[0], 3.84064, places=5)
+                                                    'Value'].iloc[0], 3.84064, places=2)
 
         # Calculated spread price
         self.assertAlmostEqual(spread_price.mean(), 0.754722, places=5)
