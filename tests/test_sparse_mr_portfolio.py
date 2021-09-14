@@ -132,8 +132,8 @@ class TestSparseMeanReversionPortfolio(unittest.TestCase):
         coeff, hl = etf_sparse_portf.mean_rev_coeff(bt_weights[:, -1], etf_sparse_portf.assets, interval='D')
 
         # The test output below depends on your machine!
-        self.assertAlmostEqual(coeff, 9.526000811184625, delta=1e-3)
-        self.assertAlmostEqual(hl, 18.33645545106608, delta=1e-3)
+        self.assertAlmostEqual(coeff, 9.526000811184625, delta=1e-2)
+        self.assertAlmostEqual(hl, 18.33645545106608, delta=1e-2)
 
     def test_mean_rev_coeff_error(self):
         """
