@@ -16,6 +16,28 @@
 A Practical Introduction to Copula
 ==================================
 
+.. raw:: html
+
+    <div style="position: relative;
+                padding-bottom: 56.25%;
+                margin-bottom: 5%;
+                height: 0;
+                overflow: hidden;
+                max-width: 100%;
+                height: auto;">
+
+        <iframe src="https://www.youtube.com/embed/hLV5Roa_Bek"
+                frameborder="0"
+                allowfullscreen
+                style="position: absolute;
+                       top: 0;
+                       left: 0;
+                       width: 100%;
+                       height: 100%;">
+        </iframe>
+        <br/>
+    </div>
+
 Instead of starting with a formal definition of copula with mathematical rigor, let's start by doing the following
 calculations to try to temporarily bypass it. The mathematical definition may not help much unless we have an idea
 of where the copula comes from.
