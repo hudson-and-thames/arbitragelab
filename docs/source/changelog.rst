@@ -12,6 +12,10 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+* :bug:`61` Fixed maxed connections a day by pointing the get public IP server to AWS.
+* :bug:`61` Fixed the API key validation and build server authentication.
+* :feature:`61` Changed the analytics we track to: MAC Address, Public IP, API_KEY, and Function Calls + time stamps.
+
 * :release:`0.5.0 <2021-04-15>`
 * :bug:`52 major` Fixed issue with too many function calls in web analytics.
 * :feature:`48` ML Approach Pairs Selection Module made more flexible - clustering and selection steps are now separate.
