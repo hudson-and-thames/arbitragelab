@@ -9,7 +9,7 @@ import itertools
 import numpy as np
 import pandas as pd
 
-from arbitragelab.util import devadarsh
+from arbitragelab.util import segment
 
 # This silencer is related to dangerous-default-value in __init__
 # pylint: disable=W0102
@@ -38,7 +38,7 @@ class FeatureExpander:
         self.n_orders = n_orders
         self.dataset = None
 
-        devadarsh.track('FeatureExpander')
+        segment.track('FeatureExpander')
 
     @staticmethod
     def _chebyshev(series: pd.Series, degree: int):

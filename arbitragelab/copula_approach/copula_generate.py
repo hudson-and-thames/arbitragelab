@@ -19,7 +19,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from arbitragelab.util import devadarsh
+from arbitragelab.util import segment
 
 
 class Copula(ABC):
@@ -194,7 +194,7 @@ class Gumbel(Copula):
         self.threshold = threshold
         self.theta = theta  # Gumbel copula parameter.
 
-        devadarsh.track('GumbelCopula')
+        segment.track('GumbelCopula')
 
     def generate_pairs(self, num: int = None, unif_vec: np.array = None) -> np.array:
         """
@@ -364,7 +364,7 @@ class Frank(Copula):
         self.threshold = threshold
         self.theta = theta  # Default input
 
-        devadarsh.track('FrankCopula')
+        segment.track('FrankCopula')
 
     def generate_pairs(self, num: int = None, unif_vec: np.array = None) -> np.array:
         """
@@ -538,7 +538,7 @@ class Clayton(Copula):
         self.threshold = threshold
         self.theta = theta  # Default input
 
-        devadarsh.track('ClaytonCopula')
+        segment.track('ClaytonCopula')
 
     def generate_pairs(self, num: int = None, unif_vec: np.array = None) -> np.array:
         r"""
@@ -691,7 +691,7 @@ class Joe(Copula):
         # Lower than this amount will be rounded to threshold
         self.threshold = threshold
 
-        devadarsh.track('JoeCopula')
+        segment.track('JoeCopula')
 
     def generate_pairs(self, num: int = None, unif_vec: np.array = None) -> np.array:
         """
@@ -863,7 +863,7 @@ class N13(Copula):
         self.threshold = threshold
         self.theta = theta  # Default input
 
-        devadarsh.track('N13Copula')
+        segment.track('N13Copula')
 
     def generate_pairs(self, num: int = None, unif_vec: np.array = None) -> np.array:
         """
@@ -1050,7 +1050,7 @@ class N14(Copula):
         self.threshold = threshold
         self.theta = theta  # Default input.
 
-        devadarsh.track('N14Copula')
+        segment.track('N14Copula')
 
     def generate_pairs(self, num: int = None, unif_vec: np.array = None) -> np.array:
         """
@@ -1224,7 +1224,7 @@ class Gaussian(Copula):
         # Correlation
         self.rho = cov[0][1] / (np.sqrt(cov[0][0]) * np.sqrt(cov[1][1]))
 
-        devadarsh.track('GaussianCopula')
+        segment.track('GaussianCopula')
 
     def generate_pairs(self, num: int = None) -> np.array:
         """
@@ -1372,7 +1372,7 @@ class Student(Copula):
         # Correlation from covariance matrix.
         self.rho = cov[0][1] / (np.sqrt(cov[0][0]) * np.sqrt(cov[1][1]))
 
-        devadarsh.track('StudentCopula')
+        segment.track('StudentCopula')
 
     def generate_pairs(self, num: int = None) -> np.array:
         """
@@ -1577,7 +1577,7 @@ class Switcher:
         self.cov = None
         self.nu = None
 
-        devadarsh.track('SwitcherCopula')
+        segment.track('SwitcherCopula')
 
     def choose_copula(self, **kwargs: dict) -> Callable[[], object]:
         """

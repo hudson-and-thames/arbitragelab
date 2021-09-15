@@ -16,7 +16,7 @@ from sklearn.linear_model import LinearRegression
 
 
 # pylint: disable=invalid-name
-from arbitragelab.util import devadarsh
+from arbitragelab.util import segment
 
 
 class PCAStrategy:
@@ -45,7 +45,7 @@ class PCAStrategy:
         self.n_components = n_components  # Number of PCA components
         self.pca_model = PCA(n_components)  # Model for PCA calculation
 
-        devadarsh.track('PCAStrategy')
+        segment.track('PCAStrategy')
 
     @staticmethod
     def standardize_data(matrix: pd.DataFrame) -> (pd.DataFrame, pd.Series):

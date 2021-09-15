@@ -176,7 +176,7 @@ Mac OS X
       .. code::
 
          import os
-         os.environ['ARBLAB_API_KEY'] = "26303adb02cb759b2"
+         os.environ['ARBLAB_API_KEY'] = "426303b02cb7475984b2d4843"
          import arbitragelab as al
 
 7. Install ArbitrageLab into your python environment via the terminal.

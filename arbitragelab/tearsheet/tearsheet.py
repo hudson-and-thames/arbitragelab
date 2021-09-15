@@ -26,7 +26,7 @@ from jupyter_dash import JupyterDash
 from arbitragelab.optimal_mean_reversion import OrnsteinUhlenbeck
 from arbitragelab.cointegration_approach import (get_half_life_of_mean_reversion,
                                                  EngleGrangerPortfolio, JohansenPortfolio)
-from arbitragelab.util import devadarsh
+from arbitragelab.util import segment
 
 
 class TearSheet:
@@ -55,7 +55,7 @@ class TearSheet:
         self.text_font = 'Arial'  # Font used for test outputs
         self.header_font = 'Arial'  # Font used for headers
 
-        devadarsh.track('TearSheet')
+        segment.track('TearSheet')
 
     @staticmethod
     def _get_app(app_display='default'):

@@ -16,7 +16,7 @@ import pandas as pd
 from arbitragelab.copula_approach.copula_strategy_basic import BasicCopulaStrategy
 import arbitragelab.copula_approach.copula_generate as cg
 import arbitragelab.copula_approach.copula_generate_mixedcopula as cgmix
-from arbitragelab.util import devadarsh
+from arbitragelab.util import segment
 
 
 class CopulaStrategyMPI(BasicCopulaStrategy):
@@ -64,7 +64,7 @@ class CopulaStrategyMPI(BasicCopulaStrategy):
         self._short_count = 0
         self._exit_count = 0
 
-        devadarsh.track('CopulaStrategyMPI')
+        segment.track('CopulaStrategyMPI')
 
     @staticmethod
     def to_returns(pair_prices: pd.DataFrame, fill_init_nan: Sequence[float] = (0, 0)) -> pd.DataFrame:

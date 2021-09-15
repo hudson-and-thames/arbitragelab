@@ -22,7 +22,7 @@ import pandas as pd
 
 
 # pylint: disable=invalid-name
-from arbitragelab.util import devadarsh
+from arbitragelab.util import segment
 
 
 class KalmanFilterStrategy:
@@ -68,7 +68,7 @@ class KalmanFilterStrategy:
         self.R = None  # Prediction variance-covariance
         self.beta = np.array([0, 0])  # Starting state prediction
 
-        devadarsh.track('KalmanFilterStrategy')
+        segment.track('KalmanFilterStrategy')
 
     def update(self, x: float, y: float):
         """

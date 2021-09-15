@@ -6,7 +6,7 @@ branch = True
 omit =
      *__init__*
      arbitragelab/network/imports.py
-     arbitragelab/util/devadarsh.py
+     arbitragelab/util/segment.py
      tests/*
      /opt/conda/*
      # Ensure we exclude any files in .local

@@ -23,7 +23,7 @@ import scipy.stats as ss
 import arbitragelab.copula_approach.copula_generate as cg
 import arbitragelab.copula_approach.copula_calculation as ccalc
 import arbitragelab.copula_approach.copula_generate_mixedcopula as cgmix
-from arbitragelab.util import devadarsh
+from arbitragelab.util import segment
 
 
 class BasicCopulaStrategy:
@@ -75,7 +75,7 @@ class BasicCopulaStrategy:
         self._short_count = 0
         self._exit_count = 0
 
-        devadarsh.track('BasicCopulaStrategy')
+        segment.track('BasicCopulaStrategy')
 
     @staticmethod
     def to_quantile(data: pd.DataFrame) -> Tuple[pd.DataFrame, list]:
