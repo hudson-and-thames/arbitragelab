@@ -276,7 +276,7 @@ of any use of the codebase.
 
 11.6	The Licensor confirms compliance with the relevant and necessary data protection laws applicable to the Country from time to time and commits to applying all safety and security measures whilst this information is under the Licensor’s control.
 
-11.7    MlFinLab, PortfolioLab, and ArbitrageLab libraries track the following data based on a device: MAC address, country code, region, city, city geographic coordinates, function calls, and time stamps.
+11.7    MlFinLab, PortfolioLab, and ArbitrageLab libraries track the following data based on a device: MAC address, Public IP address, API_KEYS, function calls, and time stamps.
 
 12. JURISDICTION OF COURTS AND GOVERNING LAWS
 *********************************************
