@@ -12,6 +12,8 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+*  :bug:`60` Fix unit tests not passing due to cvxpy bad installs.
+
 * :release:`0.5.0 <2021-04-15>`
 * :bug:`52 major` Fixed issue with too many function calls in web analytics.
 * :feature:`48` ML Approach Pairs Selection Module made more flexible - clustering and selection steps are now separate.
