@@ -311,11 +311,21 @@ The following research notebook can be used to better understand the distance ap
 
 * `Basic Distance Approach`_
 
+.. _`Basic Distance Approach`: https://hudsonthames.org/notebooks/arblab/basic_distance_approach.html
+
+.. raw:: html
+
+    <a href="https://hudthames.tech/3gCzomb"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
+
 * `Basic Distance Approach Comparison`_
 
-.. _`Basic Distance Approach`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Distance%20Approach/basic_distance_approach.ipynb
+.. _`Basic Distance Approach Comparison`: https://hudsonthames.org/notebooks/arblab/basic_distance_approach_comparison.html
 
-.. _`Basic Distance Approach Comparison`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Distance%20Approach/basic_distance_approach_comparison.ipynb
+.. raw:: html
+
+    <a href="https://hudthames.tech/3gCzomb"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
+    <a href="https://hudthames.tech/2S03R58"><button style="margin: 20px; margin-top: 0px">Download Sample Data</button></a>
+
 
 References
 ##########

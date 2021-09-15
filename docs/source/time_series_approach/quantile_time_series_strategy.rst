@@ -212,7 +212,13 @@ The following research notebook can be used to better understand the time series
 
 * `Quantile Time Series Strategy`_
 
-.. _`Quantile Time Series Strategy`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Time%20Series%20Approach/quantile_time_series.ipynb
+.. _`Quantile Time Series Strategy`: https://hudsonthames.org/notebooks/arblab/quantile_time_series.html
+
+.. raw:: html
+
+    <a href="https://hudthames.tech/3q11ATN"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
+    <a href="https://hudthames.tech/2S03R58"><button style="margin: 20px; margin-top: 0px">Download Sample Data</button></a>
+
 
 References
 ##########

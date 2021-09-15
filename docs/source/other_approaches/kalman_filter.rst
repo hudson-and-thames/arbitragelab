@@ -214,7 +214,13 @@ The following research notebook can be used to better understand the Kalman Filt
 
 * `Kalman Filter`_
 
-.. _`Kalman Filter`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Other%20Approaches/kalman_filter.ipynb
+.. _`Kalman Filter`: https://hudsonthames.org/notebooks/arblab/kalman_filter.html
+
+.. raw:: html
+
+    <a href="https://hudthames.tech/3iKM250"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
+    <a href="https://hudthames.tech/2S03R58"><button style="margin: 20px; margin-top: 0px">Download Sample Data</button></a>
+
 
 References
 ##########
