@@ -158,7 +158,7 @@ TRACK_CALLS = {}
 try:
     IP = get('http://checkip.amazonaws.com/').text.strip()
 except ConnectionError as err:
-    raise ConnectionError('Can not reach the server. Please check your connection or firewall.') from err
+    raise ConnectionError('Can not reach the Amazon CheckIP server. Please check your connection or firewall.') from err
 
 # Connect with DB
 segment.write_key = SEGMENT
