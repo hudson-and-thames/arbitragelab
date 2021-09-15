@@ -30,5 +30,5 @@ The impact of the analytics is negligible.
 
    * We chose to use MAC Addresses to track how many devices a user has installed the software on.
    * We are able to identify clients as your ARBLAB_API_KEY links to your account.
-   * Your public IP address can not be used to track your exact location but does if us high level analytics like country code and city.
+   * Your public IP address can not be used to track your exact location but does provide us with high-level analytics like country code and city.
    * Segment is the tool we use to collect, clean, and control the data.
