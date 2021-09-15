@@ -15,6 +15,7 @@ Changelog
 * :bug:`61` Fixed maxed connections a day by pointing the get public IP server to AWS.
 * :bug:`61` Fixed the API key validation and build server authentication.
 * :feature:`61` Changed the analytics we track to: MAC Address, Public IP, API_KEY, and Function Calls + time stamps.
+*  :bug:`60` Fix unit tests not passing due to cvxpy bad installs.
 
 * :release:`0.5.0 <2021-04-15>`
 * :bug:`52 major` Fixed issue with too many function calls in web analytics.

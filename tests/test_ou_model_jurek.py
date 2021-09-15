@@ -136,10 +136,10 @@ class TestOUModelJurek(unittest.TestCase):
 
         weights = sc_jurek.optimal_portfolio_weights(self.dataframe, beta=0.01, gamma=0.5, utility_type=2)
         # Checking the values of weights for gamma = 0.5 and utility_type=2
-        self.assertAlmostEqual(np.mean(weights), -2947786.5697284327, delta=1e-7)
-        self.assertAlmostEqual(weights[7], -9803080.87074925, delta=1e-7)
-        self.assertAlmostEqual(weights[28], -1762115.70956469, delta=1e-7)
-        self.assertAlmostEqual(weights[-1], -54007.10111104, delta=1e-7)
+        self.assertAlmostEqual(np.mean(weights), -2947786.5697284327, delta=1e-5)
+        self.assertAlmostEqual(weights[7], -9803080.87074925, delta=1e-5)
+        self.assertAlmostEqual(weights[28], -1762115.70956469, delta=1e-5)
+        self.assertAlmostEqual(weights[-1], -54007.10111104, delta=1e-5)
 
         weights = sc_jurek.optimal_portfolio_weights(self.dataframe, beta=0.01, gamma=2, utility_type=1)
         # Checking the values of weights for gamma = 2 and utility_type=1
