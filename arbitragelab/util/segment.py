@@ -143,7 +143,7 @@ def track(func):
 # Body
 # Env Var
 API_KEY_ENV_VAR = "ARBLAB_API_KEY"
-SEGMENT = 'r7uCHEvWWUshccLG6CYTOaZ3j3gA9Wpf'
+SEGMENT = 'F7gnyZS5UWo12fFj3m8sIgANC9ttPEbA'
 IP = None
 API_KEY = get_apikey()
 MAC = get_mac()
