@@ -6,15 +6,7 @@
 This module validates your API key. Please note that making changes to this file or any of the files in this library is
 a violation of the license agreement. If you have any problems, please contact us: research@hudsonthames.org.
 """
-
-import os
-import json
-from urllib.request import urlopen
-from urllib.error import HTTPError, URLError
-
-from arbitragelab.util import devadarsh
-
-API_KEY_ENV_VAR = "ARBLAB_API_KEY"
+from arbitragelab.util import segment
 
 
 class Golem:
@@ -26,39 +18,6 @@ class Golem:
     # pylint: disable=missing-function-docstring
     def __init__(self):
         self.__validate()
-
-    # pylint: disable=missing-function-docstring
-    @staticmethod
-    def __check_api_key():
-        # Check environment variables is present
-        if API_KEY_ENV_VAR in os.environ:
-            # Validate key
-            old_key, new_key = '', ''
-
-            # Check old server
-            try:
-                with urlopen("https://us-central1-hudson-and-thames.cloudfunctions.net/checkKey/" + os.environ[API_KEY_ENV_VAR]) as response:
-                    response_content = response.read()
-                    json_response = json.loads(response_content)
-                    old_key = json_response['status'] == 'active'
-            except HTTPError:
-                pass
-            except URLError as err:
-                raise ConnectionError('Can not reach the server. Please check your connection or firewall.') from err
-
-            # Check new server
-            try:
-                if not old_key:
-                    with urlopen("https://hudson-thames.ew.r.appspot.com/api/access/" + os.environ[API_KEY_ENV_VAR]) as response:
-                        response_content = response.read().decode()
-                        new_key = response_content == 'OK'
-            except HTTPError as err:
-                raise Exception(" ARBLAB_API_KEY is not valid.") from err
-
-            # Return the results
-            return old_key or new_key
-        # Else the API KEy has not been registered.
-        raise Exception(" ARBLAB_API_KEY not found in your environment variables. Please check the install instructions.")
 
     # pylint: disable=missing-function-docstring
     @staticmethod
@@ -77,11 +36,11 @@ class Golem:
         import arbitragelab.hedge_ratios as hedge_ratios
         import arbitragelab.pairs_selection as pairs_selection
         import arbitragelab.util as util
-        devadarsh.track('Import')
+        segment.track('Import')
 
     # pylint: disable=missing-function-docstring
     def __validate(self):
-        if self.__check_api_key():
+        if segment.VALIDATOR.is_valid():
             self.__import_libraries()
         else:
-            raise Exception("Invalid API Key: Please check the install instructions as well as your account.")
+            print('Invalid API Key, please check your account or ENV Variables.')

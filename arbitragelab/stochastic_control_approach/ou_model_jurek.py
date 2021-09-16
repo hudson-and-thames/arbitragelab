@@ -18,7 +18,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 from arbitragelab.cointegration_approach.engle_granger import EngleGrangerPortfolio
-from arbitragelab.util import devadarsh
+from arbitragelab.util import segment
 
 
 class OUModelJurek:
@@ -58,7 +58,7 @@ class OUModelJurek:
         self.gamma = None  # Coefficient of relative risk aversion
         self.beta = None  # Rate of time preference
 
-        devadarsh.track('OUModelJurek')
+        segment.track('OUModelJurek')
 
 
     @staticmethod
