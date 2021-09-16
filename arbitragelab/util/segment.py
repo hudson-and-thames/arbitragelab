@@ -10,8 +10,8 @@ import os
 from datetime import datetime as dt
 from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
-
 from requests import get
+
 import analytics as segment
 import getmac
 
@@ -22,10 +22,17 @@ class Analytics:
     """
     def __init__(self):
         # Check valid API key
-        self.isvalid = self.__check_api_key()
+        self.__isvalid = self.__check_api_key()
 
         # Identify new session
         identify()
+
+    def is_valid(self):
+        """
+        Returns the result of the APIKey Validation.
+        :return: (Bool) APIKEY Valid
+        """
+        return self.__isvalid
 
     @staticmethod
     def __check_api_key():
@@ -128,7 +135,7 @@ def track(func):
     :param func: String - name of function.
     """
     # Validate key
-    if VALIDATOR.isvalid:
+    if VALIDATOR.is_valid():
         # Validate not build server
         if not IS_DEV:
             # If 1st time func called
@@ -143,17 +150,13 @@ def track(func):
 # Body
 # Env Var
 API_KEY_ENV_VAR = "ARBLAB_API_KEY"
-SEGMENT = 'r7uCHEvWWUshccLG6CYTOaZ3j3gA9Wpf'
+SEGMENT = 'F7gnyZS5UWo12fFj3m8sIgANC9ttPEbA'
 IP = None
-LOCATION = None
 API_KEY = get_apikey()
 MAC = get_mac()
 
-# Todo: change ISDEV
-# IS_DEV = is_build_server()
-IS_DEV = False
+IS_DEV = is_build_server()
 TRACK_CALLS = {}
-
 
 try:
     IP = get('http://checkip.amazonaws.com/').text.strip()
