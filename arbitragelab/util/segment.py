@@ -28,6 +28,10 @@ class Analytics:
         identify()
 
     def is_valid(self):
+        """
+        Returns the result of the APIKey Validation.
+        :return: (Bool) APIKEY Valid
+        """
         return self.__isvalid
 
     @staticmethod
@@ -162,5 +166,3 @@ except ConnectionError as err:
 # Connect with DB
 segment.write_key = SEGMENT
 VALIDATOR = Analytics()
-
-print('end')
