@@ -22,10 +22,13 @@ class Analytics:
     """
     def __init__(self):
         # Check valid API key
-        self.isvalid = self.__check_api_key()
+        self.__isvalid = self.__check_api_key()
 
         # Identify new session
         identify()
+
+    def is_valid(self):
+        return self.__isvalid
 
     @staticmethod
     def __check_api_key():
@@ -128,7 +131,7 @@ def track(func):
     :param func: String - name of function.
     """
     # Validate key
-    if VALIDATOR.isvalid:
+    if VALIDATOR.is_valid():
         # Validate not build server
         if not IS_DEV:
             # If 1st time func called
@@ -159,3 +162,5 @@ except ConnectionError as err:
 # Connect with DB
 segment.write_key = SEGMENT
 VALIDATOR = Analytics()
+
+print('end')
