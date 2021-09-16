@@ -40,7 +40,7 @@ class Golem:
 
     # pylint: disable=missing-function-docstring
     def __validate(self):
-        if segment.VALIDATOR.isvalid:
+        if segment.VALIDATOR.is_valid():
             self.__import_libraries()
         else:
             print('Invalid API Key, please check your account or ENV Variables.')
