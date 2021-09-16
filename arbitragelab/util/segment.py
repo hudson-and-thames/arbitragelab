@@ -10,8 +10,8 @@ import os
 from datetime import datetime as dt
 from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
-
 from requests import get
+
 import analytics as segment
 import getmac
 
@@ -145,15 +145,11 @@ def track(func):
 API_KEY_ENV_VAR = "ARBLAB_API_KEY"
 SEGMENT = 'r7uCHEvWWUshccLG6CYTOaZ3j3gA9Wpf'
 IP = None
-LOCATION = None
 API_KEY = get_apikey()
 MAC = get_mac()
 
-# Todo: change ISDEV
-# IS_DEV = is_build_server()
-IS_DEV = False
+IS_DEV = is_build_server()
 TRACK_CALLS = {}
-
 
 try:
     IP = get('http://checkip.amazonaws.com/').text.strip()
