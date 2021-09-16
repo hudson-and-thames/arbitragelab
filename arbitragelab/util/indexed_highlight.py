@@ -9,7 +9,7 @@ by cluster highlighting.
 import matplotlib.pyplot as plt
 from mpldatacursor import DataCursor, HighlightingDataCursor
 
-from arbitragelab.util import devadarsh
+from arbitragelab.util import segment
 
 class IndexedHighlight(HighlightingDataCursor):
     """
@@ -28,7 +28,7 @@ class IndexedHighlight(HighlightingDataCursor):
         self.highlights = [self.create_highlight(artist) for artist in artists]
         plt.setp(self.highlights, visible=False)
 
-        devadarsh.track('IndexedHighlight')
+        segment.track('IndexedHighlight')
 
     def update(self, event, annotation):
         """

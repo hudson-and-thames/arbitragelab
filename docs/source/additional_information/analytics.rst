@@ -10,12 +10,13 @@ Analytics
    * We do provide a separate enterprise license for companies that want to white label or alter code.
    * All changes are flagged by the system.
 
-Please note that we have added standard web analytics to MLFinLab, using `Segment. <https://segment.com/>`__
+Please note that we have added standard web analytics to ArbitrageLab, using `Segment. <https://segment.com/>`__
 
 We track the following:
 
-* City, Country, Region, City Geographic Coordinate
+* Public IP Address
 * UserIDs (MAC address)
+* ARBLAB_API_KEY
 * Function calls
 * Timestamps
 
@@ -27,6 +28,7 @@ The impact of the analytics is negligible.
 
 .. note::
 
-   * We chose to use MAC Addresses as it is an anonymous token which allows us to track a machine and is not considered as personal information under GDPR unless it is combined with other personal data which then identifies the natural person.
-   * Your data is also anonymized by filtering it through ipinfo, which returns high level location (City, Country, Region) data without sharing your IP address.
+   * We chose to use MAC Addresses to track how many devices a user has installed the software on.
+   * We are able to identify clients as your ARBLAB_API_KEY links to your account.
+   * Your public IP address can not be used to track your exact location but does provide us with high-level analytics like country code and city.
    * Segment is the tool we use to collect, clean, and control the data.

@@ -15,7 +15,7 @@ import pandas as pd
 import numpy as np
 from sklearn.linear_model import LinearRegression
 
-from arbitragelab.util import devadarsh
+from arbitragelab.util import segment
 
 
 class PearsonStrategy:
@@ -42,7 +42,7 @@ class PearsonStrategy:
         self.long_pct = 0.1  # Percentage of long stocks in the sorted return divergence
         self.short_pct = 0.1  # Percentage of short stocks in the sorted return divergence
 
-        devadarsh.track('PearsonStrategy')
+        segment.track('PearsonStrategy')
 
     def form_portfolio(self, train_data, risk_free=0.0, num_pairs=50, weight='equal'):
         """
