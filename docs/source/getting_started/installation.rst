@@ -334,5 +334,4 @@ Important Notes
 ###############
 * You may need to `install Cython <https://cython.readthedocs.io/en/latest/src/quickstart/install.html>`__ if your distribution hasn't already.
 * ArbitrageLab requires an internet connection when you import the library. This checks that your API key is valid.
-* We have added analytics to the library which will let us know in which city the function call was made and which functions were called, but it shares no personal data and goes via Google Analytics.
-  This to help aid our team to improve the functionality that is used the most (standard practice with SaaS products).
+* We have added analytics to the library, please see the analytics tab for more details.
