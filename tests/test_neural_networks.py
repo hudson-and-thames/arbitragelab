@@ -103,7 +103,7 @@ class TestNeuralNetworks(unittest.TestCase):
         self.assertTrue(len(regressor.predict(feat_test)) > 0)
 
         # Check Predicted values' means.
-        self.assertAlmostEqual(regressor.predict(feat_test).mean(), -0.020863, 2)
+        self.assertAlmostEqual(regressor.predict(feat_test).mean(), -0.020863, 1)
 
         # Check if proper plotting object is returned.
         self.assertTrue(type(regressor.plot_loss()), list)

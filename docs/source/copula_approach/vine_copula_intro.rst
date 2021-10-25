@@ -12,6 +12,28 @@
 A Practical Introduction to Vine Copula
 =======================================
 
+.. raw:: html
+
+    <div style="position: relative;
+                padding-bottom: 56.25%;
+                margin-bottom: 5%;
+                height: 0;
+                overflow: hidden;
+                max-width: 100%;
+                height: auto;">
+
+        <iframe src="https://www.youtube.com/embed/FB6tNgCZSbo"
+                frameborder="0"
+                allowfullscreen
+                style="position: absolute;
+                       top: 0;
+                       left: 0;
+                       width: 100%;
+                       height: 100%;">
+        </iframe>
+        <br/>
+    </div>
+
 Copula is a great statistical tool to study the relation among multiple random variables: By focusing on the joint
 cumulative density of quantiles of marginals, we can bypass the idiosyncratic features of marginal distributions and
 directly look at how they are "related".
@@ -401,7 +423,13 @@ The following research notebook can be used to better understand the vine copula
 
 * `C-Vine Copula Strategy`_
 
-.. _`C-Vine Copula Strategy`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Copula%20Approach/CVine_Copula_Strategy.ipynb
+.. _`C-Vine Copula Strategy`: https://hudsonthames.org/notebooks/arblab/CVine_Copula_Strategy.html
+
+.. raw:: html
+
+    <a href="https://hudthames.tech/3xsu5ws"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
+    <a href="https://hudthames.tech/2S03R58"><button style="margin: 20px; margin-top: 0px">Download Sample Data</button></a>
+
 
 References
 ##########

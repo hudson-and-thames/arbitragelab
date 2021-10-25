@@ -11,6 +11,27 @@
 Distance Approach
 =================
 
+.. raw:: html
+
+    <div style="position: relative;
+                padding-bottom: 56.25%;
+                margin-bottom: 5%;
+                height: 0;
+                overflow: hidden;
+                max-width: 100%;
+                height: auto;">
+
+        <iframe src="https://www.youtube.com/embed/sKgDeqI39b4"
+                frameborder="0"
+                allowfullscreen
+                style="position: absolute;
+                       top: 0;
+                       left: 0;
+                       width: 100%;
+                       height: 100%;">
+        </iframe>
+    </div>
+
 The distance approach was introduced in the paper by Gatev et al. (2006), and it is one of the most cited
 pairs trading papers at the time of writing this documentation. The approach described in the paper is
 the following: First, a historical period is defined, cumulative returns for assets in this period are
@@ -290,11 +311,21 @@ The following research notebook can be used to better understand the distance ap
 
 * `Basic Distance Approach`_
 
+.. _`Basic Distance Approach`: https://hudsonthames.org/notebooks/arblab/basic_distance_approach.html
+
+.. raw:: html
+
+    <a href="https://hudthames.tech/3gCzomb"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
+
 * `Basic Distance Approach Comparison`_
 
-.. _`Basic Distance Approach`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Distance%20Approach/basic_distance_approach.ipynb
+.. _`Basic Distance Approach Comparison`: https://hudsonthames.org/notebooks/arblab/basic_distance_approach_comparison.html
 
-.. _`Basic Distance Approach Comparison`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Distance%20Approach/basic_distance_approach_comparison.ipynb
+.. raw:: html
+
+    <a href="https://hudthames.tech/3gCzomb"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
+    <a href="https://hudthames.tech/2S03R58"><button style="margin: 20px; margin-top: 0px">Download Sample Data</button></a>
+
 
 References
 ##########

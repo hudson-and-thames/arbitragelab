@@ -16,7 +16,7 @@ import numpy as np
 
 import arbitragelab.copula_approach.copula_generate as cg
 import arbitragelab.copula_approach.copula_calculation as ccalc
-from arbitragelab.util import devadarsh
+from arbitragelab.util import segment
 
 
 class CopulaStrategy:
@@ -77,7 +77,7 @@ class CopulaStrategy:
         self.lower_threshold = default_lower_threshold
         self.upper_threshold = default_upper_threshold
 
-        devadarsh.track('CopulaStrategy')
+        segment.track('CopulaStrategy')
 
     def fit_copula(self, s1_series: np.array, s2_series: np.ndarray, copula_name: str,
                    if_empirical_cdf: bool = True, if_renew: bool = True, nu_tol: float = 0.05) -> tuple:

@@ -15,7 +15,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 import matplotlib.pyplot as plt
 
-from arbitragelab.util import devadarsh
+from arbitragelab.util import segment
 
 class BaseNeuralNetwork:
     """
@@ -100,7 +100,7 @@ class MultiLayerPerceptron(BaseNeuralNetwork):
         self.hidden_layer_activation_function = hidden_layer_activation_function
         self.output_layer_activation_function = output_layer_act_func
 
-        devadarsh.track('MultiLayerPerceptron')
+        segment.track('MultiLayerPerceptron')
 
     def build(self):
         """
@@ -166,7 +166,7 @@ class RecurrentNeuralNetwork(BaseNeuralNetwork):
         self.hidden_layer_activation_function = hidden_layer_activation_function
         self.output_layer_activation_function = output_layer_act_func
 
-        devadarsh.track('RecurrentNeuralNetwork')
+        segment.track('RecurrentNeuralNetwork')
 
     def build(self):
         """
@@ -231,7 +231,7 @@ class PiSigmaNeuralNetwork(BaseNeuralNetwork):
         self.hidden_layer_activation_function = hidden_layer_activation_function
         self.output_layer_activation_function = output_layer_act_func
 
-        devadarsh.track('PiSigmaNeuralNetwork')
+        segment.track('PiSigmaNeuralNetwork')
 
     def build(self):
         """

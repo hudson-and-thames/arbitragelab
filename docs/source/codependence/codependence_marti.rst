@@ -231,7 +231,12 @@ The following research notebook can be used to better understand the codependenc
 
 * `Codependence by Marti`_
 
-.. _`Codependence by Marti`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Codependence%20Module/Codependence%20by%20Marti/codependence_by_marti.ipynb
+.. _`Codependence by Marti`: https://hudsonthames.org/notebooks/arblab/codependence_by_marti.html
+
+.. raw:: html
+
+    <a href="https://hudthames.tech/3gt0zAX"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
+    <a href="https://hudthames.tech/2S03R58"><button style="margin: 20px; margin-top: 0px">Download Sample Data</button></a>
 
 References
 ##########
