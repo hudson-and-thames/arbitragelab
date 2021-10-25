@@ -31,6 +31,11 @@ Changelog
 * :feature:`49` Cointegration and OU Model Tear Sheets added to the Visualization Module.
 * :support:`49` Cointegration and OU Model Tear Sheets documentation.
 * :support:`50` Updated documentation theme to hudsonthames-sphinx-docs.
+* :feature:`51` OU Optimal Threshold Model Bertram added to the Time Series Approach Module.
+* :feature:`51` OU Optimal Threshold Model Zeng added to the Time Series Approach Module.
+* :support:`51` OU Optimal Threshold Model Bertram documentation.
+* :support:`51` OU Optimal Threshold Model Zeng documentation.
+* :support:`51` Updated requirements - new package (mpmath==1.2.1).
 
 * :release:`0.4.1 <2021-04-15>`
 * :feature:`43` OU Model Jurek and OU Model Mudchanatongsuk added to the Stochastic Control Approach Module.
