@@ -1,5 +1,4 @@
 # Production
-cvxpy==1.1.10
 numpy==1.20.1
 matplotlib==3.2.2
 pandas==1.1.5
@@ -23,15 +22,14 @@ analytics-python==1.2.9
 pyvinecopulib==0.5.5
 dash==1.19.0
 jupyter-dash==0.4.0
+getmac==0.8.2
 mpmath==1.2.1
 
 # Develop
-bump2version==1.0.1
-bumpversion==0.6.0
 codecov==2.1.11
 coverage==5.4
 pylint==2.6.0
 sphinx==3.4.3 # Docs
-hudsonthames-sphinx-theme==0.1.2 # Docs
+hudsonthames-sphinx-theme==0.1.3 # Docs
 sphinx-rtd-theme==0.5.2 # Docs
 releases==1.6.3 # Docs

@@ -13,7 +13,7 @@ import pandas as pd
 
 from pmdarima.arima import auto_arima, ADFTest
 
-from arbitragelab.util import devadarsh
+from arbitragelab.util import segment
 
 
 def get_trend_order(y_train: pd.Series, max_order: int = 10) -> int:
@@ -74,7 +74,7 @@ class AutoARIMAForecast:
         self.arima_model = None
         self.y_train = None
 
-        devadarsh.track('AutoARIMAForecast')
+        segment.track('AutoARIMAForecast')
 
     def get_best_arima_model(self, y_train: pd.Series, verbose: bool = False, silence_warnings: bool = True):
         """

@@ -132,8 +132,8 @@ class TestSparseMeanReversionPortfolio(unittest.TestCase):
         coeff, hl = etf_sparse_portf.mean_rev_coeff(bt_weights[:, -1], etf_sparse_portf.assets, interval='D')
 
         # The test output below depends on your machine!
-        self.assertAlmostEqual(coeff, 9.526000811184625, delta=1e-3)
-        self.assertAlmostEqual(hl, 18.33645545106608, delta=1e-3)
+        self.assertAlmostEqual(coeff, 9.526000811184625, delta=1e-2)
+        self.assertAlmostEqual(hl, 18.33645545106608, delta=1e-2)
 
     def test_mean_rev_coeff_error(self):
         """
@@ -279,9 +279,10 @@ class TestSparseMeanReversionPortfolio(unittest.TestCase):
         # Verify minimization result
         self.assertIsNone(allclose(sdp_cross_vol_weights_idx[0],
                                    np.array([7, 9, 11, 16, 27, 28, 31, 38])))
-        self.assertIsNone(allclose(sdp_cross_vol_weights_val,
-                                   np.array([0.35380303, -0.41627861, 0.49314636, -0.30469972,
-                                             -0.24946532, -0.29270862, 0.28273044, 0.3710155])))
+        self.assertIsNone(allclose(actual=sdp_cross_vol_weights_val,
+                                   desired=np.array([0.35380303, -0.41627861, 0.49314636, -0.30469972,
+                                                     -0.24946532, -0.29270862, 0.28273044, 0.3710155]),
+                                   rtol=1e-04))
 
     def test_LASSO_VAR_tuning(self):
         """

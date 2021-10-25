@@ -10,6 +10,28 @@
 OU Model Jurek
 ==============
 
+.. raw:: html
+
+    <div style="position: relative;
+                padding-bottom: 56.25%;
+                margin-bottom: 5%;
+                height: 0;
+                overflow: hidden;
+                max-width: 100%;
+                height: auto;">
+
+        <iframe src="https://www.youtube.com/embed/P0r-Vqzpk5k?start=601"
+                frameborder="0"
+                allowfullscreen
+                style="position: absolute;
+                       top: 0;
+                       left: 0;
+                       width: 100%;
+                       height: 100%;">
+        </iframe>
+        <br/>
+    </div>
+
 Introduction
 ############
 
@@ -493,7 +515,12 @@ The following research notebook can be used to better understand the approach de
 
 * `Dynamic Portfolio Selection in Arbitrage`_
 
-.. _`Dynamic Portfolio Selection in Arbitrage`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Stochastic%20Control%20Approach/OU_Model_Jurek.ipynb
+.. _`Dynamic Portfolio Selection in Arbitrage`: https://hudsonthames.org/notebooks/arblab/OU_Model_Jurek.html
+
+.. raw:: html
+
+    <a href="https://hudthames.tech/3wyIJSK"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
+    <a href="https://hudthames.tech/2S03R58"><button style="margin: 20px; margin-top: 0px">Download Sample Data</button></a>
 
 References
 ##########

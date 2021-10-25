@@ -15,7 +15,7 @@ import numpy as np
 import pandas as pd
 
 from arbitragelab.cointegration_approach.johansen import JohansenPortfolio
-from arbitragelab.util import devadarsh
+from arbitragelab.util import segment
 
 
 class MultivariateCointegration:
@@ -39,7 +39,7 @@ class MultivariateCointegration:
         self.__trade_df = trade_df
         self.__coint_vec = None
 
-        devadarsh.track('MultivariateCointegration')
+        segment.track('MultivariateCointegration')
 
     @staticmethod
     def _missing_impute(price_df: pd.DataFrame, nan_method: str = 'ffill', order: int = 3) -> pd.DataFrame:
