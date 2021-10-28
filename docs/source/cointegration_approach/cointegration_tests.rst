@@ -12,6 +12,28 @@
 Tests for Cointegration
 =======================
 
+.. raw:: html
+
+    <div style="position: relative;
+                padding-bottom: 56.25%;
+                margin-bottom: 5%;
+                height: 0;
+                overflow: hidden;
+                max-width: 100%;
+                height: auto;">
+
+        <iframe src="https://www.youtube.com/embed/1zz91G0nR14?start=170"
+                frameborder="0"
+                allowfullscreen
+                style="position: absolute;
+                       top: 0;
+                       left: 0;
+                       width: 100%;
+                       height: 100%;">
+        </iframe>
+        <br/>
+    </div>
+
 According to Ernest P. Chan:
 "The mathematical description of a mean-reverting price series is that the change of the price series
 in the next period is proportional to the difference between the mean price and the current price. This
@@ -53,6 +75,13 @@ The most common approach is to use two cointegrated price series to construct a 
 simultaneously going long on one asset and short on the other, with an appropriate capital allocation
 for each asset. This approach is also called a "pairs trading strategy". However, the approach can be
 extended to three and more assets.
+
+.. warning::
+
+    From the mathematical standpoint, cointegration testing strives to prove that there exists at least
+    one linear combination of given time series that is stationary. Hence sometimes during the testing,
+    the cointegration vector might have only positive coefficients, making it not suitable for making a spread,
+    while being completely theoretically sound.
 
 .. Note::
 
@@ -226,7 +255,12 @@ Research Notebooks
 
 * `Mean Reversion`_
 
-.. _`Mean Reversion`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Cointegration%20Approach/mean_reversion.ipynb
+.. _`Mean Reversion`: https://hudsonthames.org/notebooks/arblab/mean_reversion.html
+
+.. raw:: html
+
+    <a href="https://hudthames.tech/3iIGDvv"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
+    <a href="https://hudthames.tech/2S03R58"><button style="margin: 20px; margin-top: 0px">Download Sample Data</button></a>
 
 References
 ##########

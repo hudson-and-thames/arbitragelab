@@ -14,6 +14,28 @@
 Pearson Approach
 ================
 
+.. raw:: html
+
+    <div style="position: relative;
+                padding-bottom: 56.25%;
+                margin-bottom: 5%;
+                height: 0;
+                overflow: hidden;
+                max-width: 100%;
+                height: auto;">
+
+        <iframe src="https://www.youtube.com/embed/fvTQAnjgIaA"
+                frameborder="0"
+                allowfullscreen
+                style="position: absolute;
+                       top: 0;
+                       left: 0;
+                       width: 100%;
+                       height: 100%;">
+        </iframe>
+        <br/>
+    </div>
+
 After the distance approach was introduced in the paper by Gatev et al. (2006), a lot of research has been
 conducted to further develop the original distance approach. One of the adjustments is the Pearson correlation
 approach proposed by Chen et al.(2012). In this paper, the authors use the same data set and time frame as
@@ -205,7 +227,12 @@ The following research notebook can be used to better understand the Pearson app
 
 * `Pearson Distance Approach`_
 
-.. _`Pearson Distance Approach`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Distance%20Approach/basic_distance_approach.ipynb
+.. _`Pearson Distance Approach`: https://hudsonthames.org/notebooks/arblab/pearson_distance_approach.html
+
+.. raw:: html
+
+    <a href="https://hudthames.tech/3gCzomb"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
+    <a href="https://hudthames.tech/2S03R58"><button style="margin: 20px; margin-top: 0px">Download Sample Data</button></a>
 
 References
 ##########

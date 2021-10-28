@@ -4,6 +4,28 @@
 Hedge Ratio Calculations
 ========================
 
+.. raw:: html
+
+    <div style="position: relative;
+                padding-bottom: 56.25%;
+                margin-bottom: 5%;
+                height: 0;
+                overflow: hidden;
+                max-width: 100%;
+                height: auto;">
+
+        <iframe src="https://www.youtube.com/embed/odh5rH3WYJM"
+                frameborder="0"
+                allowfullscreen
+                style="position: absolute;
+                       top: 0;
+                       left: 0;
+                       width: 100%;
+                       height: 100%;">
+        </iframe>
+        <br/>
+    </div>
+
 There are various ways to find mean-reverting spread, including distance, cointegration, copula and ML approach.
 In the next step, when a trade signal is generated (Z-score > or < then threshold value), a researcher needs to understand
 how to trade the spread. How many units of X stock to buy and how many units of Y to sell.
@@ -77,7 +99,8 @@ Examples
     # Importing packages
     import pandas as pd
     import numpy as np
-    from arbitragelab.hedge_ratios import get_ols_hedge_ratio, get_tls_hedge_ratio, get_minimum_hl_hedge_ratio
+    from arbitragelab.hedge_ratios import (get_ols_hedge_ratio, get_tls_hedge_ratio,
+                                           get_minimum_hl_hedge_ratio)
 
     # Getting the dataframe with time series of asset prices
     data = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])

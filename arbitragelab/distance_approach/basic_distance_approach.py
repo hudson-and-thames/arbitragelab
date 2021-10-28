@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from arbitragelab.util import devadarsh
+from arbitragelab.util import segment
 
 
 class DistanceStrategy:
@@ -39,7 +39,7 @@ class DistanceStrategy:
         self.trading_signals = None  # Final trading signals
         self.num_crossing = None  # Number of zero crossings from train dataset
 
-        devadarsh.track('DistanceStrategy')
+        segment.track('DistanceStrategy')
 
     def form_pairs(self, train_data, method='standard', industry_dict=None, num_top=5, skip_top=0, selection_pool=50,
                    list_names=None):
