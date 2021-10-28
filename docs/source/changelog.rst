@@ -17,6 +17,11 @@ Changelog
 * :feature:`55` Scaling function for cointegration vectors added to the Cointegration Approach Module.
 * :feature:`54` Markov Regime-Switching Model added to the Time Series Approach Module.
 * :support:`54` Markov Regime-Switching Model documentation.
+* :feature:`51` OU Optimal Threshold Model Bertram added to the Time Series Approach Module.
+* :feature:`51` OU Optimal Threshold Model Zeng added to the Time Series Approach Module.
+* :support:`51` OU Optimal Threshold Model Bertram documentation.
+* :support:`51` OU Optimal Threshold Model Zeng documentation.
+* :support:`51` Updated requirements - new package (mpmath==1.2.1).
 * :bug:`60` Fix unit tests not passing due to cvxpy bad installs.
 * :bug:`58` Fixed maxed connections a day by pointing the get public IP server to AWS.
 * :bug:`58` Fixed the API key validation and build server authentication.
@@ -36,11 +41,6 @@ Changelog
 * :feature:`49` Cointegration and OU Model Tear Sheets added to the Visualization Module.
 * :support:`49` Cointegration and OU Model Tear Sheets documentation.
 * :support:`50` Updated documentation theme to hudsonthames-sphinx-docs.
-* :feature:`51` OU Optimal Threshold Model Bertram added to the Time Series Approach Module.
-* :feature:`51` OU Optimal Threshold Model Zeng added to the Time Series Approach Module.
-* :support:`51` OU Optimal Threshold Model Bertram documentation.
-* :support:`51` OU Optimal Threshold Model Zeng documentation.
-* :support:`51` Updated requirements - new package (mpmath==1.2.1).
 
 * :release:`0.4.1 <2021-04-15>`
 * :feature:`43` OU Model Jurek and OU Model Mudchanatongsuk added to the Stochastic Control Approach Module.
