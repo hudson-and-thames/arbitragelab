@@ -79,8 +79,7 @@ We establish **Ornstein-Uhlenbeck process** driven by the SDE:
 * :math:`\sigma` - instantaneous volatility, measures instant by instant the amplitude of randomness entering the system. Higher values imply more randomness.
 
 
-
-Under the OU model the probability density function of :math:`X_t` with increment  :math:`\delta t = t_i
+Under the OU model the probability density function of :math:`X_t` with increment  :math:`\Delta t = t_i
 - t_{i-1}` is:
 
 .. math::
@@ -92,6 +91,12 @@ Under the OU model the probability density function of :math:`X_t` with incremen
 
     \text{with the constant } \tilde{\sigma}^2 = \sigma^2 \frac{1 - e^{-2\mu\Delta t}}{2\mu}
     \end{gather*}
+
+.. warning::
+
+    The following algorithms are devised and best suited for the data frequencies ranging from yearly to daily.
+    Usage of the intraday data is theoretically possible, but as the value of time increment :math:`\Delta t` becomes
+    closer to zero, it might lead to divergence in the optimization process.
 
 We observe the resulting portfolio values :math:`(x_i^\beta)_{i = 0,1,\cdots,n}` for every strategy :math:`\beta`
 realized over an *n*-day period. To fit the model to our data and find optimal parameters we define the average

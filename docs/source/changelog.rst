@@ -12,6 +12,7 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+* :feature:`55` Scaling function for cointegration vectors added to the Cointegration Approach Module.
 * :feature:`54` Markov Regime-Switching Model added to the Time Series Approach Module.
 * :support:`54` Markov Regime-Switching Model documentation.
 * :bug:`60` Fix unit tests not passing due to cvxpy bad installs.
