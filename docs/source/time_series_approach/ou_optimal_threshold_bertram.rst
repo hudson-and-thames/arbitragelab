@@ -242,7 +242,12 @@ The following research notebook can be used to better understand the method desc
 
 * `OU Model Optimal Trading Thresholds Bertram`_
 
-.. _`OU Model Optimal Trading Thresholds Bertram`: https://github.com/hudson-and-thames/arbitrage_research/blob/time_series_approach/Time%20Series%20Approach/ou_model_optimal_threshold_Bertram.ipynb
+.. _`OU Model Optimal Trading Thresholds Bertram`: https://hudsonthames.org/notebooks/arblab/ou_model_optimal_threshold_Bertram.html
+
+.. raw:: html
+
+    <a href="https://hudthames.tech/3q11ATN"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
+    <a href="https://hudthames.tech/2S03R58"><button style="margin: 20px; margin-top: 0px">Download Sample Data</button></a>
 
 References
 ##########

@@ -311,7 +311,12 @@ The following research notebook can be used to better understand the strategy de
 
 * `Statistical Arbitrage Strategy Based on the Markov Regime-Switching Model`_
 
-.. _`Statistical Arbitrage Strategy Based on the Markov Regime-Switching Model`: https://github.com/hudson-and-thames/arbitrage_research/blob/Markov_regime_switching_model/Time%20Series%20Approach/regime_switching_arbitrage_rule.ipynb
+.. _`Statistical Arbitrage Strategy Based on the Markov Regime-Switching Model`: https://hudsonthames.org/notebooks/arblab/regime_switching_arbitrage_rule.html
+
+.. raw:: html
+
+    <a href="https://hudthames.tech/3q11ATN"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
+    <a href="https://hudthames.tech/2S03R58"><button style="margin: 20px; margin-top: 0px">Download Sample Data</button></a>
 
 References
 ##########

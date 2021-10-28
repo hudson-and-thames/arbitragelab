@@ -219,7 +219,6 @@ The following research notebook can be used to better understand the time series
     <a href="https://hudthames.tech/3q11ATN"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
     <a href="https://hudthames.tech/2S03R58"><button style="margin: 20px; margin-top: 0px">Download Sample Data</button></a>
 
-
 References
 ##########
 

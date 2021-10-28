@@ -343,7 +343,12 @@ The following research notebook can be used to better understand the method desc
 
 * `H-Strategy`_
 
-.. _`H-Strategy`: https://github.com/hudson-and-thames/arbitrage_research/blob/H_strategy/Time%20Series%20Approach/H_strategy.ipynb
+.. _`H-Strategy`: https://hudsonthames.org/notebooks/arblab/H_strategy.html
+
+.. raw:: html
+
+    <a href="https://hudthames.tech/3q11ATN"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
+    <a href="https://hudthames.tech/2S03R58"><button style="margin: 20px; margin-top: 0px">Download Sample Data</button></a>
 
 References
 ##########
