@@ -14,7 +14,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 
-from arbitragelab.util import devadarsh
+from arbitragelab.util import segment
 
 class OptimalConvergence:
     """
@@ -53,7 +53,7 @@ class OptimalConvergence:
         self.mu_m = None
         self.sigma_m = None
 
-        devadarsh.track('OptimalConvergence')
+        segment.track('OptimalConvergence')
 
 
     def fit(self, prices: pd.DataFrame, mu_m: float, sigma_m: float, r: float, delta_t: float = 1 / 252):

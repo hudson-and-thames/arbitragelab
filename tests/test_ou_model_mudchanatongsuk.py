@@ -52,12 +52,12 @@ class TestOUModelMudchanatongsuk(unittest.TestCase):
         self.assertAlmostEqual(sc_mudchana.spread[-1], 2.0202245834, delta=1e-7)
 
         # Checking other parameter values.
-        self.assertAlmostEqual(sc_mudchana.sigma, 0.503695, delta=1e-4)
-        self.assertAlmostEqual(sc_mudchana.mu, 0.114877, delta=1e-4)
+        self.assertAlmostEqual(sc_mudchana.sigma, 0.503695, delta=1e-3)
+        self.assertAlmostEqual(sc_mudchana.mu, 0.114877, delta=1e-3)
         self.assertAlmostEqual(sc_mudchana.k, 3.99205, delta=1e-3)
-        self.assertAlmostEqual(sc_mudchana.theta, 1.98816, delta=1e-4)
-        self.assertAlmostEqual(sc_mudchana.eta, 0.404292, delta=1e-4)
-        self.assertAlmostEqual(sc_mudchana.rho, 0.96202, delta=1e-4)
+        self.assertAlmostEqual(sc_mudchana.theta, 1.98816, delta=1e-3)
+        self.assertAlmostEqual(sc_mudchana.eta, 0.404292, delta=1e-3)
+        self.assertAlmostEqual(sc_mudchana.rho, 0.96202, delta=1e-3)
 
 
     def test_describe(self):
@@ -104,7 +104,7 @@ class TestOUModelMudchanatongsuk(unittest.TestCase):
 
         weights = sc_mudchana.optimal_portfolio_weights(self.dataframe, gamma=-10)
         # Checking the values of weights
-        self.assertAlmostEqual(np.mean(weights), 0.4986890920, delta=1e-5)
-        self.assertAlmostEqual(weights[7], 0.5117099817, delta=1e-4)
-        self.assertAlmostEqual(weights[28], 0.5246204647, delta=1e-4)
-        self.assertAlmostEqual(weights[-1], 0.4043368460, delta=1e-4)
+        self.assertAlmostEqual(np.mean(weights), 0.4986890920, delta=1e-3)
+        self.assertAlmostEqual(weights[7], 0.5117099817, delta=1e-3)
+        self.assertAlmostEqual(weights[28], 0.5246204647, delta=1e-3)
+        self.assertAlmostEqual(weights[-1], 0.4043368460, delta=1e-3)

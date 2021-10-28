@@ -178,7 +178,13 @@ The following research notebook can be used to better understand the implementat
 
 * `Futures Rollover`_ - showcases the use of various rollers on specific contracts.
 
-.. _`Futures Rollover`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/ML%20Approach/futures_rollover.ipynb
+.. _`Futures Rollover`: https://hudsonthames.org/notebooks/arblab/futures_rollover.html
+
+.. raw:: html
+
+    <a href="https://hudthames.tech/3gFGwy8"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
+    <a href="https://hudthames.tech/2S03R58"><button style="margin: 20px; margin-top: 0px">Download Sample Data</button></a>
+
 
 References
 ##########

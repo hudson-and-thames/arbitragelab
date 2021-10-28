@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
 from arch.univariate import ZeroMean, EWMAVariance
 
-from arbitragelab.util import devadarsh
+from arbitragelab.util import segment
 
 class CorrelationFilter:
     """
@@ -36,7 +36,7 @@ class CorrelationFilter:
         self.frame = None
         self.transformed = None
 
-        devadarsh.track('CorrelationFilter')
+        segment.track('CorrelationFilter')
 
     def fit(self, frame: pd.DataFrame):
         """
@@ -184,7 +184,7 @@ class ThresholdFilter:
         self.frame = None
         self.transformed = None
 
-        devadarsh.track('ThresholdFilter')
+        segment.track('ThresholdFilter')
 
     def plot(self) -> list:
         """
@@ -277,7 +277,7 @@ class VolatilityFilter:
         self.rolling_mean_vol = None
         self.vol_forcast_series = None
 
-        devadarsh.track('VolatilityFilter')
+        segment.track('VolatilityFilter')
 
     def plot(self) -> list:
         """

@@ -210,7 +210,12 @@ The following research notebook can be used to better understand the Multivariat
 
 * `Multivariate Cointegration Strategy`_
 
-.. _`Multivariate Cointegration Strategy`: https://github.com/Hudson-and-Thames-Clients/arbitrage_research/blob/master/Cointegration%20Approach/multivariate_cointegration.ipynb
+.. _`Multivariate Cointegration Strategy`: https://hudsonthames.org/notebooks/arblab/multivariate_cointegration.html
+
+.. raw:: html
+
+    <a href="https://hudthames.tech/3iIGDvv"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
+    <a href="https://hudthames.tech/2S03R58"><button style="margin: 20px; margin-top: 0px">Download Sample Data</button></a>
 
 References
 ##########

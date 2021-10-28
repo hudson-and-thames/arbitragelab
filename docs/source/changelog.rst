@@ -13,12 +13,20 @@ Changelog
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
 * :feature:`55` Scaling function for cointegration vectors added to the Cointegration Approach Module.
-* :bug:`52` Fixed issue with too many function calls in web analytics.
+* :feature:`54` Markov Regime-Switching Model added to the Time Series Approach Module.
+* :support:`54` Markov Regime-Switching Model documentation.
+* :bug:`60` Fix unit tests not passing due to cvxpy bad installs.
+* :bug:`58` Fixed maxed connections a day by pointing the get public IP server to AWS.
+* :bug:`58` Fixed the API key validation and build server authentication.
+* :feature:`58` Changed the analytics we track to: MAC Address, Public IP, API_KEY, and Function Calls + time stamps.
+
+* :release:`0.5.0 <2021-04-15>`
+* :bug:`52 major` Fixed issue with too many function calls in web analytics.
 * :feature:`48` ML Approach Pairs Selection Module made more flexible - clustering and selection steps are now separate.
 * :support:`48` ML Approach Pairs Selection Module documentation updated.
 * :feature:`48` Hedge Ratio Estimation Module added with OLS, TLS, and Minimum HL Methods.
 * :support:`48` Hedge Ratio Estimation Module documentation.
-* :bug:`48` Fixed bug in ML Approach Pairs Selector hedge ratio calculation (previously had included intercept).
+* :bug:`48 major` Fixed bug in ML Approach Pairs Selector hedge ratio calculation (previously had included intercept).
 * :feature:`45` Pearson Strategy added to the Distance Approach Module.
 * :support:`45` Pearson Strategy documentation.
 * :feature:`46` Optimal Convergence Model added to the Stochastic Control Approach Module.
@@ -26,6 +34,11 @@ Changelog
 * :feature:`49` Cointegration and OU Model Tear Sheets added to the Visualization Module.
 * :support:`49` Cointegration and OU Model Tear Sheets documentation.
 * :support:`50` Updated documentation theme to hudsonthames-sphinx-docs.
+* :feature:`51` OU Optimal Threshold Model Bertram added to the Time Series Approach Module.
+* :feature:`51` OU Optimal Threshold Model Zeng added to the Time Series Approach Module.
+* :support:`51` OU Optimal Threshold Model Bertram documentation.
+* :support:`51` OU Optimal Threshold Model Zeng documentation.
+* :support:`51` Updated requirements - new package (mpmath==1.2.1).
 
 * :release:`0.4.1 <2021-04-15>`
 * :feature:`43` OU Model Jurek and OU Model Mudchanatongsuk added to the Stochastic Control Approach Module.

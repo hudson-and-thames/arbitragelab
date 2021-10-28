@@ -9,7 +9,7 @@ Sarmento and Nuno Horta in `"A Machine Learning based Pairs Trading Investment S
 import pandas as pd
 
 from arbitragelab.ml_approach.stat_arb_utils import _outer_cointegration_loop, _outer_ou_loop
-from arbitragelab.util import devadarsh
+from arbitragelab.util import segment
 from arbitragelab.util.hurst import get_hurst_exponent
 from arbitragelab.pairs_selection.base import AbstractPairsSelector
 
@@ -41,7 +41,7 @@ class CointegrationPairsSelector(AbstractPairsSelector):
 
         self.final_pairs = []
 
-        devadarsh.track('CointegrationPairsSelector')
+        segment.track('CointegrationPairsSelector')
 
     def _hurst_criterion(self, pairs: pd.DataFrame,
                          hurst_exp_threshold: int = 0.5) -> tuple:

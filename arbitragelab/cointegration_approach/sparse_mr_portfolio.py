@@ -31,7 +31,7 @@ from sklearn.linear_model import lasso_path, Lasso, MultiTaskLasso
 from sklearn.preprocessing import normalize, StandardScaler
 
 from arbitragelab.optimal_mean_reversion import OrnsteinUhlenbeck
-from arbitragelab.util import devadarsh
+from arbitragelab.util import segment
 
 
 class SparseMeanReversionPortfolio:
@@ -59,7 +59,7 @@ class SparseMeanReversionPortfolio:
         self._standardized = standard_data
         self._standardized.columns = self._assets.columns
 
-        devadarsh.track('SparseMeanReversionPortfolio')
+        segment.track('SparseMeanReversionPortfolio')
 
     @property
     def assets(self) -> pd.DataFrame:
