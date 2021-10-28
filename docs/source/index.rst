@@ -176,6 +176,7 @@ This project is licensed under an all rights reserved licence.
     time_series_approach/quantile_time_series_strategy
     time_series_approach/ou_optimal_threshold_bertram
     time_series_approach/ou_optimal_threshold_zeng
+    time_series_approach/regime_switching_arbitrage_rule
 
 .. toctree::
     :maxdepth: 2

@@ -12,7 +12,9 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
-*  :bug:`60` Fix unit tests not passing due to cvxpy bad installs.
+* :feature:`54` Markov Regime-Switching Model added to the Time Series Approach Module.
+* :support:`54` Markov Regime-Switching Model documentation.
+* :bug:`60` Fix unit tests not passing due to cvxpy bad installs.
 * :bug:`58` Fixed maxed connections a day by pointing the get public IP server to AWS.
 * :bug:`58` Fixed the API key validation and build server authentication.
 * :feature:`58` Changed the analytics we track to: MAC Address, Public IP, API_KEY, and Function Calls + time stamps.
