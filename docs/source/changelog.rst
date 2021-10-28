@@ -12,6 +12,8 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+* :feature:`56` H-Strategy (Renko and Kagi) Model added to the Time Series Approach Module.
+* :support:`56` H-Strategy (Renko and Kagi) Model documentation.
 * :feature:`55` Scaling function for cointegration vectors added to the Cointegration Approach Module.
 * :feature:`54` Markov Regime-Switching Model added to the Time Series Approach Module.
 * :support:`54` Markov Regime-Switching Model documentation.
