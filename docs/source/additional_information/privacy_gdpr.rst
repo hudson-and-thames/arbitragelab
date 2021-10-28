@@ -1,4 +1,4 @@
-.. _additional_information-analytics:
+.. _additional_information-privacy_gdpr:
 
 =======================
 Privacy and GDPR Policy

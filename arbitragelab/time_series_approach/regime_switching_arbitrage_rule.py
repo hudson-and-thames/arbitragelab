@@ -14,7 +14,7 @@ import numpy as np
 import statsmodels.api as sm
 import matplotlib.pyplot as plt
 
-from arbitragelab.util import devadarsh
+from arbitragelab.util import segment
 
 
 class RegimeSwitchingArbitrageRule:
@@ -85,7 +85,7 @@ class RegimeSwitchingArbitrageRule:
             0: {True: False, False: False}
         }
 
-        devadarsh.track('RegimeSwitchingArbitrageRule')
+        segment.track('RegimeSwitchingArbitrageRule')
 
     def change_strategy(self, regime: str, direction: str, action: str, rule: Callable):
         """
