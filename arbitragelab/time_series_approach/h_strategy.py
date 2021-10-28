@@ -14,7 +14,7 @@ import pandas as pd
 import numpy as np
 from tqdm import tqdm
 
-from arbitragelab.util import devadarsh
+from arbitragelab.util import segment
 
 class HConstruction:
     """
@@ -57,7 +57,7 @@ class HConstruction:
         # Building the H-construction
         self._construct()
 
-        devadarsh.track('HConstruction')
+        segment.track('HConstruction')
 
     def _process(self, i: int):
         """
