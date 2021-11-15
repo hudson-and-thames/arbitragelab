@@ -8,10 +8,32 @@ from setuptools import setup
 
 setup()
 
+# Old instructions
+# Create package
+# python setup.py bdist_wheel
+# twine upload dist/*  (This is official repo)
+# ----------------------------------------------------------------------------------
+
+# Pull new commits
 # Bump version
-# Make sure install codes are updated in the docs (Installation guide).
 # Update Changelog release
-# bumpversion major/minor/patch --allow-dirty
-# Double-check if you did a Git Push
-# git push origin [0.1.0]
+# Update version in docs cfg and library setup.cfg
+# Update install location on install.rst
+# Make sure you double check pushing all changes to git: git push
+
+# Obfuscation steps
+# 1. Create package: python setup.py bdist_wheel
+# 2. Unzip the dist.whl file
+# 2.2 cd into the unzipped dir
+# 2.3 Remember that you need to make a different obf package for Py 3.7 Colab and Python3.8
+# 3. Obfuscate: pyarmor obfuscate --platform windows.x86_64 --platform linux.x86_64 --platform darwin.x86_64 --obf-code=0 --recursive --output dist/mlfinlab mlfinlab/__init__.py
+# 4. Add back datasets in mlfinlab
+# 4. Repackage
+# 5. install
+# 6. test
+# 7. deploy on client repo
+
+# Tagging
+# git tag [1.4.0]
+# git push origin [1.4.0]
 # On Github, go to tags and use the GUI to push a Release.
