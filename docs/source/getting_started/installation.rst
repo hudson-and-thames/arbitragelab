@@ -81,7 +81,7 @@ Ubuntu Linux
 
    .. code-block::
 
-      pip install https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@raw.githubusercontent.com/hudson-and-thames-clients/arbitragelab/master/arbitragelab-0.5.0-py3-none-any.whl
+      pip install https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@raw.githubusercontent.com/hudson-and-thames-clients/arbitragelab/master/arbitragelab-0.6.0-py3-none-any.whl
 
 8. Install CVXPY (this library is used for convex optimization problems).
 
@@ -185,7 +185,7 @@ Mac OS X
 
    .. code-block::
 
-      pip install https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@raw.githubusercontent.com/hudson-and-thames-clients/arbitragelab/master/arbitragelab-0.5.0-py3-none-any.whl
+      pip install https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@raw.githubusercontent.com/hudson-and-thames-clients/arbitragelab/master/arbitragelab-0.6.0-py3-none-any.whl
 
 8. Install CVXPY (this library is used for convex optimization problems).
 
@@ -303,7 +303,7 @@ Windows
 
    .. code-block::
 
-      pip install https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@raw.githubusercontent.com/hudson-and-thames-clients/arbitragelab/master/arbitragelab-0.5.0-py3-none-any.whl
+      pip install https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@raw.githubusercontent.com/hudson-and-thames-clients/arbitragelab/master/arbitragelab-0.6.0-py3-none-any.whl
 
 9. (Optional) **Only if you want to use the ML Approach Module**, install the TensorFlow, Keras packages, and update the NumPy version.
    Note that you should have pip version "pip==20.1.1" to do this. Supported TensorFlow and Keras versions
