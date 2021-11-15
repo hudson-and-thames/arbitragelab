@@ -12,6 +12,7 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+* :release:`0.6.0 <2021-11-15>`
 * :feature:`56` H-Strategy (Renko and Kagi) Model added to the Time Series Approach Module.
 * :support:`56` H-Strategy (Renko and Kagi) Model documentation.
 * :feature:`55` Scaling function for cointegration vectors added to the Cointegration Approach Module.
@@ -22,9 +23,9 @@ Changelog
 * :support:`51` OU Optimal Threshold Model Bertram documentation.
 * :support:`51` OU Optimal Threshold Model Zeng documentation.
 * :support:`51` Updated requirements - new package (mpmath==1.2.1).
-* :bug:`60` Fix unit tests not passing due to cvxpy bad installs.
-* :bug:`58` Fixed maxed connections a day by pointing the get public IP server to AWS.
-* :bug:`58` Fixed the API key validation and build server authentication.
+* :bug:`60 major` Fix unit tests not passing due to cvxpy bad installs.
+* :bug:`58 major` Fixed maxed connections a day by pointing the get public IP server to AWS.
+* :bug:`58 major` Fixed the API key validation and build server authentication.
 * :feature:`58` Changed the analytics we track to: MAC Address, Public IP, API_KEY, and Function Calls + time stamps.
 
 * :release:`0.5.0 <2021-04-15>`
