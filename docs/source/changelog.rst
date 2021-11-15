@@ -12,7 +12,17 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
-*  :bug:`60` Fix unit tests not passing due to cvxpy bad installs.
+* :feature:`56` H-Strategy (Renko and Kagi) Model added to the Time Series Approach Module.
+* :support:`56` H-Strategy (Renko and Kagi) Model documentation.
+* :feature:`55` Scaling function for cointegration vectors added to the Cointegration Approach Module.
+* :feature:`54` Markov Regime-Switching Model added to the Time Series Approach Module.
+* :support:`54` Markov Regime-Switching Model documentation.
+* :feature:`51` OU Optimal Threshold Model Bertram added to the Time Series Approach Module.
+* :feature:`51` OU Optimal Threshold Model Zeng added to the Time Series Approach Module.
+* :support:`51` OU Optimal Threshold Model Bertram documentation.
+* :support:`51` OU Optimal Threshold Model Zeng documentation.
+* :support:`51` Updated requirements - new package (mpmath==1.2.1).
+* :bug:`60` Fix unit tests not passing due to cvxpy bad installs.
 * :bug:`58` Fixed maxed connections a day by pointing the get public IP server to AWS.
 * :bug:`58` Fixed the API key validation and build server authentication.
 * :feature:`58` Changed the analytics we track to: MAC Address, Public IP, API_KEY, and Function Calls + time stamps.

@@ -94,6 +94,16 @@ class TestCointegration(unittest.TestCase):
         self.assertAlmostEqual(mean_reverting_port_1.iloc[5], -13.58, delta=1e-2)
         self.assertAlmostEqual(mean_reverting_port_2.iloc[5], 8.03, delta=1e-2)
 
+        # Test scaled cointegration vector values
+        scaled_cointegration_1 = port.get_scaled_cointegration_vector()
+        scaled_cointegration_2 = port.get_scaled_cointegration_vector(cointegration_vector=
+                                                                      port.cointegration_vectors.iloc[0])
+
+        self.assertEqual(scaled_cointegration_1.iloc[0], 1)
+        self.assertEqual(scaled_cointegration_2.iloc[0], 1)
+        self.assertAlmostEqual(scaled_cointegration_1.iloc[1], scaled_cointegration_2.iloc[1], delta=1e-2)
+        self.assertAlmostEqual(scaled_cointegration_2.mean(), scaled_cointegration_1.mean(), delta=1e-2)
+
     def test_half_life(self):
         """
         Tests function get_half_life_of_mean_reversion.
