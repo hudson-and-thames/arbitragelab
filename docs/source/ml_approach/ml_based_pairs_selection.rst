@@ -142,9 +142,9 @@ expect that if the variables are truly cointegrated the two equations will yield
 
 To mitigate this issue, the original paper proposes that the Engle-Granger test is run for the two 
 possible selections of the dependent variable and that the combination that generated the lowest t-statistic 
-is selected. Further work in `Hoel (2013) <https://core.ac.uk/download/pdf/52072275.pdf>`__ adds on, "the 
-unsymmetrical coefficients imply that a hedge of long / short is not the opposite of long / short , i.e. 
-the hedge ratios are inconsistent". 
+is selected. Further work in `Hoel (2013) <https://openaccess.nhh.no/nhh-xmlui/bitstream/handle/11250/169897/hoel2013.pdf?sequence=1>`__
+adds on, "the unsymmetrical coefficients imply that a hedge of long / short is not the opposite of long / short ,
+i.e. the hedge ratios are inconsistent".
 
 A better solution is proposed and implemented, based on `Gregory et al. (2011) <http://dx.doi.org/10.2139/ssrn.1663703>`__ 
 to use orthogonal regression – also referred to as Total Least Squares (TLS) – in which the residuals 
@@ -273,6 +273,6 @@ References
 
 * `Armstrong, J.S. ed., 2001. Principles of forecasting: a handbook for researchers and practitioners (Vol. 30). Springer Science & Business Media. <http://doi.org/10.1007/978-0-306-47630-3>`__
 
-* `Hoel, C.H., 2013. Statistical arbitrage pairs: can cointegration capture market neutral profits? (Master's thesis). <https://core.ac.uk/download/pdf/52072275.pdf>`__
+* `Hoel, C.H., 2013. Statistical arbitrage pairs: can cointegration capture market neutral profits? (Master's thesis). <https://openaccess.nhh.no/nhh-xmlui/bitstream/handle/11250/169897/hoel2013.pdf?sequence=1>`__
 
 * `Gregory, I., Ewald, C.O. and Knox, P., 2010, November. Analytical pairs trading under different assumptions on the spread and ratio dynamics. In 23rd Australasian Finance and Banking Conference. <http://dx.doi.org/10.2139/ssrn.1663703>`__

@@ -278,5 +278,5 @@ References
 ##########
 
 * `Gatev, E., Goetzmann, W.N. and Rouwenhorst, K.G., 2006. Pairs trading: Performance of a relative-value arbitrage rule. The Review of Financial Studies, 19(3), pp.797-827. <http://www-stat.wharton.upenn.edu/~steele/Courses/434/434Context/PairsTrading/PairsTradingGGR.pdf>`__
-* `Golub, G.H. and Van Loan, C.F., 1980. An analysis of the total least squares problem. SIAM journal on numerical analysis, 17(6), pp.883-893. <http://www.cs.cornell.edu/cv/ResearchPDF/Analysis.total.least.squares.prob.pdf>`__
+* `Golub, G.H. and Van Loan, C.F., 1980. An analysis of the total least squares problem. SIAM journal on numerical analysis, 17(6), pp.883-893. <https://ecommons.cornell.edu/handle/1813/6251>`__
 * `Lee, C.F., Lin, F.L., Tu, H.C. and Chen, M.L., 2009. Alternative methods for estimating hedge ratio: Review, integration and empirical evidence. working article). Rutgers University. <http://www.centerforpbbefr.rutgers.edu/2007/Papers/135-Three%20Alternative%20Methods.doc>`__
