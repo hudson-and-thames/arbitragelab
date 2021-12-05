@@ -86,7 +86,7 @@ Flexibility
 +++++++++++
 |
 
-Learn in the way that most suitable for you as more and more documentation pages are now supplemented with both
+Learn in the way that is most suitable for you as more and more documentation pages are now supplemented with both
 video lectures and presentation slides on the topic.
 
 
