@@ -234,6 +234,31 @@ The following research notebook can be used to better understand the Pearson app
     <a href="https://hudthames.tech/3gCzomb"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
     <a href="https://hudthames.tech/2S03R58"><button style="margin: 20px; margin-top: 0px">Download Sample Data</button></a>
 
+Presentation Slides
+###################
+
+.. raw:: html
+
+    <div style="position: relative;
+                padding-bottom: 56.25%;
+                height: 0;
+                overflow: hidden;
+                max-width: 100%;
+                height: auto;">
+
+        <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vQTqONMwJ_K_EZpUxtrlOipjeDmqFpmYnu-3BpncKpeNCFc7KamH83-vAoBMJProW0Bfv5FlHJmxGlz/embed?start=false&loop=false&delayms=3000"
+                frameborder="0"
+                allowfullscreen
+                style="position: absolute;
+                       top: 0;
+                       left: 0;
+                       width: 100%;
+                       height: 100%;">
+        </iframe>
+    </div>
+
+|
+
 References
 ##########
 

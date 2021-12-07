@@ -732,6 +732,14 @@ portfolio selection module.
     <a href="https://hudthames.tech/3iIGDvv"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
     <a href="https://hudthames.tech/2S03R58"><button style="margin: 20px; margin-top: 0px">Download Sample Data</button></a>
 
+Presentation Slides
+###################
+
+.. image:: images/sparse_mr_slides.png
+   :scale: 40 %
+   :align: center
+   :target: https://drive.google.com/file/d/1y9d9fkaMuxcoJ5N44KN9G2GGP8tXwjfj/view
+
 References
 ##########
 

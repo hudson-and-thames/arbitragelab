@@ -115,6 +115,31 @@ Examples
     half_life_fit, _, _, _ = get_tls_hedge_ratio(data, dependent_variable='SPY')
     print(f'Minimum HL hedge ratio for SPY/QQQ spred is {half_life_fit.x[0]})
 
+Presentation Slides
+###################
+
+.. raw:: html
+
+    <div style="position: relative;
+                padding-bottom: 56.25%;
+                height: 0;
+                overflow: hidden;
+                max-width: 100%;
+                height: auto;">
+
+        <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vQgWsguF9SOa59ugYCpu3nNMTv4LoP-xbqw7hqlr0WhdkVeiisnLPaewm0Jf6qE5cTxFrJdIsQ4RILK/embed?start=false&loop=false&delayms=3000"
+                frameborder="0"
+                allowfullscreen
+                style="position: absolute;
+                       top: 0;
+                       left: 0;
+                       width: 100%;
+                       height: 100%;">
+        </iframe>
+    </div>
+
+|
+
 References
 ##########
 

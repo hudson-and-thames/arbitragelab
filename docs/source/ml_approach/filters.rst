@@ -269,7 +269,32 @@ Example
 
     # Plotting results
     vol_filter.plot()
-    
+
+Presentation Slides
+###################
+
+.. raw:: html
+
+    <div style="position: relative;
+                padding-bottom: 56.25%;
+                height: 0;
+                overflow: hidden;
+                max-width: 100%;
+                height: auto;">
+
+        <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vTQSpwcbKAQB84c8TgT2_4hWsZdazBNCJTdb1sdVBuUQ9Bt4_MkPpEk3DsJL4rl2iocJEYC2HZW54Ef/embed?start=false&loop=false&delayms=3000#slide=id.gba8c492c2b_0_10"
+                frameborder="0"
+                allowfullscreen
+                style="position: absolute;
+                       top: 0;
+                       left: 0;
+                       width: 100%;
+                       height: 100%;">
+        </iframe>
+    </div>
+
+|
+
 References
 ##########
 

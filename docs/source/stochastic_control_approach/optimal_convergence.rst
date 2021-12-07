@@ -420,6 +420,30 @@ Finally, we use the out-of-sample test data to calculate the delta neutral portf
     
     phi_1, phi_2, phi_m = oc.delta_neutral_portfolio_weights_continuous(data_test_dataframe, gamma=4)
 
+Presentation Slides
+###################
+
+.. raw:: html
+
+    <div style="position: relative;
+                padding-bottom: 56.25%;
+                height: 0;
+                overflow: hidden;
+                max-width: 100%;
+                height: auto;">
+
+        <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vS6VuN_NPnc9ufJm6FzeQNgFvVFt2s_9ZcWV9v7XkOvYO5RBCNI2yk1J-vw4-4DlSbetf-DFMSZuxqK/embed?start=false&loop=false&delayms=3000"
+                frameborder="0"
+                allowfullscreen
+                style="position: absolute;
+                       top: 0;
+                       left: 0;
+                       width: 100%;
+                       height: 100%;">
+        </iframe>
+    </div>
+
+|
 
 References
 ##########
