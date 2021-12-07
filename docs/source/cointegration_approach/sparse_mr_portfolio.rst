@@ -44,6 +44,8 @@ Sparse Mean-reverting Portfolio Selection
         <br/>
     </div>
 
+|
+
 Introduction
 ############
 

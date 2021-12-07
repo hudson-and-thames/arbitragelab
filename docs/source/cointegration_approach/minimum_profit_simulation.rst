@@ -31,6 +31,8 @@ Simulation of Cointegratred Series
         <br/>
     </div>
 
+|
+
 This module allows users to simulate:
 
 - AR(1) processes

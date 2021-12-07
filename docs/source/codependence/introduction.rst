@@ -28,6 +28,8 @@ This module includes implementations of codependence metrics.
         <br/>
     </div>
 
+|
+
 According to Lopez de Prado: "Two random variables are codependent when knowing the value of one helps us determine the value of the other.
 This should not be confounded with the notion of causality."
 

@@ -35,6 +35,8 @@ Vine Copula Partner Selection
         <br/>
     </div>
 
+|
+
 This module contains implementation of the four partner selection approaches
 mentioned in Section 3.1.1 of Statistical Arbitrage with Vine Copulas.
 

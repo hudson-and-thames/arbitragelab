@@ -26,6 +26,8 @@ Hedge Ratio Calculations
         <br/>
     </div>
 
+|
+
 There are various ways to find mean-reverting spread, including distance, cointegration, copula and ML approach.
 In the next step, when a trade signal is generated (Z-score > or < then threshold value), a researcher needs to understand
 how to trade the spread. How many units of X stock to buy and how many units of Y to sell.

@@ -9,6 +9,30 @@
 Regime-Switching Arbitrage Rule
 ===============================
 
+.. raw:: html
+
+    <div style="position: relative;
+                padding-bottom: 56.25%;
+                margin-bottom: 5%;
+                height: 0;
+                overflow: hidden;
+                max-width: 100%;
+                height: auto;">
+
+        <iframe src="https://www.youtube.com/embed/lE0FuOSDvVI"
+                frameborder="0"
+                allowfullscreen
+                style="position: absolute;
+                       top: 0;
+                       left: 0;
+                       width: 100%;
+                       height: 100%;">
+        </iframe>
+        <br/>
+    </div>
+
+|
+
 The traditional pairs trading strategy usually fails when fundamental or economic reasons cause a
 structural break on one of the stocks in the pair. This break will cause the temporary spread
 deviations formed by the pair to become persistent spread deviations which will not revert.

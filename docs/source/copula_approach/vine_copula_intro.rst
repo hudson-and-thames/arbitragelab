@@ -34,6 +34,8 @@ A Practical Introduction to Vine Copula
         <br/>
     </div>
 
+|
+
 Copula is a great statistical tool to study the relation among multiple random variables: By focusing on the joint
 cumulative density of quantiles of marginals, we can bypass the idiosyncratic features of marginal distributions and
 directly look at how they are "related".

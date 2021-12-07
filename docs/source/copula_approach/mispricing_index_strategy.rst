@@ -26,6 +26,8 @@ Mispricing Index Trading Strategy
         <br/>
     </div>
 
+|
+
 .. Note::
     The following strategy closely follows the implementations:
 

@@ -38,6 +38,8 @@ A Practical Introduction to Copula
         <br/>
     </div>
 
+|
+
 Instead of starting with a formal definition of copula with mathematical rigor, let's start by doing the following
 calculations to try to temporarily bypass it. The mathematical definition may not help much unless we have an idea
 of where the copula comes from.
