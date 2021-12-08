@@ -12,6 +12,30 @@
 ML Based Pairs Selection
 ========================
 
+.. raw:: html
+
+    <div style="position: relative;
+                padding-bottom: 56.25%;
+                margin-bottom: 5%;
+                height: 0;
+                overflow: hidden;
+                max-width: 100%;
+                height: auto;">
+
+        <iframe src="https://www.youtube.com/embed/R22JR4tqqqs"
+                frameborder="0"
+                allowfullscreen
+                style="position: absolute;
+                       top: 0;
+                       left: 0;
+                       width: 100%;
+                       height: 100%;">
+        </iframe>
+        <br/>
+    </div>
+
+|
+
 The success of a Pairs Trading strategy highly depends on finding the right pairs.
 But with the increasing availability of data, more traders manage to spot interesting 
 pairs and quickly profit from the correction of price discrepancies, leaving no margin 
@@ -257,6 +281,31 @@ The following research notebook can be used to better understand the Pairs Selec
 
     <a href="https://hudthames.tech/3gFGwy8"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
     <a href="https://hudthames.tech/2S03R58"><button style="margin: 20px; margin-top: 0px">Download Sample Data</button></a>
+
+Presentation Slides
+###################
+
+.. raw:: html
+
+    <div style="position: relative;
+                padding-bottom: 56.25%;
+                height: 0;
+                overflow: hidden;
+                max-width: 100%;
+                height: auto;">
+
+        <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vSEB8nZgKR13qVuHVbeACt3iXbqJC2ZiCL4FSIMKwFLwzXhaQPYwcBqQC4UBtAYj7J8GWLIrAySZ1OS/embed?start=false&loop=false&delayms=3000"
+                frameborder="0"
+                allowfullscreen
+                style="position: absolute;
+                       top: 0;
+                       left: 0;
+                       width: 100%;
+                       height: 100%;">
+        </iframe>
+    </div>
+
+|
 
 References
 ##########

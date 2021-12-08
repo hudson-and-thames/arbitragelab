@@ -4,8 +4,6 @@
 Introduction
 ============
 
-This module includes implementations of codependence metrics.
-
 .. raw:: html
 
     <div style="position: relative;
@@ -28,7 +26,11 @@ This module includes implementations of codependence metrics.
         <br/>
     </div>
 
-According to Lopez de Prado: "Two random variables are codependent when knowing the value of one helps us determine the value of the other.
+|
+
+This module includes implementations of codependence metrics. According to Lopez de Prado:
+
+"Two random variables are codependent when knowing the value of one helps us determine the value of the other.
 This should not be confounded with the notion of causality."
 
 Pearson correlation coefficient is the most famous and widely used measure of codependence, however, it has some drawbacks.
@@ -61,3 +63,21 @@ which are described in the parts of this module.
    3. :math:`d(x,y) \le d(x,z) + d(z,y)` — triangle inequality;
 
    and these imply :math:`d(x,y) \ge 0` — non-negativity.
+
+Presentation Slides
+###################
+
+.. image:: images/codep_slides.png
+   :scale: 70 %
+   :align: center
+   :target: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994
+
+.. image:: images/codependence_slides.png
+   :scale: 40 %
+   :align: center
+   :target: https://drive.google.com/file/d/1pamteuYyc06r1q-BR3VFsxwa3c7-7oeK/view
+
+References
+##########
+
+* `Lopez de Prado, M., 2020. Codependence (Presentation Slides). Available at SSRN 3512994. <https://ssrn.com/abstract=3512994>`_

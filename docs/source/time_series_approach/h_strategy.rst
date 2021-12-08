@@ -9,6 +9,30 @@
 H-Strategy
 ==========
 
+.. raw:: html
+
+    <div style="position: relative;
+                padding-bottom: 56.25%;
+                margin-bottom: 5%;
+                height: 0;
+                overflow: hidden;
+                max-width: 100%;
+                height: auto;">
+
+        <iframe src="https://www.youtube.com/embed/jpU0U0egqfo"
+                frameborder="0"
+                allowfullscreen
+                style="position: absolute;
+                       top: 0;
+                       left: 0;
+                       width: 100%;
+                       height: 100%;">
+        </iframe>
+        <br/>
+    </div>
+
+|
+
 In this paper, the author proposes a new nonparametric approach to pairs trading based on the idea of
 Renko and Kagi charts. This approach exploits statistical information about the variability of the
 tradable process. The approach does not aim to find a long-run mean of the process and trade towards it
@@ -349,6 +373,31 @@ The following research notebook can be used to better understand the method desc
 
     <a href="https://hudthames.tech/3q11ATN"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
     <a href="https://hudthames.tech/2S03R58"><button style="margin: 20px; margin-top: 0px">Download Sample Data</button></a>
+
+Presentation Slides
+###################
+
+.. raw:: html
+
+    <div style="position: relative;
+                padding-bottom: 56.25%;
+                height: 0;
+                overflow: hidden;
+                max-width: 100%;
+                height: auto;">
+
+        <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vQ71ZBwPZzYXnDCPUtxl5qWWuuvp7PmmCki5b19WOhZb5GqoYohB5rZcoNfszL06QNTVTcJrJ9ep3rO/embed?start=false&loop=false&delayms=3000"
+                frameborder="0"
+                allowfullscreen
+                style="position: absolute;
+                       top: 0;
+                       left: 0;
+                       width: 100%;
+                       height: 100%;">
+        </iframe>
+    </div>
+
+|
 
 References
 ##########

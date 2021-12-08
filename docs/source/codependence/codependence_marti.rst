@@ -5,8 +5,32 @@
    `Some contributions to the clustering of financial time series and applications to credit default swaps <https://www.researchgate.net/publication/322714557>`_.
 
 =====================
-Codependence by Marti
+Copula-Based Metrics
 =====================
+
+.. raw:: html
+
+    <div style="position: relative;
+                padding-bottom: 56.25%;
+                margin-bottom: 5%;
+                height: 0;
+                overflow: hidden;
+                max-width: 100%;
+                height: auto;">
+
+        <iframe src="https://www.youtube.com/embed/YyMouLPj2QA?start=1205"
+                frameborder="0"
+                allowfullscreen
+                style="position: absolute;
+                       top: 0;
+                       left: 0;
+                       width: 100%;
+                       height: 100%;">
+        </iframe>
+        <br/>
+    </div>
+
+|
 
 The work mentioned above introduces a new approach of representing the random variables that splits apart dependency and
 distribution without losing any information. It also contains a distance metric between two financial time series based
@@ -237,6 +261,14 @@ The following research notebook can be used to better understand the codependenc
 
     <a href="https://hudthames.tech/3gt0zAX"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
     <a href="https://hudthames.tech/2S03R58"><button style="margin: 20px; margin-top: 0px">Download Sample Data</button></a>
+
+Presentation Slides
+###################
+
+.. image:: images/codependence_slides.png
+   :scale: 40 %
+   :align: center
+   :target: https://drive.google.com/file/d/1pamteuYyc06r1q-BR3VFsxwa3c7-7oeK/view
 
 References
 ##########

@@ -35,6 +35,8 @@ Introduction
         <br/>
     </div>
 
+|
+
 The success of a Pairs Trading strategy highly depends on finding the right pairs.
 But with the increasing availability of data, more traders manage to spot interesting 
 pairs and quickly profit from the correction of price discrepancies, leaving no margin 

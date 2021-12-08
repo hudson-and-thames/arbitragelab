@@ -31,6 +31,8 @@ Simulation of Cointegratred Series
         <br/>
     </div>
 
+|
+
 This module allows users to simulate:
 
 - AR(1) processes
@@ -136,6 +138,14 @@ Research Notebooks
 
     <a href="https://hudthames.tech/3iIGDvv"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
     <a href="https://hudthames.tech/2S03R58"><button style="margin: 20px; margin-top: 0px">Download Sample Data</button></a>
+
+Presentation Slides
+###################
+
+.. image:: images/minimum_profit_slides.png
+   :scale: 40 %
+   :align: center
+   :target: https://drive.google.com/file/d/1ZeJD81OrKln8QDxm1sU63ivRgqXCcQbS/view
 
 References
 ##########

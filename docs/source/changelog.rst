@@ -12,6 +12,8 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+* :support:`66` Added presentation slides and videos to documentation.
+
 * :release:`0.6.0 <2021-11-15>`
 * :feature:`56` H-Strategy (Renko and Kagi) Model added to the Time Series Approach Module.
 * :support:`56` H-Strategy (Renko and Kagi) Model documentation.

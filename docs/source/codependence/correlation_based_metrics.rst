@@ -8,6 +8,43 @@
 Correlation-Based Metrics
 =========================
 
+.. raw:: html
+
+    <div style="position: relative;
+                padding-bottom: 56.25%;
+                margin-bottom: 5%;
+                height: 0;
+                overflow: hidden;
+                max-width: 100%;
+                height: auto;">
+
+        <iframe src="https://www.youtube.com/embed/YyMouLPj2QA?start=375"
+                frameborder="0"
+                allowfullscreen
+                style="position: absolute;
+                       top: 0;
+                       left: 0;
+                       width: 100%;
+                       height: 100%;">
+        </iframe>
+        <br/>
+    </div>
+
+|
+
+.. Note::
+    **Underlying Literature**
+
+    The following sources elaborate extensively on the topic:
+
+    - `Codependence (Presentation Slides) <https://ssrn.com/abstract=3512994>`__ *by* Marcos Lopez de Prado.
+    - `Measuring and testing dependence by correlation of distances <https://projecteuclid.org/download/pdfview_1/euclid.aos/1201012979>`__ *by* Székely, G.J., Rizzo, M.L. and Bakirov, N.K.
+    - `Introducing the discussion paper by Székely and Rizzo <https://arxiv.org/pdf/1010.3575.pdf>`__ *by* Michael A. Newton.
+    - `Building Diversified Portfolios that Outperform Out-of-Sample <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2708678>`_ *by* Marcos Lopez de Prado.
+    - `Kullback-Leibler distance as a measure of the information filtered from multivariate data. <https://arxiv.org/pdf/0706.0168.pdf>`__ *by* Tumminello, M., Lillo, F. and Mantegna, R.N.
+
+--------------------------------------------
+
 Distance Correlation
 ####################
 
@@ -262,11 +299,24 @@ The following examples show how the described above correlation-based metrics ca
     # Calculate the Norm distance between two correlation matrices
     dist = norm_distance(corr_18, corr_19)
 
+Presentation Slides
+###################
+
+.. image:: images/codep_slides.png
+   :scale: 70 %
+   :align: center
+   :target: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994
+
+.. image:: images/codependence_slides.png
+   :scale: 40 %
+   :align: center
+   :target: https://drive.google.com/file/d/1pamteuYyc06r1q-BR3VFsxwa3c7-7oeK/view
+
 References
 ##########
-* `De Prado, M.L., 2016. Building diversified portfolios that outperform out of sample. The Journal of Portfolio Management, 42(4), pp.59-69. <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2708678>`__
-* `De Prado, M.L., 2020. Codependence (Presentation Slides). Available at SSRN 3512994. <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994>`__
-* `Johnson, D. and Sinanovic, S., 2001. Symmetrizing the kullback-leibler distance. IEEE Transactions on Information Theory. <https://scholarship.rice.edu/bitstream/handle/1911/19969/Joh2001Mar1Symmetrizi.PDF?sequence=1>`__
-* `Newton, M.A., 2010. Introducing the discussion paper by Szekely and Rizzo. arXiv preprint arXiv:1010.3575. <https://arxiv.org/pdf/1010.3575>`__
-* `Székely, G.J., Rizzo, M.L. and Bakirov, N.K., 2007. Measuring and testing dependence by correlation of distances. The annals of statistics, 35(6), pp.2769-2794. <https://projecteuclid.org/download/pdfview_1/euclid.aos/1201012979>`__
-* `Tumminello, M., Lillo, F. and Mantegna, R.N., 2007. Kullback-Leibler distance as a measure of the information filtered from multivariate data. Physical Review E, 76(3), p.031123. <https://arxiv.org/pdf/0706.0168>`__
+
+* `de Prado, M.L, 2020. Codependence (Presentation Slides). Available at SSRN 3512994. <https://ssrn.com/abstract=3512994>`_
+* `Székely, G.J., Rizzo, M.L. and Bakirov, N.K., 2007. Measuring and testing dependence by correlation of distances. The annals of statistics, 35(6), pp.2769-2794. <https://projecteuclid.org/download/pdfview_1/euclid.aos/1201012979>`_
+* `Newton, M.A., 2009. Introducing the discussion paper by Székely and Rizzo. The Annals of Applied Statistics, 3(4), pp.1233-1235. <https://arxiv.org/pdf/1010.3575.pdf>`_
+* `de Prado, M.L., 2016. Building diversified portfolios that outperform out of sample. The Journal of Portfolio Management, 42(4), pp.59-69. <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2708678>`_
+* `Tumminello, M., Lillo, F. and Mantegna, R.N., 2007. Kullback-Leibler distance as a measure of the information filtered from multivariate data. Physical Review E, 76(3), p.031123. <https://arxiv.org/pdf/0706.0168.pdf>`_
