@@ -33,3 +33,4 @@ sphinx==3.4.3 # Docs
 hudsonthames-sphinx-theme==0.1.5 # Docs
 sphinx-rtd-theme==0.5.2 # Docs
 releases==1.6.3 # Docs
+docutils==0.16 # Docs
