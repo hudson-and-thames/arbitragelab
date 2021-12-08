@@ -31,6 +31,8 @@ Trading Under the Ornstein-Uhlenbeck Model
         <br/>
     </div>
 
+|
+
 .. warning::
 
     Alongside with Leung's research we are using :math:`\theta` for mean and :math:`\mu` for mean-reversion

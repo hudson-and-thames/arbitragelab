@@ -1,4 +1,4 @@
-.. _codependence-optimal_trnsport:
+.. _codependence-optimal_transport:
 
 
 .. note::
@@ -63,7 +63,12 @@ With this optimal copula transport dependence tool, one can look for answers to,
    For an example comparing the behaviour of Optimal Copula Transport dependence to Pearson's correlation, Spearman's rho,
    and Kendall tau distance, please read `this blog post by Gautier Marti <https://gmarti.gitlab.io/qfin/2020/06/25/copula-optimal-transport-dependence.html>`__.
 
-----
+.. Note::
+    **Underlying Literature**
+
+    The following sources elaborate extensively on the topic:
+
+    - `Exploring and measuring non-linear correlations: Copulas, Lightspeed Transportation and Clustering <https://arxiv.org/pdf/1610.09659.pdf>`__ *by* Marti, G., Andler, S., Nielsen, F. and Donnat, P.
 
 Optimal Copula Transport dependence
 ###################################
@@ -209,8 +214,8 @@ Implementation
 
 .. autofunction:: optimal_transport_dependence
 
-Examples
-########
+Example
+#######
 
 The following example shows how the optimal copula transport dependence can be used:
 
@@ -243,8 +248,8 @@ The following example shows how the optimal copula transport dependence can be u
    ot_matrix_posneg = get_dependence_matrix(data, dependence_method='optimal_transport',
                                             target_dependence='positive_negative')
 
-Research Notebooks
-******************
+Research Notebook
+#################
 
 The following research notebook can be used to better understand the optimal copula transport dependence measure described above.
 

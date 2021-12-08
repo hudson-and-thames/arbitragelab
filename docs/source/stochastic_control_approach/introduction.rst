@@ -32,6 +32,8 @@ Introduction
         <br/>
     </div>
 
+|
+
 Modeling asset pricing dynamics with the Ornstein-Uhlenbeck process
 ###################################################################
 

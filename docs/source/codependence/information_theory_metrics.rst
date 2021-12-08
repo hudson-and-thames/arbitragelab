@@ -8,6 +8,30 @@
 Information Theory Metrics
 ==========================
 
+.. raw:: html
+
+    <div style="position: relative;
+                padding-bottom: 56.25%;
+                margin-bottom: 5%;
+                height: 0;
+                overflow: hidden;
+                max-width: 100%;
+                height: auto;">
+
+        <iframe src="https://www.youtube.com/embed/YyMouLPj2QA?start=990"
+                frameborder="0"
+                allowfullscreen
+                style="position: absolute;
+                       top: 0;
+                       left: 0;
+                       width: 100%;
+                       height: 100%;">
+        </iframe>
+        <br/>
+    </div>
+
+|
+
 We can gauge the codependence from the information theory perspective. In information theory, (Shannon’s) entropy is a
 measure of information (uncertainty). As described in the `Cornell lecture slides, p.13 <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994>`_
 , entropy is calculated as:
@@ -44,7 +68,19 @@ The following figure highlights how we can view the relationships of various inf
    :figclass: align-center
    :alt: Entropy Relational Diagram
 
-   The correspondence between joint entropy, marginal entropies, conditional entropies, mutual information and variation of information (Lopez de Prado, 2020)
+   The correspondence between joint entropy, marginal entropies, conditional entropies, mutual information and variation of information (Lopez de Prado, 2020).
+
+.. Note::
+    **Underlying Literature**
+
+    The following sources elaborate extensively on the topic:
+
+    - `Codependence (Presentation Slides) <https://ssrn.com/abstract=3512994>`__ *by* Marcos Lopez de Prado.
+    - `Mutual information is copula entropy <https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=6077935>`__ *by* Ma, J. and Sun, Z.
+    - `Low bias histogram-based estimation of mutual information for feature selection <https://www.researchgate.net/publication/257014935>`__ *by* Hacine-Gharbi, A., Ravier, P., Harba, R. and Mohamadi, T.
+    - `A binning formula of bi-histogram for joint entropy estimation using mean square error minimization <https://www.researchgate.net/publication/320887281>`_ *by* Hacine-Gharbi, A. and Ravier, P.
+
+--------------------------------------------
 
 Mutual Information
 ##################
@@ -77,7 +113,7 @@ It can also be normalized using a known upper boundary:
 
 An alternative way of estimating the Mutual information is through using copulas.
 A link between Mutual information and copula entropy was presented in the paper by
-`Ma, Jian & Sun, Zengqi. (2008). Mutual information is copula entropy <https://ieeexplore.ieee.org/iel5/5971803/6077925/06077935.pdf>`_.
+`Ma, Jian & Sun, Zengqi. (2008). Mutual information is copula entropy <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994>`_.
 
 `A blog post by Gautier Marti <https://gmarti.gitlab.io/qfin/2020/07/01/mutual-information-is-copula-entropy.html>`_
 includes descriptions of two alternative estimators of copula entropy:
@@ -205,8 +241,10 @@ The following example highlights how the various metrics behave under various va
 
 .. code-block::
 
+    # Importing packages
     import numpy as np
     import matplotlib.pyplot as plt
+    from ace import model  # The ace package is used for max correlation estimation
 
     from arbitragelab.codependence (import distance_correlation, get_mutual_info, variation_of_information_score)
     from ace import model # ace package is used for max correlation estimation
@@ -220,8 +258,10 @@ The following example highlights how the various metrics behave under various va
         y_input = y
         ace_model = model.Model()
         ace_model.build_model_from_xy(x_input, y_input)
+
         return np.corrcoef(ace_model.ace.x_transforms[0], ace_model.ace.y_transform)[0][1]
 
+    # Creating variables
     state = np.random.RandomState(42)
     x = state.normal(size=1000)
     y_1 = 2 * x + state.normal(size=1000) / 5 # linear
@@ -282,13 +322,25 @@ The following example highlights how the various metrics behave under various va
    :figclass: align-center
    :alt: No Relationship
     
-   Indepedent
+   Independent
+
+Presentation Slides
+###################
+
+.. image:: images/codep_slides.png
+   :scale: 70 %
+   :align: center
+   :target: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994
+
+.. image:: images/codependence_slides.png
+   :scale: 40 %
+   :align: center
+   :target: https://drive.google.com/file/d/1pamteuYyc06r1q-BR3VFsxwa3c7-7oeK/view
 
 References
 ##########
 
-* `De Prado, M.L., 2020. Codependence (Presentation Slides). Available at SSRN 3512994. <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994>`__
-* `Hacine-Gharbi, A., Ravier, P., Harba, R. and Mohamadi, T., 2012. Low bias histogram-based estimation of mutual information for feature selection. Pattern Recognition Letters, 33(10), pp.1302-1308. <https://www.researchgate.net/publication/257014935_Low_bias_histogram-based_estimation_of_mutual_information_for_feature_selection>`__
-* `Hacine-Gharbi, A. and Ravier, P., 2018. A binning formula of bi-histogram for joint entropy estimation using mean square error minimization. Pattern Recognition Letters, 101, pp.21-28. <https://www.researchgate.net/publication/320887281_A_binning_formula_of_bi-histogram_for_joint_entropy_estimation_using_mean_square_error_minimization>`__
-* `Ma, J. and Sun, Z., 2011. Mutual information is copula entropy. Tsinghua Science & Technology, 16(1), pp.51-54. <https://ieeexplore.ieee.org/iel5/5971803/6077925/06077935.pdf>`__
-* `Marti Gautier, 2020. Mutual Information Is Copula Entropy. Available at personal blog. <https://gmarti.gitlab.io/qfin/2020/07/01/mutual-information-is-copula-entropy.html>`__
+* `de Prado, M.L., 2020. Codependence (Presentation Slides). Available at SSRN 3512994. <https://ssrn.com/abstract=3512994>`_
+* `Ma, J. and Sun, Z., 2011. Mutual information is copula entropy. Tsinghua Science & Technology, 16(1), pp.51-54. <https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=6077935>`_
+* `Hacine-Gharbi, A., Ravier, P., Harba, R. and Mohamadi, T., 2012. Low bias histogram-based estimation of mutual information for feature selection. Pattern recognition letters, 33(10), pp.1302-1308. <https://www.researchgate.net/publication/257014935>`_
+* `Hacine-Gharbi, A. and Ravier, P., 2018. A binning formula of bi-histogram for joint entropy estimation using mean square error minimization. Pattern Recognition Letters, 101, pp.21-28. <https://www.researchgate.net/publication/320887281>`_
