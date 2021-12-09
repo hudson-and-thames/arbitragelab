@@ -10,7 +10,6 @@ import os
 from datetime import datetime as dt
 from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
-from requests import get
 
 import analytics as segment
 import getmac
@@ -124,7 +123,6 @@ def identify():
     if not IS_DEV:
         segment.identify(MAC, {'mac_address': MAC,
                                'api_key': API_KEY,
-                               'IP': IP,
                                'created_at': dt.now()})
 
 
@@ -139,7 +137,7 @@ def track(func):
         # Validate not build server
         if not IS_DEV:
             # If 1st time func called
-            if func not in TRACK_CALLS:
+            if (func == 'Import') and (func not in TRACK_CALLS):
                 TRACK_CALLS[func] = True
                 segment.track(MAC, func, {'time': dt.now()})
     else:
@@ -157,11 +155,6 @@ MAC = get_mac()
 
 IS_DEV = is_build_server()
 TRACK_CALLS = {}
-
-try:
-    IP = get('http://checkip.amazonaws.com/').text.strip()
-except ConnectionError as err:
-    raise ConnectionError('Can not reach the Amazon CheckIP server. Please check your connection or firewall.') from err
 
 # Connect with DB
 segment.write_key = SEGMENT
