@@ -5,6 +5,9 @@
 Utility Modules
 ===============
 
+.. note::
+   `Read our article on the topic <https://hudsonthames.org/copula-for-pairs-trading-sampling-and-fitting/>`_
+
 We also included a few functionalities that are often used for copula-based trading strategies in the :code:`copula_approach`
 module listed below:
 

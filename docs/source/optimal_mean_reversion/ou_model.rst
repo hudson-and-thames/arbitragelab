@@ -33,6 +33,9 @@ Trading Under the Ornstein-Uhlenbeck Model
 
 |
 
+.. note::
+   `Read our article on the topic <https://hudsonthames.org/optimal-stopping-in-pairs-trading-ornstein-uhlenbeck-model/>`_
+
 .. warning::
 
     Alongside with Leung's research we are using :math:`\theta` for mean and :math:`\mu` for mean-reversion

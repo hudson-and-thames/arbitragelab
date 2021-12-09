@@ -36,6 +36,9 @@ ML Based Pairs Selection
 
 |
 
+.. note::
+   `Read our article on the topic <https://hudsonthames.org/employing-machine-learning-for-trading-pairs-selection/>`_
+
 The success of a Pairs Trading strategy highly depends on finding the right pairs.
 But with the increasing availability of data, more traders manage to spot interesting 
 pairs and quickly profit from the correction of price discrepancies, leaving no margin 

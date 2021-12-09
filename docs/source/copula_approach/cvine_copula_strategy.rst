@@ -35,6 +35,9 @@ C-vine Copula Strategy
 
 |
 
+.. note::
+   `Read our article on the topic <https://hudsonthames.org/copula-for-statistical-arbitrage-a-c-vine-copula-trading-strategy/>`_
+
 With the power of vine copula, we are able to model the relation among several random variables. Speficifally
 we aim to trade based on the information generated from the vine copula model.
 Similar to traditional bivariate approaches, we use the conditional (cumulative) probability to gauge whether

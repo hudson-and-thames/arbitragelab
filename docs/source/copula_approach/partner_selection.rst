@@ -37,6 +37,9 @@ Vine Copula Partner Selection
 
 |
 
+.. note::
+   `Read our article on the topic <https://hudsonthames.org/copula-for-statistical-arbitrage-stocks-selection-methods/>`_
+
 This module contains implementation of the four partner selection approaches
 mentioned in Section 3.1.1 of Statistical Arbitrage with Vine Copulas.
 

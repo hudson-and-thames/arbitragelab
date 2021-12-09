@@ -34,6 +34,9 @@ Minimum Profit Optimization
 
 |
 
+.. note::
+   `Read our article on the topic <https://hudsonthames.org/minimum-profit-optimization/>`_
+
 Introduction
 ############
 

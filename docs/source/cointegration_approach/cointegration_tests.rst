@@ -36,6 +36,9 @@ Tests for Cointegration
 
 |
 
+.. note::
+   `Read our article on the topic <https://hudsonthames.org/an-introduction-to-cointegration/>`_
+
 According to Ernest P. Chan:
 "The mathematical description of a mean-reverting price series is that the change of the price series
 in the next period is proportional to the difference between the mean price and the current price. This

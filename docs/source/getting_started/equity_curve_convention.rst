@@ -3,6 +3,9 @@
 Equity Curve Convention
 =======================
 
+.. note::
+   `Read our article on the topic <https://hudsonthames.org/correct-backtest-methodology-pairs-trading/>`_
+
 Why We Write This
 #################
 

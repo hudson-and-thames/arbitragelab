@@ -4,6 +4,9 @@
 Basic Trading Strategy
 ======================
 
+.. note::
+   `Read our article on the topic <https://hudsonthames.org/copula-for-pairs-trading-introduction/>`_
+
 .. Note::
     The following strategy closely follows the implementations:
 

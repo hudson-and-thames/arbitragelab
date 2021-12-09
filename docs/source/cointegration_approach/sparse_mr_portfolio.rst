@@ -46,6 +46,10 @@ Sparse Mean-reverting Portfolio Selection
 
 |
 
+
+.. note::
+   `Read our article on the topic <https://hudsonthames.org/sparse-mean-reverting-portfolio-selection/>`_
+
 Introduction
 ############
 

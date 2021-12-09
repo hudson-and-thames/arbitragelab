@@ -28,6 +28,9 @@ Mispricing Index Trading Strategy
 
 |
 
+.. note::
+   `Read our article on the topic <https://hudsonthames.org/copula-for-pairs-trading-overview-of-common-strategies/>`_
+
 .. Note::
     The following strategy closely follows the implementations:
 
