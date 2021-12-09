@@ -25,7 +25,8 @@ setup()
 # 1. Create package: python setup.py bdist_wheel
 # 2. Unzip the dist.whl file
 # 2.2 cd into the unzipped dir
-# 3. Obfuscate: pyarmor obfuscate --platform windows.x86_64 --platform linux.x86_64 --platform darwin.x86_64 --obf-code=0 --recursive --output dist/arbitragelab arbitragelab/__init__.py
+# 2.3 Create an expiring license: pyarmor licenses --expired 2021-01-01 c1_version
+# 3. Obfuscate: pyarmor obfuscate --with-license licenses/c1_version/license.lic --platform windows.x86_64 --platform linux.x86_64 --platform darwin.x86_64 --obf-code=0 --recursive --output dist/arbitragelab arbitragelab/__init__.py
 # 4. Repackage
 # 5. install
 # 6. test
