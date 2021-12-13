@@ -34,6 +34,9 @@ Optimal Convergence
 
 |
 
+.. note::
+   `Read our article on the topic <https://hudsonthames.org/extended-optimal-arbitrage-strategies/>`_
+
 Introduction
 ############
 

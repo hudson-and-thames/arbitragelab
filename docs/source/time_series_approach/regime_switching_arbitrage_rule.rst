@@ -33,6 +33,9 @@ Regime-Switching Arbitrage Rule
 
 |
 
+.. note::
+   `Read our article on the topic <https://hudsonthames.org/pairs-trading-with-markov-regime-switching-model/>`_
+
 The traditional pairs trading strategy usually fails when fundamental or economic reasons cause a
 structural break on one of the stocks in the pair. This break will cause the temporary spread
 deviations formed by the pair to become persistent spread deviations which will not revert.

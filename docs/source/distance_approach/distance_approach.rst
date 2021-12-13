@@ -34,6 +34,9 @@ Distance Approach
 
 |
 
+.. note::
+   `Read our article on the topic <https://hudsonthames.org/distance-approach-in-pairs-trading-part-i/>`_
+
 The distance approach was introduced in the paper by Gatev et al. (2006), and it is one of the most cited
 pairs trading papers at the time of writing this documentation. The approach described in the paper is
 the following: First, a historical period is defined, cumulative returns for assets in this period are

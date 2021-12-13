@@ -38,6 +38,9 @@ Pearson Approach
 
 |
 
+.. note::
+   `Read our article on the topic <https://hudsonthames.org/introduction-to-distance-approach-in-pairs-trading-part-ii/>`_
+
 After the distance approach was introduced in the paper by Gatev et al. (2006), a lot of research has been
 conducted to further develop the original distance approach. One of the adjustments is the Pearson correlation
 approach proposed by Chen et al.(2012). In this paper, the authors use the same data set and time frame as

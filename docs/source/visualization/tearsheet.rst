@@ -4,6 +4,9 @@
 Visualization Tear Sheets
 ==========================
 
+.. note::
+   `Read our article on the topic <https://hudsonthames.org/introducing-arbitragelab-tear-sheets/>`_
+
 `TearSheet` is the visualization class for the pairs analysis process
 based on different modules implemented in the ArbitrageLab package. It creates a locally ran Flask server,
 bringing an interactive approach to the data visualization with `Plotly's Dash <https://dash.plotly.com>`_.
@@ -22,6 +25,30 @@ Cointegration analysis and OU-model analysis available for the users.
 
 Cointegration Tear Sheet
 ########################
+
+.. raw:: html
+
+    <div style="position: relative;
+                padding-bottom: 56.25%;
+                margin-bottom: 5%;
+                height: 0;
+                overflow: hidden;
+                max-width: 100%;
+                height: auto;">
+
+        <iframe src="https://www.youtube.com/embed/dO0toCkR9ro"
+                frameborder="0"
+                allowfullscreen
+                style="position: absolute;
+                       top: 0;
+                       left: 0;
+                       width: 100%;
+                       height: 100%;">
+        </iframe>
+        <br/>
+    </div>
+
+|
 
 .. Note::
 
@@ -90,6 +117,30 @@ Code Example
 
 OU Model Tear Sheet
 ###################
+
+.. raw:: html
+
+    <div style="position: relative;
+                padding-bottom: 56.25%;
+                margin-bottom: 5%;
+                height: 0;
+                overflow: hidden;
+                max-width: 100%;
+                height: auto;">
+
+        <iframe src="https://www.youtube.com/embed/HGbWL2hhEUU"
+                frameborder="0"
+                allowfullscreen
+                style="position: absolute;
+                       top: 0;
+                       left: 0;
+                       width: 100%;
+                       height: 100%;">
+        </iframe>
+        <br/>
+    </div>
+
+|
 
 .. Note::
 

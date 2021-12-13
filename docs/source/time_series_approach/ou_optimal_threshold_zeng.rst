@@ -33,6 +33,9 @@ OU Model Optimal Trading Thresholds Zeng
 
 |
 
+.. note::
+   `Read our article on the topic <https://hudsonthames.org/optimal-trading-thresholds-for-the-o-u-process/>`_
+
 In this paper, the authors enhance the work in `Bertram(2010)
 <http://www.stagirit.org/sites/default/files/articles/a_0340_ssrn-id1505073.pdf>`_, which assumes no short selling
 of the synthetic asset when finding the optimal trading thresholds. To resolve the assumption, they derive

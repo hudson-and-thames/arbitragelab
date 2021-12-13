@@ -33,6 +33,9 @@ H-Strategy
 
 |
 
+.. note::
+   `Read our article on the topic <https://hudsonthames.org/pairs-trading-based-on-renko-and-kagi-models/>`_
+
 In this paper, the author proposes a new nonparametric approach to pairs trading based on the idea of
 Renko and Kagi charts. This approach exploits statistical information about the variability of the
 tradable process. The approach does not aim to find a long-run mean of the process and trade towards it

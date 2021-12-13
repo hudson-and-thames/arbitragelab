@@ -33,6 +33,9 @@ OU Model Optimal Trading Thresholds Bertram
 
 |
 
+.. note::
+   `Read our article on the topic <https://hudsonthames.org/optimal-trading-thresholds-for-the-o-u-process/>`_
+
 For statistical arbitrage strategies, determining the trading thresholds is an essential issue,
 and one of the solutions for this is to maximize performance per unit of time. To do so, the
 investor should choose the proper entry and exit thresholds. If the thresholds are narrow, then

@@ -35,6 +35,9 @@ OU Model Mudchanatongsuk
 
 |
 
+.. note::
+   `Read our article on the topic <https://hudsonthames.org/pairs-trading-with-stochastic-control-and-ou-process/>`_
+
 Introduction
 ############
 

@@ -36,6 +36,9 @@ Simulation of Cointegratred Series
 .. note::
    `Read our article on the topic <https://hudsonthames.org/an-introduction-to-cointegration/>`_
 
+.. note::
+   `Read our article on the topic <https://hudsonthames.org/caveats-in-calibrating-the-ou-process/>`_
+
 This module allows users to simulate:
 
 - AR(1) processes
