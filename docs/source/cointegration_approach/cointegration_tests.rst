@@ -36,9 +36,6 @@ Tests for Cointegration
 
 |
 
-.. note::
-   `Read our article on the topic <https://hudsonthames.org/an-introduction-to-cointegration/>`_
-
 According to Ernest P. Chan:
 "The mathematical description of a mean-reverting price series is that the change of the price series
 in the next period is proportional to the difference between the mean price and the current price. This
@@ -266,6 +263,57 @@ Research Notebooks
 
     <a href="https://hudthames.tech/3iIGDvv"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
     <a href="https://hudthames.tech/2S03R58"><button style="margin: 20px; margin-top: 0px">Download Sample Data</button></a>
+
+Research Article
+################
+
+.. raw:: html
+
+    <style>
+      .special {
+        display: inline-block;
+        background-color: #0399AB;
+        color: #eeeeee;
+        text-align: center;
+        font-size: 180%;
+        padding: 15px;
+        width: 100%;
+        transition: all 0.5s;
+        cursor: pointer;
+        font-family: 'Josefin Sans';
+      }
+      .special span {
+        cursor: pointer;
+        display: inline-block;
+        position: relative;
+        transition: 0.5s;
+      }
+      .special span:after {
+        content: '\00bb';
+        position: absolute;
+        opacity: 0;
+        top: 0;
+        right: -20px;
+        transition: 0.5s;
+      }
+      .special:hover {
+        background-color: #e7f2fa;
+        color: #000000;
+      }
+      .special:hover span {
+        padding-right: 25px;
+      }
+      .special:hover span:after {
+        opacity: 1;
+        right: 0;
+      }
+    </style>
+
+    <button class="special" onclick="window.open('https://hudsonthames.org/an-introduction-to-cointegration/','_blank')">
+      <span>Read our article on the topic</span>
+    </button>
+
+|
 
 Presentation Slides
 ###################

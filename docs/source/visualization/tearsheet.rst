@@ -4,9 +4,6 @@
 Visualization Tear Sheets
 ==========================
 
-.. note::
-   `Read our article on the topic <https://hudsonthames.org/introducing-arbitragelab-tear-sheets/>`_
-
 `TearSheet` is the visualization class for the pairs analysis process
 based on different modules implemented in the ArbitrageLab package. It creates a locally ran Flask server,
 bringing an interactive approach to the data visualization with `Plotly's Dash <https://dash.plotly.com>`_.
@@ -240,3 +237,54 @@ Initialising the server with an additional argument ``'jupyter'``, creates a Jup
 Running ``mode='inline'`` will allow the interactive visualisations to display within a cell output of the Jupyter notebook.
 For detailed explanations of the different modes, refer to
 `this article <https://medium.com/plotly/introducing-jupyterdash-811f1f57c02e>`_ on Jupyter Dash.
+
+Research Article
+################
+
+.. raw:: html
+
+    <style>
+      .special {
+        display: inline-block;
+        background-color: #0399AB;
+        color: #eeeeee;
+        text-align: center;
+        font-size: 180%;
+        padding: 15px;
+        width: 100%;
+        transition: all 0.5s;
+        cursor: pointer;
+        font-family: 'Josefin Sans';
+      }
+      .special span {
+        cursor: pointer;
+        display: inline-block;
+        position: relative;
+        transition: 0.5s;
+      }
+      .special span:after {
+        content: '\00bb';
+        position: absolute;
+        opacity: 0;
+        top: 0;
+        right: -20px;
+        transition: 0.5s;
+      }
+      .special:hover {
+        background-color: #e7f2fa;
+        color: #000000;
+      }
+      .special:hover span {
+        padding-right: 25px;
+      }
+      .special:hover span:after {
+        opacity: 1;
+        right: 0;
+      }
+    </style>
+
+    <button class="special" onclick="window.open('https://hudsonthames.org/introducing-arbitragelab-tear-sheets/','_blank')">
+      <span>Read our article on the topic</span>
+    </button>
+
+|
