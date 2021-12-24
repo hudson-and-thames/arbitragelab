@@ -1,6 +1,6 @@
 <div align="center">
    <a href="https://hudsonthames.org/">
-   <img src="https://raw.githubusercontent.com/hudson-and-thames/mlfinlab/master/docs/source/logo/Hudson%20%26%20Thames_verticalblack.png" height="300"><br>
+   <img src="https://hudsonthames.org/wp-content/uploads/2021/04/featured-picture-arbitragelab.jpg" height="300"><br>
 </div>
 
 
