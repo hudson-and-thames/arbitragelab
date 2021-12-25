@@ -1,34 +1,50 @@
 <div align="center">
-   <a href="https://hudsonthames.org/">
-   <img src="https://hudsonthames.org/wp-content/uploads/2021/04/featured-picture-arbitragelab.jpg" height="300"><br>
+   <a href="https://hudsonthames.org/arbitragelab">
+   <img src="https://hudsonthames.org/wp-content/uploads/2021/04/featured-picture-arbitragelab.jpg" height="100%" 
+   style="margin-left: auto; margin-right: auto; display:block;">
+   
+   </a>
+  </br>
 </div>
 
+# Welcome to Statistical Arbitrage Laboratory! 
 
------------------
-# Statistical Arbitrage Laboratory (ArbitrageLab)
+## What is ArbitrageLab?
 
-ArbitrageLab is a python library that enables traders who want to exploit mean-reverting portfolios by providing a complete set of algorithms from the best academic journals.
+ArbitrageLab is a python library that enables traders who want to exploit mean-reverting portfolios
+by providing a complete set of algorithms from the best academic journals.
 
-## Documentation & Tutorials
-We lower barriers to entry for all users by providing extensive documentation and tutorial notebooks, with code examples.
+## Documentation, Example Notebooks and Lecture Videos
+For every technique present in the library we not only provide extensive documentation, with both theoretical explanations
+and detailed descriptions of available functions, but also supplement the modules with ever-growing array of lecture videos and slides 
+on the implemented methods.
+ 
+We want you to be able to use the tools right away. To achieve that, every module comes with a number of example notebooks 
+which include detailed examples of the usage of the algorithms. Our goal is to show you the whole pipeline, starting from 
+importing the libraries and ending with strategy performance metrics so you can get the added value from the get-go.
+
+## Licensing options
+This project is licensed under an all rights reserved [licence](https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt).
+
+* Business
+* Enterprise
+
+## Community
+With the purchase of the library, our clients get access to the Hudson & Thames Slack community, where our engineers and other quants 
+are always ready to answer your questions.
+
+Alternatively, you can email us at: research@hudsonthames.org.
+
+<div align="center">
+   <a>
+   <img src="https://hudsonthames.org/wp-content/uploads/2021/11/header_github_ht.jpg" width="100%" 
+   style="margin-left: auto; margin-right: auto; display:block;">
+   </a>
+</div>
 
 ## Who is Hudson & Thames?
-Hudson and Thames Quantitative Research is a company with a focus on implementing the most cutting edge algorithms in 
-quantitative finance. We productionalize all our tools in the form of libraries and provide capability to our clients.
+Hudson and Thames Quantitative Research is a company with the goal of bridging the gap between the advanced research developed in 
+quantitative finance and its practical application. We have created three premium python libraries so you can effortlessly access the
+latest techniques and focus on what matters most: **creating your own winning strategy**.
 
-Adding our libraries to your company’s pipeline is like adding a department of PhD researchers.
-
-* [Website](https://hudsonthames.org/)
-* [Github Group](https://github.com/hudson-and-thames)
-* [MlFinLab](https://mlfinlab.readthedocs.io/en/latest/)
-* [PortfolioLab](https://hudson-and-thames-portfoliolab.readthedocs-hosted.com/en/latest/)
-
----
-
-## Contact us
-The best place to contact the team is via the ArbitrageLab Slack channel. Alternatively you can email us at: research@hudsonthames.org.
-
-Looking forward to hearing from you!
-
-## License
-This project is licensed under an all rights reserved [licence](https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html).
+### What was only possible with the help of huge R&D teams is now at your disposal, anywhere, anytime.
