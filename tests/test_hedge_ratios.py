@@ -39,12 +39,12 @@ class TestHedgeRatios(unittest.TestCase):
         Test OLS hedge ratio calculation.
         """
 
-        clf, _, _, residuals = get_ols_hedge_ratio(price_data=self.cointegrated_series, dependent_variable='Y')
-        clf_constant, _, _, residuals_const = get_ols_hedge_ratio(price_data=self.cointegrated_series,
-                                                                  dependent_variable='Y',
-                                                                  add_constant=True)
-        self.assertAlmostEqual(clf.coef_[0], 5, delta=1e-3)
-        self.assertAlmostEqual(clf_constant.coef_[0], 5, delta=1e-2)
+        hedge_ratios, _, _, residuals = get_ols_hedge_ratio(price_data=self.cointegrated_series, dependent_variable='Y')
+        hedge_ratios_constant, _, _, residuals_const = get_ols_hedge_ratio(price_data=self.cointegrated_series,
+                                                                           dependent_variable='Y',
+                                                                           add_constant=True)
+        self.assertAlmostEqual(hedge_ratios[0], 5, delta=1e-3)
+        self.assertAlmostEqual(hedge_ratios_constant[0], 5, delta=1e-2)
         self.assertAlmostEqual(residuals.mean(), 0, delta=1e-2)
         self.assertAlmostEqual(residuals_const.mean(), 0, delta=1e-2)
 
@@ -53,15 +53,21 @@ class TestHedgeRatios(unittest.TestCase):
         Test TLS hedge ratio calculation.
         """
 
-        clf, _, _, residuals = get_tls_hedge_ratio(price_data=self.cointegrated_series, dependent_variable='Y')
-        self.assertAlmostEqual(clf.beta[0], 5, delta=1e-3)
+        hedge_ratios, _, _, residuals = get_tls_hedge_ratio(price_data=self.cointegrated_series, dependent_variable='Y')
+        hedge_ratios_constant, _, _, residuals_const = get_tls_hedge_ratio(price_data=self.cointegrated_series,
+                                                                           dependent_variable='Y',
+                                                                           add_constant=True)
+        self.assertAlmostEqual(hedge_ratios[0], 5, delta=1e-3)
+        self.assertAlmostEqual(hedge_ratios_constant[0], 5, delta=1e-2)
         self.assertAlmostEqual(residuals.mean(), 0, delta=1e-2)
+        self.assertAlmostEqual(residuals_const.mean(), 0, delta=1e-2)
 
     def test_hl_hedge_ratio(self):
         """
         Test HL hedge ratio calculation.
         """
 
-        clf, _, _, residuals = get_minimum_hl_hedge_ratio(price_data=self.cointegrated_series, dependent_variable='Y')
-        self.assertAlmostEqual(clf.x[0], 5, delta=1e-3)
+        hedge_ratios, _, _, residuals = get_minimum_hl_hedge_ratio(price_data=self.cointegrated_series,
+                                                                   dependent_variable='Y')
+        self.assertAlmostEqual(hedge_ratios[0], 5, delta=1e-3)
         self.assertAlmostEqual(residuals.mean(), 0.06, delta=1e-2)

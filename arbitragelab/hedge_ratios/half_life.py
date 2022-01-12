@@ -27,7 +27,7 @@ def _min_hl_function(beta: np.array, X: pd.DataFrame, y: pd.Series) -> float:
 
     spread = y - (beta * X).sum(axis=1)
 
-    return get_half_life_of_mean_reversion(spread)
+    return abs(get_half_life_of_mean_reversion(spread))
 
 
 def get_minimum_hl_hedge_ratio(price_data: pd.DataFrame, dependent_variable: str) -> \
@@ -48,4 +48,4 @@ def get_minimum_hl_hedge_ratio(price_data: pd.DataFrame, dependent_variable: str
     result = minimize(_min_hl_function, x0=initial_guess, method='BFGS', tol=1e-5, args=(X, y))
     residuals = y - (result.x * X).sum(axis=1)
 
-    return result, X, y, residuals
+    return result.x, X, y, residuals
