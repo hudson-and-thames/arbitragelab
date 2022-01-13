@@ -15,20 +15,21 @@ from scipy.odr import ODR, Model, RealData
 
 
 def get_ols_hedge_ratio(price_data: pd.DataFrame, dependent_variable: str, add_constant: bool = False) -> \
-        Tuple[list, pd.DataFrame, pd.Series, pd.Series]:
+        Tuple[dict, pd.DataFrame, pd.Series, pd.Series]:
     """
     Get OLS hedge ratio: y = beta*X.
 
     :param price_data: (pd.DataFrame) Data Frame with security prices.
     :param dependent_variable: (str) Column name which represents the dependent variable (y).
     :param add_constant: (bool) Boolean flag to add constant in regression setting.
-    :return: (Tuple) Fit OLS, X, and y and OLS fit residuals.
+    :return: (Tuple) Hedge ratios, X, and y and OLS fit residuals.
     """
 
     ols_model = LinearRegression(fit_intercept=add_constant)
 
     X = price_data.copy()
     X.drop(columns=dependent_variable, axis=1, inplace=True)
+    exogenous_variables = X.columns.tolist()
     if X.shape[1] == 1:
         X = X.values.reshape(-1, 1)
 
@@ -38,8 +39,9 @@ def get_ols_hedge_ratio(price_data: pd.DataFrame, dependent_variable: str, add_c
     residuals = y - ols_model.predict(X)
 
     hedge_ratios = ols_model.coef_
+    hedge_ratios_dict = dict(zip([dependent_variable] + exogenous_variables, np.insert(hedge_ratios, 0, 1.0)))
 
-    return hedge_ratios, X, y, residuals
+    return hedge_ratios_dict, X, y, residuals
 
 
 def _linear_f_constant(beta: np.array, x_variable: np.array) -> np.array:
@@ -85,14 +87,14 @@ def _linear_f_constant(beta: np.array, x_variable: np.array) -> np.array:
 
 
 def get_tls_hedge_ratio(price_data: pd.DataFrame, dependent_variable: str, add_constant: bool = False) -> \
-        Tuple[list, pd.DataFrame, pd.Series, pd.Series]:
+        Tuple[dict, pd.DataFrame, pd.Series, pd.Series]:
     """
     Get Total Least Squares (TLS) hedge ratio using Orthogonal Regression.
 
     :param price_data: (pd.DataFrame) Data Frame with security prices.
     :param dependent_variable: (str) Column name which represents the dependent variable (y).
     :param add_constant: (bool) Boolean flag to add constant in regression setting.
-    :return: (Tuple) Fit TLS object, X, and y and fit residuals.
+    :return: (Tuple) Hedge ratios dict, X, and y and fit residuals.
     """
 
     X = price_data.copy()
@@ -106,6 +108,7 @@ def get_tls_hedge_ratio(price_data: pd.DataFrame, dependent_variable: str, add_c
 
     hedge_ratios = res_co.beta[1:]  # We don't need constant.
     residuals = y - res_co.beta[0] - (X * hedge_ratios).sum(axis=1) if add_constant is True else y - (
-                X * hedge_ratios).sum(axis=1)
+            X * hedge_ratios).sum(axis=1)
+    hedge_ratios_dict = dict(zip([dependent_variable] + X.columns.tolist(), np.insert(hedge_ratios, 0, 1.0)))
 
-    return hedge_ratios.x, X, y, residuals
+    return hedge_ratios_dict, X, y, residuals
