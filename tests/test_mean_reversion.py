@@ -31,7 +31,7 @@ class TestCointegration(unittest.TestCase):
         data_path = project_path + '/test_data/stock_prices.csv'
         self.data = pd.read_csv(data_path, parse_dates=True, index_col="Date")
 
-    def test_angle_granger(self):
+    def test_engle_granger(self):
         """
         Tests functions from EngleGrangerPortfolio for cointegration vectors and critical values.
         """
