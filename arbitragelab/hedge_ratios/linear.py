@@ -44,20 +44,6 @@ def get_ols_hedge_ratio(price_data: pd.DataFrame, dependent_variable: str, add_c
     return hedge_ratios_dict, X, y, residuals
 
 
-def _linear_f_constant(beta: np.array, x_variable: np.array) -> np.array:
-    """
-    This is the helper linear model that is used in the Orthogonal Regression.
-
-    :param beta: (np.array) Model beta coefficient.
-    :param x_variable: (np.array) Model X vector.
-    :return: (np.array) Vector result of equation calculation.
-    """
-    a, b = beta[0], beta[1:]
-    b.shape = (b.shape[0], 1)
-
-    return a + (x_variable * b).sum(axis=0)
-
-
 def _linear_f_no_constant(beta: np.array, x_variable: np.array) -> np.array:
     """
     This is the helper linear model that is used in the Orthogonal Regression.
@@ -66,7 +52,7 @@ def _linear_f_no_constant(beta: np.array, x_variable: np.array) -> np.array:
     :param x_variable: (np.array) Model X vector.
     :return: (np.array) Vector result of equation calculation.
     """
-    a, b = beta[0], beta[1:]
+    _, b = beta[0], beta[1:]
     b.shape = (b.shape[0], 1)
 
     return (x_variable * b).sum(axis=0)

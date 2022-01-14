@@ -147,7 +147,7 @@ class CointegrationSpreadSelector(AbstractPairsSelector):
 
         cointegration_results = []
 
-        for iteration, (spread_ticker, spread_series) in enumerate(spreads_dict.items()):
+        for iteration, spread_series in enumerate(spreads_dict.values()):
             eg_port = EngleGrangerPortfolio()
 
             constant = spread_series.mean()
@@ -167,7 +167,8 @@ class CointegrationSpreadSelector(AbstractPairsSelector):
                             index=list(spreads_dict.keys()),
                             columns=['coint_t', 'p_value_99%', 'p_value_95%', 'p_value_90%', 'constant'])
 
-    def _hurst_criterion(self, spreads_dict: dict, spread_tickers: list, hurst_exp_threshold: int = 0.5) -> pd.Series:
+    @staticmethod
+    def _hurst_criterion(spreads_dict: dict, spread_tickers: list, hurst_exp_threshold: int = 0.5) -> pd.Series:
         """
         This method will go through all the pairs given, calculate the needed spread and run
         the Hurst exponent test against each one.

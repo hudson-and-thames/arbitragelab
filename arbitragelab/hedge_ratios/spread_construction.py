@@ -23,5 +23,4 @@ def construct_spread(price_data: pd.DataFrame, hedge_ratios: pd.Series, dependen
     if dependent_variable is not None:
         non_dependent_variables = [x for x in weighted_prices.columns if x != dependent_variable]
         return weighted_prices[dependent_variable] - weighted_prices[non_dependent_variables].sum(axis=1)
-    else:
-        return weighted_prices[weighted_prices.columns[0]] - weighted_prices[weighted_prices.columns[1:]].sum(axis=1)
+    return weighted_prices[weighted_prices.columns[0]] - weighted_prices[weighted_prices.columns[1:]].sum(axis=1)

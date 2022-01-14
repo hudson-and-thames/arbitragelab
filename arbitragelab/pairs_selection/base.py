@@ -9,9 +9,9 @@ Abstract pair selector class.
 from abc import ABC
 from abc import abstractmethod
 
+import sys
 import numpy as np
 import pandas as pd
-import sys
 
 import matplotlib.pyplot as plt
 from matplotlib.axes._axes import Axes
