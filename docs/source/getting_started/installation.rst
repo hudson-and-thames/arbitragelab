@@ -88,6 +88,7 @@ Ubuntu Linux
     .. code-block::
 
         pip install --no-cache-dir -I cvxpy==1.1.10
+        pip install scs==2.1.4
 
 9. (Optional) **Only if you want to use the ML Approach Module**, install the TensorFlow, Keras packages, and update the NumPy version.
    Note that you should have pip version "pip==20.1.1" to do this. Supported TensorFlow and Keras versions
@@ -192,6 +193,7 @@ Mac OS X
     .. code-block::
 
         pip install --no-cache-dir -I cvxpy==1.1.10
+        pip install scs==2.1.4
 
 9. (Optional) **Only if you want to use the ML Approach Module**, install the TensorFlow, Keras packages, and update the NumPy version.
    Note that you should have pip version "pip==20.1.1" to do this. Supported TensorFlow and Keras versions
@@ -296,6 +298,7 @@ Windows
    .. code-block::
 
       conda install -c conda-forge "cvxpy=1.1.10"
+      pip install scs==2.1.4
 
 8. Install ArbitrageLab into your python environment via the terminal.
 
