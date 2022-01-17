@@ -12,6 +12,7 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+* :bug:`69 major` Fixed SCS package version breaking Sparse MR Module.
 * :support:`66` Added presentation slides and videos to documentation.
 
 * :release:`0.6.0 <2021-11-15>`
