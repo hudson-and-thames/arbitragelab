@@ -31,6 +31,8 @@ Introduction
         <br/>
     </div>
 
+|
+
 Mean-reverting processes and events often occur in nature. Observations of the processes that have a
 mean-reverting nature tend to move to their average value over time. However, as mentioned in
 the work of E.P. Chan, most financial price series are not mean-reverting.

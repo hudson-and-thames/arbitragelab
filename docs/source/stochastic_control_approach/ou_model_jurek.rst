@@ -32,6 +32,8 @@ OU Model Jurek
         <br/>
     </div>
 
+|
+
 Introduction
 ############
 
@@ -521,6 +523,31 @@ The following research notebook can be used to better understand the approach de
 
     <a href="https://hudthames.tech/3wyIJSK"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
     <a href="https://hudthames.tech/2S03R58"><button style="margin: 20px; margin-top: 0px">Download Sample Data</button></a>
+
+Presentation Slides
+###################
+
+.. raw:: html
+
+    <div style="position: relative;
+                padding-bottom: 56.25%;
+                height: 0;
+                overflow: hidden;
+                max-width: 100%;
+                height: auto;">
+
+        <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vQfY6XeBJButvol4zgWtDUY3XMjhKMr3Z9gXekY94m_3eAJuy4FR_520WAQpT1m_tZ3eWkI6zqD_af9/embed?start=false&loop=false&delayms=3000#slide=id.gdb744a52cf_0_314"
+                frameborder="0"
+                allowfullscreen
+                style="position: absolute;
+                       top: 0;
+                       left: 0;
+                       width: 100%;
+                       height: 100%;">
+        </iframe>
+    </div>
+
+|
 
 References
 ##########

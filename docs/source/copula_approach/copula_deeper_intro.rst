@@ -10,7 +10,7 @@
        Proceedings of the first brazilian conference on statistical modeling in insurance and finance.
        University Press USP Sao Paulo, 2003.
     3. Chang, Bo. `Copula: A Very Short Introduction <https://bochang.me/blog/posts/copula/>`__.
-    4. Andy Jones. `SCAD penalty <https://andrewcharlesjones.github.io/posts/2020/03/scad/>`__.
+    4. Andy Jones. `SCAD penalty <https://andrewcharlesjones.github.io/journal/scad.html>`__.
 
 =========================
 A Deeper Intro to Copulas
@@ -437,7 +437,7 @@ References
 * `Liew, R.Q. and Wu, Y., 2013. Pairs trading: A copula approach. Journal of Derivatives & Hedge Funds, 19(1), pp.12-30. <https://link.springer.com/article/10.1057/jdhf.2013.1>`__
 * `Stander, Y., Marais, D. and Botha, I., 2013. Trading strategies with copulas. Journal of Economic and Financial Sciences, 6(1), pp.83-107. <https://www.researchgate.net/publication/318054326_Trading_strategies_with_copulas>`__
 * `Schmid, F., Schmidt, R., Blumentritt, T., Gaißer, S. and Ruppert, M., 2010. Copula-based measures of multivariate association. In Copula theory and its applications (pp. 209-236). Springer, Berlin, Heidelberg. <https://www.researchgate.net/publication/225898324_Copula-Based_Measures_of_Multivariate_Association>`__
-* `Huard, D., Évin, G. and Favre, A.C., 2006. Bayesian copula selection. Computational Statistics & Data Analysis, 51(2), pp.809-822. <http://www.academia.edu/download/43927781/Bayesian_copula_selection20160320-19907-11r1q20.pdf>`__
+* `Huard, D., Évin, G. and Favre, A.C., 2006. Bayesian copula selection. Computational Statistics & Data Analysis, 51(2), pp.809-822. <https://dl.acm.org/doi/10.1016/j.csda.2005.08.010>`__
 * `Kole, E., Koedijk, K. and Verbeek, M., 2007. Selecting copulas for risk management. Journal of Banking & Finance, 31(8), pp.2405-2423. <https://repub.eur.nl/pub/12668/SelectingCopulas_2005.pdf>`__
 * `Nelsen, R.B., 2003, September. Properties and applications of copulas: A brief survey. In Proceedings of the first brazilian conference on statistical modeling in insurance and finance (pp. 10-28). University Press USP Sao Paulo. <http://w4.stern.nyu.edu/ioms/docs/sg/seminars/nelsen.pdf>`__
 * `Cai, Z. and Wang, X., 2014. Selection of mixed copula model via penalized likelihood. Journal of the American Statistical Association, 109(506), pp.788-801. <https://www.tandfonline.com/doi/pdf/10.1080/01621459.2013.873366?casa_token=e4kOD3APdtUAAAAA:DnBnxkvcOtfPw3gDYoO66db8GzJiGS5M2G5rMK3ERfAvejk5022dhjAe2X26dk7eTf9kWmYfMg6Mkg>`__

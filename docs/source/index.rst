@@ -1,15 +1,18 @@
-.. image:: _static/logo_black.png
-   :scale: 50 %
+.. image:: https://hudsonthames.org/wp-content/uploads/2021/12/documentation-header-arbitragelab.jpg
    :align: center
    :target: https://hudsonthames.org/
 
 |
 
-===============================================
-Statistical Arbitrage Laboratory (ArbitrageLab)
-===============================================
+============================================
+Welcome to Statistical Arbitrage Laboratory
+============================================
 
-ArbitrageLab is a python library that enables traders who want to exploit mean-reverting portfolios by providing a complete set of algorithms from the best academic journals.
+
+**What was only possible with the help of huge R&D teams is now at your disposal, anywhere, anytime.**
+
+ArbitrageLab is a python library that includes both end-to-end strategies and strategy creation tools that cover the
+whole range of strategies defined by Krauss' taxonomy for pairs trading strategies.
 
 .. raw:: html
 
@@ -30,37 +33,124 @@ ArbitrageLab is a python library that enables traders who want to exploit mean-r
                        height: 100%;">
         </iframe>
     </div>
+|
 
-----
 
-Documentation & Tutorials
-#########################
+Hudson & Thames documentation has three core advantages in helping you learn the new techniques:
+**Thoroughness**, **Flexibility** and **Credibility**.
 
-We lower barriers to entry for all users by providing extensive documentation and tutorial notebooks, with code examples.
+.. image:: https://hudsonthames.org/wp-content/uploads/2021/03/1-n.png
+   :height: 70 px
+   :align: left
+   :target: https://hudsonthames.org/
+
+
+____________
+
+Thoroughness
+++++++++++++
+|
+
+We want to make the learning process for the advanced tools and approaches effortless
+for our clients by providing detailed explanations, examples of use and additional context behind them.
+
+The general documentation structure looks the following way:
+
+
++------------------------------------------+
+|   Documentation page :                   |
++==========================================+
+|    Lecture video*                        |
++------------------------------------------+
+|    Mathematical concept explanation      |
++------------------------------------------+
+|    Implementation description            |
++------------------------------------------+
+|    Short code example                    |
++------------------------------------------+
+|    Link to an extensive example notebook |
++------------------------------------------+
+|    Presentation slides*                  |
++------------------------------------------+
+
+\* *- optional content*
+
+.. image:: https://hudsonthames.org/wp-content/uploads/2021/03/2-n.png
+   :height: 70 px
+   :align: left
+   :target: https://hudsonthames.org/
+
+___________
+
+Flexibility
++++++++++++
+|
+
+Learn in the way that is most suitable for you as more and more documentation pages are now supplemented with both
+video lectures and presentation slides on the topic.
+
+
+.. image:: https://hudsonthames.org/wp-content/uploads/2021/12/docs-example.png
+   :align: center
+   :target: https://hudsonthames.org/
+|
+
+.. image:: https://hudsonthames.org/wp-content/uploads/2021/03/3-n.png
+   :height: 70 px
+   :align: left
+   :target: https://hudsonthames.org/
+
+___________
+
+Credibility
++++++++++++
+|
+
+All of our implementations are from the most elite and peer-reviewed journals.
+
+
+
+Including publications from:
+
+1. `The Journal of Portfolio Management <https://jpm.pm-research.com/>`_
+2. `The Journal of Financial Data Science <https://jfds.pm-research.com/>`_
+3. `The Journal of Algorithmic Finance <http://www.algorithmicfinance.org/>`_
+4. `Cambridge University Press <https://www.cambridge.org/>`_
+
+.. image:: https://hudsonthames.org/wp-content/uploads/2021/12/sourses-v2.png
+   :align: center
+|
+
+
+.. image:: https://hudsonthames.org/wp-content/uploads/2021/11/header_github_ht.jpg
+   :align: center
+   :target: https://hudsonthames.org/
+|
 
 Who is Hudson & Thames?
-#######################
++++++++++++++++++++++++
 
-Hudson and Thames Quantitative Research is a company with a focus on implementing the most cutting edge algorithms in
-quantitative finance. We productionalize all our tools in the form of libraries and provide capability to our clients.
-
-Adding our libraries to your company’s pipeline is like adding a department of PhD researchers.
-
-* `Website <https://hudsonthames.org/>`__
-* `Github Group <https://github.com/hudson-and-thames>`__
-* `MlFinLab <https://mlfinlab.readthedocs.io/en/latest/>`__
+Hudson and Thames Quantitative Research is a company with the goal of bridging the gap between the advanced research developed in
+quantitative finance and its practical application. We have created three premium python libraries so you can effortlessly access the
+latest techniques and focus on what matters most: **creating your own winning strategy**.
 
 
-Contact us
-##########
-The best place to contact the team is via the ArbitrageLab Slack channel. Alternatively you can email us at: research@hudsonthames.org.
+Community
++++++++++
 
-Looking forward to hearing from you!
+With the purchase of the library, our clients get access to the Hudson & Thames Slack community, where our engineers and other quants
+are always ready to answer your questions.
+
+Alternatively, you can email us at: research@hudsonthames.org.
+
+
 
 License
-#######
++++++++
 
-This project is licensed under an all rights reserved licence.
+This project is licensed under an all rights reserved license and is NOT open-source, and may not be used for any purposes without a commercial license which may be purchased from Hudson and Thames Quantitative Research.
+
+
 
 .. toctree::
     :maxdepth: 2
@@ -78,7 +168,6 @@ This project is licensed under an all rights reserved licence.
 
     getting_started/installation
     getting_started/research_tools
-    getting_started/roadmap
     getting_started/equity_curve_convention
 
 .. toctree::

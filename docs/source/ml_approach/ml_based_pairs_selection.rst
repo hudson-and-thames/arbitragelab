@@ -12,6 +12,30 @@
 ML Based Pairs Selection
 ========================
 
+.. raw:: html
+
+    <div style="position: relative;
+                padding-bottom: 56.25%;
+                margin-bottom: 5%;
+                height: 0;
+                overflow: hidden;
+                max-width: 100%;
+                height: auto;">
+
+        <iframe src="https://www.youtube.com/embed/R22JR4tqqqs"
+                frameborder="0"
+                allowfullscreen
+                style="position: absolute;
+                       top: 0;
+                       left: 0;
+                       width: 100%;
+                       height: 100%;">
+        </iframe>
+        <br/>
+    </div>
+
+|
+
 The success of a Pairs Trading strategy highly depends on finding the right pairs.
 But with the increasing availability of data, more traders manage to spot interesting 
 pairs and quickly profit from the correction of price discrepancies, leaving no margin 
@@ -142,9 +166,9 @@ expect that if the variables are truly cointegrated the two equations will yield
 
 To mitigate this issue, the original paper proposes that the Engle-Granger test is run for the two 
 possible selections of the dependent variable and that the combination that generated the lowest t-statistic 
-is selected. Further work in `Hoel (2013) <https://core.ac.uk/download/pdf/52072275.pdf>`__ adds on, "the 
-unsymmetrical coefficients imply that a hedge of long / short is not the opposite of long / short , i.e. 
-the hedge ratios are inconsistent". 
+is selected. Further work in `Hoel (2013) <https://openaccess.nhh.no/nhh-xmlui/bitstream/handle/11250/169897/hoel2013.pdf?sequence=1>`__
+adds on, "the unsymmetrical coefficients imply that a hedge of long / short is not the opposite of long / short ,
+i.e. the hedge ratios are inconsistent".
 
 A better solution is proposed and implemented, based on `Gregory et al. (2011) <http://dx.doi.org/10.2139/ssrn.1663703>`__ 
 to use orthogonal regression – also referred to as Total Least Squares (TLS) – in which the residuals 
@@ -258,6 +282,31 @@ The following research notebook can be used to better understand the Pairs Selec
     <a href="https://hudthames.tech/3gFGwy8"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
     <a href="https://hudthames.tech/2S03R58"><button style="margin: 20px; margin-top: 0px">Download Sample Data</button></a>
 
+Presentation Slides
+###################
+
+.. raw:: html
+
+    <div style="position: relative;
+                padding-bottom: 56.25%;
+                height: 0;
+                overflow: hidden;
+                max-width: 100%;
+                height: auto;">
+
+        <iframe src="https://docs.google.com/presentation/d/e/2PACX-1vSEB8nZgKR13qVuHVbeACt3iXbqJC2ZiCL4FSIMKwFLwzXhaQPYwcBqQC4UBtAYj7J8GWLIrAySZ1OS/embed?start=false&loop=false&delayms=3000"
+                frameborder="0"
+                allowfullscreen
+                style="position: absolute;
+                       top: 0;
+                       left: 0;
+                       width: 100%;
+                       height: 100%;">
+        </iframe>
+    </div>
+
+|
+
 References
 ##########
 
@@ -273,6 +322,6 @@ References
 
 * `Armstrong, J.S. ed., 2001. Principles of forecasting: a handbook for researchers and practitioners (Vol. 30). Springer Science & Business Media. <http://doi.org/10.1007/978-0-306-47630-3>`__
 
-* `Hoel, C.H., 2013. Statistical arbitrage pairs: can cointegration capture market neutral profits? (Master's thesis). <https://core.ac.uk/download/pdf/52072275.pdf>`__
+* `Hoel, C.H., 2013. Statistical arbitrage pairs: can cointegration capture market neutral profits? (Master's thesis). <https://openaccess.nhh.no/nhh-xmlui/bitstream/handle/11250/169897/hoel2013.pdf?sequence=1>`__
 
 * `Gregory, I., Ewald, C.O. and Knox, P., 2010, November. Analytical pairs trading under different assumptions on the spread and ratio dynamics. In 23rd Australasian Finance and Banking Conference. <http://dx.doi.org/10.2139/ssrn.1663703>`__
