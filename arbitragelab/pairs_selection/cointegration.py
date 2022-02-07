@@ -79,12 +79,12 @@ class CointegrationSpreadSelector(AbstractPairsSelector):
             spreads_dict['_'.join(bundle)] = spread
         return spreads_dict
 
-    def select_pairs(self, hedge_ratio_calculation: str = 'OLS',
-                     adf_cutoff_threshold: float = 0.95,
-                     hurst_exp_threshold: float = 0.5,
-                     min_crossover_threshold_per_year: int = 12,
-                     min_half_life: float = 365,
-                     test_period: str = '2Y') -> list:
+    def select_spreads(self, hedge_ratio_calculation: str = 'OLS',
+                       adf_cutoff_threshold: float = 0.95,
+                       hurst_exp_threshold: float = 0.5,
+                       min_crossover_threshold_per_year: int = 12,
+                       min_half_life: float = 365,
+                       test_period: str = '2Y') -> list:
         """
         Apply cointegration selection rules (ADF, Hurst, Min SMA crossover, Min Half-Life) to filter-out pairs/baskets.
 

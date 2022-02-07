@@ -8,9 +8,9 @@
    In order to use this module, you should additionally install *TensorFlow v2.2.1.* and *Keras v2.3.1.*
    For more details, please visit our :ref:`ArbitrageLab installation guide <getting_started-installation>`.
 
-========================
-ML Based Pairs Selection
-========================
+==========================
+ML Based Spreads Selection
+==========================
 
 .. raw:: html
 
@@ -206,24 +206,28 @@ thus providing enough opportunities to exit a position.
     threshold may seem too strict in pair selection which can be decreased to either 95% or 90%. On the other hand,
     the user may impose more strict thresholds on half life of mean reversion.
 
+.. note::
+    H&T teams has extended pair selection rules to higher dimensions such that filtering rules can be applied to any spread, not only
+    pairs. As a result, the module can be applied in statistical arbitrage applications.
+
 Implementation
 **************
 
 
 .. automodule:: arbitragelab.pairs_selection.cointegration
 
-.. autoclass:: CointegrationPairsSelector
+.. autoclass:: CointegrationSpreadSelector
    :members: __init__
 
 
-.. automethod:: CointegrationPairsSelector.select_pairs
-.. automethod:: CointegrationPairsSelector.plot_selected_pairs
+.. automethod:: CointegrationSpreadSelector.select_pairs
+.. automethod:: CointegrationSpreadSelector.plot_selected_pairs
 
 Following methods describe the results of the selector in various ways.
 
-.. automethod:: CointegrationPairsSelector.describe
-.. automethod:: CointegrationPairsSelector.describe_extra
-.. automethod:: CointegrationPairsSelector.describe_pairs_sectoral_info
+.. automethod:: CointegrationSpreadSelector.describe
+.. automethod:: CointegrationSpreadSelector.describe_extra
+.. automethod:: CointegrationSpreadSelector.describe_pairs_sectoral_info
 
 .. note::
     In the original paper Pairs Selection module was a part of ML Pairs Trading approach. However, the user may want to use pairs selection
@@ -240,7 +244,7 @@ Examples
     import pandas as pd
     import numpy as np
     from arbitragelab.ml_approach import OPTICSDBSCANPairsClustering
-    from arbitragelab.pairs_selection import CointegrationPairsSelector
+    from arbitragelab.pairs_selection import CointegrationSpreadSelector
 
     # Getting the dataframe with time series of asset returns
     data = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])
@@ -254,19 +258,19 @@ Examples
     clustered_pairs = pairs_clusterer.cluster_using_optics({'min_samples': 3})
 
     # Generated Pairs are processed through the rules mentioned above
-    pairs_selector = CointegrationPairsSelector(prices_df=data, pairs_to_filter=clustered_pairs)
-    filtered_pairs = pairs_selector.select_pairs()
+    spreads_selector = CointegrationSpreadSelector(prices_df=data, baskets_to_filter=clustered_pairs)
+    filtered_spreads = spreads_selector.select_spreads()
 
     # Generate a Panel of information of the selected pairs
-    final_pairs_info = pairs_selector.describe_extra()
+    final_pairs_info = spreads_selector.describe_extra()
 
     # Import the ticker sector info csv
     sectoral_info = pd.read_csv('X_FILE_PATH.csv')
 
     # Generate a sector/industry relationship Panel of each pair
-    pairs_selector.describe_pairs_sectoral_info(final_pairs_info['leg_1'],
-                                                final_pairs_info['leg_2'],
-                                                sectoral_info)
+    spreads_selector.describe_pairs_sectoral_info(final_pairs_info['leg_1'],
+                                                  final_pairs_info['leg_2'],
+                                                  sectoral_info)
 
 Research Notebooks
 ##################

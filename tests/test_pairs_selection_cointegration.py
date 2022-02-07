@@ -77,9 +77,8 @@ class TestCointegrationSelector(unittest.TestCase):
         input_pairs = final_pairs + other_pairs
         pairs_selector = CointegrationSpreadSelector(prices_df=self.data, baskets_to_filter=input_pairs)
 
-        result = pairs_selector.select_pairs(hedge_ratio_calculation='OLS',
-                                             adf_cutoff_threshold=0.9,
-                                             min_crossover_threshold_per_year=None)
+        result = pairs_selector.select_spreads(hedge_ratio_calculation='OLS', adf_cutoff_threshold=0.9,
+                                               min_crossover_threshold_per_year=None)
 
         # Assert that only 2 pairs passes cointegration tests and only 1 pair passes all tests.
         self.assertCountEqual(result, ['BA_CF'])
@@ -96,10 +95,8 @@ class TestCointegrationSelector(unittest.TestCase):
         input_pairs = final_pairs + other_pairs
         pairs_selector = CointegrationSpreadSelector(prices_df=self.data, baskets_to_filter=input_pairs)
 
-        result = pairs_selector.select_pairs(adf_cutoff_threshold=0.9,
-                                             min_crossover_threshold_per_year=None,
-                                             hurst_exp_threshold=0.55,
-                                             hedge_ratio_calculation='TLS')
+        result = pairs_selector.select_spreads(hedge_ratio_calculation='TLS', adf_cutoff_threshold=0.9,
+                                               hurst_exp_threshold=0.55, min_crossover_threshold_per_year=None)
         # Assert that only 2 pairs passes cointegration tests and only 1 pair passes all tests.
         self.assertCountEqual(result, ['BA_CF', 'BKR_CE'])
         self.assertCountEqual(pairs_selector.coint_pass_pairs.index, ['_'.join(x) for x in coint_pairs])
@@ -114,10 +111,8 @@ class TestCointegrationSelector(unittest.TestCase):
         input_pairs = final_pairs + other_pairs
         pairs_selector = CointegrationSpreadSelector(prices_df=self.data, baskets_to_filter=input_pairs)
 
-        result = pairs_selector.select_pairs(adf_cutoff_threshold=0.95,
-                                             min_crossover_threshold_per_year=8,
-                                             hurst_exp_threshold=0.55,
-                                             hedge_ratio_calculation='min_half_life')
+        result = pairs_selector.select_spreads(hedge_ratio_calculation='min_half_life', adf_cutoff_threshold=0.95,
+                                               hurst_exp_threshold=0.55, min_crossover_threshold_per_year=8)
 
         # Assert that only 2 pairs passes cointegration tests and only 1 pair passes all tests.
         self.assertCountEqual(result, ['BA_CF'])
@@ -125,10 +120,8 @@ class TestCointegrationSelector(unittest.TestCase):
 
         # Check value error raise for unknown hedge ratio input.
         with self.assertRaises(ValueError):
-            pairs_selector.select_pairs(adf_cutoff_threshold=0.95,
-                                        min_crossover_threshold_per_year=8,
-                                        hurst_exp_threshold=0.55,
-                                        hedge_ratio_calculation='johansen')
+            pairs_selector.select_spreads(hedge_ratio_calculation='johansen', adf_cutoff_threshold=0.95,
+                                          hurst_exp_threshold=0.55, min_crossover_threshold_per_year=8)
 
     def test_unsupervised_candidate_pair_selector(self):
         """
@@ -140,13 +133,11 @@ class TestCointegrationSelector(unittest.TestCase):
         input_pairs = final_pairs + other_pairs
         pairs_selector = CointegrationSpreadSelector(prices_df=self.data, baskets_to_filter=input_pairs)
 
-        _ = pairs_selector.select_pairs(hedge_ratio_calculation='OLS',
-                                        adf_cutoff_threshold=0.9,
-                                        min_crossover_threshold_per_year=None)
+        _ = pairs_selector.select_spreads(hedge_ratio_calculation='OLS', adf_cutoff_threshold=0.9,
+                                          min_crossover_threshold_per_year=None)
 
         self.assertTrue(
-            type(pairs_selector.select_pairs(adf_cutoff_threshold=0.9,
-                                             min_crossover_threshold_per_year=4)), list)
+            type(pairs_selector.select_spreads(adf_cutoff_threshold=0.9, min_crossover_threshold_per_year=4)), list)
 
         final_pairs = pd.DataFrame(index=[('ABMD', 'AZO'), ('AES', 'BBY'), ('BKR', 'CE')])
         pairs_selector.final_pairs = final_pairs
@@ -170,9 +161,8 @@ class TestCointegrationSelector(unittest.TestCase):
         other_pairs = [('ABMD', 'AZO'), ('AES', 'BBY'), ('BKR', 'CE')]
         input_pairs = final_pairs + other_pairs
         pairs_selector = CointegrationSpreadSelector(prices_df=self.data, baskets_to_filter=input_pairs)
-        _ = pairs_selector.select_pairs(hedge_ratio_calculation='OLS',
-                                        adf_cutoff_threshold=0.9,
-                                        min_crossover_threshold_per_year=None)
+        _ = pairs_selector.select_spreads(hedge_ratio_calculation='OLS', adf_cutoff_threshold=0.9,
+                                          min_crossover_threshold_per_year=None)
 
         # Test return of the describe method.
         intro_descr = pairs_selector.describe()
