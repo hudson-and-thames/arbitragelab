@@ -24,7 +24,7 @@ class AbstractPairsSelector(ABC):
     """
 
     @abstractmethod
-    def select_pairs(self):
+    def select_spreads(self):
         """
         Method which selects pairs based on some predefined criteria.
         """
