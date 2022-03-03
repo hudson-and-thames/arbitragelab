@@ -54,7 +54,7 @@ class CointegrationSpreadSelector(AbstractPairsSelector):
         """
         For `self.baskets_to_filter` construct spreads and log hedge ratio calculated based on `hedge_ratio_calculation`.
 
-        :param hedge_ratio_calculation: (str) Defines how hedge ratio is calculated. Can be either 'OLS,
+        :param hedge_ratio_calculation: (str) Defines how hedge ratio is calculated. Can be either 'OLS',
                                         'TLS' (Total Least Squares) or 'min_half_life'.
         :return: (dict) Dictionary of generated spreads (tuple: pd.Series).
         """

@@ -2,8 +2,7 @@
 # All rights reserved
 # Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 """
-Tests function of Pairs Selection module:
-pairs_selection/cointegration.py
+Tests spread construction of Hedge Ratios - used in Pairs Selection module:
 """
 # pylint: disable=protected-access
 
