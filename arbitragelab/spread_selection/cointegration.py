@@ -6,15 +6,16 @@ This module implements the ML based Pairs Selection Framework described by Simã
 Sarmento and Nuno Horta in `"A Machine Learning based Pairs Trading Investment Strategy." <http://premio-vidigal.inesc.pt/pdf/SimaoSarmentoMSc-resumo.pdf>`__.
 """
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 from arbitragelab.cointegration_approach import EngleGrangerPortfolio, get_half_life_of_mean_reversion
+from arbitragelab.hedge_ratios import construct_spread
+from arbitragelab.hedge_ratios import get_ols_hedge_ratio, get_tls_hedge_ratio, get_minimum_hl_hedge_ratio, \
+    get_johansen_hedge_ratio, get_adf_optimal_hedge_ratio
+from arbitragelab.spread_selection.base import AbstractPairsSelector
 from arbitragelab.util import segment
 from arbitragelab.util.hurst import get_hurst_exponent
-from arbitragelab.hedge_ratios import get_ols_hedge_ratio, get_tls_hedge_ratio, get_minimum_hl_hedge_ratio
-from arbitragelab.hedge_ratios import construct_spread
-from arbitragelab.pairs_selection.base import AbstractPairsSelector
 
 
 # pylint: disable=arguments-differ
@@ -55,7 +56,7 @@ class CointegrationSpreadSelector(AbstractPairsSelector):
         For `self.baskets_to_filter` construct spreads and log hedge ratio calculated based on `hedge_ratio_calculation`.
 
         :param hedge_ratio_calculation: (str) Defines how hedge ratio is calculated. Can be either 'OLS',
-                                        'TLS' (Total Least Squares) or 'min_half_life'.
+                                        'TLS' (Total Least Squares), 'min_half_life', 'min_adf' or 'johansen'.
         :return: (dict) Dictionary of generated spreads (tuple: pd.Series).
         """
         spreads_dict = {}  # Spread ticker: pd.Series of constructed spread.
@@ -71,6 +72,12 @@ class CointegrationSpreadSelector(AbstractPairsSelector):
             elif hedge_ratio_calculation == 'min_half_life':
                 hedge_ratios, _, _, _ = get_minimum_hl_hedge_ratio(price_data=self.prices_df[list(bundle)],
                                                                    dependent_variable=bundle[0])
+            elif hedge_ratio_calculation == 'min_adf':
+                hedge_ratios, _, _, _ = get_adf_optimal_hedge_ratio(price_data=self.prices_df[list(bundle)],
+                                                                    dependent_variable=bundle[0])
+            elif hedge_ratio_calculation == 'johansen':
+                hedge_ratios, _, _, _ = get_johansen_hedge_ratio(price_data=self.prices_df[list(bundle)],
+                                                                 dependent_variable=bundle[0])
             else:
                 raise ValueError('Unknown hedge ratio calculation parameter value.')
 

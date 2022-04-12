@@ -3,7 +3,7 @@
 # Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 """
 Tests function of Pairs Selection module:
-pairs_selection/cointegration.py
+spread_selection/cointegration.py
 """
 # pylint: disable=protected-access
 
@@ -13,7 +13,7 @@ import pandas as pd
 import numpy as np
 import matplotlib
 
-from arbitragelab.pairs_selection.cointegration import CointegrationSpreadSelector
+from arbitragelab.spread_selection.cointegration import CointegrationSpreadSelector
 
 
 class TestCointegrationSelector(unittest.TestCase):
@@ -40,10 +40,10 @@ class TestCointegrationSelector(unittest.TestCase):
 
         idx = [('A', 'AVB'), ('ABMD', 'AZO'), ('ABMD', 'AZO', 'AMZN')]
         pairs_selector = CointegrationSpreadSelector(prices_df=self.data, baskets_to_filter=idx)
-        spreads_dict = pairs_selector.construct_spreads('OLS')
+        spreads_dict = pairs_selector.construct_spreads('johansen')
 
         result = pairs_selector._hurst_criterion(spreads_dict, ['_'.join(x) for x in idx])
-        self.assertCountEqual(result.index, ['_'.join(x) for x in idx[slice(0, 3, 2)]])
+        self.assertCountEqual(result.index, ['_'.join(x) for x in idx])
 
     def test_final_criterions(self):
         """
@@ -66,18 +66,18 @@ class TestCointegrationSelector(unittest.TestCase):
         # Check that 3rd pair pass through to the final list.
         self.assertCountEqual(final_pairs.index, ['_'.join(x) for x in [idx[2]]])
 
-    def test_criterion_selector_ols(self):
+    def test_criterion_selector_min_adf(self):
         """
-        Verifies final user exposed criterion selection method with OLS hedge ratio calculation.
+        Verifies final user exposed criterion selection method with optimal ADF hedge ratio calculation.
         """
 
         final_pairs = [('BA', 'CF')]
         other_pairs = [('ABMD', 'AZO'), ('AES', 'BBY'), ('BKR', 'CE')]
-        coint_pairs = [('BA', 'CF'), ('BKR', 'CE')]
+        coint_pairs = [('BA', 'CF')]
         input_pairs = final_pairs + other_pairs
         pairs_selector = CointegrationSpreadSelector(prices_df=self.data, baskets_to_filter=input_pairs)
 
-        result = pairs_selector.select_spreads(hedge_ratio_calculation='OLS', adf_cutoff_threshold=0.9,
+        result = pairs_selector.select_spreads(hedge_ratio_calculation='min_adf', adf_cutoff_threshold=0.9,
                                                min_crossover_threshold_per_year=None)
 
         # Assert that only 2 pairs passes cointegration tests and only 1 pair passes all tests.

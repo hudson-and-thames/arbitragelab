@@ -14,6 +14,7 @@ from arbitragelab.cointegration_approach import EngleGrangerPortfolio
 
 
 # pylint: disable=invalid-name
+# pylint: disable=protected-access
 
 def _min_adf_stat(beta: np.array, X: pd.DataFrame, y: pd.Series) -> float:
     """
