@@ -12,6 +12,7 @@ import numpy as np
 
 from arbitragelab.hedge_ratios.linear import get_ols_hedge_ratio, get_tls_hedge_ratio
 from arbitragelab.hedge_ratios.half_life import get_minimum_hl_hedge_ratio
+from arbitragelab.hedge_ratios.adf_optimal import get_adf_optimal_hedge_ratio
 
 
 class TestHedgeRatios(unittest.TestCase):
@@ -71,3 +72,12 @@ class TestHedgeRatios(unittest.TestCase):
                                                                    dependent_variable='Y')
         self.assertAlmostEqual(hedge_ratios['X'], 5, delta=1e-3)
         self.assertAlmostEqual(residuals.mean(), 0.06, delta=1e-2)
+
+    def test_adf_hedge_ratio(self):
+        """
+        Test ADF optimal hedge ratio calculation.
+        """
+        hedge_ratios, _, _, residuals = get_adf_optimal_hedge_ratio(price_data=self.cointegrated_series,
+                                                                    dependent_variable='Y')
+        self.assertAlmostEqual(hedge_ratios['X'], 5.0023, delta=1e-3)
+        self.assertAlmostEqual(residuals.mean(), -0.080760, delta=1e-2)
