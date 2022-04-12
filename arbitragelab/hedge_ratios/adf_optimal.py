@@ -13,7 +13,9 @@ from scipy.optimize import minimize
 from arbitragelab.cointegration_approach import EngleGrangerPortfolio
 
 
-def _min_hl_function(beta: np.array, X: pd.DataFrame, y: pd.Series) -> float:
+# pylint: disable=invalid-name
+
+def _min_adf_stat(beta: np.array, X: pd.DataFrame, y: pd.Series) -> float:
     """
     Fitness function to minimize in ADF test statistic algorithm.
 
@@ -44,7 +46,7 @@ def get_adf_optimal_hedge_ratio(price_data: pd.DataFrame, dependent_variable: st
 
     y = price_data[dependent_variable].copy()
     initial_guess = (y[0] / X).mean().values
-    result = minimize(_min_hl_function, x0=initial_guess, method='BFGS', tol=1e-5, args=(X, y))
+    result = minimize(_min_adf_stat, x0=initial_guess, method='BFGS', tol=1e-5, args=(X, y))
     residuals = y - (result.x * X).sum(axis=1)
 
     hedge_ratios = result.x

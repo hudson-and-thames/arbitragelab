@@ -10,6 +10,8 @@ from arbitragelab.cointegration_approach import JohansenPortfolio
 from arbitragelab.hedge_ratios.spread_construction import construct_spread
 
 
+# pylint: disable=invalid-name
+
 def get_johansen_hedge_ratio(price_data: pd.DataFrame, dependent_variable: str) -> Tuple[
     dict, pd.DataFrame, pd.Series, pd.Series]:
     """
