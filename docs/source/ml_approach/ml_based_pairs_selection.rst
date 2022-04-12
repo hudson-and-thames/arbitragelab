@@ -8,9 +8,9 @@
    In order to use this module, you should additionally install *TensorFlow v2.2.1.* and *Keras v2.3.1.*
    For more details, please visit our :ref:`ArbitrageLab installation guide <getting_started-installation>`.
 
-==========================
-ML Based Spreads Selection
-==========================
+========================
+ML Based Pairs Selection
+========================
 
 .. raw:: html
 
@@ -220,7 +220,7 @@ Implementation
    :members: __init__
 
 
-.. automethod:: CointegrationSpreadSelector.select_pairs
+.. automethod:: CointegrationSpreadSelector.select_spreads
 .. automethod:: CointegrationSpreadSelector.plot_selected_pairs
 
 Following methods describe the results of the selector in various ways.
@@ -255,7 +255,7 @@ Examples
     pairs_clusterer.dimensionality_reduction_by_components(5)
 
     # Clustering is performed over feature vector
-    clustered_pairs = pairs_clusterer.cluster_using_optics({'min_samples': 3})
+    clustered_pairs = pairs_clusterer.cluster_using_optics(min_samples=3)
 
     # Generated Pairs are processed through the rules mentioned above
     spreads_selector = CointegrationSpreadSelector(prices_df=data, baskets_to_filter=clustered_pairs)
