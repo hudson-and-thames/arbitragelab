@@ -12,7 +12,8 @@ import pandas as pd
 from arbitragelab.cointegration_approach import EngleGrangerPortfolio, get_half_life_of_mean_reversion
 from arbitragelab.hedge_ratios import construct_spread
 from arbitragelab.hedge_ratios import get_ols_hedge_ratio, get_tls_hedge_ratio, get_minimum_hl_hedge_ratio, \
-    get_johansen_hedge_ratio, get_adf_optimal_hedge_ratio
+    get_johansen_hedge_ratio
+from arbitragelab.hedge_ratios.adf_optimal import get_adf_optimal_hedge_ratio
 from arbitragelab.spread_selection.base import AbstractPairsSelector
 from arbitragelab.util import segment
 from arbitragelab.util.hurst import get_hurst_exponent

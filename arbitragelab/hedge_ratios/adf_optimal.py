@@ -10,7 +10,7 @@ import pandas as pd
 import numpy as np
 from scipy.optimize import minimize
 
-from arbitragelab.cointegration_approach import EngleGrangerPortfolio
+from arbitragelab.cointegration_approach.engle_granger import EngleGrangerPortfolio
 
 
 # pylint: disable=invalid-name
