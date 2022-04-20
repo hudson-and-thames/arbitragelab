@@ -82,6 +82,14 @@ class TestCointegrationSelector(unittest.TestCase):
 
         # Assert that only 2 pairs passes cointegration tests and only 1 pair passes all tests.
         self.assertCountEqual(result, ['BA_CF'])
+        self.assertTrue(pairs_selector.check_spread(spread_series=pairs_selector.spreads_dict['BA_CF'],
+                                                    adf_cutoff_threshold=0.9,
+                                                    min_crossover_threshold_per_year=None
+                                                    ))
+        self.assertFalse(pairs_selector.check_spread(spread_series=pairs_selector.spreads_dict['BKR_CE'],
+                                                     adf_cutoff_threshold=0.9,
+                                                     min_crossover_threshold_per_year=None
+                                                     ))
         self.assertCountEqual(pairs_selector.coint_pass_pairs.index, ['_'.join(x) for x in coint_pairs])
 
     def test_criterion_selector_tls(self):
@@ -120,7 +128,7 @@ class TestCointegrationSelector(unittest.TestCase):
 
         # Check value error raise for unknown hedge ratio input.
         with self.assertRaises(ValueError):
-            pairs_selector.select_spreads(hedge_ratio_calculation='johansen', adf_cutoff_threshold=0.95,
+            pairs_selector.select_spreads(hedge_ratio_calculation='my_own_hedge', adf_cutoff_threshold=0.95,
                                           hurst_exp_threshold=0.55, min_crossover_threshold_per_year=8)
 
     def test_unsupervised_candidate_pair_selector(self):

@@ -28,7 +28,7 @@ class CointegrationSpreadSelector(AbstractPairsSelector):
     H&T team improved it to work not only with pairs, but also with spreads.
     """
 
-    def __init__(self, prices_df: pd.DataFrame, baskets_to_filter: list):
+    def __init__(self, prices_df: pd.DataFrame = None, baskets_to_filter: list = None):
         """
         Constructor.
         Sets up the price series needed for the next step.
@@ -36,13 +36,13 @@ class CointegrationSpreadSelector(AbstractPairsSelector):
         :param prices_df: (pd.DataFrame) Asset prices universe.
         :param baskets_to_filter: (list) List of tuples of tickers baskets to filter (can be pairs (AAA, BBB) or higher dimensions (AAA, BBB, CCC))
         """
+        self.prices_df = None
+        self.baskets_to_filter = None
+        self.spreads_dict = None  # spread ticker: spread series.
+        self.hedge_ratio_information = None
 
-        self.prices_df = prices_df
-        self.baskets_to_filter = baskets_to_filter
-        self.spreads_df = None
-
-        self.hedge_ratio_information = pd.Series(index=['_'.join(x) for x in baskets_to_filter], dtype=object,
-                                                 name='hedge_ratio')
+        if prices_df is not None and baskets_to_filter is not None:
+            self.set_prices(prices_df, baskets_to_filter)
 
         self.coint_pass_pairs = pd.Series({}, dtype=object)
         self.hurst_pass_pairs = pd.Series({}, dtype=object)
@@ -51,6 +51,19 @@ class CointegrationSpreadSelector(AbstractPairsSelector):
         self.final_pairs = []
 
         segment.track('CointegrationSpreadSelector')
+
+    def set_prices(self, prices_df: pd.DataFrame, baskets_to_filter: list):
+        """
+        Sets up the price series needed for the next step.
+
+        :param prices_df: (pd.DataFrame) Asset prices universe.
+        :param baskets_to_filter: (list) List of tuples of tickers baskets to filter (can be pairs (AAA, BBB) or higher dimensions (AAA, BBB, CCC))
+        """
+
+        self.prices_df = prices_df
+        self.baskets_to_filter = baskets_to_filter
+        self.hedge_ratio_information = pd.Series(index=['_'.join(x) for x in baskets_to_filter], dtype=object,
+                                                 name='hedge_ratio')
 
     def construct_spreads(self, hedge_ratio_calculation: str) -> dict:
         """
@@ -112,10 +125,10 @@ class CointegrationSpreadSelector(AbstractPairsSelector):
         :return: (list) Tuple list of final pairs.
         """
 
-        generated_spreads = self.construct_spreads(hedge_ratio_calculation)
+        self.spreads_dict = self.construct_spreads(hedge_ratio_calculation)
 
         # Selection Criterion One: First, it is imposed that pairs are cointegrated
-        cointegration_results = self._outer_cointegration_loop(generated_spreads)
+        cointegration_results = self._outer_cointegration_loop(self.spreads_dict)
 
         passing_pairs = cointegration_results.loc[cointegration_results['coint_t']
                                                   <= cointegration_results[
@@ -126,14 +139,14 @@ class CointegrationSpreadSelector(AbstractPairsSelector):
         # Selection Criterion Two: Then, the spread’s Hurst exponent,
         # represented by H should be smaller than 0.5.
 
-        hurst_pass_pairs = self._hurst_criterion(generated_spreads, passing_pairs.index.tolist(), hurst_exp_threshold)
+        hurst_pass_pairs = self._hurst_criterion(self.spreads_dict, passing_pairs.index.tolist(), hurst_exp_threshold)
         self.hurst_pass_pairs = hurst_pass_pairs
 
         # Selection Criterion Three & Four: Additionally, the half-life period, represented by hl, should
         # lay between one day and one year. Finally, it is imposed that the spread crosses a mean at least
         # 12 times per year.
 
-        hl_pass_pairs, final_pairs = self._final_criterions(generated_spreads, hurst_pass_pairs.index.values,
+        hl_pass_pairs, final_pairs = self._final_criterions(self.spreads_dict, hurst_pass_pairs.index.values,
                                                             test_period,
                                                             min_crossover_threshold_per_year,
                                                             min_half_life)
@@ -143,6 +156,51 @@ class CointegrationSpreadSelector(AbstractPairsSelector):
         self.final_pairs = final_pairs
 
         return final_pairs.index.values
+
+    def check_spread(self, spread_series: pd.Series,
+                     adf_cutoff_threshold: float = 0.95,
+                     hurst_exp_threshold: float = 0.5,
+                     min_crossover_threshold_per_year: int = 12,
+                     min_half_life: float = 365,
+                     test_period: str = '2Y') -> bool:
+        """
+        Check if spread passes all filters.
+
+        :param spread_series: (pd.Series) Spread values series.
+        :param adf_cutoff_threshold: (float) ADF test threshold used to define if the spread is cointegrated. Can be
+                                             0.99, 0.95 or 0.9.
+        :param hurst_exp_threshold: (float) Max Hurst threshold value.
+        :param min_crossover_threshold_per_year: (int) Minimum amount of mean crossovers per year.
+        :param min_half_life: (float) Minimum Half-Life of mean reversion value.
+        :param test_period: (str) Time delta format, to be used as the time
+            period where the mean crossovers will be calculated.
+        :return: (bool) True if spread passes all filters, False otherwise.
+        """
+        generated_spreads = {spread_series.name: spread_series}
+
+        # Selection Criterion One: First, it is imposed that pairs are cointegrated
+        cointegration_results = self._outer_cointegration_loop(generated_spreads)
+        if not cointegration_results.loc[cointegration_results['coint_t'] <= cointegration_results[
+            'p_value_{}%'.format(int(adf_cutoff_threshold * 100))]].shape[0]:
+            return False
+
+        # Selection Criterion Two: Then, the spread’s Hurst exponent,
+        # represented by H should be smaller than 0.5.
+        if not len(self._hurst_criterion(generated_spreads, list(generated_spreads.keys()), hurst_exp_threshold)):
+            return False
+
+        # Selection Criterion Three & Four: Additionally, the half-life period, represented by hl, should
+        # lay between one day and one year. Finally, it is imposed that the spread crosses a mean at least
+        # 12 times per year.
+
+        hl_pass_pairs, final_pairs = self._final_criterions(generated_spreads, list(generated_spreads.keys()),
+                                                            test_period,
+                                                            min_crossover_threshold_per_year,
+                                                            min_half_life)
+        if not len(final_pairs):
+            return False
+
+        return True
 
     def _outer_cointegration_loop(self, spreads_dict: dict) -> pd.DataFrame:
         # pylint: disable=protected-access
