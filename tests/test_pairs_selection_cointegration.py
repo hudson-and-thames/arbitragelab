@@ -131,6 +131,28 @@ class TestCointegrationSelector(unittest.TestCase):
             pairs_selector.select_spreads(hedge_ratio_calculation='my_own_hedge', adf_cutoff_threshold=0.95,
                                           hurst_exp_threshold=0.55, min_crossover_threshold_per_year=8)
 
+    def test_criterion_selector_box_tiao(self):
+        """
+        Verifies final user exposed criterion selection method with Box-Tiao ration calculation.
+        """
+
+        final_pairs = [('BA', 'CF')]
+        other_pairs = [('ABMD', 'AZO'), ('AES', 'BBY'), ('BKR', 'CE')]
+        input_pairs = final_pairs + other_pairs
+        pairs_selector = CointegrationSpreadSelector(prices_df=self.data, baskets_to_filter=input_pairs)
+
+        result = pairs_selector.select_spreads(hedge_ratio_calculation='box_tiao', adf_cutoff_threshold=0.95,
+                                               hurst_exp_threshold=0.55, min_crossover_threshold_per_year=8)
+
+        # Assert that only 2 pairs passes cointegration tests and only 1 pair passes all tests.
+        self.assertCountEqual(result, ['BA_CF'])
+        self.assertCountEqual(pairs_selector.coint_pass_pairs.index, ['BA_CF'])
+
+        # Check value error raise for unknown hedge ratio input.
+        with self.assertRaises(ValueError):
+            pairs_selector.select_spreads(hedge_ratio_calculation='my_own_hedge', adf_cutoff_threshold=0.95,
+                                          hurst_exp_threshold=0.55, min_crossover_threshold_per_year=8)
+
     def test_unsupervised_candidate_pair_selector(self):
         """
         Tests the parent candidate pair selection method.

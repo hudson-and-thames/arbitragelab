@@ -12,7 +12,7 @@ import pandas as pd
 from arbitragelab.cointegration_approach import EngleGrangerPortfolio, get_half_life_of_mean_reversion
 from arbitragelab.hedge_ratios import construct_spread
 from arbitragelab.hedge_ratios import get_ols_hedge_ratio, get_tls_hedge_ratio, get_minimum_hl_hedge_ratio, \
-    get_johansen_hedge_ratio
+    get_johansen_hedge_ratio, get_box_tiao_hedge_ratio
 from arbitragelab.hedge_ratios.adf_optimal import get_adf_optimal_hedge_ratio
 from arbitragelab.spread_selection.base import AbstractPairsSelector
 from arbitragelab.util import segment
@@ -70,7 +70,7 @@ class CointegrationSpreadSelector(AbstractPairsSelector):
         For `self.baskets_to_filter` construct spreads and log hedge ratio calculated based on `hedge_ratio_calculation`.
 
         :param hedge_ratio_calculation: (str) Defines how hedge ratio is calculated. Can be either 'OLS',
-                                        'TLS' (Total Least Squares), 'min_half_life', 'min_adf' or 'johansen'.
+                                        'TLS' (Total Least Squares), 'min_half_life', 'min_adf', 'johansen', 'box_tiao'.
         :return: (dict) Dictionary of generated spreads (tuple: pd.Series).
         """
         spreads_dict = {}  # Spread ticker: pd.Series of constructed spread.
@@ -91,6 +91,9 @@ class CointegrationSpreadSelector(AbstractPairsSelector):
                                                                     dependent_variable=bundle[0])
             elif hedge_ratio_calculation == 'johansen':
                 hedge_ratios, _, _, _ = get_johansen_hedge_ratio(price_data=self.prices_df[list(bundle)],
+                                                                 dependent_variable=bundle[0])
+            elif hedge_ratio_calculation == 'box_tiao':
+                hedge_ratios, _, _, _ = get_box_tiao_hedge_ratio(price_data=self.prices_df[list(bundle)],
                                                                  dependent_variable=bundle[0])
             else:
                 raise ValueError('Unknown hedge ratio calculation parameter value.')
