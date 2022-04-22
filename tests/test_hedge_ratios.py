@@ -14,6 +14,7 @@ from arbitragelab.hedge_ratios.linear import get_ols_hedge_ratio, get_tls_hedge_
 from arbitragelab.hedge_ratios.half_life import get_minimum_hl_hedge_ratio
 from arbitragelab.hedge_ratios.adf_optimal import get_adf_optimal_hedge_ratio
 from arbitragelab.hedge_ratios.johansen import get_johansen_hedge_ratio
+from arbitragelab.hedge_ratios.box_tiao import get_box_tiao_hedge_ratio
 
 
 class TestHedgeRatios(unittest.TestCase):
@@ -91,3 +92,12 @@ class TestHedgeRatios(unittest.TestCase):
                                                                  dependent_variable='Y')
         self.assertAlmostEqual(hedge_ratios['X'], 5.00149, delta=1e-3)
         self.assertAlmostEqual(residuals.mean(), -0.04267, delta=1e-2)
+
+    def test_box_tiao_hedge_ratio(self):
+        """
+        Test Box-Tiao decomposition hedge ratio calculation.
+        """
+        hedge_ratios, _, _, residuals = get_box_tiao_hedge_ratio(price_data=self.cointegrated_series,
+                                                                 dependent_variable='Y')
+        self.assertAlmostEqual(hedge_ratios['X'], 5.0087, delta=1e-3)
+        self.assertAlmostEqual(residuals.mean(), -0.3609, delta=1e-2)
