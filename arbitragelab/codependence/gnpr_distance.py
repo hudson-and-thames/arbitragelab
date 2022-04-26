@@ -115,7 +115,7 @@ def gnpr_distance(x: np.array, y: np.array, theta: float, n_bins: int = 50) -> f
     loss_matrix /= loss_matrix.max()
 
     # Optimal transportation matrix
-    ot_matrix = ot.emd(x_binned.sort_values(), y_binned.sort_values(), loss_matrix)
+    ot_matrix = ot.emd(x_binned.sort_values().values, y_binned.sort_values().values, loss_matrix)
 
     # Optimal transport distance
     dist_0 = np.trace(np.dot(np.transpose(ot_matrix), loss_matrix))

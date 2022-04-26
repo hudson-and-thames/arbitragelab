@@ -9,7 +9,7 @@ import unittest
 import numpy as np
 import tensorflow as tf
 from keras.engine.training import Model
-from keras.callbacks.callbacks import History
+from keras.callbacks import History
 from sklearn.model_selection import train_test_split
 from sklearn.datasets import make_regression
 
