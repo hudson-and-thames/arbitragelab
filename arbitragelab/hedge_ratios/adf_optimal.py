@@ -29,7 +29,7 @@ def _min_adf_stat(beta: np.array, X: pd.DataFrame, y: pd.Series) -> float:
     spread = y - (beta * X).sum(axis=1)
     portfolio._perform_eg_test(spread)
 
-    return portfolio.adf_statistics.loc['statistic_value'].iloc[0] - portfolio.adf_statistics.loc['99%'].iloc[0]
+    return portfolio.adf_statistics.loc['statistic_value'].iloc[0]
 
 
 def get_adf_optimal_hedge_ratio(price_data: pd.DataFrame, dependent_variable: str) -> \

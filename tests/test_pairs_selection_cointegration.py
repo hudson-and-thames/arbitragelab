@@ -6,14 +6,15 @@ Tests function of Pairs Selection module:
 spread_selection/cointegration.py
 """
 # pylint: disable=protected-access
+# pylint: disable=invalid-name
 
 import os
 import unittest
 import pandas as pd
 import numpy as np
-import matplotlib
 
 from arbitragelab.spread_selection.cointegration import CointegrationSpreadSelector
+from arbitragelab.hedge_ratios import get_ols_hedge_ratio
 
 
 class TestCointegrationSelector(unittest.TestCase):
@@ -33,64 +34,24 @@ class TestCointegrationSelector(unittest.TestCase):
         self.data = pd.read_csv(data_path, parse_dates=True, index_col="Date")
         self.data.dropna(inplace=True)
 
-    def test_hurst_criterion(self):
+    def test_criterion_selector_ols(self):
         """
-        Verifies private hurst processing method.
-        """
-
-        idx = [('A', 'AVB'), ('ABMD', 'AZO'), ('ABMD', 'AZO', 'AMZN')]
-        pairs_selector = CointegrationSpreadSelector(prices_df=self.data, baskets_to_filter=idx)
-        spreads_dict = pairs_selector.construct_spreads('johansen')
-
-        result = pairs_selector._hurst_criterion(spreads_dict, ['_'.join(x) for x in idx])
-        self.assertCountEqual(result.index, ['_'.join(x) for x in idx])
-
-    def test_final_criterions(self):
-        """
-        Verifies private final criterions processing method.
-        """
-
-        idx = [('A', 'AVB'), ('ABMD', 'AZO'), ('BA', 'CF')]
-        pairs_selector = CointegrationSpreadSelector(prices_df=self.data, baskets_to_filter=idx)
-
-        # Generate the inputs needed for the final criterions method test.
-        spreads_dict = pairs_selector.construct_spreads('OLS')
-        result = pairs_selector._hurst_criterion(spreads_dict, ['_'.join(x) for x in idx])
-
-        hl_pairs, final_pairs = pairs_selector._final_criterions(
-            spreads_dict, result.index.values, min_crossover_threshold_per_year=0
-        )
-
-        # Check that the third pair passes the Half Life Test.
-        self.assertCountEqual(hl_pairs.index, ['_'.join(x) for x in [idx[2]]])
-        # Check that 3rd pair pass through to the final list.
-        self.assertCountEqual(final_pairs.index, ['_'.join(x) for x in [idx[2]]])
-
-    def test_criterion_selector_min_adf(self):
-        """
-        Verifies final user exposed criterion selection method with optimal ADF hedge ratio calculation.
+        Verifies final user exposed criterion selection method with OLS hedge ration calculation.
         """
 
         final_pairs = [('BA', 'CF')]
         other_pairs = [('ABMD', 'AZO'), ('AES', 'BBY'), ('BKR', 'CE')]
-        coint_pairs = [('BA', 'CF')]
+        coint_pairs = [('BA', 'CF'), ('BKR', 'CE')]
         input_pairs = final_pairs + other_pairs
         pairs_selector = CointegrationSpreadSelector(prices_df=self.data, baskets_to_filter=input_pairs)
 
-        result = pairs_selector.select_spreads(hedge_ratio_calculation='min_adf', adf_cutoff_threshold=0.9,
-                                               min_crossover_threshold_per_year=None)
-
+        result = pairs_selector.select_spreads(hedge_ratio_calculation='OLS', adf_cutoff_threshold=0.9,
+                                               hurst_exp_threshold=0.55, min_crossover_threshold=0)
+        logs = pairs_selector.selection_logs.copy()
         # Assert that only 2 pairs passes cointegration tests and only 1 pair passes all tests.
-        self.assertCountEqual(result, ['BA_CF'])
-        self.assertTrue(pairs_selector.check_spread(spread_series=pairs_selector.spreads_dict['BA_CF'],
-                                                    adf_cutoff_threshold=0.9,
-                                                    min_crossover_threshold_per_year=None
-                                                    ))
-        self.assertFalse(pairs_selector.check_spread(spread_series=pairs_selector.spreads_dict['BKR_CE'],
-                                                     adf_cutoff_threshold=0.9,
-                                                     min_crossover_threshold_per_year=None
-                                                     ))
-        self.assertCountEqual(pairs_selector.coint_pass_pairs.index, ['_'.join(x) for x in coint_pairs])
+        self.assertCountEqual(result, ['BA_CF', 'BKR_CE'])
+        self.assertCountEqual(logs[logs['coint_t'] <= logs['p_value_90%']].index.to_list(),
+                              ['_'.join(x) for x in coint_pairs])
 
     def test_criterion_selector_tls(self):
         """
@@ -104,10 +65,29 @@ class TestCointegrationSelector(unittest.TestCase):
         pairs_selector = CointegrationSpreadSelector(prices_df=self.data, baskets_to_filter=input_pairs)
 
         result = pairs_selector.select_spreads(hedge_ratio_calculation='TLS', adf_cutoff_threshold=0.9,
-                                               hurst_exp_threshold=0.55, min_crossover_threshold_per_year=None)
+                                               hurst_exp_threshold=0.55, min_crossover_threshold=0)
+        logs = pairs_selector.selection_logs.copy()
         # Assert that only 2 pairs passes cointegration tests and only 1 pair passes all tests.
         self.assertCountEqual(result, ['BA_CF', 'BKR_CE'])
-        self.assertCountEqual(pairs_selector.coint_pass_pairs.index, ['_'.join(x) for x in coint_pairs])
+        self.assertCountEqual(logs[logs['coint_t'] <= logs['p_value_90%']].index.to_list(),
+                              ['_'.join(x) for x in coint_pairs])
+
+    def test_criterion_selector_min_adf(self):
+        """
+        Verifies final user exposed criterion selection method with optimal ADF hedge ratio calculation.
+        """
+
+        final_pairs = [('BA', 'CF')]
+        other_pairs = [('ABMD', 'AZO'), ('AES', 'BBY'), ('BKR', 'CE')]
+        input_pairs = final_pairs + other_pairs
+        pairs_selector = CointegrationSpreadSelector(prices_df=self.data, baskets_to_filter=input_pairs)
+
+        result = pairs_selector.select_spreads(hedge_ratio_calculation='min_adf', adf_cutoff_threshold=0.9,
+                                               hurst_exp_threshold=0.55, min_crossover_threshold=0)
+        logs = pairs_selector.selection_logs.copy()
+        # Assert that only 1 pair passes cointegration tests and only 1 pair passes all tests.
+        self.assertCountEqual(result, ['BA_CF'])
+        self.assertCountEqual(logs[logs['coint_t'] <= logs['p_value_90%']].index.to_list(), ['BA_CF'])
 
     def test_criterion_selector_min_hl(self):
         """
@@ -120,16 +100,16 @@ class TestCointegrationSelector(unittest.TestCase):
         pairs_selector = CointegrationSpreadSelector(prices_df=self.data, baskets_to_filter=input_pairs)
 
         result = pairs_selector.select_spreads(hedge_ratio_calculation='min_half_life', adf_cutoff_threshold=0.95,
-                                               hurst_exp_threshold=0.55, min_crossover_threshold_per_year=8)
-
-        # Assert that only 2 pairs passes cointegration tests and only 1 pair passes all tests.
+                                               hurst_exp_threshold=0.5, min_crossover_threshold=0)
+        logs = pairs_selector.selection_logs.copy()
+        # Assert that only 1 pair passes cointegration tests and only 1 pair passes all tests.
         self.assertCountEqual(result, ['BA_CF'])
-        self.assertCountEqual(pairs_selector.coint_pass_pairs.index, ['BA_CF'])
+        self.assertCountEqual(logs[logs['coint_t'] <= logs['p_value_90%']].index.to_list(), ['BA_CF'])
 
         # Check value error raise for unknown hedge ratio input.
         with self.assertRaises(ValueError):
             pairs_selector.select_spreads(hedge_ratio_calculation='my_own_hedge', adf_cutoff_threshold=0.95,
-                                          hurst_exp_threshold=0.55, min_crossover_threshold_per_year=8)
+                                          hurst_exp_threshold=0.55, min_crossover_threshold=8)
 
     def test_criterion_selector_box_tiao(self):
         """
@@ -142,20 +122,15 @@ class TestCointegrationSelector(unittest.TestCase):
         pairs_selector = CointegrationSpreadSelector(prices_df=self.data, baskets_to_filter=input_pairs)
 
         result = pairs_selector.select_spreads(hedge_ratio_calculation='box_tiao', adf_cutoff_threshold=0.95,
-                                               hurst_exp_threshold=0.55, min_crossover_threshold_per_year=8)
-
-        # Assert that only 2 pairs passes cointegration tests and only 1 pair passes all tests.
+                                               hurst_exp_threshold=0.52, min_crossover_threshold=50)
+        logs = pairs_selector.selection_logs.copy()
+        # Assert that only 1 pair passes cointegration tests and only 1 pair passes all tests.
         self.assertCountEqual(result, ['BA_CF'])
-        self.assertCountEqual(pairs_selector.coint_pass_pairs.index, ['BA_CF'])
+        self.assertCountEqual(logs[logs['coint_t'] <= logs['p_value_90%']].index.to_list(), ['BA_CF', 'BKR_CE'])
 
-        # Check value error raise for unknown hedge ratio input.
-        with self.assertRaises(ValueError):
-            pairs_selector.select_spreads(hedge_ratio_calculation='my_own_hedge', adf_cutoff_threshold=0.95,
-                                          hurst_exp_threshold=0.55, min_crossover_threshold_per_year=8)
-
-    def test_unsupervised_candidate_pair_selector(self):
+    def test_criterion_selector_johansen(self):
         """
-        Tests the parent candidate pair selection method.
+        Verifies final user exposed criterion selection method with Box-Tiao ration calculation.
         """
 
         final_pairs = [('BA', 'CF')]
@@ -163,74 +138,40 @@ class TestCointegrationSelector(unittest.TestCase):
         input_pairs = final_pairs + other_pairs
         pairs_selector = CointegrationSpreadSelector(prices_df=self.data, baskets_to_filter=input_pairs)
 
-        _ = pairs_selector.select_spreads(hedge_ratio_calculation='OLS', adf_cutoff_threshold=0.9,
-                                          min_crossover_threshold_per_year=None)
+        result = pairs_selector.select_spreads(hedge_ratio_calculation='johansen', adf_cutoff_threshold=0.95,
+                                               hurst_exp_threshold=0.52, min_crossover_threshold=50)
+        logs = pairs_selector.selection_logs.copy()
+        # Assert that only 1 pair passes cointegration tests and only 1 pair passes all tests.
+        self.assertCountEqual(result, ['BA_CF'])
+        self.assertCountEqual(logs[logs['coint_t'] <= logs['p_value_90%']].index.to_list(), ['BA_CF'])
 
-        self.assertTrue(
-            type(pairs_selector.select_spreads(adf_cutoff_threshold=0.9, min_crossover_threshold_per_year=4)), list)
-
-        final_pairs = pd.DataFrame(index=[('ABMD', 'AZO'), ('AES', 'BBY'), ('BKR', 'CE')])
-        pairs_selector.final_pairs = final_pairs
-        selected_pairs_return = pairs_selector.plot_selected_pairs()
-
-        # Check if returned plot object is a list of Axes objects.
-        self.assertTrue(type(selected_pairs_return), list)
-
-        with self.assertRaises(Exception):
-            pairs_list = list((('F', 'V'),) * 45)
-            final_pairs = pd.DataFrame(index=pairs_list)
-            pairs_selector.final_pairs = final_pairs
-            pairs_selector.plot_selected_pairs()
-
-    def test_description_methods(self):
+    def test_internal_functions(self):
         """
-        Tests the various pair description methods.
+        Tests `generate_spread_statistics`, 'apply_filtering_rules` function.
         """
+        rs = np.random.RandomState(42)
+        X_returns = rs.normal(0, 1, 101)
+        X = pd.Series(np.cumsum(X_returns), name='X') + 50
 
-        final_pairs = [('BA', 'CF')]
-        other_pairs = [('ABMD', 'AZO'), ('AES', 'BBY'), ('BKR', 'CE')]
-        input_pairs = final_pairs + other_pairs
-        pairs_selector = CointegrationSpreadSelector(prices_df=self.data, baskets_to_filter=input_pairs)
-        _ = pairs_selector.select_spreads(hedge_ratio_calculation='OLS', adf_cutoff_threshold=0.9,
-                                          min_crossover_threshold_per_year=None)
+        noise = rs.normal(0, 1, 101)
+        Y = 5 * X + noise
+        Y.name = 'Y'
 
-        # Test return of the describe method.
-        intro_descr = pairs_selector.describe()
-        self.assertEqual(type(intro_descr), pd.DataFrame)
+        cointegrated_series = pd.concat([X, Y], axis=1)
+        _, _, _, residuals = get_ols_hedge_ratio(price_data=cointegrated_series, dependent_variable='Y')
+        pairs_selector = CointegrationSpreadSelector(prices_df=None, baskets_to_filter=None)
+        stats = pairs_selector.generate_spread_statistics(residuals, log_info=True)
 
-        # Test return of the extended describe method.
-        extended_descr = pairs_selector.describe_extra()
-        self.assertEqual(type(extended_descr), pd.DataFrame)
+        # Test spread statistics.
+        self.assertAlmostEqual(stats['coint_t'], -11, delta=1e-2)
+        self.assertAlmostEqual(stats['half_life'], 0.62, delta=1e-2)
+        self.assertAlmostEqual(stats['hurst_exponent'], -0.111, delta=1e-2)
+        self.assertAlmostEqual(stats['crossovers'], 55)
 
-        # Test return of the sectoral based method with empty sector info dataframe input.
-        empty_sectoral_df = pd.DataFrame(columns=['ticker', 'sector', 'industry'])
-        empty_sectoral_descr = pairs_selector.describe_pairs_sectoral_info(['AJG'], ['ICE'], empty_sectoral_df)
-        self.assertEqual(type(empty_sectoral_descr), pd.DataFrame)
-
-        sector_info = pd.DataFrame(data=[
-            ('AJG', 'sector', 'industry'),
-            ('ICE', 'sector', 'industry')
-        ])
-        sector_info.columns = ['ticker', 'sector', 'industry']
-        full_sectoral_descr = pairs_selector.describe_pairs_sectoral_info(['AJG'], ['ICE'], sector_info)
-
-        # Test return of the sectoral based method with full sector info dataframe input.
-        self.assertEqual(type(full_sectoral_descr), pd.DataFrame)
-
-    def test_plotting_methods(self):
-        """
-        Tests all plotting methods.
-        """
-
-        final_pairs = [('BA', 'CF')]
-        other_pairs = [('ABMD', 'AZO'), ('AES', 'BBY'), ('BKR', 'CE')]
-        input_pairs = final_pairs + other_pairs
-        pairs_selector = CointegrationSpreadSelector(prices_df=self.data, baskets_to_filter=input_pairs)
-
-        # Test the final pairs plotting method with no information.
-        with self.assertRaises(Exception):
-            pairs_selector.plot_selected_pairs()
-
-        # Test single pair plot return object.
-        singlepair_pyplot_obj = pairs_selector.plot_single_pair(('AJG', 'ABMD'))
-        self.assertTrue(issubclass(type(singlepair_pyplot_obj), matplotlib.axes.SubplotBase))
+        # Test filtering function.
+        result = pairs_selector.apply_filtering_rules(adf_cutoff_threshold=0.99, hurst_exp_threshold=0.5)
+        self.assertEqual(len(result), 1)
+        result_2 = pairs_selector.apply_filtering_rules(min_half_life=0.2)  # Too strict.
+        self.assertEqual(len(result_2), 0)
+        result_3 = pairs_selector.apply_filtering_rules(min_crossover_threshold=100)  # Too strict.
+        self.assertEqual(len(result_3), 0)
