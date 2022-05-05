@@ -7,9 +7,9 @@ by cluster highlighting.
 """
 
 import matplotlib.pyplot as plt
-# Temporary solution, current version 0.7.1 is not compatible with matplotlib>=3.3.0
-from .data_cursor import DataCursor, HighlightingDataCursor
 
+# Temporary solution, current version 0.7.1 is not compatible with matplotlib>=3.3.0
+from arbitragelab.util.data_cursor import DataCursor, HighlightingDataCursor
 from arbitragelab.util import segment
 
 
