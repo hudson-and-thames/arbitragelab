@@ -315,10 +315,10 @@ class TestTearSheet(unittest.TestCase):
                                                     'Value'].iloc[0], 3.84064, places=1)
 
         # Calculated spread price
-        self.assertAlmostEqual(spread_price.mean(), 0.754722, places=2)
+        self.assertAlmostEqual(spread_price.mean(), 0.754722, places=1)
 
         # Modelled process
-        self.assertAlmostEqual(ou_modelled_process.mean(), 0.731289, places=2)
+        self.assertAlmostEqual(ou_modelled_process.mean(), 0.731289, places=1)
 
     def test_ou_plot(self):
         """

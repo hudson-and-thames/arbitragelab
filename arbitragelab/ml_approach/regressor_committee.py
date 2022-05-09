@@ -42,6 +42,7 @@ class RegressorCommittee:
         self.regressor_class = regressor_class
         self.num_committee = num_committee
         self.committee_members = []
+        self.histories = []
         self.epochs = epochs
         self.patience = patience
         self.verbose = verbose
@@ -63,6 +64,7 @@ class RegressorCommittee:
         from keras.callbacks import EarlyStopping
 
         committee_members = []
+        histories = []
         idx = 0
 
         while idx in range(self.num_committee):
@@ -81,15 +83,19 @@ class RegressorCommittee:
                                           verbose=self.verbose, patience=self.patience)
 
             # Fit keras model with early stopper as callback.
-            regressor.fit(xtrain, ytrain, validation_data=(xtest, ytest), epochs=self.epochs,
-                          verbose=self.verbose, callbacks=[early_stopper])
+            history = regressor.fit(xtrain, ytrain, validation_data=(xtest, ytest), epochs=self.epochs,
+                                    verbose=self.verbose, callbacks=[early_stopper])
 
             # Store all model instances for later use.
             committee_members.append(regressor)
 
+            # Store history for later plotting.
+            histories.append(history)
+
             idx = idx + 1
 
         self.committee_members = committee_members
+        self.histories = histories
 
         return self
 
@@ -122,13 +128,12 @@ class RegressorCommittee:
         :return: (Axes)
         """
 
-        _, axs = plt.subplots(len(self.committee_members),
-                              figsize=(figsize[0], figsize[1] * len(self.committee_members)))
+        _, axs = plt.subplots(len(self.histories),
+                              figsize=(figsize[0], figsize[1] * len(self.histories)))
 
-        for idx, (plot_obj, member) in enumerate(zip(axs, self.committee_members)):
-            print(member.history.history.keys())
-            plot_obj.plot(member.history['loss'])
-            plot_obj.plot(member.history.history['val_loss'])
+        for idx, (plot_obj, history) in enumerate(zip(axs, self.histories)):
+            plot_obj.plot(history.history['loss'])
+            plot_obj.plot(history.history['val_loss'])
             plot_obj.legend(['Training Loss', 'Validation Loss'])
             plot_obj.set_xlabel("Epochs")
             plot_obj.set_ylabel("Loss")
