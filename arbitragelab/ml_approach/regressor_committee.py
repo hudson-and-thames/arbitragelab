@@ -126,7 +126,7 @@ class RegressorCommittee:
                               figsize=(figsize[0], figsize[1] * len(self.committee_members)))
 
         for idx, (plot_obj, member) in enumerate(zip(axs, self.committee_members)):
-            print(member.history.keys())
+            print(member.history.history.keys())
             plot_obj.plot(member.history['loss'])
             plot_obj.plot(member.history.history['val_loss'])
             plot_obj.legend(['Training Loss', 'Validation Loss'])
