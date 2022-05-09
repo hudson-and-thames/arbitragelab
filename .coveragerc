@@ -14,6 +14,8 @@ omit =
      */tmp/*
      # Temporary fix for YFinance issues
      arbitragelab/util/data_importer.py
+     # External part of package
+     arbitragelab/util/data_cursor.py
 
 disable_warnings = no-data-collected
 

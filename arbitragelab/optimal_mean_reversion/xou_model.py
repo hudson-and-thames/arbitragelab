@@ -207,7 +207,7 @@ class ExponentialOrnsteinUhlenbeck(OrnsteinUhlenbeck):
         """
 
         # Checking for the necessary condition
-        if not self._check_xou():
+        if not self._check_xou():  # pragma: no cover
             raise Exception("There is no optimal solution for your data")
 
         # If the entry level wasn't calculated before, set it
