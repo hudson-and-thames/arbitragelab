@@ -12,6 +12,8 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+* :feature:`70` Updated requirements versions to newest stable numpy, pandas etc.
+* :bug:`70 major` Fixed package breaking due to faulty werkzeug version.
 * :feature:`68` Updated Cointegration Pairs Selection Module to work with any type of spread (3-leg, N-leg spread).
 * :feature:`68` Updated Hedge Ratios Module to work with any type of spread (3-leg, N-leg spread).
 * :support:`68` Reflected changes to Cointegration Pairs Selection Module in the documentation.

@@ -17,9 +17,6 @@ jobs:
           name: Install Dependencies
           command: |
             . venv/bin/activate
-            pip3 install --no-cache-dir -I cvxpy==1.1.10
-            pip3 install scs==2.1.4
-            pip3 install numpy==1.20.1
             pip3 install -r requirements.txt
       # Step 3: run pylint styling check
       - run:

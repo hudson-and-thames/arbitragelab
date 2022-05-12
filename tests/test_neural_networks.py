@@ -9,7 +9,7 @@ import unittest
 import numpy as np
 import tensorflow as tf
 from keras.engine.training import Model
-from keras.callbacks.callbacks import History
+from keras.callbacks import History
 from sklearn.model_selection import train_test_split
 from sklearn.datasets import make_regression
 
@@ -67,7 +67,7 @@ class TestNeuralNetworks(unittest.TestCase):
         self.assertTrue(len(regressor.predict(feat_test)) > 0)
 
         # Check Predicted values' means.
-        self.assertAlmostEqual(regressor.predict(feat_test).mean(), -1.182, 2)
+        self.assertAlmostEqual(regressor.predict(feat_test).mean(), -0.421, 2)
 
         # Check if proper plotting object is returned.
         self.assertTrue(type(regressor.plot_loss()), list)
@@ -137,7 +137,7 @@ class TestNeuralNetworks(unittest.TestCase):
         self.assertTrue(len(regressor.predict(feat_test)) > 0)
 
         # Check Predicted values' means.
-        self.assertAlmostEqual(regressor.predict(feat_test).mean(), 0.82836, 2)
+        self.assertAlmostEqual(regressor.predict(feat_test).mean(), 0.49735, 2)
 
         # Check if proper plotting object is returned.
         self.assertTrue(type(regressor.plot_loss()), list)
