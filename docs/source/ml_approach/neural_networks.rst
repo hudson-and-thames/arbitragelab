@@ -1,7 +1,7 @@
 .. _ml_approach-neural_networks:
 
 .. warning::
-   In order to use this module, you should additionally install *TensorFlow v2.2.1.* and *Keras v2.3.1.*
+   In order to use this module, you should additionally install *TensorFlow v2.8.0.* and *Keras v2.3.1.*
    For more details, please visit our :ref:`ArbitrageLab installation guide <getting_started-installation>`.
 
 ===============
