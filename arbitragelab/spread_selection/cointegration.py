@@ -6,10 +6,9 @@ This module implements the ML based Pairs Selection Framework described by Simã
 Sarmento and Nuno Horta in `"A Machine Learning based Pairs Trading Investment Strategy." <http://premio-vidigal.inesc.pt/pdf/SimaoSarmentoMSc-resumo.pdf>`__.
 """
 
+from functools import reduce
 import numpy as np
 import pandas as pd
-
-from functools import reduce
 
 from arbitragelab.cointegration_approach import EngleGrangerPortfolio, get_half_life_of_mean_reversion
 from arbitragelab.hedge_ratios import construct_spread

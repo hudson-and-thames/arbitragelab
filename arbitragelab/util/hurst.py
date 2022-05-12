@@ -2,7 +2,6 @@
 The module implements Hurst exponent calculations.
 """
 
-import pandas as pd
 import numpy as np
 
 

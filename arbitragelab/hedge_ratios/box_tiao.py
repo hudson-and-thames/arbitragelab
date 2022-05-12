@@ -60,7 +60,7 @@ def get_box_tiao_hedge_ratio(price_data: pd.DataFrame, dependent_variable: str) 
 
     # Sort the eigenvectors by eigenvalues by descending order
     bt_eigvecs = eigvecs[:, np.argsort(eigvals)[::-1]]
-    hedge_ratios = {k: v for k, v in zip(X.columns, bt_eigvecs[:, -1])}
+    hedge_ratios = dict(zip(X.columns, bt_eigvecs[:, -1]))
 
     # Convert to a format expected by `construct_spread` function and normalize such that dependent has a hedge ratio 1.
     for ticker, h in hedge_ratios.items():
