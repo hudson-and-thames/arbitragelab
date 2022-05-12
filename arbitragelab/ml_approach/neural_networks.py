@@ -30,7 +30,7 @@ class BaseNeuralNetwork:
         # Importing needed packages
         import tensorflow as tf
         from keras.models import Model
-        from keras.callbacks.callbacks import History
+        from keras.callbacks import History
         from keras.layers import Input, LSTM, Dense, Activation, Lambda
 
         self.fitted_model = None

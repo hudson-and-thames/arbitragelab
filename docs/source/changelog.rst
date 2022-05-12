@@ -12,6 +12,8 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+* :feature:`70` Updated requirements versions to newest stable numpy, pandas etc.
+* :bug:`70 major` Fixed package breaking due to faulty werkzeug version.
 * :bug:`69 major` Fixed SCS package version breaking Sparse MR Module.
 * :support:`66` Added presentation slides and videos to documentation.
 
