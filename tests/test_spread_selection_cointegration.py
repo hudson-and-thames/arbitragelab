@@ -36,7 +36,7 @@ class TestCointegrationSelector(unittest.TestCase):
 
     def test_criterion_selector_ols(self):
         """
-        Verifies final user exposed criterion selection method with OLS hedge ration calculation.
+        Verifies final user exposed criterion selection method with OLS hedge ratio calculation.
         """
 
         final_pairs = [('BA', 'CF')]
@@ -149,6 +149,7 @@ class TestCointegrationSelector(unittest.TestCase):
         """
         Tests `generate_spread_statistics`, 'apply_filtering_rules` function.
         """
+
         rs = np.random.RandomState(42)
         X_returns = rs.normal(0, 1, 101)
         X = pd.Series(np.cumsum(X_returns), name='X') + 50

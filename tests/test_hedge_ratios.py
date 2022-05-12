@@ -79,6 +79,7 @@ class TestHedgeRatios(unittest.TestCase):
         """
         Test ADF optimal hedge ratio calculation.
         """
+
         hedge_ratios, _, _, residuals, _ = get_adf_optimal_hedge_ratio(price_data=self.cointegrated_series,
                                                                        dependent_variable='Y')
         self.assertAlmostEqual(hedge_ratios['X'], 5.0023, delta=1e-3)
@@ -88,6 +89,7 @@ class TestHedgeRatios(unittest.TestCase):
         """
         Test Johansen hedge ratio calculation.
         """
+
         hedge_ratios, _, _, residuals = get_johansen_hedge_ratio(price_data=self.cointegrated_series,
                                                                  dependent_variable='Y')
         self.assertAlmostEqual(hedge_ratios['X'], 5.00149, delta=1e-3)
@@ -97,6 +99,7 @@ class TestHedgeRatios(unittest.TestCase):
         """
         Test Box-Tiao decomposition hedge ratio calculation.
         """
+
         hedge_ratios, _, _, residuals = get_box_tiao_hedge_ratio(price_data=self.cointegrated_series,
                                                                  dependent_variable='Y')
         self.assertAlmostEqual(hedge_ratios['X'], 5.0087, delta=1e-3)
