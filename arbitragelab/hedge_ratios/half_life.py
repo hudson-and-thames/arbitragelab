@@ -31,13 +31,13 @@ def _min_hl_function(beta: np.array, X: pd.DataFrame, y: pd.Series) -> float:
 
 
 def get_minimum_hl_hedge_ratio(price_data: pd.DataFrame, dependent_variable: str) -> \
-        Tuple[dict, pd.DataFrame, pd.Series, pd.Series]:
+        Tuple[dict, pd.DataFrame, pd.Series, pd.Series, object]:
     """
     Get hedge ratio by minimizing spread half-life of mean reversion.
 
     :param price_data: (pd.DataFrame) DataFrame with security prices.
     :param dependent_variable: (str) Column name which represents the dependent variable (y).
-    :return: (Tuple) Hedge ratios, X, and y and OLS fit residuals.
+    :return: (Tuple) Hedge ratios, X, and y, OLS fit residuals and optimization object.
     """
 
     X = price_data.copy()
@@ -51,4 +51,4 @@ def get_minimum_hl_hedge_ratio(price_data: pd.DataFrame, dependent_variable: str
     hedge_ratios = result.x
     hedge_ratios_dict = dict(zip([dependent_variable] + X.columns.tolist(), np.insert(hedge_ratios, 0, 1.0)))
 
-    return hedge_ratios_dict, X, y, residuals
+    return hedge_ratios_dict, X, y, residuals, result

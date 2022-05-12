@@ -70,8 +70,8 @@ class TestHedgeRatios(unittest.TestCase):
         Test HL hedge ratio calculation.
         """
 
-        hedge_ratios, _, _, residuals = get_minimum_hl_hedge_ratio(price_data=self.cointegrated_series,
-                                                                   dependent_variable='Y')
+        hedge_ratios, _, _, residuals, _ = get_minimum_hl_hedge_ratio(price_data=self.cointegrated_series,
+                                                                      dependent_variable='Y')
         self.assertAlmostEqual(hedge_ratios['X'], 5, delta=1e-3)
         self.assertAlmostEqual(residuals.mean(), 0.06, delta=1e-2)
 
@@ -79,8 +79,8 @@ class TestHedgeRatios(unittest.TestCase):
         """
         Test ADF optimal hedge ratio calculation.
         """
-        hedge_ratios, _, _, residuals = get_adf_optimal_hedge_ratio(price_data=self.cointegrated_series,
-                                                                    dependent_variable='Y')
+        hedge_ratios, _, _, residuals, _ = get_adf_optimal_hedge_ratio(price_data=self.cointegrated_series,
+                                                                       dependent_variable='Y')
         self.assertAlmostEqual(hedge_ratios['X'], 5.0023, delta=1e-3)
         self.assertAlmostEqual(residuals.mean(), -0.080760, delta=1e-2)
 

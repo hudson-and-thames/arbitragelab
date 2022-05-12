@@ -84,10 +84,10 @@ class CointegrationSpreadSelector(AbstractPairsSelector):
                                                             dependent_variable=bundle[0],
                                                             add_constant=False)
             elif hedge_ratio_calculation == 'min_half_life':
-                hedge_ratios, _, _, _ = get_minimum_hl_hedge_ratio(price_data=self.prices_df[list(bundle)],
+                hedge_ratios, _, _, _, _ = get_minimum_hl_hedge_ratio(price_data=self.prices_df[list(bundle)],
                                                                    dependent_variable=bundle[0])
             elif hedge_ratio_calculation == 'min_adf':
-                hedge_ratios, _, _, _ = get_adf_optimal_hedge_ratio(price_data=self.prices_df[list(bundle)],
+                hedge_ratios, _, _, _, _ = get_adf_optimal_hedge_ratio(price_data=self.prices_df[list(bundle)],
                                                                     dependent_variable=bundle[0])
             elif hedge_ratio_calculation == 'johansen':
                 hedge_ratios, _, _, _ = get_johansen_hedge_ratio(price_data=self.prices_df[list(bundle)],
