@@ -37,3 +37,4 @@ sphinx-rtd-theme==0.5.2 # Docs
 releases==1.6.3 # Docs
 docutils==0.16 # Docs
 pyarmor==6.8.0 # Encryption
+jinja2<3.1 # Docs
