@@ -5,6 +5,9 @@
 """
 Implementation of finding ADF optimal hedge ratio.
 """
+# pylint: disable=invalid-name
+# pylint: disable=protected-access
+
 from typing import Tuple
 import pandas as pd
 import numpy as np
@@ -12,9 +15,6 @@ from scipy.optimize import minimize
 
 from arbitragelab.cointegration_approach.engle_granger import EngleGrangerPortfolio
 
-
-# pylint: disable=invalid-name
-# pylint: disable=protected-access
 
 def _min_adf_stat(beta: np.array, X: pd.DataFrame, y: pd.Series) -> float:
     """
@@ -25,6 +25,8 @@ def _min_adf_stat(beta: np.array, X: pd.DataFrame, y: pd.Series) -> float:
     :param y: (pd.Series) Series of target variable. For this asset we hold 1 unit.
     :return: (float) Half-life of mean-reversion.
     """
+
+    # Performing Engle-Granger test on spread
     portfolio = EngleGrangerPortfolio()
     spread = y - (beta * X).sum(axis=1)
     portfolio._perform_eg_test(spread)

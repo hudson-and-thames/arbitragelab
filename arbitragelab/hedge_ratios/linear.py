@@ -52,6 +52,7 @@ def _linear_f_no_constant(beta: np.array, x_variable: np.array) -> np.array:
     :param x_variable: (np.array) Model X vector.
     :return: (np.array) Vector result of equation calculation.
     """
+
     _, b = beta[0], beta[1:]
     b.shape = (b.shape[0], 1)
 
@@ -66,6 +67,7 @@ def _linear_f_constant(beta: np.array, x_variable: np.array) -> np.array:
     :param x_variable: (np.array) Model X vector.
     :return: (np.array) Vector result of equation calculation.
     """
+
     a, b = beta[0], beta[1:]
     b.shape = (b.shape[0], 1)
 
@@ -92,7 +94,7 @@ def get_tls_hedge_ratio(price_data: pd.DataFrame, dependent_variable: str, add_c
     myodr = ODR(mydata, linear, beta0=np.ones(X.shape[1] + 1))
     res_co = myodr.run()
 
-    hedge_ratios = res_co.beta[1:]  # We don't need constant.
+    hedge_ratios = res_co.beta[1:]  # We don't need constant
     residuals = y - res_co.beta[0] - (X * hedge_ratios).sum(axis=1) if add_constant is True else y - (
             X * hedge_ratios).sum(axis=1)
     hedge_ratios_dict = dict(zip([dependent_variable] + X.columns.tolist(), np.insert(hedge_ratios, 0, 1.0)))

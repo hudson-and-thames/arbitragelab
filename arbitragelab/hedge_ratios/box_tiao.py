@@ -2,11 +2,10 @@
 # All rights reserved
 # Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 
-# pylint: disable=invalid-name
-
 """
 Hedge ratio estimation using Box-Tiao canonical decomposition on the assets dataframe.
 """
+# pylint: disable=invalid-name
 
 from typing import Tuple
 
@@ -39,14 +38,19 @@ def get_box_tiao_hedge_ratio(price_data: pd.DataFrame, dependent_variable: str) 
     """
     Perform Box-Tiao canonical decomposition on the assets dataframe.
 
-    :return: (np.array) The weighting of each asset in the portfolio. There will be N decompositions for N assets,
-        where each column vector corresponds to one portfolio. The order of the weightings correspond to the
-        descending order of the eigenvalue.
+    The resulting ratios are the weightings of each asset in the portfolio. There are N decompositions for N assets,
+    where each column vector corresponds to one portfolio. The order of the weightings corresponds to the
+    descending order of the eigenvalues.
+
+    :param price_data: (pd.DataFrame) DataFrame with security prices.
+    :param dependent_variable: (str) Column name which represents the dependent variable (y).
+    :return: (Tuple) Hedge ratios, X, and fit residuals.
     """
+
     X = price_data.copy()
     X = X[[dependent_variable] + [x for x in X.columns if x != dependent_variable]]
 
-    demeaned = X - X.mean()  # Subtract mean columns.
+    demeaned = X - X.mean()  # Subtract mean columns
 
     # Calculate the least square estimate of the price with VAR(1) model
     least_sq_est = _least_square_VAR_fit(demeaned)
@@ -62,7 +66,7 @@ def get_box_tiao_hedge_ratio(price_data: pd.DataFrame, dependent_variable: str) 
     bt_eigvecs = eigvecs[:, np.argsort(eigvals)[::-1]]
     hedge_ratios = dict(zip(X.columns, bt_eigvecs[:, -1]))
 
-    # Convert to a format expected by `construct_spread` function and normalize such that dependent has a hedge ratio 1.
+    # Convert to a format expected by `construct_spread` function and normalize such that dependent has a hedge ratio 1
     for ticker, h in hedge_ratios.items():
         if ticker != dependent_variable:
             hedge_ratios[ticker] = -h / hedge_ratios[dependent_variable]

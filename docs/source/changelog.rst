@@ -14,10 +14,10 @@ Changelog
 
 * :feature:`70` Updated requirements versions to newest stable numpy, pandas etc.
 * :bug:`70 major` Fixed package breaking due to faulty werkzeug version.
+* :bug:`69 major` Fixed SCS package version breaking Sparse MR Module.
 * :feature:`68` Updated Cointegration Pairs Selection Module to work with any type of spread (3-leg, N-leg spread).
 * :feature:`68` Updated Hedge Ratios Module to work with any type of spread (3-leg, N-leg spread).
 * :support:`68` Reflected changes to Cointegration Pairs Selection Module in the documentation.
-* :bug:`69 major` Fixed SCS package version breaking Sparse MR Module.
 * :support:`66` Added presentation slides and videos to documentation.
 
 * :release:`0.6.0 <2021-11-15>`

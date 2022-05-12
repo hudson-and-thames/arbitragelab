@@ -14,8 +14,8 @@ import sys
 
 class AbstractPairsSelector(ABC):
     """
-    This is an abstract class for pairs selectors objects. It has abstract method select_pairs() which needs to be
-    implemented.
+    This is an abstract class for pairs selectors objects.
+    It has abstract method select_pairs(), which needs to be implemented.
     """
 
     @abstractmethod
