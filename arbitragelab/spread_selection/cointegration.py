@@ -107,7 +107,7 @@ class CointegrationSpreadSelector(AbstractPairsSelector):
                 raise ValueError('Unknown hedge ratio calculation parameter value.')
 
             spread = construct_spread(price_data=self.prices_df[list(bundle)], hedge_ratios=pd.Series(hedge_ratios))
-            self.hedge_ratio_information['_'.join(bundle)] = hedge_ratios[bundle[1]]
+            self.hedge_ratio_information['_'.join(bundle)] = hedge_ratios
             spreads_dict['_'.join(bundle)] = spread
 
             self._print_progress(iteration + 1, len(self.baskets_to_filter), prefix='Spread construction:',
@@ -149,7 +149,7 @@ class CointegrationSpreadSelector(AbstractPairsSelector):
                                  suffix='Complete')
             iteration += 1
 
-        self.selection_logs['hedge_ratio'] = self.hedge_ratio_information.copy()[self.selection_logs.index].drop_duplicates()
+        self.selection_logs['hedge_ratio'] = self.hedge_ratio_information.copy()
 
         passing_spreads = self.apply_filtering_rules(adf_cutoff_threshold, hurst_exp_threshold,
                                                      min_crossover_threshold, min_half_life)
