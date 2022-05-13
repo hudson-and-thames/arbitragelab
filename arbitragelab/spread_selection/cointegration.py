@@ -80,6 +80,8 @@ class CointegrationSpreadSelector(AbstractPairsSelector):
         """
 
         spreads_dict = {}  # Spread ticker: pd.Series of constructed spread
+        iteration = 0
+
         for bundle in self.baskets_to_filter:
             if hedge_ratio_calculation == 'OLS':
                 hedge_ratios, _, _, _ = get_ols_hedge_ratio(price_data=self.prices_df[list(bundle)],
@@ -105,8 +107,12 @@ class CointegrationSpreadSelector(AbstractPairsSelector):
                 raise ValueError('Unknown hedge ratio calculation parameter value.')
 
             spread = construct_spread(price_data=self.prices_df[list(bundle)], hedge_ratios=pd.Series(hedge_ratios))
-            self.hedge_ratio_information['_'.join(bundle)] = hedge_ratios
+            self.hedge_ratio_information['_'.join(bundle)] = hedge_ratios[bundle[1]]
             spreads_dict['_'.join(bundle)] = spread
+
+            self._print_progress(iteration + 1, len(self.baskets_to_filter), prefix='Spread construction:',
+                                 suffix='Complete')
+            iteration += 1
 
         return spreads_dict
 
@@ -142,12 +148,14 @@ class CointegrationSpreadSelector(AbstractPairsSelector):
             self._print_progress(iteration + 1, len(self.spreads_dict), prefix='Statistics generation:',
                                  suffix='Complete')
             iteration += 1
-        self.selection_logs['hedge_ratio'] = self.hedge_ratio_information.copy()
+
+        self.selection_logs['hedge_ratio'] = self.hedge_ratio_information.copy()[self.selection_logs.index].drop_duplicates()
 
         passing_spreads = self.apply_filtering_rules(adf_cutoff_threshold, hurst_exp_threshold,
                                                      min_crossover_threshold, min_half_life)
 
         return passing_spreads
+
 
     def apply_filtering_rules(self,
                               adf_cutoff_threshold: float = 0.95,
