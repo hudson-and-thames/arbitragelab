@@ -156,7 +156,6 @@ class CointegrationSpreadSelector(AbstractPairsSelector):
 
         return passing_spreads
 
-
     def apply_filtering_rules(self,
                               adf_cutoff_threshold: float = 0.95,
                               hurst_exp_threshold: float = 0.5,
@@ -189,7 +188,7 @@ class CointegrationSpreadSelector(AbstractPairsSelector):
 
     def generate_spread_statistics(self, spread_series: pd.Series, log_info: bool = True) -> dict:
         """
-        Check if the spread passes all filters.
+        Generate spread filtering statistics (Hurst, ADF, HL, Crossovers).
 
         :param spread_series: (pd.Series) Spread values series.
         :param log_info: (bool) Flag indicating that information should be logged into `self.selection_logs`.

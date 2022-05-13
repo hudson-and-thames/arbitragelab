@@ -247,6 +247,13 @@ This project is licensed under an all rights reserved license and is NOT open-so
 
 .. toctree::
     :maxdepth: 2
+    :caption: Spread Selection Tools
+    :hidden:
+
+    spread_selection/cointegration_spread_selection.rst
+
+.. toctree::
+    :maxdepth: 2
     :caption: Optimal Mean Reversion
     :hidden:
 

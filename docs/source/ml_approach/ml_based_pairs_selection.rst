@@ -142,8 +142,8 @@ Implementation
 .. automethod:: OPTICSDBSCANPairsClustering.plot_knee_plot
 .. automethod:: OPTICSDBSCANPairsClustering.get_pairs_by_sector
 
-Select Pairs 
-############
+Select Spreads
+##############
 
 The rules selection flow diagram from `A Machine Learning based Pairs Trading Investment Strategy <http://premio-vidigal.inesc.pt/pdf/SimaoSarmentoMSc-resumo.pdf>`__.
 by Simão Moraes Sarmento and Nuno Horta.
@@ -196,7 +196,7 @@ thus providing enough opportunities to exit a position.
     In practice to calculate the spread of the pairs supplied by this module, it is important to also consider
     the hedge ratio as follows:
     
-    :math:`S = leg1 - (hedgeratio) * leg2`
+    :math:`S = leg1 - (hedgeratio_2) * leg2 - (hedgeratio_3) * leg3 - .....`
 
 .. warning::
     The pairs selection function is very computationally heavy, so execution is going to be long and might slow down your system.
@@ -214,20 +214,17 @@ Implementation
 **************
 
 
-.. automodule:: arbitragelab.pairs_selection.cointegration
+.. automodule:: arbitragelab.spread_selection.cointegration
 
 .. autoclass:: CointegrationSpreadSelector
    :members: __init__
 
 
 .. automethod:: CointegrationSpreadSelector.select_spreads
-.. automethod:: CointegrationSpreadSelector.plot_selected_pairs
+.. automethod:: CointegrationSpreadSelector.generate_spread_statistics
+.. automethod:: CointegrationSpreadSelector.construct_spreads
+.. automethod:: CointegrationSpreadSelector.apply_filtering_rules
 
-Following methods describe the results of the selector in various ways.
-
-.. automethod:: CointegrationSpreadSelector.describe
-.. automethod:: CointegrationSpreadSelector.describe_extra
-.. automethod:: CointegrationSpreadSelector.describe_pairs_sectoral_info
 
 .. note::
     In the original paper Pairs Selection module was a part of ML Pairs Trading approach. However, the user may want to use pairs selection

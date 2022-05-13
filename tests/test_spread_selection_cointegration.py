@@ -59,7 +59,7 @@ class TestCointegrationSelector(unittest.TestCase):
         """
 
         final_pairs = [('BA', 'CF')]
-        other_pairs = [('ABMD', 'AZO'), ('AES', 'BBY'), ('BKR', 'CE')]
+        other_pairs = [('ABMD', 'AZO'), ('AES', 'BBY'), ('BKR', 'CE'), ('AES', 'CE', 'AMZN')]
         coint_pairs = [('BA', 'CF'), ('BKR', 'CE')]
         input_pairs = final_pairs + other_pairs
         pairs_selector = CointegrationSpreadSelector(prices_df=self.data, baskets_to_filter=input_pairs)
