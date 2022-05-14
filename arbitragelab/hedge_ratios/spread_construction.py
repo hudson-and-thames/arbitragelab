@@ -15,7 +15,6 @@ def construct_spread(price_data: pd.DataFrame, hedge_ratios: pd.Series, dependen
     spread will be:
 
     hedge_ratio_dependent_variable * dependent_variable - sum(hedge_ratios * other variables).
-    
     Otherwise, spread is:  hedge_ratio_0 * variable_0 - sum(hedge ratios * variables[1:]).
 
     :param price_data: (pd.DataFrame) Asset prices data frame.
