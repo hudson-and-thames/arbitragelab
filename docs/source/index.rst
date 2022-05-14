@@ -187,6 +187,13 @@ This project is licensed under an all rights reserved license and is NOT open-so
 
 .. toctree::
     :maxdepth: 2
+    :caption: Hedge Ratios
+    :hidden:
+
+    hedge_ratios/hedge_ratios
+
+.. toctree::
+    :maxdepth: 2
     :caption: Distance Approach
     :hidden:
 
@@ -295,12 +302,6 @@ This project is licensed under an all rights reserved license and is NOT open-so
     ml_approach/neural_networks
     ml_approach/filters
 
-.. toctree::
-    :maxdepth: 2
-    :caption: Hedge Ratios
-    :hidden:
-
-    hedge_ratios/hedge_ratios
 
 .. toctree::
     :maxdepth: 3

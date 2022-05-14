@@ -43,6 +43,38 @@ legs. One way to solve this problem is to divide AMZN price by AMD price and use
 In this case, for each AMZN stock, we trade 3200/78 = 41 units of AMD stock. This approach is called the **ratio method**.
 In ArbitrageLab, we have implemented several methods which are used in hedge ratio calculations.
 
+Spread construction methodology
+###############################
+
+.. note::
+    In ArbitrageLab package all hedge ratio calculations methods normalize outputs such that a dependent variable asset has a hedge
+    ratio of **1** and a spread is constructed using the following formula:
+
+    :math:`S = leg1 - (hedgeratio_2) * leg2 - (hedgeratio_3) * leg3 - .....`
+
+.. note::
+    All hedge ratio calculation methods assume that the first asset is a dependent variable unless a user specifies which asset
+    should be used as a dependent.
+
+One can also use `construct_spread` function from ArbitrageLab hedge ratio module to construct spread series from generated
+hedge ratios.
+
+.. py:currentmodule:: arbitragelab.hedge_ratios.spread_construction
+.. autofunction:: construct_spread
+
+
+.. code-block::
+
+    # Importing packages
+    import pandas as pd
+    import numpy as np
+    from arbitragelab.hedge_ratios import construct_spread
+
+    data = pd.read_csv('data.csv', index_col=0, parse_dates=[0])
+    hedge_ratios = pd.Series({'A': 1, 'AVB': 0.832406370860649})
+    spread = construct_spread(self.data[['AVB', 'A']], hedge_ratios=hedge_ratios)
+    inverted_spread = construct_spread(self.data[['AVB', 'A']], hedge_ratios=hedge_ratios, dependent_variable='A')
+
 Ordinary Least Squares (OLS)
 ############################
 
@@ -80,6 +112,31 @@ Implementation
 .. py:currentmodule:: arbitragelab.hedge_ratios.linear
 .. autofunction:: get_tls_hedge_ratio
 
+Johansen Test Eigen Vector
+##########################
+
+One of big advantages of Johansen cointegration test is the resulting eigen vector which serves as a hedge ratio to construct a spread.
+A researcher can either use `JohansenPortfolio` class from ArbitrageLab cointegration module to find all eigen vectors or use a function
+from hedge ratios module to get first-order eigen vector which yields the most stationary portfolio.
+
+Implementation
+**************
+
+.. py:currentmodule:: arbitragelab.hedge_ratios.johansen
+.. autofunction:: get_johansen_hedge_ratio
+
+
+Box-Tiao Canonical Decomposition (BTCD)
+#######################################
+
+First, Box and Tiao introduced a canonical transformation of an :math:`N`-dimensional stationary autoregressive process. The components of the transformed process can then be ordered from least to most predictable according to the research by Box and Tiao.
+
+The estimation of this method goes as follows. For the :math:`VAR(L)` equation, which is called as forecasting equation, this method fits :math:`\beta` and estimates :math:`\hat{P_t}` from the beta. With the estimated :math:`P_t`, it undergoes decomposition process and solves for optimal weight.
+In short, the objective is to come up with the matrix of coefficients that deliver a vector of forecasts with the most predictive power over the next observation.
+
+:math:`\sum_{l=1}^{L} \sum_{i=1}^{N} \beta_{i, l, n} P_{t-l, i}+\beta_{n, 0} X_{t-1, n}+\varepsilon_{t, n}`
+
+
 Minimum Half-Life
 #################
 
@@ -93,6 +150,21 @@ Implementation
 .. py:currentmodule:: arbitragelab.hedge_ratios.half_life
 .. autofunction:: get_minimum_hl_hedge_ratio
 
+Minimum ADF Test T-statistic Value
+##################################
+
+In the same fashion as minimum half-life is calculated, one can find a hedge ratio which minimizes the t-statistic of the
+Augmented Dickey-Fuller Test (ADF).
+
+.. py:currentmodule:: arbitragelab.hedge_ratios.adf_optimal
+.. autofunction:: get_adf_optimal_hedge_ratio
+
+.. note::
+    As Minimum Half-Life and Minimum ADF T-statistics algorithms rely on numerical optimization, sometimes output results can be
+    unstable due to the fact the optimization algorithm did not converge. In order to control this issue, `get_minimum_hl_hedge_ratio` and
+    `get_adf_optimal_hedge_ratio` return scipy optimization object which contains logs and status flag if the method managed to
+    converge.
+
 Examples
 ########
 
@@ -102,20 +174,31 @@ Examples
     import pandas as pd
     import numpy as np
     from arbitragelab.hedge_ratios import (get_ols_hedge_ratio, get_tls_hedge_ratio,
-                                           get_minimum_hl_hedge_ratio)
+                                           get_minimum_hl_hedge_ratio, get_johansen_hedge_ratio, get_adf_optimal_hedge_ratio)
 
     # Getting the dataframe with time series of asset prices
     data = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])
     data = data[['SPY', 'QQQ']] # Filter out to 2 pairs
 
-    ols_model, _, _, _ = get_ols_hedge_ratio(data, dependent_variable='SPY', add_constant=False)
-    print(f'OLS hedge ratio for SPY/QQQ spred is {ols_model.coef_[0]})
+    ols_hedge_ratio, _, _, _ = get_ols_hedge_ratio(data, dependent_variable='SPY', add_constant=False)
+    print(f'OLS hedge ratio for SPY/QQQ spread is {ols_hedge_ratio})
 
-    tls_model, _, _, _ = get_tls_hedge_ratio(data, dependent_variable='SPY')
-    print(f'TLS hedge ratio for SPY/QQQ spred is {tls_model.beta[0]})
+    tls_hedge_ratio, _, _, _ = get_tls_hedge_ratio(data, dependent_variable='SPY')
+    print(f'TLS hedge ratio for SPY/QQQ spread is {tls_hedge_ratio})
 
-    half_life_fit, _, _, _ = get_tls_hedge_ratio(data, dependent_variable='SPY')
-    print(f'Minimum HL hedge ratio for SPY/QQQ spred is {half_life_fit.x[0]})
+    joh_hedge_ratio, _, _, _ = get_johansen_hedge_ratio(data, dependent_variable='SPY')
+    print(f'Johansen hedge ratio for SPY/QQQ spread is {joh_hedge_ratio})
+
+    box_tiao_hedge_ratio, _, _, _ = get_box_tiao_hedge_ratio(data, dependent_variable='SPY')
+    print(f'Box-Tiao hedge ratio for SPY/QQQ spread is {box_tiao_hedge_ratio})
+
+    hl_hedge_ratio, _, _, _, opt_object = get_minimum_hl_hedge_ratio(data, dependent_variable='SPY')
+    print(f'Minimum HL hedge ratio for SPY/QQQ spread is {hl_hedge_ratio})
+    print(opt_object.status)
+
+    adf_hedge_ratio, _, _, _, opt_object_adf = get_adf_optimal_hedge_ratio(data, dependent_variable='SPY')
+    print(f'Minimum ADF t-statistic hedge ratio for SPY/QQQ spread is {adf_hedge_ratio})
+    print(opt_object.opt_object_adf)
 
 Presentation Slides
 ###################

@@ -210,25 +210,9 @@ thus providing enough opportunities to exit a position.
     H&T teams has extended pair selection rules to higher dimensions such that filtering rules can be applied to any spread, not only
     pairs. As a result, the module can be applied in statistical arbitrage applications.
 
-Implementation
-**************
-
-
-.. automodule:: arbitragelab.spread_selection.cointegration
-
-.. autoclass:: CointegrationSpreadSelector
-   :members: __init__
-
-
-.. automethod:: CointegrationSpreadSelector.select_spreads
-.. automethod:: CointegrationSpreadSelector.generate_spread_statistics
-.. automethod:: CointegrationSpreadSelector.construct_spreads
-.. automethod:: CointegrationSpreadSelector.apply_filtering_rules
-
-
 .. note::
     In the original paper Pairs Selection module was a part of ML Pairs Trading approach. However, the user may want to use pairs selection
-    rules without applying DBSCAN/OPTICS clustering. That is why, we decided to split pairs selection and clustering into different objects
+    rules without applying DBSCAN/OPTICS clustering. That is why, we decided to split pairs/spreads selection and clustering into different objects
     which can be used separately or together if the user wants to repeat results from the original paper.
 
 
