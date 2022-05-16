@@ -145,6 +145,11 @@ Implementation
 Select Spreads
 ##############
 
+.. note::
+    In the original paper Pairs Selection module was a part of ML Pairs Trading approach. However, the user may want to use pairs selection
+    rules without applying DBSCAN/OPTICS clustering. That is why, we decided to split pairs/spreads selection and clustering into different objects
+    which can be used separately or together if the user wants to repeat results from the original paper.
+
 The rules selection flow diagram from `A Machine Learning based Pairs Trading Investment Strategy <http://premio-vidigal.inesc.pt/pdf/SimaoSarmentoMSc-resumo.pdf>`__.
 by Simão Moraes Sarmento and Nuno Horta.
 
@@ -193,27 +198,8 @@ Lastly, we enforce that every spread crosses its mean at least once per month, t
 thus providing enough opportunities to exit a position.
 
 .. note::
-    In practice to calculate the spread of the pairs supplied by this module, it is important to also consider
-    the hedge ratio as follows:
-    
-    :math:`S = leg1 - (hedgeratio_2) * leg2 - (hedgeratio_3) * leg3 - .....`
-
-.. warning::
-    The pairs selection function is very computationally heavy, so execution is going to be long and might slow down your system.
-
-.. note::
-    The user may specify thresholds for each pair selector rule from the framework described above. For example, Engle-Granger test 99%
-    threshold may seem too strict in pair selection which can be decreased to either 95% or 90%. On the other hand,
-    the user may impose more strict thresholds on half life of mean reversion.
-
-.. note::
-    H&T teams has extended pair selection rules to higher dimensions such that filtering rules can be applied to any spread, not only
-    pairs. As a result, the module can be applied in statistical arbitrage applications.
-
-.. note::
-    In the original paper Pairs Selection module was a part of ML Pairs Trading approach. However, the user may want to use pairs selection
-    rules without applying DBSCAN/OPTICS clustering. That is why, we decided to split pairs/spreads selection and clustering into different objects
-    which can be used separately or together if the user wants to repeat results from the original paper.
+    A more detailed explanation of the `CointegrationSpreadSelector` class and examples of use can be found in the
+    :ref:`Cointegration Rules Spread Selection <spread_selection-cointegration_spread_selection>` section of the documentation.
 
 
 Examples
@@ -239,7 +225,8 @@ Examples
     clustered_pairs = pairs_clusterer.cluster_using_optics(min_samples=3)
 
     # Generated Pairs are processed through the rules mentioned above
-    spreads_selector = CointegrationSpreadSelector(prices_df=data, baskets_to_filter=clustered_pairs)
+    spreads_selector = CointegrationSpreadSelector(prices_df=data,
+                                                   baskets_to_filter=clustered_pairs)
     filtered_spreads = spreads_selector.select_spreads()
 
     # Generate a Panel of information of the selected pairs
