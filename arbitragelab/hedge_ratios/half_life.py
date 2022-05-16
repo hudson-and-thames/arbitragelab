@@ -10,6 +10,7 @@ Module which implements Minimum Half-Life Hedge Ratio detection algorithm.
 from typing import Tuple
 import pandas as pd
 import numpy as np
+import warnings
 from scipy.optimize import minimize
 
 from arbitragelab.cointegration_approach.signals import get_half_life_of_mean_reversion
@@ -50,5 +51,7 @@ def get_minimum_hl_hedge_ratio(price_data: pd.DataFrame, dependent_variable: str
 
     hedge_ratios = result.x
     hedge_ratios_dict = dict(zip([dependent_variable] + X.columns.tolist(), np.insert(hedge_ratios, 0, 1.0)))
+    if result.status != 0:
+        warnings.warn('Optimization failed to converge. Please check output hedge ratio! The result can be unstable!')
 
     return hedge_ratios_dict, X, y, residuals, result

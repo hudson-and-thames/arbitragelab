@@ -9,6 +9,7 @@ Implementation of finding ADF optimal hedge ratio.
 # pylint: disable=protected-access
 
 from typing import Tuple
+import warnings
 import pandas as pd
 import numpy as np
 from scipy.optimize import minimize
@@ -54,5 +55,7 @@ def get_adf_optimal_hedge_ratio(price_data: pd.DataFrame, dependent_variable: st
 
     hedge_ratios = result.x
     hedge_ratios_dict = dict(zip([dependent_variable] + X.columns.tolist(), np.insert(hedge_ratios, 0, 1.0)))
+    if result.status != 0:
+        warnings.warn('Optimization failed to converge. Please check output hedge ratio! The result can be unstable!')
 
     return hedge_ratios_dict, X, y, residuals, result
