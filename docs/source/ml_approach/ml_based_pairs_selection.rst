@@ -182,8 +182,13 @@ of both legs of the spread when estimating the relationship so that hedge ratios
 the cointegration estimates will be unaffected by the ordering of variables.
 
 Hudson & Thames research team has also found out that optimal (in terms of cointegration tests statistics) hedge ratios
-are obtained by minimizng spread's half-life of mean-reversion. As a result, the user may specify hedge ratio calculation
-method: TLS, OLS or Minimum Half-Life.
+are obtained by minimizng spread's half-life of mean-reversion. Alongside this hedge ration calculation method,
+there is a wide variety of algorithms to choose from: TLS, OLS, Johansen Test Eigenvector, Box-Tiao Canonical Decomposition,
+Minimum Half-Life, Minimum ADF Test T-statistic Value.
+
+.. note::
+    More information about the hedge ratio methods and their use can be found in the
+    :ref:`Hedge Ratio Calculations <hedge_ratios-hedge_ratios>` section of the documentation.
 
 Secondly, an additional validation step is also implemented to provide more confidence in the mean-reversion
 character of the pairs’ spread. The condition imposed is that the Hurst exponent associated with the spread
@@ -211,7 +216,7 @@ Examples
     import pandas as pd
     import numpy as np
     from arbitragelab.ml_approach import OPTICSDBSCANPairsClustering
-    from arbitragelab.pairs_selection import CointegrationSpreadSelector
+    from arbitragelab.spread_selection import CointegrationSpreadSelector
 
     # Getting the dataframe with time series of asset returns
     data = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])
@@ -224,21 +229,23 @@ Examples
     # Clustering is performed over feature vector
     clustered_pairs = pairs_clusterer.cluster_using_optics(min_samples=3)
 
+    # Removing duplicates
+    clustered_pairs = list(set(clustered_pairs))
+
     # Generated Pairs are processed through the rules mentioned above
     spreads_selector = CointegrationSpreadSelector(prices_df=data,
                                                    baskets_to_filter=clustered_pairs)
     filtered_spreads = spreads_selector.select_spreads()
 
-    # Generate a Panel of information of the selected pairs
-    final_pairs_info = spreads_selector.describe_extra()
+    # Checking the resulting spreads
+    print(filtered_spreads)
 
-    # Import the ticker sector info csv
-    sectoral_info = pd.read_csv('X_FILE_PATH.csv')
+    # Generate a plot of the selected spread
+    spreads_selector.spreads_dict['AAL_FTI'].plot(figsize=(12,6))
 
-    # Generate a sector/industry relationship Panel of each pair
-    spreads_selector.describe_pairs_sectoral_info(final_pairs_info['leg_1'],
-                                                  final_pairs_info['leg_2'],
-                                                  sectoral_info)
+    # Generate detailed spread statistics
+    spreads_selector.selection_logs.loc[['AAL_FTI']].T
+
 
 Research Notebooks
 ##################

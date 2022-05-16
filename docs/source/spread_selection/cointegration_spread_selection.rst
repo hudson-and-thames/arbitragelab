@@ -36,8 +36,13 @@ of both legs of the spread when estimating the relationship so that hedge ratios
 the cointegration estimates will be unaffected by the ordering of variables.
 
 Hudson & Thames research team has also found out that optimal (in terms of cointegration tests statistics) hedge ratios
-are obtained by minimizng spread's half-life of mean-reversion. As a result, the user may specify hedge ratio calculation
-method: TLS, OLS or Minimum Half-Life.
+are obtained by minimizng spread's half-life of mean-reversion. Alongside this hedge ration calculation method,
+there is a wide variety of algorithms to choose from: TLS, OLS, Johansen Test Eigenvector, Box-Tiao Canonical Decomposition,
+Minimum Half-Life, Minimum ADF Test T-statistic Value.
+
+.. note::
+    More information about the hedge ratio methods and their use can be found in the
+    :ref:`Hedge Ratio Calculations <hedge_ratios-hedge_ratios>` section of the documentation.
 
 Secondly, an additional validation step is also implemented to provide more confidence in the mean-reversion
 character of the pairs’ spread. The condition imposed is that the Hurst exponent associated with the spread
@@ -92,7 +97,7 @@ Examples
     # Importing packages
     import pandas as pd
     import numpy as np
-    from arbitragelab.pairs_selection import CointegrationSpreadSelector
+    from arbitragelab.spread_selection import CointegrationSpreadSelector
 
     data = pd.read_csv('sp100_prices.csv', index_col=0, parse_dates=[0])
     input_spreads = [('ABMD', 'AZO'), ('AES', 'BBY'), ('BKR', 'CE'), ('BKR', 'CE', 'AMZN')]
@@ -115,6 +120,7 @@ Examples
     print(stats)
     filtered_spreads = pairs_selector.apply_filtering_rules(adf_cutoff_threshold=0.99,
                                                             hurst_exp_threshold=0.5)
+
 
 Research Notebooks
 ##################

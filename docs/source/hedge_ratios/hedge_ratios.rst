@@ -116,8 +116,8 @@ Implementation
 .. py:currentmodule:: arbitragelab.hedge_ratios.linear
 .. autofunction:: get_tls_hedge_ratio
 
-Johansen Test Eigen Vector
-##########################
+Johansen Test Eigenvector
+#########################
 
 One of the big advantages of the Johansen cointegration test is the resulting eigenvector which serves as a hedge ratio to construct a spread.
 A researcher can either use the `JohansenPortfolio` class from the ArbitrageLab cointegration module to find all eigenvectors or use a function
