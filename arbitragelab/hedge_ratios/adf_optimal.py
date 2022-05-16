@@ -14,7 +14,7 @@ import pandas as pd
 import numpy as np
 from scipy.optimize import minimize
 
-from arbitragelab.cointegration_approach.engle_granger import EngleGrangerPortfolio
+from arbitragelab.cointegration_approach import EngleGrangerPortfolio
 
 
 def _min_adf_stat(beta: np.array, X: pd.DataFrame, y: pd.Series) -> float:

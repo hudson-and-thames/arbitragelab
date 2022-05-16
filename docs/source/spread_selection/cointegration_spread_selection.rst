@@ -36,8 +36,13 @@ of both legs of the spread when estimating the relationship so that hedge ratios
 the cointegration estimates will be unaffected by the ordering of variables.
 
 Hudson & Thames research team has also found out that optimal (in terms of cointegration tests statistics) hedge ratios
-are obtained by minimizng spread's half-life of mean-reversion. As a result, the user may specify hedge ratio calculation
-method: TLS, OLS or Minimum Half-Life.
+are obtained by minimizng spread's half-life of mean-reversion. Alongside this hedge ration calculation method,
+there is a wide variety of algorithms to choose from: TLS, OLS, Johansen Test Eigenvector, Box-Tiao Canonical Decomposition,
+Minimum Half-Life, Minimum ADF Test T-statistic Value.
+
+.. note::
+    More information about the hedge ratio methods and their use can be found in the
+    :ref:`Hedge Ratio Calculations <hedge_ratios-hedge_ratios>` section of the documentation.
 
 Secondly, an additional validation step is also implemented to provide more confidence in the mean-reversion
 character of the pairs’ spread. The condition imposed is that the Hurst exponent associated with the spread
@@ -92,21 +97,52 @@ Examples
     # Importing packages
     import pandas as pd
     import numpy as np
-    from arbitragelab.pairs_selection import CointegrationSpreadSelector
+    from arbitragelab.spread_selection import CointegrationSpreadSelector
 
     data = pd.read_csv('sp100_prices.csv', index_col=0, parse_dates=[0])
     input_spreads = [('ABMD', 'AZO'), ('AES', 'BBY'), ('BKR', 'CE'), ('BKR', 'CE', 'AMZN')]
     pairs_selector = CointegrationSpreadSelector(prices_df=data, baskets_to_filter=input_spreads)
-    filtered_spreads = pairs_selector.select_spreads(hedge_ratio_calculation='TLS', adf_cutoff_threshold=0.9,
-                                                     hurst_exp_threshold=0.55, min_crossover_threshold=0,
+    filtered_spreads = pairs_selector.select_spreads(hedge_ratio_calculation='TLS',
+                                                     adf_cutoff_threshold=0.9,
+                                                     hurst_exp_threshold=0.55,
+                                                     min_crossover_threshold=0,
                                                      min_half_life=20)
-    logs = pairs_selector.selection_logs.copy() # Statistics logs data frame.
+
+    # Statistics logs data frame.
+    logs = pairs_selector.selection_logs.copy()
 
     # A user may also specify own constructed spread to be tested.
     spread = pd.read_csv('spread.csv', index_col=0, parse_dates=[0])
     pairs_selector = CointegrationSpreadSelector(prices_df=None, baskets_to_filter=None)
-    stats = pairs_selector.generate_spread_statistics(spread, log_info=True) # log_info=True to save stats.
+    # Using log_info=True to save stats.
+    stats = pairs_selector.generate_spread_statistics(spread, log_info=True)
     print(pairs_selector.selection_logs)
     print(stats)
-    filtered_spreads = pairs_selector.apply_filtering_rules(adf_cutoff_threshold=0.99, hurst_exp_threshold=0.5)
+    filtered_spreads = pairs_selector.apply_filtering_rules(adf_cutoff_threshold=0.99,
+                                                            hurst_exp_threshold=0.5)
 
+
+Research Notebooks
+##################
+
+The following research notebook can be used to better understand the Cointegration Rules Spread Selection described above.
+
+* `ML based Pairs Selection`_
+
+.. _`ML based Pairs Selection`: https://hudsonthames.org/notebooks/arblab/ml_based_pairs_selection.html
+
+.. raw:: html
+
+    <a href="https://hudthames.tech/3gFGwy8"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
+    <a href="https://hudthames.tech/2S03R58"><button style="margin: 20px; margin-top: 0px">Download Sample Data</button></a>
+
+References
+##########
+
+* `Sarmento, S.M. and Horta, N., A Machine Learning based Pairs Trading Investment Strategy. <https://www.springer.com/gp/book/9783030472504>`__
+
+* `Armstrong, J.S. ed., 2001. Principles of forecasting: a handbook for researchers and practitioners (Vol. 30). Springer Science & Business Media. <http://doi.org/10.1007/978-0-306-47630-3>`__
+
+* `Hoel, C.H., 2013. Statistical arbitrage pairs: can cointegration capture market neutral profits? (Master's thesis). <https://openaccess.nhh.no/nhh-xmlui/bitstream/handle/11250/169897/hoel2013.pdf?sequence=1>`__
+
+* `Gregory, I., Ewald, C.O. and Knox, P., 2010, November. Analytical pairs trading under different assumptions on the spread and ratio dynamics. In 23rd Australasian Finance and Banking Conference. <http://dx.doi.org/10.2139/ssrn.1663703>`__
