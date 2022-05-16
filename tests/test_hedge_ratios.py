@@ -107,7 +107,7 @@ class TestHedgeRatios(unittest.TestCase):
 
     def test_diverging_hedge_ratios(self):
         """
-        Test diverging min HL, min ADF hedge ratios.
+        Test diverging min HL, min ADF hedge ratios and edge cases.
         """
         diverging_series = self.cointegrated_series.copy()
         diverging_series['Y'] = 1.0
@@ -118,3 +118,6 @@ class TestHedgeRatios(unittest.TestCase):
         _, _, _, _, res = get_minimum_hl_hedge_ratio(price_data=diverging_series,
                                                      dependent_variable='Y')
         self.assertEqual(res.status, 3.0)
+        hedge_ratio, _, _, _ = get_ols_hedge_ratio(price_data=diverging_series.iloc[:1],
+                                                   dependent_variable='Y')
+        self.assertEqual(hedge_ratio['X'], 0.5)
