@@ -112,9 +112,9 @@ class TestHedgeRatios(unittest.TestCase):
         diverging_series = self.cointegrated_series.copy()
         diverging_series['Y'] = 1.0
         diverging_series['X'] = 2.0
-        hedge_ratios, _, _, residuals, res = get_adf_optimal_hedge_ratio(price_data=diverging_series,
-                                                                         dependent_variable='Y')
+        _, _, _, _, res = get_adf_optimal_hedge_ratio(price_data=diverging_series,
+                                                      dependent_variable='Y')
         self.assertEqual(res.status, 3.0)
-        hedge_ratios, _, _, residuals, res = get_minimum_hl_hedge_ratio(price_data=diverging_series,
-                                                                        dependent_variable='Y')
+        _, _, _, _, res = get_minimum_hl_hedge_ratio(price_data=diverging_series,
+                                                     dependent_variable='Y')
         self.assertEqual(res.status, 3.0)
