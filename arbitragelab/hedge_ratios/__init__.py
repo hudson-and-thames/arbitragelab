@@ -7,3 +7,4 @@ from arbitragelab.hedge_ratios.half_life import get_minimum_hl_hedge_ratio
 from arbitragelab.hedge_ratios.johansen import get_johansen_hedge_ratio
 from arbitragelab.hedge_ratios.spread_construction import construct_spread
 from arbitragelab.hedge_ratios.box_tiao import get_box_tiao_hedge_ratio
+from arbitragelab.hedge_ratios.adf_optimal import get_adf_optimal_hedge_ratio
