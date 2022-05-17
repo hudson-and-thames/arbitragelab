@@ -36,7 +36,7 @@ class EngleGrangerPortfolio(CointegratedPortfolio):
 
         segment.track('EngleGrangerPortfolio')
 
-    def _perform_eg_test(self, residuals: pd.Series):
+    def perform_eg_test(self, residuals: pd.Series):
         """
         Perform Engle-Granger test on model residuals and generate test statistics and p values.
 
@@ -73,7 +73,7 @@ class EngleGrangerPortfolio(CointegratedPortfolio):
 
         # Get model residuals
         self.residuals = residuals
-        self._perform_eg_test(self.residuals)
+        self.perform_eg_test(self.residuals)
 
     @staticmethod
     def get_ols_hedge_ratio(price_data: pd.DataFrame, dependent_variable: str, add_constant: bool = False) -> \

@@ -20,7 +20,7 @@ from arbitragelab.hedge_ratios import get_ols_hedge_ratio, get_tls_hedge_ratio, 
 from arbitragelab.hedge_ratios.adf_optimal import get_adf_optimal_hedge_ratio
 from arbitragelab.spread_selection.base import AbstractPairsSelector
 from arbitragelab.util import segment
-from arbitragelab.util.hurst import get_hurst_exponent
+from arbitragelab.cointegration_approach.utils import get_hurst_exponent
 
 
 class CointegrationSpreadSelector(AbstractPairsSelector):
@@ -237,7 +237,7 @@ class CointegrationSpreadSelector(AbstractPairsSelector):
         """
 
         eg_port = EngleGrangerPortfolio()
-        eg_port._perform_eg_test(spread_series)
+        eg_port.perform_eg_test(spread_series)
         statistic_value = eg_port.adf_statistics.loc['statistic_value'].iloc[0]
         p_value_99 = eg_port.adf_statistics.loc['99%'].iloc[0]
         p_value_95 = eg_port.adf_statistics.loc['95%'].iloc[0]
