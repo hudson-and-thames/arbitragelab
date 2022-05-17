@@ -37,11 +37,18 @@ class TestHedgeRatios(unittest.TestCase):
 
         self.cointegrated_series = pd.concat([X, Y], axis=1)
 
+        noise_1 = rs.normal(0, 1, 100)
+        Z = 2 * Y + noise_1
+        Z.name = 'Z'
+
+        self.multiple_series = pd.concat([X, Y, Z], axis=1)
+
     def test_ols_hedge_ratio(self):
         """
         Test OLS hedge ratio calculation.
         """
 
+        # Test a 2-leg spread
         hedge_ratios, _, _, residuals = get_ols_hedge_ratio(price_data=self.cointegrated_series, dependent_variable='Y')
         hedge_ratios_constant, _, _, residuals_const = get_ols_hedge_ratio(price_data=self.cointegrated_series,
                                                                            dependent_variable='Y',
@@ -51,11 +58,17 @@ class TestHedgeRatios(unittest.TestCase):
         self.assertAlmostEqual(residuals.mean(), 0, delta=1e-2)
         self.assertAlmostEqual(residuals_const.mean(), 0, delta=1e-2)
 
+        # Test a 3-leg spread
+        hedge_ratios, _, _, residuals = get_ols_hedge_ratio(price_data=self.multiple_series, dependent_variable='Z')
+        self.assertAlmostEqual(hedge_ratios['Z'], 1, delta=1e-3)
+        self.assertAlmostEqual(residuals.mean(), -0.0212, delta=1e-2)
+
     def test_tls_hedge_ratio(self):
         """
         Test TLS hedge ratio calculation.
         """
 
+        # Test a 2-leg spread
         hedge_ratios, _, _, residuals = get_tls_hedge_ratio(price_data=self.cointegrated_series, dependent_variable='Y')
         hedge_ratios_constant, _, _, residuals_const = get_tls_hedge_ratio(price_data=self.cointegrated_series,
                                                                            dependent_variable='Y',
@@ -65,59 +78,98 @@ class TestHedgeRatios(unittest.TestCase):
         self.assertAlmostEqual(residuals.mean(), 0, delta=1e-2)
         self.assertAlmostEqual(residuals_const.mean(), 0, delta=1e-2)
 
+        # Test a 3-leg spread
+        hedge_ratios, _, _, residuals = get_tls_hedge_ratio(price_data=self.multiple_series, dependent_variable='Z')
+        self.assertAlmostEqual(hedge_ratios['Z'], 1, delta=1e-3)
+        self.assertAlmostEqual(residuals.mean(), 0, delta=1e-1)
+
     def test_hl_hedge_ratio(self):
         """
         Test HL hedge ratio calculation.
         """
 
+        # Test a 2-leg spread
         hedge_ratios, _, _, residuals, _ = get_minimum_hl_hedge_ratio(price_data=self.cointegrated_series,
                                                                       dependent_variable='Y')
         self.assertAlmostEqual(hedge_ratios['X'], 5, delta=1e-3)
         self.assertAlmostEqual(residuals.mean(), 0.06, delta=1e-2)
+
+        # Test a 3-leg spread
+        hedge_ratios, _, _, residuals, _ = get_minimum_hl_hedge_ratio(price_data=self.multiple_series,
+                                                                      dependent_variable='Z')
+        self.assertAlmostEqual(hedge_ratios['Z'], 1, delta=1e-3)
+        self.assertAlmostEqual(residuals.mean(), -1.7353, delta=1e-2)
 
     def test_adf_hedge_ratio(self):
         """
         Test ADF optimal hedge ratio calculation.
         """
 
+        # Test a 2-leg spread
         hedge_ratios, _, _, residuals, _ = get_adf_optimal_hedge_ratio(price_data=self.cointegrated_series,
                                                                        dependent_variable='Y')
         self.assertAlmostEqual(hedge_ratios['X'], 5.0023, delta=1e-3)
         self.assertAlmostEqual(residuals.mean(), -0.080760, delta=1e-2)
+
+        # Test a 3-leg spread
+        hedge_ratios, _, _, residuals, _ = get_minimum_hl_hedge_ratio(price_data=self.multiple_series,
+                                                                      dependent_variable='Z')
+        self.assertAlmostEqual(hedge_ratios['Z'], 1, delta=1e-3)
+        self.assertAlmostEqual(residuals.mean(), -1.7353, delta=1e-2)
 
     def test_johansen_hedge_ratio(self):
         """
         Test Johansen hedge ratio calculation.
         """
 
+        # Test a 2-leg spread
         hedge_ratios, _, _, residuals = get_johansen_hedge_ratio(price_data=self.cointegrated_series,
                                                                  dependent_variable='Y')
         self.assertAlmostEqual(hedge_ratios['X'], 5.00149, delta=1e-3)
         self.assertAlmostEqual(residuals.mean(), -0.04267, delta=1e-2)
+
+        # Test a 3-leg spread
+        hedge_ratios, _, _, residuals = get_johansen_hedge_ratio(price_data=self.multiple_series,
+                                                                 dependent_variable='Z')
+        self.assertAlmostEqual(hedge_ratios['Z'], 1, delta=1e-3)
+        self.assertAlmostEqual(residuals.mean(), -1.9534, delta=1e-2)
 
     def test_box_tiao_hedge_ratio(self):
         """
         Test Box-Tiao decomposition hedge ratio calculation.
         """
 
+        # Test a 2-leg spread
         hedge_ratios, _, _, residuals = get_box_tiao_hedge_ratio(price_data=self.cointegrated_series,
                                                                  dependent_variable='Y')
         self.assertAlmostEqual(hedge_ratios['X'], 5.0087, delta=1e-3)
         self.assertAlmostEqual(residuals.mean(), -0.3609, delta=1e-2)
 
+        # Test a 3-leg spread
+        hedge_ratios, _, _, residuals = get_box_tiao_hedge_ratio(price_data=self.multiple_series,
+                                                                 dependent_variable='Z')
+        self.assertAlmostEqual(hedge_ratios['Z'], 1, delta=1e-3)
+        self.assertAlmostEqual(residuals.mean(), -1.016, delta=1e-2)
+
     def test_diverging_hedge_ratios(self):
         """
         Test diverging min HL, min ADF hedge ratios and edge cases.
         """
+
         diverging_series = self.cointegrated_series.copy()
         diverging_series['Y'] = 1.0
         diverging_series['X'] = 2.0
-        _, _, _, _, res = get_adf_optimal_hedge_ratio(price_data=diverging_series,
-                                                      dependent_variable='Y')
+
+        with self.assertWarns(UserWarning):
+            _, _, _, _, res = get_adf_optimal_hedge_ratio(price_data=diverging_series,
+                                                          dependent_variable='Y')
         self.assertEqual(res.status, 3.0)
-        _, _, _, _, res = get_minimum_hl_hedge_ratio(price_data=diverging_series,
-                                                     dependent_variable='Y')
+
+        with self.assertWarns(UserWarning):
+            _, _, _, _, res = get_minimum_hl_hedge_ratio(price_data=diverging_series,
+                                                         dependent_variable='Y')
         self.assertEqual(res.status, 3.0)
+
         hedge_ratio, _, _, _ = get_ols_hedge_ratio(price_data=diverging_series.iloc[:1],
                                                    dependent_variable='Y')
         self.assertEqual(hedge_ratio['X'], 0.5)
