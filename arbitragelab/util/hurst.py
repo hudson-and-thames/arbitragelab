@@ -2,15 +2,14 @@
 The module implements Hurst exponent calculations.
 """
 
-import pandas as pd
 import numpy as np
 
 
-def get_hurst_exponent(data: pd.DataFrame, max_lags: int = 100) -> float:
+def get_hurst_exponent(data: np.array, max_lags: int = 100) -> float:
     """
     Hurst Exponent Calculation.
 
-    :param data: (pd.DataFrame) Time Series that is going to be analyzed.
+    :param data: (np.array) Time Series that is going to be analyzed.
     :param max_lags: (int) Maximum amount of lags to be used calculating tau.
     :return: (float) Hurst exponent.
     """
