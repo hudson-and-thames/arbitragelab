@@ -209,8 +209,8 @@ class PCAStrategy:
 
         This function follows the logic:
 
-        Enter a long position if s-score < −sbo
-        Close a long position if s-score > −ssc
+        Enter a long position if s-score < -sbo
+        Close a long position if s-score > -ssc
         Enter a short position if s-score > +sso
         Close a short position if s-score < +sbc
 
@@ -301,8 +301,8 @@ class PCAStrategy:
 
         Trading rules to enter a mean-reverting portfolio based on the S-score are:
 
-        Enter a long position if s-score < −sbo
-        Close a long position if s-score > −ssc
+        Enter a long position if s-score < -sbo
+        Close a long position if s-score > -ssc
         Enter a short position if s-score > +sso
         Close a short position if s-score < +sbc
 

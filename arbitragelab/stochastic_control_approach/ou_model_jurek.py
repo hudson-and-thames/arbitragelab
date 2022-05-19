@@ -205,7 +205,7 @@ class OUModelJurek:
 
         What is beta?
         Beta signifies the constant fraction of total wealth an investor chooses to consume. This is analogous to a hedge fund investor
-        who cares both about terminal wealth in some risk-averse way and consumes a constant fraction, β,
+        who cares both about terminal wealth in some risk-averse way and consumes a constant fraction, beta,
         of assets under management (the management fee).
         For utility_type = 2, C(Consumption) = beta * W.
 

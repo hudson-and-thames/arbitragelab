@@ -296,7 +296,7 @@ class OPTICSDBSCANPairsClustering:
         This method will plot the k-distance graph, ordered from the largest to the smallest value.
 
         The values where this plot shows an "elbow" should be a reference to the user of the optimal
-        ε parameter to be used for the DBSCAN clustering method.
+        eps parameter to be used for the DBSCAN clustering method.
 
         :return: (Axes) Axes object.
         """
