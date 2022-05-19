@@ -1,311 +1,815 @@
-.. image:: https://hudsonthames.org/wp-content/uploads/2021/12/documentation-header-arbitragelab.jpg
-   :align: center
-   :target: https://hudsonthames.org/
-
-|
-
 ============================================
 Welcome to Statistical Arbitrage Laboratory
 ============================================
 
+====
+Data
+====
 
-**What was only possible with the help of huge R&D teams is now at your disposal, anywhere, anytime.**
+Data Importer
+#############
 
-ArbitrageLab is a python library that includes both end-to-end strategies and strategy creation tools that cover the
-whole range of strategies defined by Krauss' taxonomy for pairs trading strategies.
+arbitragelab.util.data_importer
+*******************************
 
-.. raw:: html
+.. py:currentmodule:: arbitragelab.util.data_importer
 
-    <div style="position: relative;
-                padding-bottom: 56.25%;
-                height: 0;
-                overflow: hidden;
-                max-width: 100%;
-                height: auto;">
+.. automodule:: arbitragelab.util.data_importer
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
 
-        <iframe src="https://www.youtube.com/embed/DgU1lSdH3vM"
-                frameborder="0"
-                allowfullscreen
-                style="position: absolute;
-                       top: 0;
-                       left: 0;
-                       width: 100%;
-                       height: 100%;">
-        </iframe>
-    </div>
-|
+Futures Rollover
+################
 
+arbitragelab.util.base_futures_roller
+*************************************
 
-Hudson & Thames documentation has three core advantages in helping you learn the new techniques:
-**Thoroughness**, **Flexibility** and **Credibility**.
+.. py:currentmodule:: arbitragelab.util.base_futures_roller
 
-.. image:: https://hudsonthames.org/wp-content/uploads/2021/03/1-n.png
-   :height: 70 px
-   :align: left
-   :target: https://hudsonthames.org/
+.. automodule:: arbitragelab.util.base_futures_roller
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
 
+arbitragelab.util.rollers
+*************************
 
-____________
+.. py:currentmodule:: arbitragelab.util.rollers
 
-Thoroughness
-++++++++++++
-|
+.. automodule:: arbitragelab.util.rollers
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
 
-We want to make the learning process for the advanced tools and approaches effortless
-for our clients by providing detailed explanations, examples of use and additional context behind them.
 
-The general documentation structure looks the following way:
+=============
+Visualization
+=============
 
+Visualization Tear Sheets
+#########################
 
-+------------------------------------------+
-|   Documentation page :                   |
-+==========================================+
-|    Lecture video*                        |
-+------------------------------------------+
-|    Mathematical concept explanation      |
-+------------------------------------------+
-|    Implementation description            |
-+------------------------------------------+
-|    Short code example                    |
-+------------------------------------------+
-|    Link to an extensive example notebook |
-+------------------------------------------+
-|    Presentation slides*                  |
-+------------------------------------------+
+arbitragelab.tearsheet.tearsheet
+********************************
 
-\* *- optional content*
+.. py:currentmodule:: arbitragelab.tearsheet.tearsheet
 
-.. image:: https://hudsonthames.org/wp-content/uploads/2021/03/2-n.png
-   :height: 70 px
-   :align: left
-   :target: https://hudsonthames.org/
+.. automodule:: arbitragelab.tearsheet.tearsheet
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
 
-___________
 
-Flexibility
-+++++++++++
-|
+============
+Hedge Ratios
+============
 
-Learn in the way that is most suitable for you as more and more documentation pages are now supplemented with both
-video lectures and presentation slides on the topic.
+Hedge Ratio Calculations
+########################
 
+arbitragelab.hedge_ratios.spread_construction
+*********************************************
 
-.. image:: https://hudsonthames.org/wp-content/uploads/2021/12/docs-example.png
-   :align: center
-   :target: https://hudsonthames.org/
-|
+.. py:currentmodule:: arbitragelab.hedge_ratios.spread_construction
 
-.. image:: https://hudsonthames.org/wp-content/uploads/2021/03/3-n.png
-   :height: 70 px
-   :align: left
-   :target: https://hudsonthames.org/
+.. automodule:: arbitragelab.hedge_ratios.spread_construction
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
 
-___________
+arbitragelab.hedge_ratios.adf_optimal
+*************************************
 
-Credibility
-+++++++++++
-|
+.. py:currentmodule:: arbitragelab.hedge_ratios.adf_optimal
 
-All of our implementations are from the most elite and peer-reviewed journals.
+.. automodule:: arbitragelab.hedge_ratios.adf_optimal
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
 
+arbitragelab.hedge_ratios.box_tiao
+**********************************
 
+.. py:currentmodule:: arbitragelab.hedge_ratios.box_tiao
 
-Including publications from:
+.. automodule:: arbitragelab.hedge_ratios.box_tiao
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
 
-1. `The Journal of Portfolio Management <https://jpm.pm-research.com/>`_
-2. `The Journal of Financial Data Science <https://jfds.pm-research.com/>`_
-3. `The Journal of Algorithmic Finance <http://www.algorithmicfinance.org/>`_
-4. `Cambridge University Press <https://www.cambridge.org/>`_
+arbitragelab.hedge_ratios.half_life
+***********************************
 
-.. image:: https://hudsonthames.org/wp-content/uploads/2021/12/sourses-v2.png
-   :align: center
-|
+.. py:currentmodule:: arbitragelab.hedge_ratios.half_life
 
+.. automodule:: arbitragelab.hedge_ratios.half_life
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
 
-.. image:: https://hudsonthames.org/wp-content/uploads/2021/11/header_github_ht.jpg
-   :align: center
-   :target: https://hudsonthames.org/
-|
+arbitragelab.hedge_ratios.johansen
+**********************************
 
-Who is Hudson & Thames?
-+++++++++++++++++++++++
+.. py:currentmodule:: arbitragelab.hedge_ratios.johansen
 
-Hudson and Thames Quantitative Research is a company with the goal of bridging the gap between the advanced research developed in
-quantitative finance and its practical application. We have created three premium python libraries so you can effortlessly access the
-latest techniques and focus on what matters most: **creating your own winning strategy**.
+.. automodule:: arbitragelab.hedge_ratios.johansen
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
 
+arbitragelab.hedge_ratios.linear
+********************************
 
-Community
-+++++++++
+.. py:currentmodule:: arbitragelab.hedge_ratios.linear
 
-With the purchase of the library, our clients get access to the Hudson & Thames Slack community, where our engineers and other quants
-are always ready to answer your questions.
+.. automodule:: arbitragelab.hedge_ratios.linear
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
 
-Alternatively, you can email us at: research@hudsonthames.org.
 
+=================
+Distance Approach
+=================
 
+Distance Approach
+#################
 
-License
-+++++++
+arbitragelab.distance_approach.basic_distance_approach
+******************************************************
 
-This project is licensed under an all rights reserved license and is NOT open-source, and may not be used for any purposes without a commercial license which may be purchased from Hudson and Thames Quantitative Research.
+.. py:currentmodule:: arbitragelab.distance_approach.basic_distance_approach
 
+.. automodule:: arbitragelab.distance_approach.basic_distance_approach
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
 
+Pearson Approach
+################
 
-.. toctree::
-    :maxdepth: 2
-    :caption: Legal
-    :hidden:
+arbitragelab.distance_approach.pearson_distance_approach
+********************************************************
 
-    additional_information/license
-    additional_information/analytics
-    additional_information/privacy_gdpr
+.. py:currentmodule:: arbitragelab.distance_approach.pearson_distance_approach
 
-.. toctree::
-    :maxdepth: 2
-    :caption: Getting Started
-    :hidden:
+.. automodule:: arbitragelab.distance_approach.pearson_distance_approach
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
 
-    getting_started/installation
-    getting_started/research_tools
-    getting_started/equity_curve_convention
 
-.. toctree::
-    :maxdepth: 2
-    :caption: Data
-    :hidden:
+=====================
+Codependence Measures
+=====================
 
-    data/data_importer
-    data/futures_rollover
+Correlation-Based Metrics
+#########################
 
-.. toctree::
-    :maxdepth: 2
-    :caption: Visualization
-    :hidden:
+arbitragelab.codependence.correlation
+*************************************
 
-    visualization/tearsheet
+.. py:currentmodule:: arbitragelab.codependence.correlation
 
-.. toctree::
-    :maxdepth: 2
-    :caption: Hedge Ratios
-    :hidden:
+.. automodule:: arbitragelab.codependence.correlation
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
 
-    hedge_ratios/hedge_ratios
+Information Theory Metrics
+##########################
 
-.. toctree::
-    :maxdepth: 2
-    :caption: Distance Approach
-    :hidden:
+arbitragelab.codependence.information
+*************************************
 
-    distance_approach/introduction
-    distance_approach/distance_approach
-    distance_approach/pearson_approach
+.. py:currentmodule:: arbitragelab.codependence.information
 
-.. toctree::
-    :maxdepth: 2
-    :caption: Codependence Measures
-    :hidden:
+.. automodule:: arbitragelab.codependence.information
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
 
-    codependence/introduction
-    codependence/correlation_based_metrics
-    codependence/information_theory_metrics
-    codependence/codependence_marti
-    codependence/codependence_matrix
-    codependence/optimal_transport
+Copula-Based Metrics
+####################
 
-.. toctree::
-    :maxdepth: 2
-    :caption: Cointegration Approach
-    :hidden:
+arbitragelab.codependence.gnpr_distance
+***************************************
 
-    cointegration_approach/introduction
-    cointegration_approach/cointegration_tests
-    cointegration_approach/half_life
-    cointegration_approach/trading_strategies
-    cointegration_approach/minimum_profit_simulation
-    cointegration_approach/minimum_profit
-    cointegration_approach/multivariate_cointegration
-    cointegration_approach/sparse_mr_portfolio
+.. py:currentmodule:: arbitragelab.codependence.gnpr_distance
 
-.. toctree::
-    :maxdepth: 2
-    :caption: Copula Approach
-    :hidden:
+.. automodule:: arbitragelab.codependence.gnpr_distance
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
 
-    copula_approach/introduction
-    copula_approach/copula_brief_intro
-    copula_approach/copula_deeper_intro
-    copula_approach/basic_trading_strategy
-    copula_approach/mispricing_index_strategy
-    copula_approach/vine_copula_intro
-    copula_approach/cvine_copula_strategy
-    copula_approach/partner_selection
-    copula_approach/utility_functions
+Codependence Matrix
+###################
 
-.. toctree::
-    :maxdepth: 2
-    :caption: Stochastic Control Approach
-    :hidden:
+arbitragelab.codependence.codependence_matrix
+*********************************************
 
-    stochastic_control_approach/introduction
-    stochastic_control_approach/ou_model_jurek
-    stochastic_control_approach/ou_model_mudchanatongsuk
-    stochastic_control_approach/optimal_convergence
+.. py:currentmodule:: arbitragelab.codependence.codependence_matrix
 
-.. toctree::
-    :maxdepth: 2
-    :caption: Spread Selection Tools
-    :hidden:
+.. automodule:: arbitragelab.codependence.codependence_matrix
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
 
-    spread_selection/cointegration_spread_selection.rst
+Optimal Transport
+#################
 
-.. toctree::
-    :maxdepth: 2
-    :caption: Optimal Mean Reversion
-    :hidden:
+arbitragelab.codependence.optimal_transport
+*******************************************
 
-    optimal_mean_reversion/introduction
-    optimal_mean_reversion/ou_model
-    optimal_mean_reversion/xou_model
-    optimal_mean_reversion/cir_model
-    optimal_mean_reversion/heat_potentials
+.. py:currentmodule:: arbitragelab.codependence.optimal_transport
 
-.. toctree::
-    :maxdepth: 2
-    :caption: Time Series Approach
-    :hidden:
+.. automodule:: arbitragelab.codependence.optimal_transport
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
 
-    time_series_approach/introduction
-    time_series_approach/quantile_time_series_strategy
-    time_series_approach/ou_optimal_threshold_bertram
-    time_series_approach/ou_optimal_threshold_zeng
-    time_series_approach/regime_switching_arbitrage_rule
-    time_series_approach/h_strategy
 
-.. toctree::
-    :maxdepth: 2
-    :caption: Other Approaches
-    :hidden:
+======================
+Cointegration Approach
+======================
 
-    other_approaches/kalman_filter
-    other_approaches/pca_approach
+Tests for Cointegration
+#######################
 
-.. toctree::
-    :maxdepth: 2
-    :caption: ML Approach
-    :hidden:
+arbitragelab.cointegration_approach.johansen
+********************************************
 
-    ml_approach/introduction
-    ml_approach/ml_based_pairs_selection
-    ml_approach/spread_modeling
-    ml_approach/threshold_ar
-    ml_approach/neural_networks
-    ml_approach/filters
+.. py:currentmodule:: arbitragelab.cointegration_approach.johansen
 
+.. automodule:: arbitragelab.cointegration_approach.johansen
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
 
-.. toctree::
-    :maxdepth: 3
-    :caption: Developer Guide
-    :hidden:
+arbitragelab.cointegration_approach.engle_granger
+*************************************************
 
-    changelog
+.. py:currentmodule:: arbitragelab.cointegration_approach.engle_granger
+
+.. automodule:: arbitragelab.cointegration_approach.engle_granger
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
+
+Half-life of Mean-Reversion
+###########################
+
+arbitragelab.cointegration_approach.signals
+*******************************************
+
+.. py:currentmodule:: arbitragelab.cointegration_approach.signals
+
+.. automodule:: arbitragelab.cointegration_approach.signals
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
+
+Trading Strategies
+##################
+
+arbitragelab.cointegration_approach.signals
+*******************************************
+
+.. py:currentmodule:: arbitragelab.cointegration_approach.signals
+
+.. automodule:: arbitragelab.cointegration_approach.signals
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
+
+Simulation of Cointegratred Series
+##################################
+
+arbitragelab.cointegration_approach.coint_sim
+*********************************************
+
+.. py:currentmodule:: arbitragelab.cointegration_approach.coint_sim
+
+.. automodule:: arbitragelab.cointegration_approach.coint_sim
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
+
+Minimum Profit Optimization
+###########################
+
+arbitragelab.cointegration_approach.minimum_profit
+**************************************************
+
+.. py:currentmodule:: arbitragelab.cointegration_approach.minimum_profit
+
+.. automodule:: arbitragelab.cointegration_approach.minimum_profit
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
+
+Multivariate Cointegration Framework
+####################################
+
+arbitragelab.cointegration_approach.multi_coint
+***********************************************
+
+.. py:currentmodule:: arbitragelab.cointegration_approach.multi_coint
+
+.. automodule:: arbitragelab.cointegration_approach.multi_coint
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
+
+Sparse Mean-reverting Portfolio Selection
+#########################################
+
+arbitragelab.cointegration_approach.sparse_mr_portfolio
+*******************************************************
+
+.. py:currentmodule:: arbitragelab.cointegration_approach.sparse_mr_portfolio
+
+.. automodule:: arbitragelab.cointegration_approach.sparse_mr_portfolio
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
+
+
+===============
+Copula Approach
+===============
+
+A Deeper Intro to Copulas
+#########################
+
+arbitragelab.copula_approach.copula_generate
+********************************************
+
+.. py:currentmodule:: arbitragelab.copula_approach.copula_generate
+
+.. automodule:: arbitragelab.copula_approach.copula_generate
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
+
+arbitragelab.copula_approach.copula_generate_mixedcopula
+********************************************************
+
+.. py:currentmodule:: arbitragelab.copula_approach.copula_generate_mixedcopula
+
+.. automodule:: arbitragelab.copula_approach.copula_generate_mixedcopula
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
+
+Basic Trading Strategy
+######################
+
+arbitragelab.copula_approach.copula_strategy_basic
+**************************************************
+
+.. py:currentmodule:: arbitragelab.copula_approach.copula_strategy_basic
+
+.. automodule:: arbitragelab.copula_approach.copula_strategy_basic
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
+
+Mispricing Index Trading Strategy
+#################################
+
+arbitragelab.copula_approach.copula_strategy_mpi
+************************************************
+
+.. py:currentmodule:: arbitragelab.copula_approach.copula_strategy_mpi
+
+.. automodule:: arbitragelab.copula_approach.copula_strategy_mpi
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
+
+A Practical Introduction to Vine Copula
+#######################################
+
+arbitragelab.copula_approach.vinecop_generate
+*********************************************
+
+.. py:currentmodule:: arbitragelab.copula_approach.vinecop_generate
+
+.. automodule:: arbitragelab.copula_approach.vinecop_generate
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
+
+C-vine Copula Strategy
+######################
+
+arbitragelab.copula_approach.vinecop_strategy
+*********************************************
+
+.. py:currentmodule:: arbitragelab.copula_approach.vinecop_strategy
+
+.. automodule:: arbitragelab.copula_approach.vinecop_strategy
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
+
+Vine Copula Partner Selection
+#############################
+
+arbitragelab.copula_approach.vine_copula_partner_selection
+**********************************************************
+
+.. py:currentmodule:: arbitragelab.copula_approach.vine_copula_partner_selection
+
+.. automodule:: arbitragelab.copula_approach.vine_copula_partner_selection
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
+
+arbitragelab.copula_approach.vine_copula_partner_selection_utils
+****************************************************************
+
+.. py:currentmodule:: arbitragelab.copula_approach.vine_copula_partner_selection_utils
+
+.. automodule:: arbitragelab.copula_approach.vine_copula_partner_selection_utils
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
+
+Utility Modules
+###############
+
+arbitragelab.copula_approach.copula_calculation
+***********************************************
+
+.. py:currentmodule:: arbitragelab.copula_approach.copula_calculation
+
+.. automodule:: arbitragelab.copula_approach.copula_calculation
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
+
+arbitragelab.copula_approach.pairs_selection
+********************************************
+
+.. py:currentmodule:: arbitragelab.copula_approach.pairs_selection
+
+.. automodule:: arbitragelab.copula_approach.pairs_selection
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
+
+
+===========================
+Stochastic Control Approach
+===========================
+
+OU Model Jurek
+##############
+
+arbitragelab.stochastic_control_approach.ou_model_jurek
+*******************************************************
+
+.. py:currentmodule:: arbitragelab.stochastic_control_approach.ou_model_jurek
+
+.. automodule:: arbitragelab.stochastic_control_approach.ou_model_jurek
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
+
+OU Model Mudchanatongsuk
+########################
+
+arbitragelab.stochastic_control_approach.ou_model_mudchanatongsuk
+*****************************************************************
+
+.. py:currentmodule:: arbitragelab.stochastic_control_approach.ou_model_mudchanatongsuk
+
+.. automodule:: arbitragelab.stochastic_control_approach.ou_model_mudchanatongsuk
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
+
+Optimal Convergence
+###################
+
+arbitragelab.stochastic_control_approach.optimal_convergence
+************************************************************
+
+.. py:currentmodule:: arbitragelab.stochastic_control_approach.optimal_convergence
+
+.. automodule:: arbitragelab.stochastic_control_approach.optimal_convergence
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
+
+
+======================
+Spread Selection Tools
+======================
+
+Cointegration Rules Spread Selection
+####################################
+
+arbitragelab.spread_selection.cointegration
+*******************************************
+
+.. py:currentmodule:: arbitragelab.spread_selection.cointegration
+
+.. automodule:: arbitragelab.spread_selection.cointegration
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
+
+
+======================
+Optimal Mean Reversion
+======================
+
+Trading Under the Ornstein-Uhlenbeck Model
+##########################################
+
+arbitragelab.optimal_mean_reversion.ou_model
+********************************************
+
+.. py:currentmodule:: arbitragelab.optimal_mean_reversion.ou_model
+
+.. automodule:: arbitragelab.optimal_mean_reversion.ou_model
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
+
+Trading Under the Exponential Ornstein-Uhlenbeck Model
+######################################################
+
+arbitragelab.optimal_mean_reversion.xou_model
+*********************************************
+
+.. py:currentmodule:: arbitragelab.optimal_mean_reversion.xou_model
+
+.. automodule:: arbitragelab.optimal_mean_reversion.xou_model
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
+
+Trading Under the Cox-Ingersoll-Ross Model
+##########################################
+
+arbitragelab.optimal_mean_reversion.cir_model
+*********************************************
+
+.. py:currentmodule:: arbitragelab.optimal_mean_reversion.cir_model
+
+.. automodule:: arbitragelab.optimal_mean_reversion.cir_model
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
+
+A closed-form solution for optimal mean-reverting trading strategies
+####################################################################
+
+arbitragelab.optimal_mean_reversion.heat_potentials
+***************************************************
+
+.. py:currentmodule:: arbitragelab.optimal_mean_reversion.heat_potentials
+
+.. automodule:: arbitragelab.optimal_mean_reversion.heat_potentials
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
+
+
+====================
+Time Series Approach
+====================
+
+Quantile Time Series Strategy
+#############################
+
+arbitragelab.time_series_approach.arima_predict
+***********************************************
+
+.. py:currentmodule:: arbitragelab.time_series_approach.arima_predict
+
+.. automodule:: arbitragelab.time_series_approach.arima_predict
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
+
+arbitragelab.time_series_approach.quantile_time_series
+******************************************************
+
+.. py:currentmodule:: arbitragelab.time_series_approach.quantile_time_series
+
+.. automodule:: arbitragelab.time_series_approach.quantile_time_series
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
+
+OU Model Optimal Trading Thresholds Bertram
+###########################################
+
+arbitragelab.time_series_approach.ou_optimal_threshold_bertram
+**************************************************************
+
+.. py:currentmodule:: arbitragelab.time_series_approach.ou_optimal_threshold_bertram
+
+.. automodule:: arbitragelab.time_series_approach.ou_optimal_threshold_bertram
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
+
+OU Model Optimal Trading Thresholds Zeng
+########################################
+
+arbitragelab.time_series_approach.ou_optimal_threshold_zeng
+***********************************************************
+
+.. py:currentmodule:: arbitragelab.time_series_approach.ou_optimal_threshold_zeng
+
+.. automodule:: arbitragelab.time_series_approach.ou_optimal_threshold_zeng
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
+
+Regime-Switching Arbitrage Rule
+###############################
+
+arbitragelab.time_series_approach.regime_switching_arbitrage_rule
+*****************************************************************
+
+.. py:currentmodule:: arbitragelab.time_series_approach.regime_switching_arbitrage_rule
+
+.. automodule:: arbitragelab.time_series_approach.regime_switching_arbitrage_rule
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
+
+H-Strategy
+##########
+
+arbitragelab.time_series_approach.h_strategy
+********************************************
+
+.. py:currentmodule:: arbitragelab.time_series_approach.h_strategy
+
+.. automodule:: arbitragelab.time_series_approach.h_strategy
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
+
+
+================
+Other Approaches
+================
+
+Kalman Filter
+#############
+
+arbitragelab.other_approaches.kalman_filter
+*******************************************
+
+.. py:currentmodule:: arbitragelab.other_approaches.kalman_filter
+
+.. automodule:: arbitragelab.other_approaches.kalman_filter
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
+
+PCA Approach
+############
+
+arbitragelab.other_approaches.pca_approach
+******************************************
+
+.. py:currentmodule:: arbitragelab.other_approaches.pca_approach
+
+.. automodule:: arbitragelab.other_approaches.pca_approach
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
+
+
+===========
+ML Approach
+===========
+
+ML Based Pairs Selection
+########################
+
+arbitragelab.ml_approach.optics_dbscan_pairs_clustering
+*******************************************************
+
+.. py:currentmodule:: arbitragelab.ml_approach.optics_dbscan_pairs_clustering
+
+.. automodule:: arbitragelab.ml_approach.optics_dbscan_pairs_clustering
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
+
+Threshold Auto Regression
+#########################
+
+arbitragelab.ml_approach.tar
+****************************
+
+.. py:currentmodule:: arbitragelab.ml_approach.tar
+
+.. automodule:: arbitragelab.ml_approach.tar
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
+
+Neural Networks
+###############
+
+arbitragelab.ml_approach.neural_networks
+****************************************
+
+.. py:currentmodule:: arbitragelab.ml_approach.neural_networks
+
+.. automodule:: arbitragelab.ml_approach.neural_networks
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
+
+arbitragelab.ml_approach.feature_expander
+*****************************************
+
+.. py:currentmodule:: arbitragelab.ml_approach.feature_expander
+
+.. automodule:: arbitragelab.ml_approach.feature_expander
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
+
+Filters
+#######
+
+arbitragelab.ml_approach.filters
+********************************
+
+.. py:currentmodule:: arbitragelab.ml_approach.filters
+
+.. automodule:: arbitragelab.ml_approach.filters
+   :members:
+   :special-members:
+   :private-members:
+   :inherited-members:
