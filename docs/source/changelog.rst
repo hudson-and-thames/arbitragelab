@@ -12,6 +12,8 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+* :support:`71` Added Raw Docs for debugging to documentation.
+* :support:`71` Added UML Diagram for debugging to documentation.
 * :feature:`70` Updated requirements versions to the newest stable numpy, pandas etc.
 * :bug:`70 major` Fixed package breaking due to faulty werkzeug version.
 * :bug:`69 major` Fixed SCS package version breaking Sparse MR Module.
