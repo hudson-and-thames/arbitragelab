@@ -93,7 +93,7 @@ class BollingerBandsTradingRule:
             side = 1
             return True, side
         # Short entry
-        elif z_score >= self.entry_z_score:
+        if z_score >= self.entry_z_score:
             side = -1
             return True, side
         return False, None

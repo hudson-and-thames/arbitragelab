@@ -1,3 +1,7 @@
+# Copyright 2019, Hudson and Thames Quantitative Research
+# All rights reserved
+# Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
+
 """
 Various utility functions used in cointegration/mean-reversion trading.
 """
