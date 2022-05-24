@@ -179,37 +179,6 @@ def hqic(log_likelihood: float, n: int, k: int = 1) -> float:
     return hqic_value
 
 
-def fit_nu_for_t_copula(x: np.array, y: np.array, nu_tol: float = None) -> float:
-    r"""
-    Find the best fit value nu for Student-t copula.
-
-    This method finds the best value of nu for a Student-t copula by maximum likelihood, using COBYLA method from
-    `scipy.optimize.minimize`. nu's fit range is [1, 15]. When the user wishes to use nu > 15, please delegate to
-    Gaussian copula instead. This step is relatively slow.
-
-    :param x: (np.array) 1D vector data. Need to be uniformly distributed.
-    :param y: (np.array) 1D vector data. Need to be uniformly distributed.
-    :param nu_tol: (float) The final accuracy for finding nu.
-    :return: (float) The best fit of nu by maximum likelihood.
-    """
-
-    # Define the objective function
-    def neg_log_likelihood_for_t_copula(nu):
-        log_likelihood, _ = log_ml(x, y, 'Student', nu)
-
-        return -log_likelihood  # Minimizing the negative of likelihood.
-
-    # Optimizing to find best nu
-    nu0 = np.array([3])
-    # Constraint: nu between [1, 15]. Too large nu value will lead to calculation issues for gamma function.
-    cons = ({'type': 'ineq', 'fun': lambda nu: nu + 1},  # x - 1 > 0
-            {'type': 'ineq', 'fun': lambda nu: -nu + 15})  # -x + 15 > 0 (i.e., x - 10 < 0)
-
-    res = minimize(neg_log_likelihood_for_t_copula, nu0, method='COBYLA', constraints=cons,
-                   options={'disp': False}, tol=nu_tol)
-
-    return res['x'][0]
-
 def scad_penalty(x: float, gamma: float, a: float) -> float:
     """
     SCAD (smoothly clipped absolute deviation) penalty function.
