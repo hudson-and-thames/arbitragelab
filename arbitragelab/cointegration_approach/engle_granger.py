@@ -67,7 +67,7 @@ class EngleGrangerPortfolio(CointegratedPortfolio):
         hedge_ratios, _, _, residuals = self.get_ols_hedge_ratio(price_data=price_data,
                                                                  dependent_variable=self.dependent_variable,
                                                                  add_constant=add_constant)
-        self.cointegration_vectors = pd.DataFrame([np.append(1, -1 * np.array(
+        self.cointegration_vectors = pd.DataFrame([np.append(1, np.array(
             [hedge for ticker, hedge in hedge_ratios.items() if ticker != self.dependent_variable]))],
                                                   columns=price_data.columns)
 

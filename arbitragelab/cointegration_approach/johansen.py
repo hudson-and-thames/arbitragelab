@@ -31,7 +31,7 @@ class JohansenPortfolio(CointegratedPortfolio):
         self.johansen_eigen_statistic = None  # Eigenvalue statistic data frame for each asset used to test for cointeg.
         segment.track('JohansenPortfolio')
 
-    def fit(self, price_data: pd.DataFrame, det_order: int = 0, n_lags: int = 1):
+    def fit(self, price_data: pd.DataFrame, dependent_variable: str = None, det_order: int = 0, n_lags: int = 1):
         """
         Finds cointegration vectors from the Johansen test used to form a mean-reverting portfolio.
 
@@ -53,16 +53,43 @@ class JohansenPortfolio(CointegratedPortfolio):
         <https://www.statsmodels.org/stable/generated/statsmodels.tsa.vector_ar.vecm.coint_johansen.html>`_.
 
         :param price_data: (pd.DataFrame) Price data with columns containing asset prices.
+        :param dependent_variable: (str) Column name which represents the dependent variable (y).
+            By default, the first column is used as a dependent variable.
         :param det_order: (int) -1 for no deterministic term in Johansen test, 0 - for constant term, 1 - for linear trend.
         :param n_lags: (int) Number of lags used in the Johansen test. The practitioners use 1 as the default base value.
         """
+
+        if not dependent_variable:
+            dependent_variable = price_data.columns[0]
 
         self.price_data = price_data
 
         test_res = coint_johansen(price_data, det_order=det_order, k_ar_diff=n_lags)
 
         # Store eigenvectors in decreasing order of eigenvalues
-        self.cointegration_vectors = pd.DataFrame(test_res.evec[:, test_res.ind].T, columns=price_data.columns)
+        cointegration_vectors = pd.DataFrame(test_res.evec[:, test_res.ind].T, columns=price_data.columns)
+
+        # Adjusting cointegration vectors to hedge ratios
+        data_copy = price_data.copy()
+        data_copy.drop(columns=dependent_variable, axis=1, inplace=True)
+
+        # Convert to a format expected by `construct_spread` function and normalize such that dependent has a hedge ratio 1.
+        all_hedge_ratios = pd.DataFrame()
+
+        # Calculating for all vectors
+        for vector in range(cointegration_vectors.shape[0]):
+
+            hedge_ratios = cointegration_vectors.iloc[vector].to_dict()
+            for ticker, ratio in hedge_ratios.items():
+                if ticker != dependent_variable:
+                    hedge_ratios[ticker] = -ratio / hedge_ratios[dependent_variable]
+            hedge_ratios[dependent_variable] = 1.0
+
+            # Add all to one dataframe
+            all_hedge_ratios = all_hedge_ratios.append(hedge_ratios, ignore_index=True)
+            all_hedge_ratios = all_hedge_ratios[price_data.columns]
+
+        self.cointegration_vectors = all_hedge_ratios
 
         # Test critical values are available only if number of variables <= 12
         if price_data.shape[1] <= 12:
