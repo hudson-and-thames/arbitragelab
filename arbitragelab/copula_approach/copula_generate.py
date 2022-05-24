@@ -121,6 +121,20 @@ class Copula(ABC):
         # Wrapper around individual copula's condi_cdf method.
         return self.condi_cdf(u, v)
 
+    def get_log_likelihood_sum(self, u: np.array, v: np.array) -> float:
+        """
+        Get log-likelihood value sum.
+
+        :param u: (np.array) 1D vector data of X pseudo-observations. Need to be uniformly distributed.
+        :param v: (np.array) 1D vector data of Y pseudo-observations. Need to be uniformly distributed.
+        :return: (float) Log-likelihood sum value.
+        """
+        # Likelihood quantity for each pair of data, stored in a list.
+        likelihood_list = [self.c(xi, yi) for (xi, yi) in zip(u, v)]
+        # Sum of logarithm of likelihood data.
+        log_likelihood_sum = np.sum(np.log(likelihood_list))
+        return log_likelihood_sum
+
     def plot(self, num: int, ax: plt.axes = None, **ax_kwargs) -> plt.axes:
         """
         Plot a given number sampling of the copula.
