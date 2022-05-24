@@ -19,6 +19,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
+from arbitragelab.copula_approach.base import Copula
+
 from arbitragelab.util import segment
 
 
@@ -26,13 +28,15 @@ class Gumbel(Copula):
     """
     Gumbel Copula.
     """
+    # TODO: remebmer theta and threshold have been swapped! That's why tests break down.
 
-    def __init__(self, threshold: float = 1e-10, theta: float = None):
+    def __init__(self, theta: float = None, threshold: float = 1e-10, ):
         r"""
         Initiate a Gumbel copula object.
 
-        :param threshold: (float) Optional. Below this threshold, a percentile will be rounded to the threshold.
         :param theta: (float) Range in [1, +inf), measurement of copula dependency.
+        :param threshold: (float) Optional. Below this threshold, a percentile will be rounded to the threshold.
+
         """
 
         super().__init__()
@@ -134,10 +138,10 @@ class Gumbel(Copula):
 
         # Assembling for P.D.F.
         pdf = 1 / (u * v) \
-            * (np.exp(-expo)
-               * u_part / (-np.log(u)) * v_part / (-np.log(v))
-               * (theta + expo - 1)
-               * (u_part + v_part) ** (1 / theta - 2))
+              * (np.exp(-expo)
+                 * u_part / (-np.log(u)) * v_part / (-np.log(v))
+                 * (theta + expo - 1)
+                 * (u_part + v_part) ** (1 / theta - 2))
 
         return pdf
 
@@ -197,12 +201,12 @@ class Frank(Copula):
     Frank Copula.
     """
 
-    def __init__(self, threshold: float = 1e-10, theta: float = None):
+    def __init__(self, theta: float = None, threshold: float = 1e-10):
         r"""
         Initiate a Frank copula object.
 
-        :param threshold: (float) Optional. Below this threshold, a percentile will be rounded to the threshold.
         :param theta: (float) All reals except for 0, measurement of copula dependency.
+        :param threshold: (float) Optional. Below this threshold, a percentile will be rounded to the threshold.
         """
 
         super().__init__()
@@ -291,7 +295,7 @@ class Frank(Copula):
         eut = np.exp(u * theta)
         evt = np.exp(v * theta)
         pdf = (et * eut * evt * (et - 1) * theta /
-               (et + eut * evt - et * eut - et * evt)**2)
+               (et + eut * evt - et * eut - et * evt) ** 2)
 
         return pdf
 
@@ -371,12 +375,12 @@ class Clayton(Copula):
     Clayton copula.
     """
 
-    def __init__(self, threshold: float = 1e-10, theta: float = None):
+    def __init__(self, theta: float = None, threshold: float = 1e-10, ):
         r"""
         Initiate a Clayton copula object.
 
-        :param threshold: (float) Optional. Below this threshold, a percentile will be rounded to the threshold.
         :param theta: (float) Range in [-1, +inf) \ {0}, measurement of copula dependency.
+        :param threshold: (float) Optional. Below this threshold, a percentile will be rounded to the threshold.
         """
 
         super().__init__()
@@ -528,8 +532,8 @@ class Joe(Copula):
         r"""
         Initiate a Joe copula object.
 
-        :param threshold: (float) Optional. Below this threshold, a percentile will be rounded to the threshold.
         :param theta: (float) Range in [1, +inf), measurement of copula dependency.
+        :param threshold: (float) Optional. Below this threshold, a percentile will be rounded to the threshold.
         """
 
         super().__init__()
@@ -558,8 +562,8 @@ class Joe(Copula):
 
         def _Kc(w: float, theta: float):
             return w - 1 / theta * (
-                (np.log(1 - (1 - w)**theta)) * (1 - (1 - w)**theta)
-                / ((1 - w)**(theta - 1)))
+                    (np.log(1 - (1 - w) ** theta)) * (1 - (1 - w) ** theta)
+                    / ((1 - w) ** (theta - 1)))
 
         # Generate pairs of indep uniform dist vectors. Use numpy to generate.
         if unif_vec is None:
@@ -588,9 +592,9 @@ class Joe(Copula):
                        self.threshold, 1 - self.threshold)
         else:
             w = self.threshold  # Below the threshold, gives the threshold
-        u1 = 1 - (1 - (1 - (1 - w)**theta)**v1)**(1 / theta)
+        u1 = 1 - (1 - (1 - (1 - w) ** theta) ** v1) ** (1 / theta)
 
-        u2 = 1 - (1 - (1 - (1 - w)**theta)**(1 - v1))**(1 / theta)
+        u2 = 1 - (1 - (1 - (1 - w) ** theta) ** (1 - v1)) ** (1 / theta)
 
         return u1, u2
 
@@ -622,10 +626,10 @@ class Joe(Copula):
         """
 
         theta = self.theta
-        u_part = (1 - u)**theta
-        v_part = (1 - v)**theta
+        u_part = (1 - u) ** theta
+        v_part = (1 - v) ** theta
         pdf = (u_part / (1 - u) * v_part / (1 - v)
-               * (u_part + v_part - u_part * v_part)**(1 / theta - 2)
+               * (u_part + v_part - u_part * v_part) ** (1 / theta - 2)
                * (theta - (u_part - 1) * (v_part - 1)))
 
         return pdf
@@ -665,7 +669,7 @@ class Joe(Copula):
         theta = self.theta
         u_part = (1 - u) ** theta
         v_part = (1 - v) ** theta
-        result = -(-1 + u_part) * (u_part + v_part - u_part * v_part)**(-1 + 1/theta) * v_part / (1 - v)
+        result = -(-1 + u_part) * (u_part + v_part - u_part * v_part) ** (-1 + 1 / theta) * v_part / (1 - v)
 
         return result
 
@@ -681,9 +685,9 @@ class Joe(Copula):
         # Calculate tau(theta) = 1 + 4*intg_0^1[phi(t)/d(phi(t)) dt]
         def kendall_tau(theta):
             # phi(t)/d(phi(t)), phi is the generator function for this copula.
-            pddp = lambda x: (1 - (1 - x)**theta) * (1 - x)**(1 - theta) * np.log(1 - (1 - x)**theta) / theta
+            pddp = lambda x: (1 - (1 - x) ** theta) * (1 - x) ** (1 - theta) * np.log(1 - (1 - x) ** theta) / theta
             result = quad(pddp, 0, 1, full_output=1)[0]
-            return 1 + 4*result
+            return 1 + 4 * result
 
         # Numerically find the root.
         result = brentq(lambda theta: kendall_tau(theta) - tau, 1, 100)
@@ -696,12 +700,12 @@ class N13(Copula):
     N13 Copula (Nelsen 13).
     """
 
-    def __init__(self, threshold: float = 1e-10, theta: float = None):
+    def __init__(self, theta: float = None, threshold: float = 1e-10):
         r"""
         Initiate an N13 copula object.
 
-        :param threshold: (float) Optional. Below this threshold, a percentile will be rounded to the threshold.
         :param theta: (float) Range in [0, +inf), measurement of copula dependency.
+        :param threshold: (float) Optional. Below this threshold, a percentile will be rounded to the threshold.
         """
 
         super().__init__()
@@ -730,7 +734,7 @@ class N13(Copula):
 
         def _Kc(w: float, theta: float):
             return w + 1 / theta * (
-                w - w * np.power((1 - np.log(w)), 1 - theta) - w * np.log(w))
+                    w - w * np.power((1 - np.log(w)), 1 - theta) - w * np.log(w))
 
         # Generate pairs of indep uniform dist vectors. Use numpy to generate.
         if unif_vec is None:
@@ -763,10 +767,10 @@ class N13(Copula):
         else:
             w = self.threshold  # Below the threshold, gives threshold as the root.
         u1 = np.exp(
-            1 - (v1 * ((1 - np.log(w))**theta - 1) + 1)**(1 / theta))
+            1 - (v1 * ((1 - np.log(w)) ** theta - 1) + 1) ** (1 / theta))
 
         u2 = np.exp(
-            1 - ((1 - v1) * ((1 - np.log(w))**theta - 1) + 1)**(1 / theta))
+            1 - ((1 - v1) * ((1 - np.log(w)) ** theta - 1) + 1) ** (1 / theta))
 
         return u1, u2
 
@@ -798,15 +802,15 @@ class N13(Copula):
         """
 
         theta = self.theta
-        u_part = (1 - np.log(u))**theta
-        v_part = (1 - np.log(v))**theta
+        u_part = (1 - np.log(u)) ** theta
+        v_part = (1 - np.log(v)) ** theta
         Cuv = self.C(u, v)
 
         numerator = (Cuv * u_part * v_part
-                     * (-1 + theta + (-1 + u_part + v_part)**(1/theta))
-                     * (-1 + u_part + v_part)**(1/theta))
+                     * (-1 + theta + (-1 + u_part + v_part) ** (1 / theta))
+                     * (-1 + u_part + v_part) ** (1 / theta))
 
-        denominator = u * v * (1 - np.log(u)) * (1 - np.log(v)) * (-1 + u_part + v_part)**2
+        denominator = u * v * (1 - np.log(u)) * (1 - np.log(v)) * (-1 + u_part + v_part) ** 2
 
         pdf = numerator / denominator
 
@@ -824,10 +828,10 @@ class N13(Copula):
         """
 
         theta = self.theta
-        u_part = (1 - np.log(u))**theta
-        v_part = (1 - np.log(v))**theta
+        u_part = (1 - np.log(u)) ** theta
+        v_part = (1 - np.log(v)) ** theta
         cdf = np.exp(
-            1 - (-1 + u_part + v_part)**(1/theta))
+            1 - (-1 + u_part + v_part) ** (1 / theta))
 
         return cdf
 
@@ -845,11 +849,11 @@ class N13(Copula):
         """
 
         theta = self.theta
-        u_part = (1 - np.log(u))**theta
-        v_part = (1 - np.log(v))**theta
+        u_part = (1 - np.log(u)) ** theta
+        v_part = (1 - np.log(v)) ** theta
         Cuv = self.C(u, v)
 
-        numerator = Cuv * (-1 + u_part + v_part)**(1/theta) * v_part
+        numerator = Cuv * (-1 + u_part + v_part) ** (1 / theta) * v_part
         denominator = v * (-1 + u_part + v_part) * (1 - np.log(v))
 
         result = numerator / denominator
@@ -868,9 +872,9 @@ class N13(Copula):
         # Calculate tau(theta) = 1 + 4*intg_0^1[phi(t)/d(phi(t)) dt]
         def kendall_tau(theta):
             # phi(t)/d(phi(t)), phi is the generator function for this copula.
-            pddp = lambda x: -((x - x * (1 - np.log(x))**(1 - theta) - x * np.log(x)) / theta)
+            pddp = lambda x: -((x - x * (1 - np.log(x)) ** (1 - theta) - x * np.log(x)) / theta)
             result = quad(pddp, 0, 1, full_output=1)[0]
-            return 1 + 4*result
+            return 1 + 4 * result
 
         # Numerically find the root.
         result = brentq(lambda theta: kendall_tau(theta) - tau, 1e-7, 100)
@@ -883,12 +887,12 @@ class N14(Copula):
     N14 Copula (Nelsen 14).
     """
 
-    def __init__(self, threshold: float = 1e-10, theta: float = None):
+    def __init__(self, theta: float = None, threshold: float = 1e-10):
         r"""
         Initiate an N14 copula object.
 
-        :param threshold: (float) Optional. Below this threshold, a percentile will be rounded to the threshold.
         :param theta: (float) Range in [1, +inf), measurement of copula dependency.
+        :param threshold: (float) Optional. Below this threshold, a percentile will be rounded to the threshold.
         """
 
         super().__init__()
@@ -916,7 +920,7 @@ class N14(Copula):
         theta = self.theta  # Use the default input.
 
         def _Kc(w: float, theta: float):
-            return -w * (-2 + w**(1/theta))
+            return -w * (-2 + w ** (1 / theta))
 
         # Generate pairs of indep uniform dist vectors. Use numpy to generate.
         if unif_vec is None:
@@ -945,8 +949,8 @@ class N14(Copula):
                        self.threshold, 1 - self.threshold)
         else:
             w = self.threshold  # Below the threshold, gives threshold as the root.
-        u1 = (1 + (v1 * (w**(-1 / theta) - 1)**theta) ** (1 / theta))**(-theta)
-        u2 = (1 + ((1 - v1) * (w**(-1 / theta) - 1)**theta)**(1 / theta))**(-theta)
+        u1 = (1 + (v1 * (w ** (-1 / theta) - 1) ** theta) ** (1 / theta)) ** (-theta)
+        u2 = (1 + ((1 - v1) * (w ** (-1 / theta) - 1) ** theta) ** (1 / theta)) ** (-theta)
 
         return u1, u2
 
@@ -978,16 +982,16 @@ class N14(Copula):
         """
 
         theta = self.theta
-        u_ker = -1 + np.power(u, 1/theta)
-        v_ker = -1 + np.power(v, 1/theta)
-        u_part = (-1 + np.power(u, -1/theta))**theta
-        v_part = (-1 + np.power(v, -1/theta))**theta
-        cdf_ker = 1 + (u_part + v_part)**(1/theta)
+        u_ker = -1 + np.power(u, 1 / theta)
+        v_ker = -1 + np.power(v, 1 / theta)
+        u_part = (-1 + np.power(u, -1 / theta)) ** theta
+        v_part = (-1 + np.power(v, -1 / theta)) ** theta
+        cdf_ker = 1 + (u_part + v_part) ** (1 / theta)
 
         numerator = (u_part * v_part * (cdf_ker - 1)
                      * (-1 + theta + 2 * theta * (cdf_ker - 1)))
 
-        denominator = ((u_part + v_part)**2 * cdf_ker**(2 + theta)
+        denominator = ((u_part + v_part) ** 2 * cdf_ker ** (2 + theta)
                        * u * v * u_ker * v_ker * theta)
 
         pdf = numerator / denominator
@@ -1006,9 +1010,9 @@ class N14(Copula):
         """
 
         theta = self.theta
-        u_part = (-1 + np.power(u, -1/theta))**theta
-        v_part = (-1 + np.power(v, -1/theta))**theta
-        cdf = (1 + (u_part + v_part)**(1/theta))**(-1 * theta)
+        u_part = (-1 + np.power(u, -1 / theta)) ** theta
+        v_part = (-1 + np.power(v, -1 / theta)) ** theta
+        cdf = (1 + (u_part + v_part) ** (1 / theta)) ** (-1 * theta)
 
         return cdf
 
@@ -1025,13 +1029,13 @@ class N14(Copula):
         :return: (float) The conditional probability.
         """
         theta = self.theta
-        v_ker = -1 + np.power(v, -1/theta)
-        u_part = (-1 + np.power(u, -1/theta))**theta
-        v_part = (-1 + np.power(v, -1/theta))**theta
-        cdf_ker = 1 + (u_part + v_part)**(1/theta)
+        v_ker = -1 + np.power(v, -1 / theta)
+        u_part = (-1 + np.power(u, -1 / theta)) ** theta
+        v_part = (-1 + np.power(v, -1 / theta)) ** theta
+        cdf_ker = 1 + (u_part + v_part) ** (1 / theta)
 
         numerator = v_part * (cdf_ker - 1)
-        denominator = v**(1 + 1/theta) * v_ker * (u_part + v_part) * cdf_ker**(1 + theta)
+        denominator = v ** (1 + 1 / theta) * v_ker * (u_part + v_part) * cdf_ker ** (1 + theta)
 
         result = numerator / denominator
 
@@ -1138,10 +1142,10 @@ class Gaussian(Copula):
         inv_u = ss.norm.ppf(u)
         inv_v = ss.norm.ppf(v)
 
-        exp_ker = (rho * (-2 * inv_u * inv_v + inv_u**2 * rho + inv_v**2 * rho)
-                   / (2 * (rho**2 - 1)))
+        exp_ker = (rho * (-2 * inv_u * inv_v + inv_u ** 2 * rho + inv_v ** 2 * rho)
+                   / (2 * (rho ** 2 - 1)))
 
-        pdf = np.exp(exp_ker) / np.sqrt(1 - rho**2)
+        pdf = np.exp(exp_ker) / np.sqrt(1 - rho ** 2)
 
         return pdf
 

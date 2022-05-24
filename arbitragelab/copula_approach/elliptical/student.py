@@ -33,6 +33,7 @@ class StudentCopula(Copula):
         super().__init__()
         self.cov = cov  # Covariance matrix.
         self.nu = nu  # Degree of freedom.
+        self.theta = None
         # Correlation from covariance matrix.
         self.rho = cov[0][1] / (np.sqrt(cov[0][0]) * np.sqrt(cov[1][1]))
 

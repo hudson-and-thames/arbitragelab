@@ -12,6 +12,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
+import scipy.stats as ss
+
 
 class Copula(ABC):
     """
@@ -173,6 +175,22 @@ class Copula(ABC):
         """
         Place holder for calculating copula conditional probability.
         """
+
+    def fit(self, u: np.array, v: np.array) -> float:
+        """
+        Fit copula to empirical data (pseudo-observations). Once fit, `self.theta` is updated.
+
+        :param u: (np.array) 1D vector data of X pseudo-observations. Need to be uniformly distributed [0, 1].
+        :param v: (np.array) 1D vector data of Y pseudo-observations. Need to be uniformly distributed [0, 1].
+        :return: (float) Theta hat estimate for fit copula.
+        """
+        # Calculate Kendall's tau from data.
+        tau = ss.kendalltau(u, v)[0]
+
+        # Translate Kendall's tau into theta.
+        theta_hat = self.theta_hat(tau)
+        self.theta = theta_hat
+        return theta_hat
 
     @abstractmethod
     def _get_param(self):
