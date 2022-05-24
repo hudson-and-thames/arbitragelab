@@ -39,13 +39,13 @@ class TestCointegration(unittest.TestCase):
         port.fit(price_data=self.data[self.data.columns[:2]])
 
         self.assertEqual(port.cointegration_vectors[port.dependent_variable][0], 1)  # Dependent coef. is always 1
-        self.assertAlmostEqual(port.cointegration_vectors['EWG'][0], -1.57, delta=1e-2)
+        self.assertAlmostEqual(port.cointegration_vectors['EWG'][0], 1.57, delta=1e-2)
 
         # Test using data set with 5 variables
         port.fit(price_data=self.data[self.data.columns[:5]], add_constant=True)
 
-        self.assertAlmostEqual(port.cointegration_vectors.iloc[0].mean(), 0.35, delta=1e-2)
-        self.assertAlmostEqual(port.cointegration_vectors['EFA'][0], -2.169, delta=1e-2)
+        self.assertAlmostEqual(port.cointegration_vectors.iloc[0].mean(), 0.044, delta=1e-2)
+        self.assertAlmostEqual(port.cointegration_vectors['EFA'][0], 2.169, delta=1e-2)
         self.assertAlmostEqual(port.adf_statistics.loc['statistic_value'][0], -3.5, delta=1e-2)
         self.assertAlmostEqual(port.adf_statistics.loc['90%'][0], -2.57, delta=1e-2)
 
@@ -78,20 +78,9 @@ class TestCointegration(unittest.TestCase):
                 '90%', 'EFA'])
 
         # Check eigenvector
-        self.assertAlmostEqual(port.cointegration_vectors.mean().mean(), 0.029, delta=1e-3)
-        self.assertAlmostEqual(port.cointegration_vectors.iloc[0]['EFA'], -0.86, delta=1e-2)
-        self.assertAlmostEqual(port.cointegration_vectors.iloc[0]['EWJ'], 0.05, delta=1e-2)
-
-        # Test mean-reverting portfolio value formed by different eigenvectors
-        mean_reverting_port_1 = port.construct_mean_reverting_portfolio(self.data[self.data.columns[:5]])
-        mean_reverting_port_2 = port.construct_mean_reverting_portfolio(self.data[self.data.columns[:5]],
-                                                                        cointegration_vector=
-                                                                        port.cointegration_vectors.iloc[1])
-
-        self.assertAlmostEqual(mean_reverting_port_1.mean(), -13.65, delta=1e-2)
-        self.assertAlmostEqual(mean_reverting_port_2.mean(), 7.57, delta=1e-2)
-        self.assertAlmostEqual(mean_reverting_port_1.iloc[5], -13.58, delta=1e-2)
-        self.assertAlmostEqual(mean_reverting_port_2.iloc[5], 8.03, delta=1e-2)
+        self.assertAlmostEqual(port.cointegration_vectors.mean().mean(), -0.767, delta=1e-3)
+        self.assertAlmostEqual(port.cointegration_vectors.iloc[0]['EFA'], 3.502, delta=1e-2)
+        self.assertAlmostEqual(port.cointegration_vectors.iloc[0]['EWJ'], -0.203, delta=1e-2)
 
         # Test scaled cointegration vector values
         scaled_cointegration_1 = port.get_scaled_cointegration_vector()
@@ -110,7 +99,9 @@ class TestCointegration(unittest.TestCase):
 
         port = JohansenPortfolio()
         port.fit(price_data=self.data[self.data.columns[:5]])
-        mean_reverting_port = port.construct_mean_reverting_portfolio(self.data[self.data.columns[:5]])
+
+        # Construct spread
+        mean_reverting_port = (port.cointegration_vectors.iloc[0] * self.data[self.data.columns[:5]]).sum(axis=1)
         half_life = get_half_life_of_mean_reversion(mean_reverting_port)
 
-        self.assertAlmostEqual(half_life, 31.23, delta=1e-2)
+        self.assertAlmostEqual(half_life, 75.55, delta=1e-2)
