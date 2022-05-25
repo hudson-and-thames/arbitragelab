@@ -167,3 +167,114 @@ class Copula(ABC):
         """
         Place holder for getting the parameter(s) of the specific copula.
         """
+
+    @staticmethod
+    def _3d_surface_plot(x: np.array, y: np.array, z: np.array, bounds: list, title: str, **kwargs) -> plt.axis:
+        """
+        Helper function to plot 3-d plot.
+
+        :param x: (np.array) X-axis data.
+        :param y: (np.array) Y-axis data.
+        :param z: (np.array) Z-axis data.
+        :param bounds: (list) Min and max values bounds.
+        :param title: (str) Plot title.
+        :param kwargs: (dict) User-specified params for `ax.plot_surface`.
+        :return: (plt.axis) Axis object.
+        """
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        ax.set_xticks(np.linspace(bounds[0], bounds[1], 6))
+        ax.set_yticks(np.linspace(bounds[0], bounds[1], 6))
+        ax.set_xlim(bounds)
+        ax.set_ylim(bounds)
+        ax.plot_surface(x, y, z, **kwargs)
+        plt.title(title)
+        plt.show()
+        return ax
+
+    @staticmethod
+    def _2d_contour_plot(x: np.array, y: np.array, z: np.array, bounds: float, title: str, **kwargs) -> plt.axis:
+        """
+        Helper function to plot 2-d contour plot.
+
+        :param x: (np.array) X-axis data.
+        :param y: (np.array) Y-axis data.
+        :param z: (np.array) Z-axis data.
+        :param bounds: (list) Min and max values bounds.
+        :param title: (str) Plot title.
+        :param kwargs: (dict) User-specified params for `plt.contour`.
+        :return: (plt.axis) Axis object.
+        """
+        plt.figure()
+        contour_plot = plt.contour(x, y, z, colors='k', linewidths=1., linestyles=None, **kwargs)
+        plt.clabel(contour_plot, fontsize=8, inline=1)
+        plt.xlim(bounds)
+        plt.ylim(bounds)
+        plt.title(title)
+        plt.show()
+        return contour_plot
+
+    def plot_cdf(self, plot_type: str = '3d', grid_size: int = 50, **kwargs) -> plt.axis:
+        """
+        Plot either `3d` or `contour` plot of copula CDF.
+
+        :param plot_type: (str) Either ``3d` or `contour`(2D) plot.
+        :param grid_size: (int) Mesh grid granularity.
+        :param kwargs: (dict) User-specified params for `ax.plot_surface`/`plt.contour`.
+        :return: (plt.axis) Axis object.
+        """
+        title = "Copula CDF"
+
+        bounds = [0 + 1e-2, 1 - 1e-2]
+        u_grid, v_grid = np.meshgrid(
+            np.linspace(bounds[0], bounds[1], grid_size),
+            np.linspace(bounds[0], bounds[1], grid_size))
+
+        z = np.array(
+            [self.C(u, v) for u, v in zip(np.ravel(u_grid), np.ravel(v_grid))])
+
+        z = z.reshape(u_grid.shape)
+
+        if plot_type == "3d":
+            ax = self._3d_surface_plot(u_grid, v_grid, z, [0, 1], title, **kwargs)
+            return ax
+        elif plot_type == "contour":
+            ax = self._2d_contour_plot(u_grid, v_grid, z, [0, 1], title, **kwargs)
+            return ax
+        else:
+            raise ValueError('Only contour and 3d plot options are available.')
+
+    def plot_pdf(self, plot_type: str = '3d', grid_size: int = 50, **kwargs) -> plt.axis:
+        """
+        Plot either `3d` or `contour` plot of copula PDF.
+
+        :param plot_type: (str) Either ``3d` or `contour`(2D) plot.
+        :param grid_size: (int) Mesh grid granularity.
+        :return: (plt.axis) Axis object.
+        """
+
+        title = " Copula PDF"
+
+        if plot_type == "3d":
+            bounds = [0 + 1e-1 / 2, 1 - 1e-1 / 2]
+        elif plot_type == "contour":
+            bounds = [0 + 1e-2, 1 - 1e-2]
+
+        u_grid, v_grid = np.meshgrid(
+            np.linspace(bounds[0], bounds[1], grid_size),
+            np.linspace(bounds[0], bounds[1], grid_size))
+
+        z = np.array(
+            [self.c(u, v) for u, v in zip(np.ravel(u_grid), np.ravel(v_grid))])
+
+        z = z.reshape(u_grid.shape)
+
+        if plot_type == "3d":
+            ax = self._3d_surface_plot(u_grid, v_grid, z, [0, 1], title, **kwargs)
+            return ax
+        elif plot_type == "contour":
+            ax = self._2d_contour_plot(u_grid, v_grid, z, [0, 1], title, **kwargs)
+            return ax
+        else:
+            raise ValueError('Only contour and 3d plot options are available.')
