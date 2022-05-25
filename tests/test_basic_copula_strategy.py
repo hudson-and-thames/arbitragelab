@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import scipy.stats as ss
-from arbitragelab.copula_approach import copula_generate, copula_strategy, copula_calculation
+from arbitragelab.copula_approach.archimedean import Clayton
 
 
 class TestCopulaStrategy(unittest.TestCase):
@@ -124,7 +124,8 @@ class TestCopulaStrategy(unittest.TestCase):
         Test Clayton copula class.
         """
 
-        cop = copula_generate.Clayton(theta=2)
+        cop = Clayton(theta=2)
+        cop.plot_scatter()
         # Check describe
         descr = cop.describe()
         self.assertEqual(descr['Descriptive Name'], 'Bivariate Clayton Copula')

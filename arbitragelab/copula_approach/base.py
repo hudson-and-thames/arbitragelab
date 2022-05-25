@@ -10,6 +10,7 @@ Abstract class for pairs copulas implementation
 from abc import ABC, abstractmethod
 import numpy as np
 import pandas as pd
+import seaborn as sns
 import matplotlib.pyplot as plt
 
 import scipy.stats as ss
@@ -146,6 +147,12 @@ class Copula(ABC):
         Place holder for calculating copula conditional probability.
         """
 
+    @abstractmethod
+    def sample(self, num: int = None, unif_vec: np.array = None) -> np.array:
+        """
+        Place holder for sampling from copula.
+        """
+
     def fit(self, u: np.array, v: np.array) -> float:
         """
         Fit copula to empirical data (pseudo-observations). Once fit, `self.theta` is updated.
@@ -244,6 +251,11 @@ class Copula(ABC):
             return ax
         else:
             raise ValueError('Only contour and 3d plot options are available.')
+
+    def plot_scatter(self, num_points: int = 100):
+        samples = self.sample(num=num_points)
+        plt.title('Scatter plot for generated copula samples.')
+        sns.kdeplot(samples[:, 0], samples[:, 1], shade=True)
 
     def plot_pdf(self, plot_type: str = '3d', grid_size: int = 50, **kwargs) -> plt.axis:
         """
