@@ -128,36 +128,6 @@ class Copula(ABC):
         log_likelihood_sum = np.sum(np.log(likelihood_list))
         return log_likelihood_sum
 
-    def plot(self, num: int, ax: plt.axes = None, **ax_kwargs) -> plt.axes:
-        """
-        Plot a given number sampling of the copula.
-
-        :param num: (int) The number of points to sample for plotting.
-        :param ax: (plt.axes) Optional. The plotting axes. If not provided it will generate its own. Defaults to None.
-        :param ax_kwargs: (dict) Additional axes keyword arguments for plotting.
-        :return: (plt.axes) The plot axes.
-        """
-
-        samples = self.generate_pairs(num)  # Sample from each copula for plotting
-
-        # Plot the samples on an axes
-        ax = ax or plt.gca()
-        ax.scatter(samples[:, 0], samples[:, 1], **ax_kwargs)
-        ax.set_xlim(-0.02, 1.02)
-        ax.set_ylim(-0.02, 1.02)
-        ax.set_aspect('equal', adjustable='box')  # Equal scale in x and y.
-
-        # Modify the title.
-        copula_name = self.__class__.__name__  # Each specific copula's name
-        if copula_name in self.archimedean_names:
-            ax.set_title(r'{} Copula, $\theta={:.3f}$'.format(copula_name, self.theta))
-        if copula_name == "Gaussian":
-            ax.set_title(r'{} Copula, $\rho={:.3f}$'.format(copula_name, self.rho))
-        if copula_name == "Student":
-            ax.set_title(r'Student-t Copula, $\rho={:.3f}$, $\nu={:.3f}$'.format(self.rho, self.nu))
-
-        return ax
-
     @abstractmethod
     def c(self, u: float, v: float) -> float:
         """
