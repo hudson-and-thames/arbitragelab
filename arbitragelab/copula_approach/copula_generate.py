@@ -30,7 +30,7 @@ class Gumbel(Copula):
     """
     # TODO: remebmer theta and threshold have been swapped! That's why tests break down.
 
-    def __init__(self, theta: float = None, threshold: float = 1e-10, ):
+    def __init__(self, theta: float = None, threshold: float = 1e-10):
         r"""
         Initiate a Gumbel copula object.
 
@@ -46,7 +46,7 @@ class Gumbel(Copula):
 
         segment.track('GumbelCopula')
 
-    def generate_pairs(self, num: int = None, unif_vec: np.array = None) -> np.array:
+    def sample(self, num: int = None, unif_vec: np.array = None) -> np.array:
         """
         Generate pairs according to P.D.F., stored in a 2D np.array.
 
@@ -216,7 +216,7 @@ class Frank(Copula):
 
         segment.track('FrankCopula')
 
-    def generate_pairs(self, num: int = None, unif_vec: np.array = None) -> np.array:
+    def sample(self, num: int = None, unif_vec: np.array = None) -> np.array:
         """
         Generate pairs according to P.D.F., stored in a 2D np.array.
 
@@ -390,7 +390,7 @@ class Clayton(Copula):
 
         segment.track('ClaytonCopula')
 
-    def generate_pairs(self, num: int = None, unif_vec: np.array = None) -> np.array:
+    def sample(self, num: int = None, unif_vec: np.array = None) -> np.array:
         r"""
         Generate pairs according to P.D.F., stored in a 2D np.array.
 
@@ -543,7 +543,7 @@ class Joe(Copula):
 
         segment.track('JoeCopula')
 
-    def generate_pairs(self, num: int = None, unif_vec: np.array = None) -> np.array:
+    def sample(self, num: int = None, unif_vec: np.array = None) -> np.array:
         """
         Generate pairs according to P.D.F., stored in a 2D np.array.
 
@@ -715,7 +715,7 @@ class N13(Copula):
 
         segment.track('N13Copula')
 
-    def generate_pairs(self, num: int = None, unif_vec: np.array = None) -> np.array:
+    def sample(self, num: int = None, unif_vec: np.array = None) -> np.array:
         """
         Generate pairs according to P.D.F., stored in a 2D np.array.
 
@@ -902,7 +902,7 @@ class N14(Copula):
 
         segment.track('N14Copula')
 
-    def generate_pairs(self, num: int = None, unif_vec: np.array = None) -> np.array:
+    def sample(self, num: int = None, unif_vec: np.array = None) -> np.array:
         """
         Generate pairs according to P.D.F., stored in a 2D np.array.
 
@@ -1076,7 +1076,7 @@ class Gaussian(Copula):
 
         segment.track('GaussianCopula')
 
-    def generate_pairs(self, num: int = None) -> np.array:
+    def sample(self, num: int = None) -> np.array:
         """
         Generate pairs according to P.D.F., stored in a 2D np.array.
 
@@ -1200,121 +1200,3 @@ class Gaussian(Copula):
         """
 
         return np.sin(tau * np.pi / 2)
-
-
-class Switcher:
-    """
-    Switch class to emulate switch functionality.
-
-    A helper class that creates a copula by its string name.
-    """
-
-    def __init__(self):
-        """
-        Initiate a Switcher object.
-        """
-
-        self.theta = None
-        self.cov = None
-        self.nu = None
-
-        segment.track('SwitcherCopula')
-
-    def choose_copula(self, **kwargs: dict) -> Callable[[], object]:
-        """
-        Choosing a method to instantiate a copula.
-
-        User needs to input copula's name and necessary parameters as kwargs.
-
-        :param kwargs: (dict) Keyword arguments to generate a copula by its name.
-            copula_name: (str) Name of the copula.
-            theta: (float) A measurement of correlation.
-            cov: (np.array) Covariance matrix, only useful for Gaussian and Student-t.
-            nu: (float) Degree of freedom, only useful for Student-t.
-        :return method: (func) The method that creates the wanted copula. Eventually the returned object
-            is a copula.
-        """
-
-        # Taking parameters from kwargs.
-        copula_name = kwargs.get('copula_name')
-        self.theta = kwargs.get('theta', None)
-        self.cov = kwargs.get('cov', None)
-        self.nu = kwargs.get('nu', None)
-
-        # Create copula from string names, by using class attributes/methods.
-        method_name = '_create_' + str(copula_name).lower()
-        method = getattr(self, method_name)
-
-        return method()
-
-    def _create_gumbel(self) -> Gumbel:
-        """
-        Create Gumbel copula.
-        """
-
-        my_copula = Gumbel(theta=self.theta)
-
-        return my_copula
-
-    def _create_frank(self) -> Frank:
-        """
-        Create Frank copula.
-        """
-
-        my_copula = Frank(theta=self.theta)
-
-        return my_copula
-
-    def _create_clayton(self) -> Clayton:
-        """
-        Create Clayton copula.
-        """
-
-        my_copula = Clayton(theta=self.theta)
-
-        return my_copula
-
-    def _create_joe(self) -> Joe:
-        """
-        Create Joe copula.
-        """
-
-        my_copula = Joe(theta=self.theta)
-
-        return my_copula
-
-    def _create_n13(self) -> N13:
-        """
-        Create N13 copula.
-        """
-
-        my_copula = N13(theta=self.theta)
-
-        return my_copula
-
-    def _create_n14(self) -> N14:
-        """
-        Create N14 copula.
-        """
-
-        my_copula = N14(theta=self.theta)
-
-        return my_copula
-
-    def _create_gaussian(self) -> Gaussian:
-        """
-        Create Gaussian copula.
-        """
-
-        my_copula = Gaussian(cov=self.cov)
-
-        return my_copula
-
-    def _create_student(self) -> Student:
-        """
-        Create Student copula.
-        """
-
-        my_copula = Student(nu=self.nu, cov=self.cov)
-
-        return my_copula
