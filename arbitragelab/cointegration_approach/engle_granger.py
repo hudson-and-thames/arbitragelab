@@ -32,6 +32,7 @@ class EngleGrangerPortfolio(CointegratedPortfolio):
         self.residuals = None  # OLS model residuals.
         self.dependent_variable = None  # Column name for dependent variable used in OLS estimation.
         self.cointegration_vectors = None  # Regression coefficients used as hedge-ratios.
+        self.hedge_ratios = None  # Engle-Granger hedge ratios.
         self.adf_statistics = None  # ADF statistics.
 
         segment.track('EngleGrangerPortfolio')
@@ -67,7 +68,11 @@ class EngleGrangerPortfolio(CointegratedPortfolio):
         hedge_ratios, _, _, residuals = self.get_ols_hedge_ratio(price_data=price_data,
                                                                  dependent_variable=self.dependent_variable,
                                                                  add_constant=add_constant)
-        self.cointegration_vectors = pd.DataFrame([np.append(1, np.array(
+        self.cointegration_vectors = pd.DataFrame([np.append(1, -1 * np.array(
+            [hedge for ticker, hedge in hedge_ratios.items() if ticker != self.dependent_variable]))],
+                                                  columns=price_data.columns)
+
+        self.hedge_ratios = pd.DataFrame([np.append(1, np.array(
             [hedge for ticker, hedge in hedge_ratios.items() if ticker != self.dependent_variable]))],
                                                   columns=price_data.columns)
 

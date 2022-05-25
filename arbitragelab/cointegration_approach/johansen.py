@@ -27,6 +27,7 @@ class JohansenPortfolio(CointegratedPortfolio):
 
         self.price_data = None  # pd.DataFrame with price data used to fit the model.
         self.cointegration_vectors = None  # Johansen eigenvectors used to form mean-reverting portfolios.
+        self.hedge_ratios = None  # Johansen hedge ratios.
         self.johansen_trace_statistic = None  # Trace statistic data frame for each asset used to test for cointegration.
         self.johansen_eigen_statistic = None  # Eigenvalue statistic data frame for each asset used to test for cointeg.
         segment.track('JohansenPortfolio')
@@ -73,10 +74,14 @@ class JohansenPortfolio(CointegratedPortfolio):
         data_copy = price_data.copy()
         data_copy.drop(columns=dependent_variable, axis=1, inplace=True)
 
-        # Convert to a format expected by `construct_spread` function and normalize such that dependent has a hedge ratio 1.
+        # Store cointegration vectors
+        self.cointegration_vectors = pd.DataFrame(test_res.evec[:, test_res.ind].T, columns=price_data.columns)
+
+        # Calculating hedge ratios
         all_hedge_ratios = pd.DataFrame()
 
-        # Calculating for all vectors
+        # Convert to a format expected by `construct_spread` function and
+        # normalize such that dependent has a hedge ratio 1.
         for vector in range(cointegration_vectors.shape[0]):
 
             hedge_ratios = cointegration_vectors.iloc[vector].to_dict()
@@ -89,7 +94,7 @@ class JohansenPortfolio(CointegratedPortfolio):
             all_hedge_ratios = all_hedge_ratios.append(hedge_ratios, ignore_index=True)
             all_hedge_ratios = all_hedge_ratios[price_data.columns]
 
-        self.cointegration_vectors = all_hedge_ratios
+        self.hedge_ratios = all_hedge_ratios
 
         # Test critical values are available only if number of variables <= 12
         if price_data.shape[1] <= 12:

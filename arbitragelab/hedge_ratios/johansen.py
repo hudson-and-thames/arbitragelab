@@ -35,7 +35,7 @@ def get_johansen_hedge_ratio(price_data: pd.DataFrame, dependent_variable: str) 
     y = price_data[dependent_variable].copy()
 
     # Convert to a format expected by `construct_spread` function and normalize such that dependent has a hedge ratio 1.
-    hedge_ratios = port.cointegration_vectors.iloc[0].to_dict()
+    hedge_ratios = port.hedge_ratios.iloc[0].to_dict()
 
     residuals = construct_spread(price_data, hedge_ratios=hedge_ratios, dependent_variable=dependent_variable)
 
