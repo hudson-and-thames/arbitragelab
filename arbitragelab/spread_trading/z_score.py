@@ -150,7 +150,6 @@ class BollingerBandsTradingRule:
                               'uuid': data['uuid'], 'start_value': data['start_value'],
                               'end_value': update_value, 'side': data['side'],
                               'initial_z_score': data['initial_z_score']}
-                label_data['bin'] = 1 if label_data['ret'] > 0 else 0
                 formed_trades_uuid.append(data['uuid'])
                 self.closed_trades[timestamp] = label_data
 
