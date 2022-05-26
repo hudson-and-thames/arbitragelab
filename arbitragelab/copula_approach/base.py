@@ -201,7 +201,8 @@ class Copula(ABC):
         return ax
 
     @staticmethod
-    def _2d_contour_plot(x: np.array, y: np.array, z: np.array, bounds: float, title: str, **kwargs) -> plt.axis:
+    def _2d_contour_plot(x: np.array, y: np.array, z: np.array, bounds: float, title: str,
+                         levels: list, **kwargs) -> plt.axis:
         """
         Helper function to plot 2-d contour plot.
 
@@ -210,11 +211,12 @@ class Copula(ABC):
         :param z: (np.array) Z-axis data.
         :param bounds: (list) Min and max values bounds.
         :param title: (str) Plot title.
+        :param levels: (list) List of float values that determine the number and levels of lines in a contour plot.
         :param kwargs: (dict) User-specified params for `plt.contour`.
         :return: (plt.axis) Axis object.
         """
         plt.figure()
-        contour_plot = plt.contour(x, y, z, colors='k', linewidths=1., linestyles=None, **kwargs)
+        contour_plot = plt.contour(x, y, z, levels, colors='k', linewidths=1., linestyles=None, **kwargs)
         plt.clabel(contour_plot, fontsize=8, inline=1)
         plt.xlim(bounds)
         plt.ylim(bounds)
@@ -257,12 +259,14 @@ class Copula(ABC):
         plt.title('Scatter plot for generated copula samples.')
         sns.kdeplot(samples[:, 0], samples[:, 1], shade=True)
 
-    def plot_pdf(self, plot_type: str = '3d', grid_size: int = 50, **kwargs) -> plt.axis:
+    def plot_pdf(self, plot_type: str = '3d', grid_size: int = 50, levels: list = None, **kwargs) -> plt.axis:
         """
         Plot either `3d` or `contour` plot of copula PDF.
 
         :param plot_type: (str) Either ``3d` or `contour`(2D) plot.
         :param grid_size: (int) Mesh grid granularity.
+        :param levels: (list) List of float values that determine the number and levels of lines in a contour plot.
+            If not provided, these are calculated automatically.
         :return: (plt.axis) Axis object.
         """
 
@@ -286,7 +290,12 @@ class Copula(ABC):
             ax = self._3d_surface_plot(u_grid, v_grid, z, [0, 1], title, **kwargs)
             return ax
         elif plot_type == "contour":
-            ax = self._2d_contour_plot(u_grid, v_grid, z, [0, 1], title, **kwargs)
+            # Calculate levels if not given by user
+            if not levels:
+                min_ = np.nanpercentile(z, 5)
+                max_ = np.nanpercentile(z, 95)
+                levels = np.round(np.linspace(min_, max_, num=5), 3)
+            ax = self._2d_contour_plot(u_grid, v_grid, z, [0, 1], title, levels, **kwargs)
             return ax
         else:
             raise ValueError('Only contour and 3d plot options are available.')
