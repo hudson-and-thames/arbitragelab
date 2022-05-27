@@ -103,6 +103,13 @@ class TestCopulas(unittest.TestCase):
         expected = np.array([1, 1e10])
         np.testing.assert_array_almost_equal(result, expected, decimal=3)
 
+        # Test plot methods.
+        cop.plot_scatter(200)
+        cop.plot_pdf('3d')
+        cop.plot_pdf('contour')
+        cop.plot_cdf('3d')
+        cop.plot_cdf('contour')
+
     def test_frank(self):
         """
         Test Frank copula class.
@@ -142,6 +149,13 @@ class TestCopulas(unittest.TestCase):
         with self.assertRaises(ValueError):
             cop.sample()
 
+        # Test plot methods.
+        cop.plot_scatter(200)
+        cop.plot_pdf('3d')
+        cop.plot_pdf('contour')
+        cop.plot_cdf('3d')
+        cop.plot_cdf('contour')
+
     def test_clayton(self):
         """
         Test Clayton copula class.
@@ -180,6 +194,13 @@ class TestCopulas(unittest.TestCase):
         # Check edge cases
         with self.assertRaises(ValueError):
             cop.sample()
+
+        # Test plot methods.
+        cop.plot_scatter(200)
+        cop.plot_pdf('3d')
+        cop.plot_pdf('contour')
+        cop.plot_cdf('3d')
+        cop.plot_cdf('contour')
 
     def test_joe(self):
         """
@@ -229,6 +250,13 @@ class TestCopulas(unittest.TestCase):
         expected = np.array([1, 0])
         np.testing.assert_array_almost_equal(result, expected, decimal=3)
 
+        # Test plot methods.
+        cop.plot_scatter(200)
+        cop.plot_pdf('3d')
+        cop.plot_pdf('contour')
+        cop.plot_cdf('3d')
+        cop.plot_cdf('contour')
+
     def test_n13(self):
         """
         Test N13 Copula class.
@@ -273,6 +301,13 @@ class TestCopulas(unittest.TestCase):
         result = cop._generate_one_pair(0, 0, 3, Kc=_Kc)
         expected = np.array([1, 0])
         np.testing.assert_array_almost_equal(result, expected, decimal=3)
+
+        # Test plot methods.
+        cop.plot_scatter(200)
+        cop.plot_pdf('3d')
+        cop.plot_pdf('contour')
+        cop.plot_cdf('3d')
+        cop.plot_cdf('contour')
 
     def test_n14(self):
         """
@@ -354,6 +389,13 @@ class TestCopulas(unittest.TestCase):
         # Check edge cases
         self.assertEqual(str(type(cop.sample(num=1))), "<class 'numpy.ndarray'>")
 
+        # Test plot methods.
+        cop.plot_scatter(200)
+        cop.plot_pdf('3d')
+        cop.plot_pdf('contour')
+        cop.plot_cdf('3d')
+        cop.plot_cdf('contour')
+
     def test_student(self):
         """
         Test Student copula class (Student-t).
@@ -400,6 +442,13 @@ class TestCopulas(unittest.TestCase):
 
         # Check edge cases
         self.assertEqual(str(type(cop.sample(num=1))), "<class 'numpy.ndarray'>")
+
+        # Test plot methods.
+        cop.plot_scatter(200)
+        cop.plot_pdf('3d')
+        cop.plot_pdf('contour')
+        cop.plot_cdf('3d')
+        cop.plot_cdf('contour')
 
     def test_random_gen_kendall_tau(self):
         """
