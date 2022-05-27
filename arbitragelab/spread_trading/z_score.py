@@ -153,7 +153,7 @@ class BollingerBandsTradingRule:
                 formed_trades_uuid.append(data['uuid'])
                 self.closed_trades[timestamp] = label_data
 
-            self.closed_trades = {
+            self.open_trades = {
                 timestamp: data
                 for timestamp, data in self.open_trades.items()
                 if timestamp not in to_close
