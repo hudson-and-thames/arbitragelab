@@ -24,15 +24,11 @@ Statistical Association, 109(506), pp.788-801.
 """
 # pylint: disable = invalid-name
 from typing import Callable, Tuple
+
 import numpy as np
 import pandas as pd
-import scipy.stats as ss
 from scipy.interpolate import interp1d
-from scipy.optimize import minimize
 from statsmodels.distributions.empirical_distribution import ECDF
-from sklearn.covariance import EmpiricalCovariance
-
-import arbitragelab.copula_approach.copula_generate as cg
 
 
 def find_marginal_cdf(x: np.array, empirical: bool = True, **kwargs) -> Callable[[float], float]:
@@ -64,7 +60,8 @@ def find_marginal_cdf(x: np.array, empirical: bool = True, **kwargs) -> Callable
 
     return None
 
-def construct_ecdf_lin(train_data: np.array, upper_bound: float = 1-1e-5, lower_bound: float = 1e-5) -> Callable:
+
+def construct_ecdf_lin(train_data: np.array, upper_bound: float = 1 - 1e-5, lower_bound: float = 1e-5) -> Callable:
     """
     Construct an empirical cumulative density function with linear interpolation between data points.
 
@@ -102,6 +99,7 @@ def construct_ecdf_lin(train_data: np.array, upper_bound: float = 1-1e-5, lower_
 
     # Vectorize it to work with arrays.
     return np.vectorize(bounded_ecdf)
+
 
 def to_quantile(data: pd.DataFrame) -> Tuple[pd.DataFrame, list]:
     """
@@ -144,7 +142,7 @@ def sic(log_likelihood: float, n: int, k: int = 1) -> float:
     :return: (float) Value of SIC.
     """
 
-    sic_value = np.log(n)*k - 2*log_likelihood
+    sic_value = np.log(n) * k - 2 * log_likelihood
 
     return sic_value
 
@@ -159,7 +157,7 @@ def aic(log_likelihood: float, n: int, k: int = 1) -> float:
     :return sic_value (float): Value of AIC.
     """
 
-    aic_value = (2*n/(n-k-1))*k - 2*log_likelihood
+    aic_value = (2 * n / (n - k - 1)) * k - 2 * log_likelihood
 
     return aic_value
 
@@ -174,7 +172,7 @@ def hqic(log_likelihood: float, n: int, k: int = 1) -> float:
     :return: (float) Value of HQIC.
     """
 
-    hqic_value = 2*np.log(np.log(n))*k - 2*log_likelihood
+    hqic_value = 2 * np.log(np.log(n)) * k - 2 * log_likelihood
 
     return hqic_value
 
@@ -199,10 +197,11 @@ def scad_penalty(x: float, gamma: float, a: float) -> float:
 
     # Assembling parts.
     linear_part = gamma * np.abs(x) * is_linear
-    quadratic_part = (2 * a * gamma * np.abs(x) - x**2 - gamma**2) / (2 * (a - 1)) * is_quadratic
-    constant_part = (gamma**2 * (a + 1)) / 2 * is_constant
+    quadratic_part = (2 * a * gamma * np.abs(x) - x ** 2 - gamma ** 2) / (2 * (a - 1)) * is_quadratic
+    constant_part = (gamma ** 2 * (a + 1)) / 2 * is_constant
 
     return linear_part + quadratic_part + constant_part
+
 
 def scad_derivative(x: float, gamma: float, a: float) -> float:
     """
@@ -217,9 +216,10 @@ def scad_derivative(x: float, gamma: float, a: float) -> float:
     """
 
     part_1 = gamma * (x <= gamma)
-    part_2 = gamma * (a * gamma - x)*((a * gamma - x) > 0) / ((a - 1) * gamma) * (x > gamma)
+    part_2 = gamma * (a * gamma - x) * ((a * gamma - x) > 0) / ((a - 1) * gamma) * (x > gamma)
 
     return part_1 + part_2
+
 
 def adjust_weights(weights: np.array, threshold: float) -> np.array:
     """

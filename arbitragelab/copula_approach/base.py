@@ -224,13 +224,15 @@ class Copula(ABC):
         plt.show()
         return contour_plot
 
-    def plot_cdf(self, plot_type: str = '3d', grid_size: int = 50, **kwargs) -> plt.axis:
+    def plot_cdf(self, plot_type: str = '3d', grid_size: int = 50, levels: list = None, **kwargs) -> plt.axis:
         """
         Plot either `3d` or `contour` plot of copula CDF.
 
         :param plot_type: (str) Either ``3d` or `contour`(2D) plot.
         :param grid_size: (int) Mesh grid granularity.
         :param kwargs: (dict) User-specified params for `ax.plot_surface`/`plt.contour`.
+        :param levels: (list) List of float values that determine the number and levels of lines in a contour plot.
+            If not provided, these are calculated automatically.
         :return: (plt.axis) Axis object.
         """
         title = "Copula CDF"
@@ -249,15 +251,26 @@ class Copula(ABC):
             ax = self._3d_surface_plot(u_grid, v_grid, z, [0, 1], title, **kwargs)
             return ax
         elif plot_type == "contour":
-            ax = self._2d_contour_plot(u_grid, v_grid, z, [0, 1], title, **kwargs)
+            # Calculate levels if not given by user
+            if not levels:
+                min_ = np.nanpercentile(z, 5)
+                max_ = np.nanpercentile(z, 95)
+                levels = np.round(np.linspace(min_, max_, num=5), 3)
+            ax = self._2d_contour_plot(u_grid, v_grid, z, [0, 1], title, levels, **kwargs)
             return ax
         else:
             raise ValueError('Only contour and 3d plot options are available.')
 
     def plot_scatter(self, num_points: int = 100):
+        """
+        Plot copula scatter plot of generated pseudo-observations..
+
+        :param num_points: (int) Number of samples to generate.
+        """
         samples = self.sample(num=num_points)
-        plt.title('Scatter plot for generated copula samples.')
+        plt.title('Scatter/heat plot for generated copula samples.')
         sns.kdeplot(samples[:, 0], samples[:, 1], shade=True)
+        plt.show()
 
     def plot_pdf(self, plot_type: str = '3d', grid_size: int = 50, levels: list = None, **kwargs) -> plt.axis:
         """

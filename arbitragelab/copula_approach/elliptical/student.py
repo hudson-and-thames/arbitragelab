@@ -39,7 +39,7 @@ class StudentCopula(Copula):
 
         segment.track('StudentCopula')
 
-    def generate_pairs(self, num: int = None) -> np.array:
+    def sample(self, num: int = None) -> np.array:
         """
         Generate pairs according to P.D.F., stored in a 2D np.array.
 

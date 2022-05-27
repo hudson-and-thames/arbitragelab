@@ -13,12 +13,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import scipy.stats as ss
-from arbitragelab.copula_approach.archimedean import Clayton
+from arbitragelab.copula_approach.archimedean import Clayton, Frank, Gumbel, Joe, N14, N13
+from arbitragelab.copula_approach.elliptical import GaussianCopula, StudentCopula
+from arbitragelab.copula_approach import aic, sic, hqic, find_marginal_cdf
 
 
-class TestCopulaStrategy(unittest.TestCase):
+class TestCopulas(unittest.TestCase):
     """
-    Test each copula class, calculations and strategy.
+    Test each copula class, calculations..
     """
 
     def setUp(self):
@@ -39,7 +41,7 @@ class TestCopulaStrategy(unittest.TestCase):
         Test gumbel copula class.
         """
 
-        cop = copula_generate.Gumbel(theta=2)
+        cop = Gumbel(theta=2)
         # Check describe
         descr = cop.describe()
         self.assertEqual(descr['Descriptive Name'], 'Bivariate Gumbel Copula')
@@ -65,13 +67,13 @@ class TestCopulaStrategy(unittest.TestCase):
 
         # Check side-loading pairs generation
         unif_vec = np.random.uniform(low=0, high=1, size=(100, 2))
-        sample_pairs = cop.generate_pairs(unif_vec=unif_vec)
+        sample_pairs = cop.sample(unif_vec=unif_vec)
         self.assertEqual(str(type(sample_pairs)), "<class 'numpy.ndarray'>")
         self.assertEqual(sample_pairs.shape, (100, 2))
 
         # Check edge cases
         with self.assertRaises(ValueError):
-            cop.generate_pairs()
+            cop.sample()
 
         def _Kc(w: float, theta: float):
             return w * (1 - np.log(w) / theta)
@@ -85,7 +87,7 @@ class TestCopulaStrategy(unittest.TestCase):
         Test Frank copula class.
         """
 
-        cop = copula_generate.Frank(theta=10)
+        cop = Frank(theta=10)
         # Check describe
         descr = cop.describe()
         self.assertEqual(descr['Descriptive Name'], 'Bivariate Frank Copula')
@@ -111,13 +113,13 @@ class TestCopulaStrategy(unittest.TestCase):
 
         # Check side-loading pairs generation
         unif_vec = np.random.uniform(low=0, high=1, size=(100, 2))
-        sample_pairs = cop.generate_pairs(unif_vec=unif_vec)
+        sample_pairs = cop.sample(unif_vec=unif_vec)
         self.assertEqual(str(type(sample_pairs)), "<class 'numpy.ndarray'>")
         self.assertEqual(sample_pairs.shape, (100, 2))
 
         # Check edge cases
         with self.assertRaises(ValueError):
-            cop.generate_pairs()
+            cop.sample()
 
     def test_clayton(self):
         """
@@ -151,20 +153,20 @@ class TestCopulaStrategy(unittest.TestCase):
 
         # Check side-loading pairs generation
         unif_vec = np.random.uniform(low=0, high=1, size=(100, 2))
-        sample_pairs = cop.generate_pairs(unif_vec=unif_vec)
+        sample_pairs = cop.sample(unif_vec=unif_vec)
         self.assertEqual(str(type(sample_pairs)), "<class 'numpy.ndarray'>")
         self.assertEqual(sample_pairs.shape, (100, 2))
 
         # Check edge cases
         with self.assertRaises(ValueError):
-            cop.generate_pairs()
+            cop.sample()
 
     def test_joe(self):
         """
         Test Joe copula class.
         """
 
-        cop = copula_generate.Joe(theta=6)
+        cop = Joe(theta=6)
         # Check describe
         descr = cop.describe()
         self.assertEqual(descr['Descriptive Name'], 'Bivariate Joe Copula')
@@ -190,18 +192,18 @@ class TestCopulaStrategy(unittest.TestCase):
 
         # Check side-loading pairs generation
         unif_vec = np.random.uniform(low=0, high=1, size=(100, 2))
-        sample_pairs = cop.generate_pairs(unif_vec=unif_vec)
+        sample_pairs = cop.sample(unif_vec=unif_vec)
         self.assertEqual(str(type(sample_pairs)), "<class 'numpy.ndarray'>")
         self.assertEqual(sample_pairs.shape, (100, 2))
 
         # Check edge cases
         with self.assertRaises(ValueError):
-            cop.generate_pairs()
+            cop.sample()
 
         def _Kc(w: float, theta: float):
             return w - 1 / theta * (
-                (np.log(1 - (1 - w) ** theta)) * (1 - (1 - w) ** theta)
-                / ((1 - w) ** (theta - 1)))
+                    (np.log(1 - (1 - w) ** theta)) * (1 - (1 - w) ** theta)
+                    / ((1 - w) ** (theta - 1)))
 
         result = cop._generate_one_pair(0, 0, 3, Kc=_Kc)
         expected = np.array([1, 0])
@@ -211,7 +213,7 @@ class TestCopulaStrategy(unittest.TestCase):
         """
         Test N13 Copula class.
         """
-        cop = copula_generate.N13(theta=3)
+        cop = N13(theta=3)
         # Check describe
         descr = cop.describe()
         self.assertEqual(descr['Descriptive Name'], 'Bivariate Nelsen 13 Copula')
@@ -236,17 +238,17 @@ class TestCopulaStrategy(unittest.TestCase):
 
         # Check side-loading pairs generation
         unif_vec = np.random.uniform(low=0, high=1, size=(100, 2))
-        sample_pairs = cop.generate_pairs(unif_vec=unif_vec)
+        sample_pairs = cop.sample(unif_vec=unif_vec)
         self.assertEqual(str(type(sample_pairs)), "<class 'numpy.ndarray'>")
         self.assertEqual(sample_pairs.shape, (100, 2))
 
         # Check edge cases
         with self.assertRaises(ValueError):
-            cop.generate_pairs()
+            cop.sample()
 
         def _Kc(w: float, theta: float):
             return w + 1 / theta * (
-                w - w * np.power((1 - np.log(w)), 1 - theta) - w * np.log(w))
+                    w - w * np.power((1 - np.log(w)), 1 - theta) - w * np.log(w))
 
         result = cop._generate_one_pair(0, 0, 3, Kc=_Kc)
         expected = np.array([1, 0])
@@ -257,7 +259,7 @@ class TestCopulaStrategy(unittest.TestCase):
         Test N14 Copula class.
         """
 
-        cop = copula_generate.N14(theta=3)
+        cop = N14(theta=3)
         # Check describe
         descr = cop.describe()
         self.assertEqual(descr['Descriptive Name'], 'Bivariate Nelsen 14 Copula')
@@ -282,13 +284,13 @@ class TestCopulaStrategy(unittest.TestCase):
 
         # Check side-loading pairs generation
         unif_vec = np.random.uniform(low=0, high=1, size=(100, 2))
-        sample_pairs = cop.generate_pairs(unif_vec=unif_vec)
+        sample_pairs = cop.sample(unif_vec=unif_vec)
         self.assertEqual(str(type(sample_pairs)), "<class 'numpy.ndarray'>")
         self.assertEqual(sample_pairs.shape, (100, 2))
 
         # Check edge cases
         with self.assertRaises(ValueError):
-            cop.generate_pairs()
+            cop.sample()
 
         def _Kc(w: float, theta: float):
             return -w * (-2 + w ** (1 / theta))
@@ -303,7 +305,7 @@ class TestCopulaStrategy(unittest.TestCase):
         """
 
         cov = [[2, 0.5], [0.5, 2]]
-        cop = copula_generate.Gaussian(cov=cov)
+        cop = GaussianCopula(cov=cov)
         # Check describe
         descr = cop.describe()
         self.assertEqual(descr['Descriptive Name'], 'Bivariate Gaussian Copula')
@@ -330,7 +332,7 @@ class TestCopulaStrategy(unittest.TestCase):
         self.assertAlmostEqual(cop.theta_hat(2 * np.arcsin(0.2) / np.pi), 0.2, delta=1e-4)
 
         # Check edge cases
-        self.assertEqual(str(type(cop.generate_pairs(num=1))), "<class 'numpy.ndarray'>")
+        self.assertEqual(str(type(cop.sample(num=1))), "<class 'numpy.ndarray'>")
 
     def test_student(self):
         """
@@ -339,7 +341,7 @@ class TestCopulaStrategy(unittest.TestCase):
 
         cov = [[2, 0.5], [0.5, 2]]
         nu = 5
-        cop = copula_generate.Student(cov=cov, nu=nu)
+        cop = StudentCopula(cov=cov, nu=nu)
         # Check describe
         descr = cop.describe()
         self.assertEqual(descr['Descriptive Name'], 'Bivariate Student-t Copula')
@@ -368,14 +370,12 @@ class TestCopulaStrategy(unittest.TestCase):
         self.assertAlmostEqual(cop.theta_hat(2 * np.arcsin(0.2) / np.pi), 0.2, delta=1e-4)
 
         # log_ml function in ccalc
-        ll, _ = copula_calculation.log_ml(x=np.array([0.1, 0.21, 0.5, 0.8]),
-                                          y=np.array([0.01, 0.25, 0.4, 0.7]),
-                                          copula_name='Student',
-                                          nu=5)
+        ll = cop.get_log_likelihood_sum(u=np.array([0.1, 0.21, 0.5, 0.8]),
+                                        v=np.array([0.01, 0.25, 0.4, 0.7]))
         self.assertAlmostEqual(ll, 2.1357117471178584, delta=1e-5)
 
         # Check edge cases
-        self.assertEqual(str(type(cop.generate_pairs(num=1))), "<class 'numpy.ndarray'>")
+        self.assertEqual(str(type(cop.sample(num=1))), "<class 'numpy.ndarray'>")
 
     def test_random_gen_kendall_tau(self):
         """
@@ -383,15 +383,15 @@ class TestCopulaStrategy(unittest.TestCase):
         """
 
         # Create copulas.
-        cop_gumbel = copula_generate.Gumbel(theta=3)
-        cop_frank = copula_generate.Frank(theta=3)
-        cop_clayton = copula_generate.Clayton(theta=3)
-        cop_joe = copula_generate.Joe(theta=3)
-        cop_n13 = copula_generate.N13(theta=3)
-        cop_n14 = copula_generate.N14(theta=3)
+        cop_gumbel = Gumbel(theta=3)
+        cop_frank = Frank(theta=3)
+        cop_clayton = Clayton(theta=3)
+        cop_joe = Joe(theta=3)
+        cop_n13 = N13(theta=3)
+        cop_n14 = N14(theta=3)
         cov = [[1, 0.5], [0.5, 1]]
-        cop_gaussian = copula_generate.Gaussian(cov=cov)
-        cop_t = copula_generate.Student(cov=cov, nu=3)
+        cop_gaussian = GaussianCopula(cov=cov)
+        cop_t = StudentCopula(cov=cov, nu=3)
 
         copulas = [cop_gumbel, cop_frank, cop_clayton, cop_joe, cop_n13, cop_n14, cop_gaussian, cop_t]
         copula_names = ['Gumbel', 'Clayton', 'Frank', 'Joe', 'N13', 'N14', 'Gaussian', 'Student']
@@ -403,7 +403,7 @@ class TestCopulaStrategy(unittest.TestCase):
         np.random.seed(724)
         sample_pairs = {}
         for i in range(num_of_cop):
-            sample_pairs[copula_names[i]] = copulas[i].generate_pairs(num=4000)
+            sample_pairs[copula_names[i]] = copulas[i].sample(num=4000)
 
         # Calculate kendall's tau from generated data.
         kendalls_taus = {}
@@ -501,7 +501,7 @@ class TestCopulaStrategy(unittest.TestCase):
                                    [0.998016, 0.998016]])
         # Initiate a Gaussian copula to test.
         cov = [[2, 0.5], [0.5, 2]]
-        GaussianC = copula_generate.Gaussian(cov=cov)
+        GaussianC = copula_generate.GaussianCopula(cov=cov)
         CS = copula_strategy.CopulaStrategy(GaussianC)
         s1 = np.linspace(0.0001, 1 - 0.0001, 3)  # Assume those are marginal cumulative densities already.
         s2 = np.linspace(0.0001, 1 - 0.0001, 3)
@@ -516,9 +516,6 @@ class TestCopulaStrategy(unittest.TestCase):
         Test three information criterions.
         """
 
-        aic = copula_calculation.aic
-        sic = copula_calculation.sic
-        hqic = copula_calculation.hqic
         log_likelihood = 1000
         n = 200
         k = 2
@@ -537,11 +534,11 @@ class TestCopulaStrategy(unittest.TestCase):
         probflr = 0.001
         probcap = 1 - 0.001
 
-        cdf1 = copula_calculation.find_marginal_cdf(data, prob_floor=probflr, prob_cap=probcap)
+        cdf1 = find_marginal_cdf(data, prob_floor=probflr, prob_cap=probcap)
         self.assertAlmostEqual(cdf1(-1), probflr, delta=1e-5)
         self.assertAlmostEqual(cdf1(2), probcap, delta=1e-5)
 
-        cdf2 = copula_calculation.find_marginal_cdf(data, prob_floor=probflr, prob_cap=probcap, empirical=False)
+        cdf2 = find_marginal_cdf(data, prob_floor=probflr, prob_cap=probcap, empirical=False)
         self.assertIsNone(cdf2)
 
     def test_graph_copula(self):

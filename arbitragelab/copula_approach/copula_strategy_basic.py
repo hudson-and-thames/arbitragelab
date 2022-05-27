@@ -266,11 +266,11 @@ class BasicCopulaStrategy:
         tau = ss.kendalltau(x, y)[0]
         # Calculate rho hat from the specific copula using Kendall's tau.
         dud_cov = [[1, 0.5], [0.5, 1]]
-        temp_gaussian_copula = cg.Gaussian(cov=dud_cov)
+        temp_gaussian_copula = cg.GaussianCopula(cov=dud_cov)
         rho_hat = temp_gaussian_copula.theta_hat(tau)
         cov_hat = [[1, rho_hat], [rho_hat, 1]]
         # Use the result to instantiate a copula as the fitted copula
-        fitted_copula = cg.Gaussian(cov=cov_hat)
+        fitted_copula = cg.GaussianCopula(cov=cov_hat)
         # Calculate the sum of log likelihood
         log_likelihood = np.sum(np.log([fitted_copula.get_cop_density(xi, yi) for (xi, yi) in zip(x, y)]))
 

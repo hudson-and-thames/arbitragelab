@@ -880,7 +880,7 @@ class TestBasicCopulaStrategy(unittest.TestCase):
         joe = cg.Joe(theta=theta)
         n13 = cg.N13(theta=theta)
         n14 = cg.N14(theta=theta)
-        gaussian = cg.Gaussian(cov=cov)
+        gaussian = cg.GaussianCopula(cov=cov)
         student = cg.Student(cov=cov, nu=nu)
 
         # Initiate without an axes

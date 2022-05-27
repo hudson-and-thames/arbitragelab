@@ -24,7 +24,7 @@ from arbitragelab.copula_approach.base import Copula
 from arbitragelab.util import segment
 
 
-class Gaussian(Copula):
+class GaussianCopula(Copula):
     """
     Bivariate Gaussian Copula.
     """
