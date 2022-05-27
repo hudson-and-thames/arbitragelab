@@ -46,18 +46,14 @@ Where:
 - :math:`std(S_{t}, T_{std})` is the rolling standard deviation of the spread
   calculated using a backward-looking :math:`T_{std}` window.
 
-The idea is to enter a position only when the price deviates by more than *entryZscore* standard deviations
-from the mean. This parameter can be optimized in a training set.
+The idea is to enter a position only when the spread deviates by more than *entryZscore* standard deviations
+from the mean (:math:`|Zscore_{t}| >= |entryZscore|`). This parameter can be optimized in a training set.
 
 Also, the look-back windows for calculating the mean and the standard deviation are the parameters that
-can be optimized. We can later exit the strategy when the price reverts to the *exitZscore* standard
-deviations from the mean (*exitZscore* :math:`<` *entryZscore*).
+can be optimized. We can later exit the strategy when the spread changes its value by more than *exitZscore_delta*
+from the *entryZscore* in the opposite direction(:math:`|Zscore_{t}| <= |entryZscore + exitZscore\_delta|`).
 
-If *exitZscore* :math:`= -` *entryZscore*, we will exit when the price moves beyond the opposite band,
-also triggering a trading signal of the opposite sign. At either time we can have either zero or one
-unit (long or short) invested, so capital allocation is easy.
-
-If the look-back window is short and we set a small *entryZscore* and *exitZscore*, the holding period
+If the look-back window is short and we set a small *entryZscore* and *exitZscore_delta*, the holding period
 will be shorter and we get more round trip trades and generally higher profits.
 
 The strategy object is initialized with a window for a simple moving average, a window for
