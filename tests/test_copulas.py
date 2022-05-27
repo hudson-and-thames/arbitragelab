@@ -577,7 +577,7 @@ class TestCopulas(unittest.TestCase):
 
     def test_fit_copula(self):
         """
-        Test fit_copula in CopulaStrategy for each copula.
+        Test  fit_copula_to_empirical_data for each copula.
         """
 
         # Change price to cumulative log return. Here we fit the whole set.
