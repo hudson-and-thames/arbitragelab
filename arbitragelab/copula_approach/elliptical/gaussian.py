@@ -2,28 +2,18 @@
 # All rights reserved
 # Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 """
-Module that houses all copula classes and the parent copula class.
-
-Also include a Switcher class to create copula by its name and parameters,
-to emulate a switch functionality.
+Gaussian copula implementation.
 """
 
-# pylint: disable = invalid-name, too-many-lines
-from abc import ABC, abstractmethod
-from typing import Callable
-from scipy.optimize import brentq
-from scipy.special import gamma as gm
-from scipy.integrate import dblquad, quad
-import scipy.stats as ss
 import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
+import scipy.stats as ss
+from sklearn.covariance import EmpiricalCovariance
 
 from arbitragelab.copula_approach.base import Copula
-
 from arbitragelab.util import segment
 
 
+# pylint: disable = invalid-name, too-many-lines
 class GaussianCopula(Copula):
     """
     Bivariate Gaussian Copula.
@@ -38,9 +28,14 @@ class GaussianCopula(Copula):
         """
 
         super().__init__()
-        self.cov = cov  # Covariance matrix
-        # Correlation
-        self.rho = cov[0][1] / (np.sqrt(cov[0][0]) * np.sqrt(cov[1][1]))
+
+        self.cov = None
+        self.rho = None
+
+        if cov is not None:
+            self.cov = cov  # Covariance matrix
+            # Correlation
+            self.rho = cov[0][1] / (np.sqrt(cov[0][0]) * np.sqrt(cov[1][1]))
 
         segment.track('GaussianCopula')
 
@@ -94,6 +89,24 @@ class GaussianCopula(Copula):
                      'rho': rho}
 
         return info_dict
+
+    def fit(self, u: np.array, v: np.array) -> float:
+        """
+        Fit gaussian-copula to empirical data (pseudo-observations) and find cov/rho params. Once fit, `self.rho`, `self.cov` is updated.
+
+        :param u: (np.array) 1D vector data of X pseudo-observations. Need to be uniformly distributed [0, 1].
+        :param v: (np.array) 1D vector data of Y pseudo-observations. Need to be uniformly distributed [0, 1].
+        :return: (float) Rho(correlation) parameter value.
+        """
+        # 1. Calculate covariance matrix using sklearn.
+        # Correct matrix dimension for fitting in sklearn.
+        unif_data = np.array([u, v]).reshape(2, -1).T
+        value_data = ss.norm.ppf(unif_data)  # Change from quantile to value.
+        # Getting empirical covariance matrix.
+        cov_hat = EmpiricalCovariance().fit(value_data).covariance_
+        self.cov = cov_hat
+        self.rho = cov_hat[0][1] / (np.sqrt(cov_hat[0][0]) * np.sqrt(cov_hat[1][1]))
+        return self.rho
 
     def c(self, u: float, v: float) -> float:
         """

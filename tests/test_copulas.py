@@ -370,8 +370,12 @@ class TestCopulas(unittest.TestCase):
         self.assertAlmostEqual(cop.theta_hat(2 * np.arcsin(0.2) / np.pi), 0.2, delta=1e-4)
 
         # log_ml function in ccalc
-        ll = cop.get_log_likelihood_sum(u=np.array([0.1, 0.21, 0.5, 0.8]),
-                                        v=np.array([0.01, 0.25, 0.4, 0.7]))
+        u = np.array([0.1, 0.21, 0.5, 0.8])
+        v = np.array([0.01, 0.25, 0.4, 0.7])
+        new_cop = StudentCopula(nu=5)
+        new_cop.fit(u, v)
+        ll = new_cop.get_log_likelihood_sum(u=u,
+                                            v=v)
         self.assertAlmostEqual(ll, 2.1357117471178584, delta=1e-5)
 
         # Check edge cases

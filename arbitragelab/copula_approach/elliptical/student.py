@@ -31,11 +31,15 @@ class StudentCopula(Copula):
         """
 
         super().__init__()
-        self.cov = cov  # Covariance matrix.
         self.nu = nu  # Degree of freedom.
         self.theta = None
-        # Correlation from covariance matrix.
-        self.rho = cov[0][1] / (np.sqrt(cov[0][0]) * np.sqrt(cov[1][1]))
+        self.cov = None
+        self.rho = None
+
+        if cov is not None:
+            self.cov = cov  # Covariance matrix.
+            # Correlation from covariance matrix.
+            self.rho = cov[0][1] / (np.sqrt(cov[0][0]) * np.sqrt(cov[1][1]))
 
         segment.track('StudentCopula')
 
@@ -196,6 +200,26 @@ class StudentCopula(Copula):
         """
 
         return np.sin(tau * np.pi / 2)
+
+    def fit(self, u: np.array, v: np.array) -> float:
+        """
+        Fit t-copula to empirical data (pseudo-observations) and find cov/rho params. Once fit, `self.rho`, `self.cov` is updated.
+
+        :param u: (np.array) 1D vector data of X pseudo-observations. Need to be uniformly distributed [0, 1].
+        :param v: (np.array) 1D vector data of Y pseudo-observations. Need to be uniformly distributed [0, 1].
+        :return: (float) Rho(correlation) parameter value.
+        """
+        # 1. Calculate covariance matrix using sklearn.
+        # Correct matrix dimension for fitting in sklearn.
+        unif_data = np.array([u, v]).reshape(2, -1).T
+        t_dist = ss.t(df=self.nu)
+        value_data = t_dist.ppf(unif_data)  # Change from quantile to value.
+        # Getting empirical covariance matrix.
+        cov_hat = EmpiricalCovariance().fit(value_data).covariance_
+        self.cov = cov_hat
+        self.rho = cov_hat[0][1] / (np.sqrt(cov_hat[0][0]) * np.sqrt(cov_hat[1][1]))
+        return self.rho
+
 
     @staticmethod
     def _bv_t_dist(x: np.array, mu: np.array, cov: np.array, df: float) -> float:
