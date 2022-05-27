@@ -194,6 +194,13 @@ This project is licensed under an all rights reserved license and is NOT open-so
 
 .. toctree::
     :maxdepth: 2
+    :caption: Spread Trading
+    :hidden:
+
+    spread_trading/z_score
+
+.. toctree::
+    :maxdepth: 2
     :caption: Distance Approach
     :hidden:
 
