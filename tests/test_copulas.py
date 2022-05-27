@@ -2,7 +2,7 @@
 # All rights reserved
 # Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 """
-Unit tests for basic copula strategy.
+Unit tests for copula functions.
 """
 # pylint: disable = invalid-name,  protected-access, too-many-locals
 
@@ -490,11 +490,9 @@ class TestCopulas(unittest.TestCase):
                                        current_pos=1)
         self.assertEqual(new_pos, 0)
 
-
-    @staticmethod
-    def test_series_condi_prob():
+    def test_series_condi_prob(self):
         """
-        Test calculating the conditional probabilities of a seires.
+        Test calculating the conditional probabilities of a series.
         """
 
         # Expected value.
@@ -503,14 +501,14 @@ class TestCopulas(unittest.TestCase):
                                    [0.998016, 0.998016]])
         # Initiate a Gaussian copula to test.
         cov = [[2, 0.5], [0.5, 2]]
-        GaussianC = copula_generate.GaussianCopula(cov=cov)
-        CS = copula_strategy.CopulaStrategy(GaussianC)
+        gauss_cop = GaussianCopula(cov=cov)
         s1 = np.linspace(0.0001, 1 - 0.0001, 3)  # Assume those are marginal cumulative densities already.
         s2 = np.linspace(0.0001, 1 - 0.0001, 3)
         cdf1 = lambda x: x  # Use identity mapping for cumulative density.
         cdf2 = lambda x: x
-        prob_series = CS.series_condi_prob(s1_series=s1, s2_series=s2, cdf1=cdf1, cdf2=cdf2)
-
+        prob_series = []
+        for u, v in zip(s1, s2):
+            prob_series.append([gauss_cop.get_condi_prob(cdf1(u), cdf2(v)), gauss_cop.get_condi_prob(cdf2(v), cdf1(u))])
         np.testing.assert_array_almost_equal(prob_series, expected_probs, decimal=6)
 
     def test_ICs(self):
@@ -641,53 +639,3 @@ class TestCopulas(unittest.TestCase):
             np.testing.assert_array_almost_equal(positions_data[name],
                                                  expected_positions_df[name].to_numpy(),
                                                  decimal=3)
-
-    def test_ic_test(self):
-        """
-        Test ic_test from CopulaStrategy for each copula.
-        """
-
-        # Change price to cumulative log return. Here we fit the whole set.
-        CS = copula_strategy.CopulaStrategy()
-        BKD_clr = CS.cum_log_return(self.BKD_series)
-        ESC_clr = CS.cum_log_return(self.ESC_series)
-
-        # 2. Fit to every copula, and get the SIC, AIC, HQIC data from ic_test
-        copulas = ['Gumbel', 'Clayton', 'Frank', 'Joe', 'N13', 'N14', 'Gaussian', 'Student', 'Loaded-t']
-        ic_type = ['SIC', 'AIC', 'HQIC']
-        ic_dict = {copula: {ic: None for ic in ic_type} for copula in copulas}
-        for name in copulas[: -1]:
-            _, fitted_copula, cdf1, cdf2 = CS.fit_copula(s1_series=BKD_clr, s2_series=ESC_clr, copula_name=name)
-            result_dict = CS.ic_test(s1_test=BKD_clr, s2_test=ESC_clr, cdf1=cdf1, cdf2=cdf2)
-            for ic in ic_type:
-                ic_dict[name][ic] = result_dict[ic]
-
-        # Test side loading functionality. The last one should be a Student-t copula
-        result_dict = CS.ic_test(s1_test=BKD_clr, s2_test=ESC_clr, cdf1=cdf1, cdf2=cdf2, copula=fitted_copula)
-        for ic in ic_type:
-            ic_dict['Loaded-t'][ic] = result_dict[ic]
-
-        # 3. Hard coded theoretical value.
-        ic_dict_expect = {'Gumbel':
-                              {'SIC': -1991.9496657125103, 'AIC': -1996.8584204971112, 'HQIC': -1994.9956755450632},
-                          'Clayton':
-                              {'SIC': -1977.2018488567405, 'AIC': -1982.1106036413414, 'HQIC': -1980.2478586892935},
-                          'Frank':
-                              {'SIC': -2018.1903966292455, 'AIC': -2023.0991514138464, 'HQIC': -2021.2364064617984},
-                          'Joe':
-                              {'SIC': -1134.9875103889972, 'AIC': -1139.896265173598, 'HQIC': -1138.0335202215501},
-                          'N13':
-                              {'SIC': -2206.720787545359, 'AIC': -2211.6295423299603, 'HQIC': -2209.766797377912},
-                          'N14':
-                              {'SIC': -2107.0744287234816, 'AIC': -2111.9831835080827, 'HQIC': -2110.1204385560345},
-                          'Gaussian':
-                              {'SIC': -2206.539865701486, 'AIC': -2211.4486204860873, 'HQIC': -2209.585875534039},
-                          'Student':
-                              {'SIC': -2270.160333056966, 'AIC': -2275.069087841567, 'HQIC': -2273.206342889519},
-                          'Loaded-t':
-                              {'SIC': -2270.160333056966, 'AIC': -2275.069087841567, 'HQIC': -2273.206342889519}}
-
-        # 4. Check with ic_test value.
-        for name in copulas:
-            for ic in ic_type:
-                self.assertAlmostEqual(ic_dict[name][ic], ic_dict_expect[name][ic], delta=1)

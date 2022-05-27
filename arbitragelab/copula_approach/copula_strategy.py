@@ -146,59 +146,6 @@ class CopulaStrategy:
 
         return result_dict, copula, s1_cdf, s2_cdf
 
-    def ic_test(self, s1_test: np.array, s2_test: np.array,
-                cdf1: Callable[[float], float], cdf2: Callable[[float], float],
-                copula: cg.Copula = None) -> dict:
-        """
-        Run SIC, AIC, and HQIC of the fitted copula given data.
-
-        This method only works if CopulaStrategy has fitted a copula given training data.
-
-        Note: s1_series and s2_series need to be pre-processed. In general, raw price data is depreciated.
-            One may use log return or cumulative log return. CopulaStrategy class provides a method to
-            calculate cumulative log return.
-
-        :param s1_test: (np.array) 1D stock time series data in desired form.
-        :param s2_test: (np.array) 1D stock time series data in desired form.
-        :param cdf1: (func) Cumulative density function trained, for the security in s1_test.
-        :param cdf2: (func) Cumulative density function trained, for the security in s2_test.
-        :param copula: (Copula) The copula to be evaluated. By default it uses the system's copula.
-        :return: (dict) Result of SIC, AIC and HQIC.
-        """
-
-        num_of_instances = len(s1_test)
-        if copula is None:
-            copula = self.copula
-        # Get the copula's name.
-        copula_name = copula.__class__.__name__
-        # if copula_name not in self.all_copula_names:
-        #     raise ValueError('CopulaStrategy does not have a currently defined copula.')
-        # Get nu (degree of freedom) if it is a Student-t copula.
-        if copula_name == 'Student':
-            nu = copula.nu
-        else:
-            nu = None
-
-        # Quantile data for each stock w.r.t. their cumulative log return.
-        u1_series = cdf1(s1_test)
-        u2_series = cdf2(s2_test)
-
-        # Get log-likelihood value and the copula with parameters fitted to training data.
-        log_likelihood, _ = ccalc.log_ml(u1_series, u2_series,
-                                         copula_name, nu)
-
-        # Information criterion for evaluating model fitting performance.
-        sic_value = ccalc.sic(log_likelihood, n=num_of_instances)
-        aic_value = ccalc.aic(log_likelihood, n=num_of_instances)
-        hqic_value = ccalc.hqic(log_likelihood, n=num_of_instances)
-
-        result_dict = {'Copula Name': copula_name,
-                       'SIC': sic_value,
-                       'AIC': aic_value,
-                       'HQIC': hqic_value}
-
-        return result_dict
-
     def graph_copula(self, copula_name: str, ax: plt.axes = None, **kwargs: dict) -> plt.axes:
         """
         Graph the sample from a given copula by its parameters. Returns axis.
