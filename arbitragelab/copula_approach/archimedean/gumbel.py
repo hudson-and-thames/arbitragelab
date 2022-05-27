@@ -9,18 +9,12 @@ to emulate a switch functionality.
 """
 
 # pylint: disable = invalid-name, too-many-lines
-from abc import ABC, abstractmethod
 from typing import Callable
-from scipy.optimize import brentq
-from scipy.special import gamma as gm
-from scipy.integrate import dblquad, quad
-import scipy.stats as ss
+
 import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
+from scipy.optimize import brentq
 
 from arbitragelab.copula_approach.base import Copula
-
 from arbitragelab.util import segment
 
 
@@ -28,8 +22,6 @@ class Gumbel(Copula):
     """
     Gumbel Copula.
     """
-
-    # TODO: remebmer theta and threshold have been swapped! That's why tests break down.
 
     def __init__(self, theta: float = None, threshold: float = 1e-10):
         r"""
@@ -40,7 +32,7 @@ class Gumbel(Copula):
 
         """
 
-        super().__init__()
+        super().__init__('Gumbel')
         # Lower than this amount will be rounded to threshold.
         self.threshold = threshold
         self.theta = theta  # Gumbel copula parameter.

@@ -21,11 +21,13 @@ class Copula(ABC):
     Copula class houses common functions for each copula subtype.
     """
 
-    def __init__(self):
+    def __init__(self, copula_name: str):
         """
         Initiate a Copula class.
 
         This is a helper superclass for all named copulas in this module. There is no need to directly initiate.
+
+        :param copula_name: (str) Copula name.
         """
 
         # Name of each types of copula.
@@ -34,6 +36,7 @@ class Copula(ABC):
         self.theta = None
         self.rho = None
         self.nu = None
+        self.copula_name = copula_name
 
     def describe(self) -> pd.Series:
         """

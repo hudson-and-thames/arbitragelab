@@ -30,7 +30,7 @@ class StudentCopula(Copula):
         calculate correlation internally once the covariance matrix is given.
         """
 
-        super().__init__()
+        super().__init__('Student')
         self.nu = nu  # Degree of freedom.
         self.theta = None
         self.cov = None
@@ -209,6 +209,7 @@ class StudentCopula(Copula):
         :param v: (np.array) 1D vector data of Y pseudo-observations. Need to be uniformly distributed [0, 1].
         :return: (float) Rho(correlation) parameter value.
         """
+        super().fit(u, v)
         # 1. Calculate covariance matrix using sklearn.
         # Correct matrix dimension for fitting in sklearn.
         unif_data = np.array([u, v]).reshape(2, -1).T
@@ -219,7 +220,6 @@ class StudentCopula(Copula):
         self.cov = cov_hat
         self.rho = cov_hat[0][1] / (np.sqrt(cov_hat[0][0]) * np.sqrt(cov_hat[1][1]))
         return self.rho
-
 
     @staticmethod
     def _bv_t_dist(x: np.array, mu: np.array, cov: np.array, df: float) -> float:
@@ -275,7 +275,7 @@ def fit_nu_for_t_copula(u: np.array, v: np.array, nu_tol: float = None) -> float
         # Getting empirical covariance matrix.
         cov_hat = EmpiricalCovariance().fit(value_data).covariance_
         cop = StudentCopula(nu=nu, cov=cov_hat)
-        log_likelihood, _ = cop.get_log_likelihood_sum(u, v)
+        log_likelihood = cop.get_log_likelihood_sum(u, v)
 
         return -log_likelihood  # Minimizing the negative of likelihood.
 

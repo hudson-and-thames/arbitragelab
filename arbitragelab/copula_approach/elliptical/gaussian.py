@@ -27,7 +27,7 @@ class GaussianCopula(Copula):
         calculate correlation internally once the covariance matrix is given.
         """
 
-        super().__init__()
+        super().__init__('Gaussian')
 
         self.cov = None
         self.rho = None
@@ -98,6 +98,7 @@ class GaussianCopula(Copula):
         :param v: (np.array) 1D vector data of Y pseudo-observations. Need to be uniformly distributed [0, 1].
         :return: (float) Rho(correlation) parameter value.
         """
+        super().fit(u, v)
         # 1. Calculate covariance matrix using sklearn.
         # Correct matrix dimension for fitting in sklearn.
         unif_data = np.array([u, v]).reshape(2, -1).T

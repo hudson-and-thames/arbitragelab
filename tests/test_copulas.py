@@ -9,13 +9,13 @@ Unit tests for basic copula strategy.
 import os
 import unittest
 import warnings
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import scipy.stats as ss
+
 from arbitragelab.copula_approach.archimedean import Clayton, Frank, Gumbel, Joe, N14, N13
-from arbitragelab.copula_approach.elliptical import GaussianCopula, StudentCopula
-from arbitragelab.copula_approach import aic, sic, hqic, find_marginal_cdf
+from arbitragelab.copula_approach.elliptical import GaussianCopula, StudentCopula, fit_nu_for_t_copula
+from arbitragelab.copula_approach import aic, sic, hqic, find_marginal_cdf, fit_copula_to_empirical_data
 
 
 class TestCopulas(unittest.TestCase):
@@ -35,6 +35,27 @@ class TestCopulas(unittest.TestCase):
         self.BKD_series = pair_prices['BKD'].to_numpy()
         self.ESC_series = pair_prices['ESC'].to_numpy()
         warnings.simplefilter('ignore')
+
+    @staticmethod
+    def cum_log_return(price_series: np.array, start: float = None) -> np.array:
+        """
+        Convert a price time series to cumulative log return.
+        clr[i] = log(S[i]/S[0]) = log(S[i]) - log(S[0]).
+        :param price_series: (np.array) 1D price time series.
+        :param start: (float) Initial price. Default to the starting element of price_series.
+        :return: (np.array) 1D cumulative log return series.
+        """
+
+        if start is None:
+            start = price_series[0]
+        log_start = np.log(start)
+
+        # Natural log of price series.
+        log_prices = np.log(price_series)
+        # Calculate cumulative log return.
+        clr = np.array([log_price_now - log_start for log_price_now in log_prices])
+
+        return clr
 
     def test_gumbel(self):
         """
@@ -127,7 +148,6 @@ class TestCopulas(unittest.TestCase):
         """
 
         cop = Clayton(theta=2)
-        cop.plot_scatter()
         # Check describe
         descr = cop.describe()
         self.assertEqual(descr['Descriptive Name'], 'Bivariate Clayton Copula')
@@ -470,28 +490,6 @@ class TestCopulas(unittest.TestCase):
                                        current_pos=1)
         self.assertEqual(new_pos, 0)
 
-    def test_cum_log_return(self):
-        """
-        Test calculation of cumulative log return.
-        """
-
-        CS = copula_strategy.CopulaStrategy()
-
-        # Testing a constant series.
-        const_series = np.ones(100) * 10
-        expected_clr = np.zeros_like(const_series)
-        clr = CS.cum_log_return(const_series)
-        np.testing.assert_array_almost_equal(clr, expected_clr, decimal=6)
-
-        # Testing a exponential series, with a custom start
-        exp_series = np.exp(np.linspace(start=0, stop=1, num=101))
-        expected_clr = np.linspace(start=0, stop=1, num=101) + 1
-        clr = CS.cum_log_return(exp_series, start=np.exp(-1))
-        np.testing.assert_array_almost_equal(clr, expected_clr, decimal=6)
-
-        # Test __init__ for CopulaStrategy
-        CS_1 = copula_strategy.CopulaStrategy(position_kind=[3, 4, 5])
-        self.assertEqual(CS_1.position_kind, [3, 4, 5])
 
     @staticmethod
     def test_series_condi_prob():
@@ -545,66 +543,35 @@ class TestCopulas(unittest.TestCase):
         cdf2 = find_marginal_cdf(data, prob_floor=probflr, prob_cap=probcap, empirical=False)
         self.assertIsNone(cdf2)
 
-    def test_graph_copula(self):
-        """
-        Test graph_copula from copula_strategy.CopulaStrategy
-        """
-
-        CS = copula_strategy.CopulaStrategy()
-        cov = [[1, 0.5], [0.5, 1]]
-        nu = 4
-        theta = 5
-
-        # Expect None type
-        axs = {}
-        axs['Gumbel'] = CS.graph_copula(copula_name='Gumbel', theta=theta)
-        axs['Frank'] = CS.graph_copula(copula_name='Frank', theta=theta)
-        axs['Clayton'] = CS.graph_copula(copula_name='Clayton', theta=theta)
-        axs['Joe'] = CS.graph_copula(copula_name='Joe', theta=theta)
-        axs['N13'] = CS.graph_copula(copula_name='N13', theta=theta)
-        axs['N14'] = CS.graph_copula(copula_name='N14', theta=theta)
-        axs['Gaussian'] = CS.graph_copula(copula_name='Gaussian', cov=cov)
-        axs['Student'] = CS.graph_copula(copula_name='Student', cov=cov, nu=nu)
-        plt.close()
-
-        for key in axs:
-            self.assertIsNone(axs[key])
-
-        # Expect plt.ax type
-        _, ax = plt.subplots()
-        axs = {}
-        axs['Gumbel'] = CS.graph_copula(copula_name='Gumbel', theta=theta, ax=ax)
-        axs['Frank'] = CS.graph_copula(copula_name='Frank', theta=theta, ax=ax)
-        axs['Clayton'] = CS.graph_copula(copula_name='Clayton', theta=theta, ax=ax)
-        axs['Joe'] = CS.graph_copula(copula_name='Joe', theta=theta, ax=ax)
-        axs['N13'] = CS.graph_copula(copula_name='N13', theta=theta, ax=ax)
-        axs['N14'] = CS.graph_copula(copula_name='N14', theta=theta, ax=ax)
-        axs['Gaussian'] = CS.graph_copula(copula_name='Gaussian', cov=cov, ax=ax)
-        axs['Student'] = CS.graph_copula(copula_name='Student', cov=cov, nu=nu, ax=ax)
-        plt.close()
-
-        for key in axs:
-            self.assertEqual(str(type(axs[key])), "<class 'matplotlib.axes._subplots.AxesSubplot'>")
-
     def test_ml_theta_hat(self):
         """
         Test max likelihood fit of theta hat for each copula.
         """
 
         # Change price to cumulative log return. Here we fit the whole set.
-        ml_theta_hat = copula_calculation.ml_theta_hat
-        CS = copula_strategy.CopulaStrategy()
-        BKD_clr = CS.cum_log_return(self.BKD_series)
-        ESC_clr = CS.cum_log_return(self.ESC_series)
+        BKD_clr = self.cum_log_return(self.BKD_series)
+        ESC_clr = self.cum_log_return(self.ESC_series)
+        ecdf_x = find_marginal_cdf(BKD_clr)
+        ecdf_y = find_marginal_cdf(ESC_clr)
 
         # Fit through the copulas using theta_hat as its parameter
-        copulas = ['Gumbel', 'Clayton', 'Frank', 'Joe', 'N13', 'N14', 'Gaussian', 'Student']
-        theta_hats = np.array(
-            [ml_theta_hat(x=BKD_clr, y=ESC_clr, copula_name=name) for name in copulas])
+        copulas = [Gumbel, Clayton, Frank, Joe, N13, N14, GaussianCopula, StudentCopula]
+        theta_hats = []
+
+        for cop in copulas:
+            if cop == GaussianCopula:
+                # These copulas can't be fit on returns! Only on [0,1] data.
+                theta_hats.append(cop().fit(ecdf_x(BKD_clr), ecdf_y(ESC_clr)))
+            elif cop == StudentCopula:
+                fitted_nu = fit_nu_for_t_copula(ecdf_x(BKD_clr), ecdf_y(ESC_clr), nu_tol=0.05)
+                theta_hats.append(cop(nu=fitted_nu).fit(ecdf_x(BKD_clr), ecdf_y(ESC_clr)))
+            else:
+                theta_hats.append(
+                    cop().fit(BKD_clr, ESC_clr))  # Using copula in this way is wrong! Use pseudo-observations.
 
         # Expected values.
         expected_theta = np.array([4.823917032678924, 7.6478340653578485, 17.479858671919537, 8.416268109560686,
-                                   13.006445455285089, 4.323917032678924, 0.9474504200741508, 0.9474504200741508])
+                                   13.006445455285089, 4.323917032678924, 0.9431138949207484, 0.9471157685912241])
 
         np.testing.assert_array_almost_equal(theta_hats, expected_theta, decimal=6)
 
@@ -614,21 +581,16 @@ class TestCopulas(unittest.TestCase):
         """
 
         # Change price to cumulative log return. Here we fit the whole set.
-        CS = copula_strategy.CopulaStrategy()
-        BKD_clr = CS.cum_log_return(self.BKD_series)
-        ESC_clr = CS.cum_log_return(self.ESC_series)
+        BKD_clr = self.cum_log_return(self.BKD_series)
+        ESC_clr = self.cum_log_return(self.ESC_series)
 
         # Fit through the copulas and the last one we do not update.
-        copulas = ['Gumbel', 'Clayton', 'Frank', 'Joe', 'N13', 'N14', 'Gaussian', 'Student']
+        copulas = [Gumbel, Clayton, Frank, Joe, N13, N14, GaussianCopula, StudentCopula]
         aics = dict()
 
-        for name in copulas:
-            result_dict, _, _, _ = CS.fit_copula(s1_series=BKD_clr, s2_series=ESC_clr, copula_name=name)
-            aics[name] = result_dict['AIC']
-
-        # Check the renew functionality. It should still be a Student-t copula internally.
-        _, _, _, _ = CS.fit_copula(s1_series=BKD_clr, s2_series=ESC_clr, copula_name='Gumbel', if_renew=False)
-        self.assertIsInstance(CS.copula, copula_generate.Student)
+        for cop in copulas:
+            result_dict, _, _, _ = fit_copula_to_empirical_data(x=BKD_clr, y=ESC_clr, copula=cop)
+            aics[result_dict['Copula Name']] = result_dict['AIC']
 
         expeced_aics = {'Gumbel': -1996.8584204971112, 'Clayton': -1982.1106036413414,
                         'Frank': -2023.0991514138464, 'Joe': -1139.896265173598,

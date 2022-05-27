@@ -9,18 +9,13 @@ to emulate a switch functionality.
 """
 
 # pylint: disable = invalid-name, too-many-lines
-from abc import ABC, abstractmethod
 from typing import Callable
-from scipy.optimize import brentq
-from scipy.special import gamma as gm
-from scipy.integrate import dblquad, quad
-import scipy.stats as ss
+
 import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
+from scipy.integrate import quad
+from scipy.optimize import brentq
 
 from arbitragelab.copula_approach.base import Copula
-
 from arbitragelab.util import segment
 
 
@@ -37,7 +32,7 @@ class N13(Copula):
         :param threshold: (float) Optional. Below this threshold, a percentile will be rounded to the threshold.
         """
 
-        super().__init__()
+        super().__init__('N13')
         # Lower than this amount will be rounded to threshold
         self.threshold = threshold
         self.theta = theta  # Default input

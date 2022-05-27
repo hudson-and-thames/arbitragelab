@@ -23,12 +23,15 @@ Statistical Association, 109(506), pp.788-801.
 <https://www.tandfonline.com/doi/pdf/10.1080/01621459.2013.873366?casa_token=sey8HrojSgYAAAAA:TEMBX8wLYdGFGyM78UXSYm6hXl1Qp_K6wiLgRJf6kPcqW4dYT8z3oA3I_odrAL48DNr3OSoqkQsEmQ>`__
 """
 # pylint: disable = invalid-name
-from typing import Callable, Tuple
+from typing import Callable, Tuple, Union
 
 import numpy as np
 import pandas as pd
 from scipy.interpolate import interp1d
 from statsmodels.distributions.empirical_distribution import ECDF
+
+from arbitragelab.copula_approach.base import Copula
+from arbitragelab.copula_approach.elliptical import StudentCopula, fit_nu_for_t_copula
 
 
 def find_marginal_cdf(x: np.array, empirical: bool = True, **kwargs) -> Callable[[float], float]:
@@ -241,3 +244,61 @@ def adjust_weights(weights: np.array, threshold: float) -> np.array:
     adjusted_weights = filtered_weights / scaler
 
     return adjusted_weights
+
+
+def fit_copula_to_empirical_data(x: np.array, y: np.array, copula: Copula) -> tuple:
+    """
+    Fit copula to empirical data and generate goodness-of-fit statistics as well as empirical CDFs used in estimation.
+
+
+     If fitting a Student-t copula, it also includes a max likelihood fit for nu using COBYLA method from
+        scipy.optimize.minimize. nu's fit range is [1, 15]. When the user wishes to use nu > 15, please delegate to
+        Gaussian copula instead. This step is relatively slow.
+
+        The output returns:
+            - result_dict: (dict) The name of the copula and its SIC, AIC, HQIC values;
+            - copula: (Copula) The fitted copula with parameters satisfying maximum likelihood;
+            - s1_cdf: (func) The cumulative density function for stock 1, using training data;
+            - s2_cdf: (func) The cumulative density function for stock 2, using training data.
+
+        :param x: (np.array) 1D stock time series data in desired form.
+        :param y: (np.array) 1D stock time series data in desired form.
+        :param copula: (Copula) Copula class to fit.
+        :return: (dict, Copula, func, func)
+            The name of the copula and its SIC, AIC, HQIC values;
+            The fitted copula with parameters satisfying maximum likelihood;
+            The cumulative density function for series 1, using training data;
+            The cumulative density function for series 2, using training data.
+    """
+    num_of_instances = len(x)  # Number of instances.
+
+    # Finding an inverse cumulative density distribution (quantile) for each stock price series.
+    s1_cdf = find_marginal_cdf(x, empirical=True)
+    s2_cdf = find_marginal_cdf(x, empirical=True)
+
+    # Quantile data for each stock w.r.t. their cumulative log return.
+    u1_series = s1_cdf(x)
+    u2_series = s2_cdf(y)
+
+    # Get log-likelihood value and the copula with parameters fitted to training data.
+    if copula == StudentCopula:
+        fitted_nu = fit_nu_for_t_copula(u1_series, u2_series, nu_tol=0.05)
+        copula_obj = StudentCopula(nu=fitted_nu, cov=None)
+        copula_obj.fit(u1_series, u2_series)
+        log_likelihood = copula_obj.get_log_likelihood_sum(u1_series, u2_series)
+    else:
+        copula_obj = copula()
+        copula_obj.fit(u1_series, u2_series)
+        log_likelihood = copula_obj.get_log_likelihood_sum(u1_series, u2_series)
+
+    # Information criterion for evaluating model fitting performance.
+    sic_value = sic(log_likelihood, n=num_of_instances)
+    aic_value = aic(log_likelihood, n=num_of_instances)
+    hqic_value = hqic(log_likelihood, n=num_of_instances)
+
+    result_dict = {'Copula Name': copula_obj.copula_name,
+                   'SIC': sic_value,
+                   'AIC': aic_value,
+                   'HQIC': hqic_value}
+
+    return result_dict, copula_obj, s1_cdf, s2_cdf
