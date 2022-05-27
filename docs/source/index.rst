@@ -228,7 +228,6 @@ This project is licensed under an all rights reserved license and is NOT open-so
     cointegration_approach/introduction
     cointegration_approach/cointegration_tests
     cointegration_approach/half_life
-    cointegration_approach/trading_strategies
     cointegration_approach/minimum_profit_simulation
     cointegration_approach/minimum_profit
     cointegration_approach/multivariate_cointegration

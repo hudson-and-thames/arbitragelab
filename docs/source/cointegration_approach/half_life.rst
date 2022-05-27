@@ -18,7 +18,7 @@ where :math:`d \varepsilon` is some Gaussian noise.
 Implementation
 ##############
 
-.. py:currentmodule:: arbitragelab.cointegration_approach.signals
+.. py:currentmodule:: arbitragelab.cointegration_approach.utils
 
 .. autofunction:: get_half_life_of_mean_reversion
 
@@ -28,7 +28,7 @@ Examples
 .. code-block::
 
    # Importing the function
-   from arbitragelab.cointegration_approach.signals import get_half_life_of_mean_reversion
+   from arbitragelab.cointegration_approach.utils import get_half_life_of_mean_reversion
 
    # Finding the half-life of mean-reversion
-   half_life = get_half_life_of_mean_reversion(portfolio_price)
+   half_life = get_half_life_of_mean_reversion(spread)

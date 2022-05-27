@@ -125,6 +125,20 @@ Example
     # Checking all closed trades
     closed_trades = strategy.closed_trades
 
+Research Notebooks
+##################
+
+The following research notebook can be used to better understand trading strategies described above.
+
+* `Mean Reversion`_
+
+.. _`Mean Reversion`: https://hudsonthames.org/notebooks/arblab/mean_reversion.html
+
+.. raw:: html
+
+    <a href="https://hudthames.tech/3iIGDvv"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
+    <a href="https://hudthames.tech/2S03R58"><button style="margin: 20px; margin-top: 0px">Download Sample Data</button></a>
+
 References
 ##########
 
