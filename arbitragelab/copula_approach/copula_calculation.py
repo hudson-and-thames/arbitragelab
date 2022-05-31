@@ -50,13 +50,14 @@ def find_marginal_cdf(x: np.array, empirical: bool = True, **kwargs) -> Callable
 
     # Make sure it is an np.array.
     x = np.array(x)
+    x = x[~np.isnan(x)]  # Delete nan values.
 
     prob_floor = kwargs.get('prob_floor', 0.00001)
     prob_cap = kwargs.get('prob_cap', 0.99999)
 
     if empirical:
         # Use empirical cumulative density function on data.
-        fitted_cdf = lambda data: max(min(ECDF(x)(data), prob_cap), prob_floor)
+        fitted_cdf = lambda data: max(min(ECDF(x)(data), prob_cap), prob_floor) if not np.isnan(data) else np.nan
         # Vectorize so it works on an np.array.
         v_fitted_cdf = np.vectorize(fitted_cdf)
         return v_fitted_cdf

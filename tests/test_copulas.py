@@ -498,47 +498,6 @@ class TestCopulas(unittest.TestCase):
             if copula_names[i] in elliptics:
                 self.assertAlmostEqual(0.5, thetas[copula_names[i]], delta=0.05)  # Compare rho (corr)
 
-    def test_signal(self):
-        """
-        Test trading signal generation.
-        """
-
-        CS = copula_strategy.CopulaStrategy()
-
-        # Testing long.
-        new_pos = CS.get_next_position(prob_u1=0.01, prob_u2=0.99,
-                                       prev_prob_u1=0.5, prev_prob_u2=0.5,
-                                       current_pos=0)
-        self.assertEqual(new_pos, 1)
-        new_pos = CS.get_next_position(prob_u1=0.01, prob_u2=0.99,
-                                       prev_prob_u1=0.49, prev_prob_u2=0.51,
-                                       current_pos=1)
-        self.assertEqual(new_pos, 1)
-
-        # Testing short.
-        new_pos = CS.get_next_position(prob_u1=0.99, prob_u2=0.01,
-                                       prev_prob_u1=0.5, prev_prob_u2=0.5,
-                                       current_pos=0)
-        self.assertEqual(new_pos, -1)
-        new_pos = CS.get_next_position(prob_u1=0.99, prob_u2=0.01,
-                                       prev_prob_u1=0.51, prev_prob_u2=0.49,
-                                       current_pos=-1)
-        self.assertEqual(new_pos, -1)
-
-        # Testing exit.
-        new_pos = CS.get_next_position(prob_u1=0.3, prob_u2=0.1,
-                                       prev_prob_u1=0.6, prev_prob_u2=0.1,
-                                       current_pos=0)
-        self.assertEqual(new_pos, 0)
-        new_pos = CS.get_next_position(prob_u1=0.99, prob_u2=0.01,
-                                       prev_prob_u1=0.3, prev_prob_u2=0.1,
-                                       current_pos=-1)
-        self.assertEqual(new_pos, 0)
-        new_pos = CS.get_next_position(prob_u1=0.99, prob_u2=0.01,
-                                       prev_prob_u1=0.3, prev_prob_u2=0.1,
-                                       current_pos=1)
-        self.assertEqual(new_pos, 0)
-
     def test_series_condi_prob(self):
         """
         Test calculating the conditional probabilities of a series.
@@ -646,45 +605,3 @@ class TestCopulas(unittest.TestCase):
 
         for key in aics:
             self.assertAlmostEqual(aics[key], expeced_aics[key], delta=1)
-
-    def test_analyze_time_series(self):
-        """
-        Test analyze_time_series in CopulaStrategy for each copula.
-        """
-
-        CS = copula_strategy.CopulaStrategy(default_lower_threshold=0.25, default_upper_threshold=0.75)
-        BKD_clr = CS.cum_log_return(self.BKD_series)
-        ESC_clr = CS.cum_log_return(self.ESC_series)
-
-        # Training testing split
-        training_length = 670
-
-        BKD_train = BKD_clr[: training_length]
-        ESC_train = ESC_clr[: training_length]
-        BKD_test = BKD_clr[training_length:]
-        ESC_test = ESC_clr[training_length:]
-
-        # Compare their AIC values
-        copulas = ['Gumbel', 'Clayton', 'Frank', 'Joe', 'N13', 'N14', 'Gaussian', 'Student']
-
-        # For each copula type, fit, then analyze
-        positions_data = {}
-        for name in copulas:
-            if name != 'Student':
-                _, _, cdf1, cdf2 = CS.fit_copula(s1_series=BKD_train, s2_series=ESC_train, copula_name=name)
-                positions = CS.analyze_time_series(s1_series=BKD_test, s2_series=ESC_test,
-                                                   cdf1=cdf1, cdf2=cdf2)
-                positions_data[name] = positions
-            else:
-                _, _, cdf1, cdf2 = CS.fit_copula(s1_series=BKD_train, s2_series=ESC_train, copula_name=name)
-                positions = CS.analyze_time_series(s1_series=BKD_test, s2_series=ESC_test,
-                                                   cdf1=cdf1, cdf2=cdf2, start_position=0,
-                                                   lower_threshold=0.25, upper_threshold=0.75)
-                positions_data[name] = positions
-
-        # Load and compare with theoretical data
-        expected_positions_df = pd.read_csv(self.data_path + r'/BKD_ESC_unittest_positions.csv')
-        for name in copulas:
-            np.testing.assert_array_almost_equal(positions_data[name],
-                                                 expected_positions_df[name].to_numpy(),
-                                                 decimal=3)

@@ -27,9 +27,9 @@ class BasicCopulaTradingRule:
     logic is as follows (All the thresholds can be customized via open_thresholds, exit_thresholds parameters):
 
             - If P(U1 <= u1 | U2 = u2) <= 0.05 AND P(U2 <= u2 | U1 = u1) >= 0.95, then stock 1 is under-valued and
-              stock 2 is over-valued. Thus we short the spread.
+              stock 2 is over-valued. Thus we long the spread.
             - If P(U1 <= u1 | U2 = u2) >= 0.95 AND P(U2 <= u2 | U1 = u1) <= 0.05, then stock 2 is under-valued and
-              stock 1 is over-valued. Thus we long the spread.
+              stock 1 is over-valued. Thus we short the spread.
             - We close the position if the conditional probabilities cross with 0.5 (`exit_probabilities`).
 
     For the exiting condition, the author proposed a closure when stock 1 AND 2's conditional probabilities cross
@@ -92,9 +92,13 @@ class BasicCopulaTradingRule:
 
         As a result, updated probabilities are stored in `self.current_probabilities` and previous probabilities are
         stored in `self.prev_probabilities`. These containers are used to check entry/exit signals.
-
-
         """
+        if self.copula is None:
+            raise ValueError('Copula object was not set! Use `self.set_copula()` first.')
+
+        if self.cdf_x is None or self.cdf_y is None:
+            raise ValueError('CDF x or y is not set. Use `self.set_cdf()` first.')
+
         p1 = self.copula.get_condi_prob(u=self.cdf_x(x_value), v=self.cdf_y(y_value))
         p2 = self.copula.get_condi_prob(u=self.cdf_y(y_value), v=self.cdf_x(x_value))
 
@@ -106,20 +110,19 @@ class BasicCopulaTradingRule:
         Function which checks entry condition based on `self.current_probabilities`.
 
         - If P(U1 <= u1 | U2 = u2) <= 0.05 AND P(U2 <= u2 | U1 = u1) >= 0.95, then stock 1 is under-valued and
-              stock 2 is over-valued. Thus we short the spread.
+              stock 2 is over-valued. Thus we long the spread.
         - If P(U1 <= u1 | U2 = u2) >= 0.95 AND P(U2 <= u2 | U1 = u1) <= 0.05, then stock 2 is under-valued and
-          stock 1 is over-valued. Thus we long the spread.
+          stock 1 is over-valued. Thus we short the spread.
 
         :return: (tuple) Tuple of boolean entry flag and side (if entry flag is True).
         """
-        # Calculate z score
 
-        # Short entry
+        # Long entry
         if self.current_probabilities[0] <= self.open_probabilities[0] and self.current_probabilities[1] >= \
                 self.open_probabilities[1]:
-            side = -1
+            side = 1
             return True, side
-        # Long entry
+        # Short entry
         if self.current_probabilities[0] >= self.open_probabilities[1] and self.current_probabilities[1] <= \
                 self.open_probabilities[0]:
             side = -1
@@ -168,8 +171,8 @@ class BasicCopulaTradingRule:
 
         # Check at this step which variable crossed the band.
         exit_dict = {-1: False, 1: False}
-        exit_dict[-1] = prob_u1_up and prob_u2_down if self.exit_rule is 'and' else prob_u1_up or prob_u2_down
-        exit_dict[1] = prob_u2_up and prob_u1_down if self.exit_rule is 'and' else prob_u2_up or prob_u1_down
+        exit_dict[-1] = prob_u1_up and prob_u2_down if self.exit_rule == 'and' else prob_u1_up or prob_u2_down
+        exit_dict[1] = prob_u2_up and prob_u1_down if self.exit_rule == 'and' else prob_u2_up or prob_u1_down
         return exit_dict
 
     def update_trades(self, update_timestamp: pd.Timestamp) -> list:

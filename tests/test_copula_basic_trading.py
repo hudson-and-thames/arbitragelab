@@ -11,9 +11,9 @@ import unittest
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import arbitragelab.copula_approach.copula_generate as cg
-import arbitragelab.copula_approach.copula_generate_mixedcopula as cgmix
-from arbitragelab.copula_approach.copula_strategy_basic import BasicCopulaStrategy
+
+from arbitragelab.trading.copula_approach import BasicCopulaTradingRule
+from arbitragelab.copula_approach import find_marginal_cdf
 
 
 class TestBasicCopulaStrategy(unittest.TestCase):
@@ -30,42 +30,35 @@ class TestBasicCopulaStrategy(unittest.TestCase):
         data_path = project_path + "/test_data/BKD_ESC_2009_2011.csv"
         self.stocks = pd.read_csv(data_path, parse_dates=True, index_col="Date")
 
-    @staticmethod
-    def test_to_quantile():
+    def test_marginal_cdf(self):
         """
-        Testing the to_quantile method.
+        Testing the find_marginal_cdf() method.
         """
 
-        BCS = BasicCopulaStrategy()
         # Create sample data frame and compute the percentile
         data = {'col1': [0, 1, 2, 3, 4, 5], 'col2': [0, 2, 4, 6, np.nan, 10], 'col3': [np.nan, 2, 4, 6, 8, 10]}
-        df = pd.DataFrame.from_dict(data)
-        quantile_df, cdfs = BCS.to_quantile(df)
+        quantile_dict = {k: find_marginal_cdf(v) for k, v in data.items()}
         # Expected result
-        expected = {'col1': [1/6, 2/6, 3/6, 4/6, 5/6, 1],
-                    'col2': [1/5, 2/5, 3/5, 4/5, np.nan, 1],
-                    'col3': [np.nan, 1/5, 2/5, 3/5, 4/5, 1]}
-        expected_df = pd.DataFrame.from_dict(expected)
-        # Compare with expected result, up to 4 digits
-        pd.testing.assert_frame_equal(quantile_df, expected_df, check_dtype=False, atol=4)
+        expected = {'col1': [1 / 6, 2 / 6, 3 / 6, 4 / 6, 5 / 6, 1],
+                    'col2': [1 / 5, 2 / 5, 3 / 5, 4 / 5, np.nan, 5/5],
+                    'col3': [np.nan, 1 / 5, 2 / 5, 3 / 5, 4 / 5, 5/5]}
+        for col, values in data.items():
+            np.testing.assert_array_almost_equal(quantile_dict[col](values), expected[col], decimal=4)
 
         # Checking the cdfs
-        test_input = pd.Series([-100, -1, 1.5, 2, 3, 10, np.nan])
-        quantiles_1 = test_input.map(cdfs[0])
-        quantiles_2 = test_input.map(cdfs[1])
-        expec_qt1 = pd.Series([0, 1e-5, 0.416667, 0.5, 0.666667, 1 - 1e-5, np.nan])
-        expec_qt2 = pd.Series([1e-5, 0.1, 0.35, 0.4, 0.5, 1 - 1e-5, np.nan])
-        pd.testing.assert_series_equal(expec_qt1, quantiles_1, check_dtype=False, atol=4)
-        pd.testing.assert_series_equal(expec_qt2, quantiles_2, check_dtype=False, atol=4)
+        test_input = [-100, -1, 1.5, 2, 3, 10, np.nan]
+        expec_qt1 = [0.1667, 0.3333, 0.5, 0.66667, 0.83333, 1, np.nan]
+        np.testing.assert_array_almost_equal(expec_qt1, find_marginal_cdf(test_input)(test_input), decimal=4)
 
     def test_exit_trigger_or(self):
         """
         Testing the exit trigger under 'or' logic.
         """
 
-        BCS = BasicCopulaStrategy()
-        exit_rule = 'or'
-        exit_thresholds = (0.5, 0.5)
+        cop_trading = BasicCopulaTradingRule(exit_rule='or', exit_probabilities=(0.5, 0.5))
+        cop_trading.current_probabilities = (0.4, 0.6)
+        cop_trading.prev_probabilities = (0.6, 0.6)
+        res = cop_trading._check_who_exits()
 
         # s1
         # s1 x-ing down, no one exited before
@@ -567,15 +560,15 @@ class TestBasicCopulaStrategy(unittest.TestCase):
         BCS = BasicCopulaStrategy(copula=ctg)
 
         # Check exception handling for NaN
-        nan_data = {'s1': [0, 1/6, 2/6, 3/6, 4/6, 5/6, 1, 0, 1],
-                    's2': [1, np.nan, 2/5, 3/5, 1/5, 4/5, 5/9, 0, 1]}
+        nan_data = {'s1': [0, 1 / 6, 2 / 6, 3 / 6, 4 / 6, 5 / 6, 1, 0, 1],
+                    's2': [1, np.nan, 2 / 5, 3 / 5, 1 / 5, 4 / 5, 5 / 9, 0, 1]}
         quantiles = pd.DataFrame.from_dict(nan_data)
         with self.assertRaises(ValueError):
             BCS.get_condi_probs(quantiles)
 
         # Check conditional probs
-        data = {'s1': [0, 1/6, 2/6, 2/5, 4/6, 5/6, 1/9, 0, 1],
-                's2': [1, 1/2, 2/5, 2/6, 1/5, 4/5, 5/9, 0, 1]}
+        data = {'s1': [0, 1 / 6, 2 / 6, 2 / 5, 4 / 6, 5 / 6, 1 / 9, 0, 1],
+                's2': [1, 1 / 2, 2 / 5, 2 / 6, 1 / 5, 4 / 5, 5 / 9, 0, 1]}
         quantiles = pd.DataFrame.from_dict(data)
         expec_data = {'s1': [0, 0.015752, 0.297881, 0.643371, 0.990806, 0.707080, 0.003577, 0.237227, 0.711624],
                       's2': [1, 0.971310, 0.643371, 0.297881, 0.006264, 0.442387, 0.991056, 0.237227, 0.711624]}
@@ -588,15 +581,15 @@ class TestBasicCopulaStrategy(unittest.TestCase):
         BCS = BasicCopulaStrategy(copula=n14)
 
         # Check exception handling for NaN
-        nan_data = {'s1': [0, 1/6, 2/6, 3/6, 4/6, 5/6, 1, 0, 1],
-                    's2': [1, np.nan, 2/5, 3/5, 1/5, 4/5, 5/9, 0, 1]}
+        nan_data = {'s1': [0, 1 / 6, 2 / 6, 3 / 6, 4 / 6, 5 / 6, 1, 0, 1],
+                    's2': [1, np.nan, 2 / 5, 3 / 5, 1 / 5, 4 / 5, 5 / 9, 0, 1]}
         quantiles = pd.DataFrame.from_dict(nan_data)
         with self.assertRaises(ValueError):
             BCS.get_condi_probs(quantiles)
 
         # Check conditional probs
-        data = {'s1': [0, 1/6, 2/6, 2/5, 4/6, 5/6, 1/9, 0, 1],
-                's2': [1, 1/2, 2/5, 2/6, 1/5, 4/5, 5/9, 0, 1]}
+        data = {'s1': [0, 1 / 6, 2 / 6, 2 / 5, 4 / 6, 5 / 6, 1 / 9, 0, 1],
+                's2': [1, 1 / 2, 2 / 5, 2 / 6, 1 / 5, 4 / 5, 5 / 9, 0, 1]}
         quantiles = pd.DataFrame.from_dict(data)
         expec_data = {'s1': [0, 0.009365, 0.292179, 0.679199, 0.997501, 0.742779, 0.001348, 0.261490, 0.594602],
                       's2': [1, 0.985101, 0.679200, 0.292179, 0.002212, 0.379101, 0.997212, 0.261490, 0.594602]}
