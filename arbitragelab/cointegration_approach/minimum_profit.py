@@ -331,20 +331,16 @@ class MinimumProfit:
         # Retrieve optimal parameter set
         return (upper_bounds[max_idx], *minimum_trade_profit[max_idx, :])
 
-    def trade_signal(self, upper_bound: float, minimum_profit: float, beta: float,
-                     epsilon_t: np.array, insample: bool = False) -> Tuple[pd.DataFrame, np.array, np.array]:
+    def get_optimal_levels(self, upper_bound: float, minimum_profit: float, beta: float, epsilon_t: np.array,
+                           insample: bool = False) -> Tuple[pd.DataFrame, np.array, np.array]:
         """
-        Generate the trade signal and calculate the number of shares to trade.
+        Generate the optimal trading levels tu use in a strategy.
 
         :param upper_bound: (float) Optimized upper bound based on mean passage time optimization.
-        :param minimum_profit: (float) Optimized minimum profit based on mean passage time
-            optimization.
+        :param minimum_profit: (float) Optimized minimum profit based on mean passage time optimization.
         :param beta: (float) Fitted cointegration coefficient, beta.
         :param epsilon_t: (np.array) Cointegration error obtained from training set.
-        :param insample: (bool) Use in-sample data or out-of-sample data to trade. If True, use in-sample data.
-            Otherwise, use out-of-sample data.
-        :return: (pd.DataFrame, np.array, np.array) Dataframe with trading conditions;
-            number of shares to trade for each leg in the cointegration pair;
+        :return: (np.array, np.array) Number of shares to trade for each leg in the cointegration pair;
             exact values of cointegration error for initiating and closing trades.
         """
 
@@ -390,3 +386,18 @@ class MinimumProfit:
         cond_lines = np.array([oversold, closing_cond, overbought])
 
         return trade_df_with_cond, shares, cond_lines
+
+    def construct_spread(self, price_series: pd.DataFrame) -> pd.Series:
+        """
+        Constructs spread using Johansen/Engle-Granger beta coefficient and
+        number of shares used in each leg of the spread.
+
+        Spread is simply calculated as:
+            Spread = Asset_A_Price + beta * Asset_B_Price
+
+        :param price_series: (pd.DataFrame) Dataframe with prices for two assets in a spread.
+        :return: (pd.Series) Resulting spread series.
+        """
+
+        pass
+
