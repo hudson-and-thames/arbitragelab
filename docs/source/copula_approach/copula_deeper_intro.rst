@@ -254,18 +254,69 @@ It is tabled below from [Demarta, McNeil, The t Copula and Related Copulas, 2005
      - 0
      - 1
 
-Implementation
-**************
+Creating own copulas
+********************
+
+A user can create one of Archimedean or elliptical copula object and play around with that.
+
+**Archimedean copulas**
 
 .. Note::
-    
+
     All copula classes share the basic public methods in this module.
     Hence here we only demonstrate one of them for example.
-    
-.. automodule:: arbitragelab.copula_approach.copula_generate
-        
+
+.. automodule:: arbitragelab.copula_approach.archimedean
+
     .. autoclass:: Gumbel
-	:members: __init__, get_cop_density, get_cop_eval, get_condi_prob, generate_pairs, plot, describe
+	:members: __init__, describe, get_cop_density, get_cop_eval, get_condi_prob, get_log_likelihood_sum, sample, fit, plot_cdf, plot_pdf, plot_scatter
+
+    .. autoclass:: Clayton
+	:members: __init__
+
+    .. autoclass:: Joe
+	:members: __init__
+
+    .. autoclass:: Frank
+	:members: __init__
+
+    .. autoclass:: N13
+	:members: __init__
+
+    .. autoclass:: N14
+	:members: __init__
+
+**Elliptical copulas**
+
+.. Note::
+
+    Elliptical copulas (Gaussian and T-Student copulas) can also work in N-dimensional space, however current implementations
+    only support 2-dimensional case. Adding multi-dimensional elliptical copulas will be added in future versions.
+
+.. automodule:: arbitragelab.copula_approach.elliptical
+
+    .. autoclass:: GaussianCopula
+	:members: __init__
+
+For Student copula there is special function used to find optimal :math:`\nu` parameter for Student distribution used in Student Copula.
+
+.. automodule:: arbitragelab.copula_approach.elliptical
+
+.. autofunction:: fit_nu_for_t_copula
+
+.. autoclass:: StudentCopula
+	:members: __init__
+
+
+As it was previously discussed, in order to use copula one first needs to fit it on empirical data and find its corresponding
+parameter - theta for Archimedean copulas and rho/cov for elliptical. However, copulas take only **pseudo-observations** distributed in
+:math:`[0, 1]`. One can either use `statsmodels.distributions.empirical_distribution` or ArbitrageLab's function `construct_ecdf_lin` which
+is a slight modification of statsmodels' ECDF with linear interpolation between data points.
+
+.. py:currentmodule:: arbitragelab.copula_approach.copula_calculation
+
+.. autofunction:: construct_ecdf_lin
+
     
 
 
