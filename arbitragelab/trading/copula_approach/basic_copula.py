@@ -74,7 +74,8 @@ class BasicCopulaTradingRule:
 
     def set_cdf(self, cdf_x: Callable[[float], float], cdf_y: Callable[[float], float]):
         """
-        Set marginal C.D.Fs functions which transform X, Y values into probabilities, usually ECDFs are used.
+        Set marginal C.D.Fs functions which transform X, Y values into probabilities, usually ECDFs are used. One can
+        use `construct_ecdf_lin` function from copula_calculations module.
 
 
         :param cdf_x: (func) Marginal C.D.F. for series X.

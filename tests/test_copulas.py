@@ -15,7 +15,7 @@ import scipy.stats as ss
 
 from arbitragelab.copula_approach.archimedean import Clayton, Frank, Gumbel, Joe, N14, N13
 from arbitragelab.copula_approach.elliptical import GaussianCopula, StudentCopula, fit_nu_for_t_copula
-from arbitragelab.copula_approach import aic, sic, hqic, find_marginal_cdf, fit_copula_to_empirical_data
+from arbitragelab.copula_approach import aic, sic, hqic, construct_ecdf_lin, find_marginal_cdf, fit_copula_to_empirical_data
 
 
 class TestCopulas(unittest.TestCase):
@@ -557,8 +557,8 @@ class TestCopulas(unittest.TestCase):
         # Change price to cumulative log return. Here we fit the whole set.
         BKD_clr = self.cum_log_return(self.BKD_series)
         ESC_clr = self.cum_log_return(self.ESC_series)
-        ecdf_x = find_marginal_cdf(BKD_clr)
-        ecdf_y = find_marginal_cdf(ESC_clr)
+        ecdf_x = construct_ecdf_lin(BKD_clr)
+        ecdf_y = construct_ecdf_lin(ESC_clr)
 
         # Fit through the copulas using theta_hat as its parameter
         copulas = [Gumbel, Clayton, Frank, Joe, N13, N14, GaussianCopula, StudentCopula]

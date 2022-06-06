@@ -274,8 +274,8 @@ def fit_copula_to_empirical_data(x: np.array, y: np.array, copula: Copula) -> tu
     num_of_instances = len(x)  # Number of instances.
 
     # Finding an inverse cumulative density distribution (quantile) for each stock price series.
-    s1_cdf = find_marginal_cdf(x, empirical=True)
-    s2_cdf = find_marginal_cdf(y, empirical=True)
+    s1_cdf = construct_ecdf_lin(x)
+    s2_cdf = construct_ecdf_lin(y)
 
     # Quantile data for each stock w.r.t. their cumulative log return.
     u1_series = s1_cdf(x)

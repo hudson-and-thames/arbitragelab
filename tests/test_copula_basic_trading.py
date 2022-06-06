@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 
 from arbitragelab.trading.copula_approach import BasicCopulaTradingRule
-from arbitragelab.copula_approach import find_marginal_cdf
+from arbitragelab.copula_approach import construct_ecdf_lin
 
 
 class TestBasicCopulaStrategy(unittest.TestCase):
@@ -30,14 +30,14 @@ class TestBasicCopulaStrategy(unittest.TestCase):
         data_path = project_path + "/test_data/BKD_ESC_2009_2011.csv"
         self.stocks = pd.read_csv(data_path, parse_dates=True, index_col="Date")
 
-    def test_marginal_cdf(self):
+    def test_construct_ecdf_lin(self):
         """
-        Testing the find_marginal_cdf() method.
+        Testing the construct_ecdf_lin() method.
         """
 
         # Create sample data frame and compute the percentile
         data = {'col1': [0, 1, 2, 3, 4, 5], 'col2': [0, 2, 4, 6, np.nan, 10], 'col3': [np.nan, 2, 4, 6, 8, 10]}
-        quantile_dict = {k: find_marginal_cdf(v) for k, v in data.items()}
+        quantile_dict = {k: construct_ecdf_lin(v) for k, v in data.items()}
         # Expected result
         expected = {'col1': [1 / 6, 2 / 6, 3 / 6, 4 / 6, 5 / 6, 1],
                     'col2': [1 / 5, 2 / 5, 3 / 5, 4 / 5, np.nan, 5/5],
@@ -48,7 +48,7 @@ class TestBasicCopulaStrategy(unittest.TestCase):
         # Checking the cdfs
         test_input = [-100, -1, 1.5, 2, 3, 10, np.nan]
         expec_qt1 = [0.1667, 0.3333, 0.5, 0.66667, 0.83333, 1, np.nan]
-        np.testing.assert_array_almost_equal(expec_qt1, find_marginal_cdf(test_input)(test_input), decimal=4)
+        np.testing.assert_array_almost_equal(expec_qt1, construct_ecdf_lin(test_input)(test_input), decimal=4)
 
     def test_exit_trigger_or(self):
         """
