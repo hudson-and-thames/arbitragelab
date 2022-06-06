@@ -15,7 +15,8 @@ import scipy.stats as ss
 
 from arbitragelab.copula_approach.archimedean import Clayton, Frank, Gumbel, Joe, N14, N13
 from arbitragelab.copula_approach.elliptical import GaussianCopula, StudentCopula, fit_nu_for_t_copula
-from arbitragelab.copula_approach import aic, sic, hqic, construct_ecdf_lin, find_marginal_cdf, fit_copula_to_empirical_data
+from arbitragelab.copula_approach import aic, sic, hqic, construct_ecdf_lin, find_marginal_cdf, \
+    fit_copula_to_empirical_data
 
 
 class TestCopulas(unittest.TestCase):

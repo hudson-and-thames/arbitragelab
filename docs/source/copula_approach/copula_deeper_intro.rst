@@ -350,15 +350,63 @@ Applying copula to empirical data
 *********************************
 
 As it was previously discussed, in order to use copula one first needs to fit it on empirical data and find its corresponding
-parameter - theta for Archimedean copulas and rho/cov for elliptical. However, copulas take only **pseudo-observations** distributed in
-:math:`[0, 1]`. One can either use `statsmodels.distributions.empirical_distribution` or ArbitrageLab's function `construct_ecdf_lin` which
-is a slight modification of statsmodels' ECDF with linear interpolation between data points.
+parameter - theta for Archimedean copulas and rho/cov for elliptical.
+
+However, copulas take only **pseudo-observations** distributed in
+:math:`[0, 1]`. One can either use :code:`statsmodels.distributions.empirical_distribution.ECDF` or ArbitrageLab's function
+:code:`construct_ecdf_lin` which is a slight modification of statsmodels' ECDF with linear interpolation between data points.
 
 .. py:currentmodule:: arbitragelab.copula_approach.copula_calculation
 
 .. autofunction:: construct_ecdf_lin
 
-    
+However, one can fit several copulas to the same dataset. The question is: **"Which copula suits best for the empirical data?"**
+
+Usually, one can either use:
+
+1. Akaike Information Criterion (AIC).
+2. Schwarz information criterion (SIC).
+3. Hannan-Quinn information criterion(HQIC).
+
+All of information criterions use **log_likelihood** from :code:`get_log_likelihood_sum` function for estimation. The best copula is the one which
+yields the minimum AIC,SIC or HQIC value.
+
+.. py:currentmodule:: arbitragelab.copula_approach.copula_calculation
+
+.. autofunction:: aic
+.. autofunction:: sic
+.. autofunction:: hqic
+
+On the other hand, one can just use ArbitrageLab function which takes empirical data -> gets ECDFs -> fits copula and
+returns fit copula object as well as fit ECDF(x), ECDF(y) functions and information criterion values info which can be used to
+find the best copula for current dataset.
+
+.. py:currentmodule:: arbitragelab.copula_approach.copula_calculation
+
+.. autofunction:: fit_copula_to_empirical_data
+
+Example
+#######
+
+.. code-block::
+
+   # Importing the function
+   import pandas as pd
+   from arbitragelab.copula_approach import fit_copula_to_empirical_data
+
+   bkd_prices = pd.read_csv('BKD.csv', index_col=0)
+   esc_prices = pd.read_csv('ECS.csv', index_col=0)
+
+   bkd_returns = bkd_prices.pct_change().dropna()
+   esc_returns = esc_prices.pct_change().dropna()
+
+   copulas = [Gumbel, Clayton, Frank, Joe, N13, N14, GaussianCopula, StudentCopula]
+   aics = dict()
+
+   for cop in copulas:
+     info_crit_logs, fit_copula, ecdf_x, ecdf_y = fit_copula_to_empirical_data(x=bkd_prices, y=esc_returns, copula=cop)
+     aics[info_crit_logs['Copula Name']] = info_crit_logs['AIC']
+   print(aics)
 
 
 Mixed Copulas
