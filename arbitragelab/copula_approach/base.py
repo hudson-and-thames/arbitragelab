@@ -53,6 +53,17 @@ class Copula(ABC):
 
         return description
 
+    @staticmethod
+    def theta_hat(tau: float) -> float:
+        r"""
+        Calculate theta hat from Kendall's tau from sample data.
+
+        :param tau: (float) Kendall's tau from sample data.
+        :return: (float) The associated theta hat for this very copula.
+        """
+
+        pass
+
     def get_cop_density(self, u: float, v: float, eps: float = 1e-5) -> float:
         """
         Get the copula density c(u, v).

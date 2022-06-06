@@ -269,7 +269,7 @@ A user can create one of Archimedean or elliptical copula object and play around
 .. automodule:: arbitragelab.copula_approach.archimedean
 
     .. autoclass:: Gumbel
-	:members: __init__, describe, get_cop_density, get_cop_eval, get_condi_prob, get_log_likelihood_sum, sample, fit, plot_cdf, plot_pdf, plot_scatter
+	:members: __init__, describe, get_cop_density, get_cop_eval, get_condi_prob, get_log_likelihood_sum, sample, fit, theta_hat, plot_cdf, plot_pdf, plot_scatter
 
     .. autoclass:: Clayton
 	:members: __init__
@@ -307,6 +307,47 @@ For Student copula there is special function used to find optimal :math:`\nu` pa
 .. autoclass:: StudentCopula
 	:members: __init__
 
+Examples
+########
+
+.. code-block::
+
+   # Importing the function
+   from arbitragelab.copula_approach.archimedean import Gumbel
+   from arbitragelab.copula_approach.elliptical import StudentCopula, fit_nu_for_t_copula
+
+   cop = Gumbel(theta=2)
+   # Check describe
+   descr = cop.describe()
+
+   # Get cdf,pdf,condi cdf.
+   cop.get_cop_density(0.5, 0.7)
+   cop.get_cop_eval(0.5, 0.7)
+   cop.get_condi_prob(0.5, 0.7)
+
+   # Sample from copula.
+   cop.sample(num=100)
+
+   # Fit copula to some data.
+   cop.fit([0.5, 0.2, 0.3, 0.2, 0.1, 0.99], [0.1, 0.02, 0.9, 0.22, 0.11, 0.79])
+   print(cop.theta)
+
+   # Generate copulas plots.
+   cop.plot_scatter(200)
+   cop.plot_pdf('3d')
+   cop.plot_pdf('contour')
+   cop.plot_cdf('3d')
+   cop.plot_cdf('contour')
+
+
+   # Student copula
+   nu = fit_nu_for_t_copula([0.5, 0.2, 0.3, 0.2, 0.1, 0.99], [0.1, 0.02, 0.9, 0.22, 0.11, 0.79])
+   student_cop = StudentCopula(nu=nu, cov=None)
+   student_cop.fit([0.5, 0.2, 0.3, 0.2, 0.1, 0.99], [0.1, 0.02, 0.9, 0.22, 0.11, 0.79])
+
+
+Applying copula to empirical data
+*********************************
 
 As it was previously discussed, in order to use copula one first needs to fit it on empirical data and find its corresponding
 parameter - theta for Archimedean copulas and rho/cov for elliptical. However, copulas take only **pseudo-observations** distributed in
