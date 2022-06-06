@@ -123,12 +123,11 @@ class BollingerBandsTradingRule:
             'initial_z_score': initial_z_score
         }
 
-    def update_trades(self, update_timestamp: pd.Timestamp, update_value: float) -> list:
+    def update_trades(self, update_timestamp: pd.Timestamp) -> list:
         """
         Checks whether any of the thresholds are triggered and currently open trades should be closed.
 
         :param update_timestamp: (pd.Timestamp) New timestamp to check vertical threshold.
-        :param update_value: (float) New value to check horizontal thresholds.
         :return: (list) of closed trades.
         """
 
@@ -148,7 +147,7 @@ class BollingerBandsTradingRule:
             for timestamp, data in to_close.items():
                 label_data = {'t1': update_timestamp, 'pt': z_score,
                               'uuid': data['uuid'], 'start_value': data['start_value'],
-                              'end_value': update_value, 'side': data['side'],
+                              'end_value': self.spread_series[-1], 'side': data['side'],
                               'initial_z_score': data['initial_z_score']}
                 formed_trades_uuid.append(data['uuid'])
                 self.closed_trades[timestamp] = label_data

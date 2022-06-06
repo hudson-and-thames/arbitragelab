@@ -54,7 +54,7 @@ class TestBollingerBandsTradingRule(unittest.TestCase):
 
             if trade:
                 strategy.add_trade(start_timestamp=self.spread_series.index[ind], side_prediction=side)
-            strategy.update_trades(update_timestamp=self.spread_series.index[ind], update_value=self.spread_series[ind])
+            strategy.update_trades(update_timestamp=self.spread_series.index[ind])
 
         self.assertEqual(len(strategy.open_trades), 0)
         self.assertEqual(len(strategy.closed_trades), 3)
