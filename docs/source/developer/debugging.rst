@@ -67,9 +67,8 @@ module of the ArbitrageLab package.
 UML Diagram
 ###########
 
-The link below leads to a UML diagram of the ArbitrageLab package classes in .dot and .png format.
-To use the .dot file, one may want to download the `Graphviz <https://graphviz.org/>`__ open-source
-software.
+The link below leads to a UML diagram of the ArbitrageLab package classes in .dot format.
+To use the .dot file, one may want to download the `Graphviz <https://graphviz.org/>`__ open-source software.
 
 .. raw:: html
 
