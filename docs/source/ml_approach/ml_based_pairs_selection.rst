@@ -5,7 +5,7 @@
    `A Machine Learning based Pairs Trading Investment Strategy <https://www.springer.com/gp/book/9783030472504>`__.
 
 .. warning::
-   In order to use this module, you should additionally install *TensorFlow v2.2.1.* and *Keras v2.3.1.*
+   In order to use this module, you should additionally install *TensorFlow v2.8.0.* and *Keras v2.3.1.*
    For more details, please visit our :ref:`ArbitrageLab installation guide <getting_started-installation>`.
 
 ========================
@@ -142,8 +142,13 @@ Implementation
 .. automethod:: OPTICSDBSCANPairsClustering.plot_knee_plot
 .. automethod:: OPTICSDBSCANPairsClustering.get_pairs_by_sector
 
-Select Pairs 
-############
+Select Spreads
+##############
+
+.. note::
+    In the original paper Pairs Selection module was a part of ML Pairs Trading approach. However, the user may want to use pairs selection
+    rules without applying DBSCAN/OPTICS clustering. That is why, we decided to split pairs/spreads selection and clustering into different objects
+    which can be used separately or together if the user wants to repeat results from the original paper.
 
 The rules selection flow diagram from `A Machine Learning based Pairs Trading Investment Strategy <http://premio-vidigal.inesc.pt/pdf/SimaoSarmentoMSc-resumo.pdf>`__.
 by Simão Moraes Sarmento and Nuno Horta.
@@ -177,8 +182,13 @@ of both legs of the spread when estimating the relationship so that hedge ratios
 the cointegration estimates will be unaffected by the ordering of variables.
 
 Hudson & Thames research team has also found out that optimal (in terms of cointegration tests statistics) hedge ratios
-are obtained by minimizng spread's half-life of mean-reversion. As a result, the user may specify hedge ratio calculation
-method: TLS, OLS or Minimum Half-Life.
+are obtained by minimizng spread's half-life of mean-reversion. Alongside this hedge ration calculation method,
+there is a wide variety of algorithms to choose from: TLS, OLS, Johansen Test Eigenvector, Box-Tiao Canonical Decomposition,
+Minimum Half-Life, Minimum ADF Test T-statistic Value.
+
+.. note::
+    More information about the hedge ratio methods and their use can be found in the
+    :ref:`Hedge Ratio Calculations <hedge_ratios-hedge_ratios>` section of the documentation.
 
 Secondly, an additional validation step is also implemented to provide more confidence in the mean-reversion
 character of the pairs’ spread. The condition imposed is that the Hurst exponent associated with the spread
@@ -193,42 +203,8 @@ Lastly, we enforce that every spread crosses its mean at least once per month, t
 thus providing enough opportunities to exit a position.
 
 .. note::
-    In practice to calculate the spread of the pairs supplied by this module, it is important to also consider
-    the hedge ratio as follows:
-    
-    :math:`S = leg1 - (hedgeratio) * leg2`
-
-.. warning::
-    The pairs selection function is very computationally heavy, so execution is going to be long and might slow down your system.
-
-.. note::
-    The user may specify thresholds for each pair selector rule from the framework described above. For example, Engle-Granger test 99%
-    threshold may seem too strict in pair selection which can be decreased to either 95% or 90%. On the other hand,
-    the user may impose more strict thresholds on half life of mean reversion.
-
-Implementation
-**************
-
-
-.. automodule:: arbitragelab.pairs_selection.cointegration
-
-.. autoclass:: CointegrationPairsSelector
-   :members: __init__
-
-
-.. automethod:: CointegrationPairsSelector.select_pairs
-.. automethod:: CointegrationPairsSelector.plot_selected_pairs
-
-Following methods describe the results of the selector in various ways.
-
-.. automethod:: CointegrationPairsSelector.describe
-.. automethod:: CointegrationPairsSelector.describe_extra
-.. automethod:: CointegrationPairsSelector.describe_pairs_sectoral_info
-
-.. note::
-    In the original paper Pairs Selection module was a part of ML Pairs Trading approach. However, the user may want to use pairs selection
-    rules without applying DBSCAN/OPTICS clustering. That is why, we decided to split pairs selection and clustering into different objects
-    which can be used separately or together if the user wants to repeat results from the original paper.
+    A more detailed explanation of the `CointegrationSpreadSelector` class and examples of use can be found in the
+    :ref:`Cointegration Rules Spread Selection <spread_selection-cointegration_spread_selection>` section of the documentation.
 
 
 Examples
@@ -240,7 +216,7 @@ Examples
     import pandas as pd
     import numpy as np
     from arbitragelab.ml_approach import OPTICSDBSCANPairsClustering
-    from arbitragelab.pairs_selection import CointegrationPairsSelector
+    from arbitragelab.spread_selection import CointegrationSpreadSelector
 
     # Getting the dataframe with time series of asset returns
     data = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])
@@ -251,22 +227,25 @@ Examples
     pairs_clusterer.dimensionality_reduction_by_components(5)
 
     # Clustering is performed over feature vector
-    clustered_pairs = pairs_clusterer.cluster_using_optics({'min_samples': 3})
+    clustered_pairs = pairs_clusterer.cluster_using_optics(min_samples=3)
+
+    # Removing duplicates
+    clustered_pairs = list(set(clustered_pairs))
 
     # Generated Pairs are processed through the rules mentioned above
-    pairs_selector = CointegrationPairsSelector(prices_df=data, pairs_to_filter=clustered_pairs)
-    filtered_pairs = pairs_selector.select_pairs()
+    spreads_selector = CointegrationSpreadSelector(prices_df=data,
+                                                   baskets_to_filter=clustered_pairs)
+    filtered_spreads = spreads_selector.select_spreads()
 
-    # Generate a Panel of information of the selected pairs
-    final_pairs_info = pairs_selector.describe_extra()
+    # Checking the resulting spreads
+    print(filtered_spreads)
 
-    # Import the ticker sector info csv
-    sectoral_info = pd.read_csv('X_FILE_PATH.csv')
+    # Generate a plot of the selected spread
+    spreads_selector.spreads_dict['AAL_FTI'].plot(figsize=(12,6))
 
-    # Generate a sector/industry relationship Panel of each pair
-    pairs_selector.describe_pairs_sectoral_info(final_pairs_info['leg_1'],
-                                                final_pairs_info['leg_2'],
-                                                sectoral_info)
+    # Generate detailed spread statistics
+    spreads_selector.selection_logs.loc[['AAL_FTI']].T
+
 
 Research Notebooks
 ##################

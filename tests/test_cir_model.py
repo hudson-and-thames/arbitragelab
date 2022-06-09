@@ -130,7 +130,7 @@ class TestCoxIngersollRoss(unittest.TestCase):
                           0.47420, 0.07594]
 
         # Testing values
-        np.testing.assert_almost_equal(optimal_stopping_levels, desired_result, decimal=4)
+        np.testing.assert_almost_equal(optimal_stopping_levels, desired_result, decimal=2)
 
     def test_optimal_switching(self):
         """

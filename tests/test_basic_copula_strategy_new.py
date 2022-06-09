@@ -778,8 +778,8 @@ class TestBasicCopulaStrategy(unittest.TestCase):
         self.assertAlmostEqual(result_dict['AIC'], -2240.761659669632, delta=1e-3)
         self.assertAlmostEqual(result_dict['HQIC'], -2231.488054789991, delta=1e-3)
         self.assertAlmostEqual(result_dict['Log-likelihood'], 1125.410859864846, delta=1e-3)
-        np.testing.assert_array_almost_equal(np.array([6.626, 4, 4.787]), fitted_copula.cop_params, decimal=3)
-        np.testing.assert_array_almost_equal(np.array([0.504756, 0, 0.495244]), fitted_copula.weights, decimal=3)
+        np.testing.assert_array_almost_equal(np.array([6.626, 4, 4.787]), fitted_copula.cop_params, decimal=2)
+        np.testing.assert_array_almost_equal(np.array([0.504756, 0, 0.495244]), fitted_copula.weights, decimal=2)
 
         # Fit CTGMixCop to data using BCS
         result_dict, fitted_copula, _, _ = BCS.fit_copula(data_df, copula_name='CTGMixCop', gamma_scad=0.6)

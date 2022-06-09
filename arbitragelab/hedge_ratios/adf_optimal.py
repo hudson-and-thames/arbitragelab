@@ -3,9 +3,10 @@
 # Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 
 """
-Module which implements Minimum Half-Life Hedge Ratio detection algorithm.
+Implementation of finding ADF optimal hedge ratio.
 """
 # pylint: disable=invalid-name
+# pylint: disable=protected-access
 
 from typing import Tuple
 import warnings
@@ -13,12 +14,12 @@ import pandas as pd
 import numpy as np
 from scipy.optimize import minimize
 
-from arbitragelab.cointegration_approach.signals import get_half_life_of_mean_reversion
+from arbitragelab.cointegration_approach import EngleGrangerPortfolio
 
 
-def _min_hl_function(beta: np.array, X: pd.DataFrame, y: pd.Series) -> float:
+def _min_adf_stat(beta: np.array, X: pd.DataFrame, y: pd.Series) -> float:
     """
-    Fitness function to minimize in Minimum Half-Life Hedge Ratio algorithm.
+    Fitness function to minimize in ADF test statistic algorithm.
 
     :param beta: (np.array) Array of hedge ratios.
     :param X: (pd.DataFrame) DataFrame of dependent variables. We hold `beta` units of X assets.
@@ -26,15 +27,18 @@ def _min_hl_function(beta: np.array, X: pd.DataFrame, y: pd.Series) -> float:
     :return: (float) Half-life of mean-reversion.
     """
 
+    # Performing Engle-Granger test on spread
+    portfolio = EngleGrangerPortfolio()
     spread = y - (beta * X).sum(axis=1)
+    portfolio._perform_eg_test(spread)
 
-    return abs(get_half_life_of_mean_reversion(spread))
+    return portfolio.adf_statistics.loc['statistic_value'].iloc[0]
 
 
-def get_minimum_hl_hedge_ratio(price_data: pd.DataFrame, dependent_variable: str) -> \
+def get_adf_optimal_hedge_ratio(price_data: pd.DataFrame, dependent_variable: str) -> \
         Tuple[dict, pd.DataFrame, pd.Series, pd.Series, object]:
     """
-    Get hedge ratio by minimizing spread half-life of mean reversion.
+    Get hedge ratio by minimizing ADF test statistic.
 
     :param price_data: (pd.DataFrame) DataFrame with security prices.
     :param dependent_variable: (str) Column name which represents the dependent variable (y).
@@ -46,7 +50,7 @@ def get_minimum_hl_hedge_ratio(price_data: pd.DataFrame, dependent_variable: str
 
     y = price_data[dependent_variable].copy()
     initial_guess = (y[0] / X).mean().values
-    result = minimize(_min_hl_function, x0=initial_guess, method='BFGS', tol=1e-5, args=(X, y))
+    result = minimize(_min_adf_stat, x0=initial_guess, method='BFGS', tol=1e-5, args=(X, y))
     residuals = y - (result.x * X).sum(axis=1)
 
     hedge_ratios = result.x
