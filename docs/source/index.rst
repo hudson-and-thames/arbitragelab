@@ -314,4 +314,5 @@ This project is licensed under an all rights reserved license and is NOT open-so
     :caption: Developer Guide
     :hidden:
 
+    developer/debugging
     changelog
