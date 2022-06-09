@@ -63,4 +63,4 @@ class TestMinimumProfitTradingRule(unittest.TestCase):
         self.assertEqual(list(strategy.closed_trades.keys())[10].to_datetime64(),
                          pd.Timestamp('2008-09-15 00:00+00:00').to_datetime64())
         self.assertEqual(list(strategy.closed_trades.keys())[20].to_datetime64(),
-                         pd.Timestamp('2013-12-19 00:00+00:00').to_datetime64())
+                         pd.Timestamp('2008-12-19 00:00+00:00').to_datetime64())
