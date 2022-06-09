@@ -26,6 +26,7 @@ jupyter-dash>=0.2.0, <1.0.0
 getmac>=0.8.0, <1.0.0
 analytics-python>=1.2.7, <2.0.0
 werkzeug==2.0.0
+protobuf<=3.20.1
 
 # Develop
 codecov==2.1.11
