@@ -22,6 +22,7 @@ Changelog
 * :feature:`68` Added Johansen Eigenvector, Box-Tiao Canonical Decomposition, Minimum ADF Test T-statistic methods to Hedge Ratios Module.
 * :support:`68` Added Spread Selection Tools Module to the documentation.
 * :support:`68` Reflected changes to Hedge Ratios Module in the documentation.
+* :support:`67` Added blog post links to documentation.
 * :support:`66` Added presentation slides and videos to documentation.
 
 * :release:`0.6.0 <2021-11-15>`
