@@ -12,6 +12,7 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+* :support:`67` Added blog post links to documentation.
 * :support:`66` Added presentation slides and videos to documentation.
 
 * :release:`0.6.0 <2021-11-15>`
