@@ -253,6 +253,13 @@ given as follows.
 
     N_{S_1} = \Big \lceil \frac{N_{S_2}}{\beta} \Big \rceil
 
+Trading the Strategy
+####################
+
+After applying the above-described optimization rules, the output is optimal levels to enter and exit trades
+as well as number of shares to trade per leg of the cointegration pair. These outputs can be used in the Minimum
+Profit Trading Rule described in the :ref:`Spread Trading <spread_trading-z_score>` section of the documentation.
+
 Implementation
 **************
 
@@ -277,11 +284,11 @@ Example
     data = pd.read_csv('X_FILE_PATH.csv', parse_dates=['Date'])
     data.set_index('Date', inplace=True)
 
-    # Initialize the optimizer for this data
-    optimizer = MinimumProfit(data)
+    # Initialize the optimizer
+    optimizer = MinimumProfit()
 
-    # Split the data into train and trade set
-    train_df, trade_df = optimizer.train_test_split(date_cutoff=pd.Timestamp(2019, 1, 1))
+    # Set the training dataset
+    optimizer = optimizer.set_train_dataset(data)
 
     # Run an Engle-Granger test to retrieve cointegration coefficient
     beta_eg, epsilon_t_eg, ar_coeff_eg, ar_resid_eg = optimizer.fit(use_johansen=False)
@@ -293,12 +300,11 @@ Example
                                                                               ar_resid_eg,
                                                                               len(train_df))
 
-    # Generate trading signals based on these optimized parameters
-    minimum_profit = 100.
-    trade_signals, num_of_shares, cond_values = optimizer.trade_signal(optimal_ub,
-                                                                       minimum_profit,
-                                                                       beta_eg,
-                                                                       epsilon_t_eg)
+    # Generate optimal trading levels and number of shares to trade
+    num_of_shares, optimal_levels = optimizer.get_optimal_levels(optimal_ub,
+                                                                 minimum_profit,
+                                                                 beta_eg,
+                                                                 epsilon_t_eg)
 
 Research Notebooks
 ##################
