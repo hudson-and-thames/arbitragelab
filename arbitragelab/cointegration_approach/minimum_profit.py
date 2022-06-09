@@ -29,11 +29,25 @@ class MinimumProfit:
     The model assumes the cointegration error follows an AR(1) process and utilizes
     mean first-passage time to determine the optimal levels to initiate trades.
     The trade will be closed when the cointegration error reverts to its mean.
+
+    The implementation is based on the method described by Lin, Y.-X., McCrae, M., and Gulati, C. in
+    `"Loss protection in pairs trading through minimum profit bounds: a cointegration approach"
+    <link_to_paper>`_
     """
 
-    def __init__(self, price_df: pd.DataFrame):
+    def __init__(self):
         """
         Constructor of the cointegration pair trading optimization class.
+        """
+
+        # Store the asset price series
+        self.price_df = None
+
+        segment.track('MinimumProfit')
+
+    def set_train_dataset(self, price_df: pd.DataFrame):
+        """
+        Provide price series for model to calculate the cointegration coefficient and beta.
 
         :param price_df: (pd.DataFrame) Price series dataframe which contains both series.
         """
@@ -41,56 +55,11 @@ class MinimumProfit:
         # Store the ticker name and rename the columns
         if price_df.shape[1] != 2:
             raise Exception("Data Format Error. Should only contain two price series.")
-        self.price_df = price_df
-
-        # Store the train and trade dataset for future use
-        self._train_df = None
-        self._trade_df = None
-
-        segment.track('MinimumProfit')
-
-    def train_test_split(self, date_cutoff: Optional[pd.Timestamp] = None,
-                         num_cutoff: int = None) -> Tuple[pd.DataFrame, pd.DataFrame]:
-        """
-        Split the price series into a training set to calculate the cointegration coefficient, beta,
-        and a test set to simulate the trades to check trade frequency and PnL.
-
-        Set both cutoffs to none to perform an in-sample test.
-
-        :param date_cutoff: (pd.Timestamp) If the price series has a date index then this will be used for the split.
-        :param num_cutoff: (int) Number of periods to include in the training set (could be used for any type of index).
-        :return: (pd.DataFrame, pd.DataFrame) Training set price series; test set price series.
-        """
-
-        # If num_cutoff is not None, then date_cutoff should be ignored
-        if num_cutoff is not None:
-            warnings.warn(
-                "Already defined the number of data points included in training set. Date cutoff will be ignored.")
-            train_series = self.price_df.iloc[:num_cutoff, :]
-            test_series = self.price_df.iloc[num_cutoff:, :]
-
-            self._train_df, self._trade_df = train_series, test_series
-            return train_series, test_series
-
-        # Both cutoff is None, do in-sample test. So training set and test set are the same
-        if date_cutoff is None:
-            self._train_df, self._trade_df = self.price_df, self.price_df
-            return self.price_df, self.price_df
 
         # Verify the index is indeed pd.DatetimeIndex
-        assert self.price_df.index.is_all_dates, "Index is not of pd.DatetimeIndex type."
+        assert price_df.index.is_all_dates, "Index is not of pd.DatetimeIndex type."
 
-        # Make sure the split point is in between the time range of the data
-        min_date = self.price_df.index.min()
-        max_date = self.price_df.index.max()
-
-        assert min_date < date_cutoff < max_date, "Date split point is not within time range of the data."
-
-        train_series = self.price_df.loc[:date_cutoff]
-        test_series = self.price_df.loc[date_cutoff:]
-
-        self._train_df, self._trade_df = train_series, test_series
-        return train_series, test_series
+        self.price_df = price_df
 
     def fit(self, sig_level: str = "95%",
             use_johansen: bool = False) -> Tuple[float, pd.Series, float, np.array]:
@@ -119,7 +88,7 @@ class MinimumProfit:
         if use_johansen:
             # Use Johansen test to find the hedge ratio
             jo_portfolio = JohansenPortfolio()
-            jo_portfolio.fit(self._train_df, det_order=0)
+            jo_portfolio.fit(self.price_df, det_order=0)
 
             # Check eigenvalue and trace statistics to see if the pairs are cointegrated at 90% level
             eigen_stats = jo_portfolio.johansen_eigen_statistic
@@ -142,7 +111,7 @@ class MinimumProfit:
         else:
             # Use Engle-Granger test to find the hedge ratio
             eg_portfolio = EngleGrangerPortfolio()
-            eg_portfolio.fit(self._train_df, add_constant=True)
+            eg_portfolio.fit(self.price_df, add_constant=True)
 
             # Check ADF statistics to see if the pairs are cointegrated at 90% level
             adf_stats = eg_portfolio.adf_statistics
@@ -157,7 +126,7 @@ class MinimumProfit:
             beta = coint_vec.iloc[:, 1].values[0]
 
         # Calculate the cointegration error, epsilon_t
-        epsilon_t = self._train_df.iloc[:, 0] + beta * self._train_df.iloc[:, 1]
+        epsilon_t = self.price_df.iloc[:, 0] + beta * self.price_df.iloc[:, 1]
 
         # The beta coefficient output by statsmodels has opposite signs
 
@@ -331,8 +300,8 @@ class MinimumProfit:
         # Retrieve optimal parameter set
         return (upper_bounds[max_idx], *minimum_trade_profit[max_idx, :])
 
-    def get_optimal_levels(self, upper_bound: float, minimum_profit: float, beta: float, epsilon_t: np.array,
-                           insample: bool = False) -> Tuple[pd.DataFrame, np.array, np.array]:
+    def get_optimal_levels(self, upper_bound: float, minimum_profit: float, beta: float,
+                           epsilon_t: np.array) -> Tuple[pd.DataFrame, np.array, np.array]:
         """
         Generate the optimal trading levels tu use in a strategy.
 
@@ -363,31 +332,16 @@ class MinimumProfit:
         share_s2_count = np.ceil(minimum_profit * np.abs(beta) / upper_bound)
         share_s1_count = np.ceil(share_s2_count / abs(beta))
 
-        if insample:
-            target_df = self._train_df
-        else:
-            target_df = self._trade_df
-        # Now calculate the cointegration error for the trade_df
-        trade_epsilon_t = target_df.iloc[:, 0] + beta * target_df.iloc[:, 1]
-        trade_df_with_cond = target_df.assign(coint_error=trade_epsilon_t)
-
-        # U-trade triggers
-        trade_df_with_cond = trade_df_with_cond.assign(otc_U=trade_df_with_cond['coint_error'] >= overbought)
-        trade_df_with_cond = trade_df_with_cond.assign(ctc_U=trade_df_with_cond['coint_error'] <= closing_cond)
-
-        # L-trade triggers
-        trade_df_with_cond = trade_df_with_cond.assign(otc_L=trade_df_with_cond['coint_error'] <= oversold)
-        trade_df_with_cond = trade_df_with_cond.assign(ctc_L=trade_df_with_cond['coint_error'] >= closing_cond)
-
         # Record number of shares to trade
         shares = np.array([share_s1_count, share_s2_count])
 
         # Record the exact values of initiating/closing trades for plotting purposes
         cond_lines = np.array([oversold, closing_cond, overbought])
 
-        return trade_df_with_cond, shares, cond_lines
+        return shares, cond_lines
 
-    def construct_spread(self, price_series: pd.DataFrame) -> pd.Series:
+    @staticmethod
+    def construct_spread(price_series: pd.DataFrame, beta: float) -> pd.Series:
         """
         Constructs spread using Johansen/Engle-Granger beta coefficient and
         number of shares used in each leg of the spread.
@@ -396,8 +350,11 @@ class MinimumProfit:
             Spread = Asset_A_Price + beta * Asset_B_Price
 
         :param price_series: (pd.DataFrame) Dataframe with prices for two assets in a spread.
+        :param beta: (float) Fitted cointegration coefficient, beta.
         :return: (pd.Series) Resulting spread series.
         """
 
-        pass
+        # Calculate cointegration error series (spread)
+        spread_series = price_series.iloc[:, 0] + beta * price_series.iloc[:, 1]
 
+        return spread_series

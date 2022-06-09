@@ -26,6 +26,8 @@ class MinimumProfitTradingRule:
     The strategy generates a signal by when
     ``|spread| >= |closing_condition + upper_bound|`` and exit from a position when
     ``|spread| <= |closing_condition|``.
+
+    This strategy allows only one open trade at a time.
     """
 
     def __init__(self, shares: np.array, optimal_levels: np.array, spread_window: int = 10):
@@ -50,6 +52,7 @@ class MinimumProfitTradingRule:
         self.exit_signal = optimal_levels[1]
         self.shares = shares
         self.spread_series = deque(maxlen=spread_window)
+        self.trade = 0  # Current trade status
 
     def update_spread_value(self, latest_spread_value: float):
         """
@@ -69,13 +72,15 @@ class MinimumProfitTradingRule:
         """
 
         # Long entry
-        if self.spread_series[-1] <= self.entry_buy_signal:
+        if self.trade == 0 and self.spread_series[-1] <= self.entry_buy_signal:
             side = 1
+            self.trade = 1
             return True, side
 
         # Short entry
-        if self.spread_series[-1] >= self.entry_sell_signal:
+        if self.trade == 0 and self.spread_series[-1] >= self.entry_sell_signal:
             side = -1
+            self.trade = -1
             return True, side
 
         return False, None
@@ -85,6 +90,7 @@ class MinimumProfitTradingRule:
             start_timestamp: pd.Timestamp,
             side_prediction: int,
             uuid: UUID = None,
+            shares: np.array = None,
     ):
         """
         Adds a new trade to track. Calculates trigger prices and trigger timestamp.
@@ -92,6 +98,7 @@ class MinimumProfitTradingRule:
         :param start_timestamp: (pd.Timestamp) Timestamp of the future label.
         :param side_prediction: (int) External prediction for the future label.
         :param uuid: (str) Unique identifier used to link label to tradelog action.
+        :param shares: (np.array) Number of shares bought and sold per asset.
         """
 
         self.open_trades[start_timestamp] = {
@@ -100,15 +107,15 @@ class MinimumProfitTradingRule:
             'spread_series': list(self.spread_series),
             'uuid': uuid,
             'side': side_prediction,
+            'shares': shares,
             'latest_update_timestamp': start_timestamp
         }
 
-    def update_trades(self, update_timestamp: pd.Timestamp, update_value: float) -> list:
+    def update_trades(self, update_timestamp: pd.Timestamp) -> list:
         """
         Checks whether any of the thresholds are triggered and currently open trades should be closed.
 
         :param update_timestamp: (pd.Timestamp) New timestamp to check vertical threshold.
-        :param update_value: (float) New value to check horizontal thresholds.
         :return: (list) of closed trades.
         """
 
@@ -119,16 +126,18 @@ class MinimumProfitTradingRule:
             data['latest_update_timestamp'] = update_timestamp
             if data['side'] > 0:
                 if self.spread_series[-1] >= data['exit_level']:
+                    self.trade = 0
                     to_close[timestamp] = data
             else:
                 if self.spread_series[-1] <= data['exit_level']:
+                    self.trade = 0
                     to_close[timestamp] = data
 
         if len(to_close) != 0:
             for timestamp, data in to_close.items():
                 label_data = {'t1': update_timestamp, 'pt': self.spread_series[-1],
                               'uuid': data['uuid'], 'start_value': data['start_value'],
-                              'end_value': update_value, 'side': data['side']}
+                              'end_value': self.spread_series[-1], 'side': data['side']}
                 formed_trades_uuid.append(data['uuid'])
                 self.closed_trades[timestamp] = label_data
 
