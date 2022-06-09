@@ -10,7 +10,7 @@ and generates the corresponding trading signal.
 
 import sys
 import warnings
-from typing import Optional, Tuple
+from typing import Tuple
 
 import numpy as np
 import pandas as pd
@@ -300,7 +300,8 @@ class MinimumProfit:
         # Retrieve optimal parameter set
         return (upper_bounds[max_idx], *minimum_trade_profit[max_idx, :])
 
-    def get_optimal_levels(self, upper_bound: float, minimum_profit: float, beta: float,
+    @staticmethod
+    def get_optimal_levels(upper_bound: float, minimum_profit: float, beta: float,
                            epsilon_t: np.array) -> Tuple[pd.DataFrame, np.array, np.array]:
         """
         Generate the optimal trading levels tu use in a strategy.

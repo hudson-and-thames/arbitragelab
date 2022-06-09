@@ -48,28 +48,30 @@ class TestMinimumProfit(unittest.TestCase):
         self.no_coint_data = pd.read_csv(no_coint_path, parse_dates=['Date'])
         self.no_coint_data.set_index("Date", inplace=True)
 
-    def test_init(self):
+    def test_set_train_dataset(self):
         """
-        Unit tests for constructor.
+        Unit tests for set_train_dataset.
         """
 
-        optimizer = MinimumProfit(self.data)
+        optimizer = MinimumProfit()
+        optimizer.set_train_dataset(self.data)
+
         self.assertEqual(optimizer.price_df.shape[1], 2)
 
         # Test a dataframe with 3 columns
-        self.assertRaises(Exception, MinimumProfit, self.faulty_data)
+        self.assertRaises(Exception, optimizer.set_train_dataset, self.faulty_data)
 
         # Test a dataframe with 1 column
-        self.assertRaises(Exception, MinimumProfit, self.faulty_data2)
+        self.assertRaises(Exception, optimizer.set_train_dataset, self.faulty_data2)
 
     def test_fit(self):
         """
         Unit tests for cointegration coefficient calculation.
         """
 
-        optimizer = MinimumProfit(self.data)
+        optimizer = MinimumProfit()
+        optimizer.set_train_dataset(self.data[self.data.index < pd.Timestamp(2002, 1, 1)])
 
-        _, _ = optimizer.train_test_split(date_cutoff=pd.Timestamp(2002, 1, 1))
         beta_eg, epsilon_t_eg, ar_coeff_eg, ar_resid_eg = optimizer.fit(sig_level="90%", use_johansen=False)
         beta_jo, epsilon_t_jo, ar_coeff_jo, ar_resid_jo = optimizer.fit(sig_level="90%", use_johansen=True)
 
@@ -98,9 +100,9 @@ class TestMinimumProfit(unittest.TestCase):
         Unit tests for warnings triggered when the series pair is not cointegrated.
         """
 
-        optimizer = MinimumProfit(self.no_coint_data)
+        optimizer = MinimumProfit()
+        optimizer.set_train_dataset(self.no_coint_data[self.no_coint_data.index < pd.Timestamp(2020, 1, 1)])
 
-        _, _ = optimizer.train_test_split(date_cutoff=pd.Timestamp(2020, 1, 1))
         with self.assertWarnsRegex(Warning, 'ADF'):
             _, _, _, _ = optimizer.fit(sig_level="95%", use_johansen=False)
         with self.assertWarnsRegex(Warning, 'eigen'):
@@ -117,9 +119,8 @@ class TestMinimumProfit(unittest.TestCase):
         Use specified parameters here instead of fit from data.
         """
 
-        # Use an empty Dataframe to initialize an instance of the optimizer
-        empty_df = pd.DataFrame(columns=['Share S1', 'Share S2'])
-        optimizer = MinimumProfit(empty_df)
+        # Initialize an instance of the optimizer
+        optimizer = MinimumProfit()
 
         # Parameters
         ar_coeff = -0.2
@@ -143,10 +144,8 @@ class TestMinimumProfit(unittest.TestCase):
         Unit tests for trade signal generation.
         """
 
-        optimizer = MinimumProfit(self.data)
-
-        # Split data into training and test set
-        _, _ = optimizer.train_test_split(date_cutoff=pd.Timestamp(2002, 1, 1))
+        optimizer = MinimumProfit()
+        optimizer.set_train_dataset(self.data[self.data.index < pd.Timestamp(2002, 1, 1)])
 
         # Fit the data
         beta_eg, epsilon_t_eg, _, _ = optimizer.fit(use_johansen=False)
@@ -162,14 +161,8 @@ class TestMinimumProfit(unittest.TestCase):
                                              beta_eg, epsilon_t_eg)
 
         # Generate trade_signal
-        trade_signals, num_of_shares, cond_values = optimizer.trade_signal(optimal_ub, optimal_mtp,
-                                                                           beta_eg, epsilon_t_eg)
-
-        # Check if trade signals are correctly stored in the dataframe
-        self.assertTrue("otc_U" in trade_signals.columns)
-        self.assertTrue("otc_L" in trade_signals.columns)
-        self.assertTrue("ctc_U" in trade_signals.columns)
-        self.assertTrue("ctc_L" in trade_signals.columns)
+        num_of_shares, cond_values = optimizer.get_optimal_levels(optimal_ub, optimal_mtp,
+                                                                  beta_eg, epsilon_t_eg)
 
         # Check if the number of shares is calculated correctly
         self.assertEqual(num_of_shares[0], 9)
@@ -180,54 +173,21 @@ class TestMinimumProfit(unittest.TestCase):
         self.assertAlmostEqual(cond_values[1], 4.34987712)
         self.assertAlmostEqual(cond_values[2], 4.71987712)
 
-        # Finally check in-sample/out-of-sample switch
-        trade_signals_is, _, _ = optimizer.trade_signal(optimal_ub, optimal_mtp,
-                                                        beta_eg, epsilon_t_eg, insample=True)
-        self.assertEqual(len(trade_signals), 168)
-        self.assertEqual(len(trade_signals_is), 253)
+        # Test exception for optimal levels
+        self.assertRaises(Exception, optimizer.get_optimal_levels,
+                          optimal_ub + 1, optimal_ub, beta_eg, epsilon_t_eg)
 
-    def test_split_dataset(self):
+    def test_construct_spread(self):
         """
-        Unit tests for cointegration coefficient calculation.
+        Unit tests for construct_spread.
         """
 
-        optimizer = MinimumProfit(self.data)
+        # Asset price series
+        series = self.data
+        beta = -1.62
 
-        # Cutoff by date
-        train_date, test_date = optimizer.train_test_split(date_cutoff=pd.Timestamp(2002, 1, 1))
+        # Construct spread
+        spread = MinimumProfit.construct_spread(series, beta)
 
-        # Cutoff by number
-        with self.assertWarns(Warning):
-            # Expected warning here that date cutoff input is not used
-            train_number, test_number = optimizer.train_test_split(date_cutoff=None, num_cutoff=253)
-
-        # No cutoff, should result in same dataset being returned twice
-        train_same, test_same = optimizer.train_test_split(date_cutoff=None)
-
-        # Test output dataframe shapes
-        self.assertTupleEqual(train_date.shape, (253, 2))
-        self.assertTupleEqual(test_date.shape, (168, 2))
-
-        # Test outputs are the same
-        pd.testing.assert_frame_equal(train_date, train_number)
-        pd.testing.assert_frame_equal(test_date, test_number)
-
-        # Test no cutoff returns same dataframe
-        pd.testing.assert_frame_equal(test_same, self.data)
-        pd.testing.assert_frame_equal(train_same, self.data)
-
-    def test_split_dataset_errors(self):
-        """
-        Unit tests for cointegration coefficient calculation.
-        """
-
-        # Test for warning when the Index is not of type pd.DatetimeIndex
-        bad_data = self.data.copy()
-        bad_data.index = np.zeros(len(bad_data.index))
-
-        optimizer = MinimumProfit(bad_data)
-
-        self.assertRaises(AssertionError, optimizer.train_test_split, pd.Timestamp(2002, 1, 1))
-
-        # Test for warning when the date cutoff point is out of range
-        self.assertRaises(AssertionError, optimizer.train_test_split, pd.Timestamp(2021, 1, 1))
+        self.assertEqual(spread.size, 421)
+        self.assertAlmostEqual(spread[5], 5.416668, 1e-5)
