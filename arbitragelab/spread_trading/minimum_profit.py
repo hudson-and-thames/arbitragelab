@@ -23,8 +23,8 @@ class MinimumProfitTradingRule:
     <link_to_paper>`_
 
     The strategy generates a signal by when
-    ``|spread| >= |closing_condition + upper_bound|`` and exit from a position when
-    ``|spread| <= |closing_condition|``.
+    ``spread <= buy_level`` or ``spread => sell_level`` and exit from a position when
+    ``|spread| <= |close_level|``.
 
     This strategy allows only one open trade at a time.
     """

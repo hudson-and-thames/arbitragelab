@@ -4,8 +4,7 @@
 
 # pylint: disable=invalid-name, too-many-arguments
 """
-This module optimizes the upper and lower bounds for mean-reversion cointegration pair trading
-and generates the corresponding trading signal.
+This module optimizes the upper and lower bounds for mean-reversion cointegration pair trading.
 """
 
 import sys
