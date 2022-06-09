@@ -258,7 +258,7 @@ Trading the Strategy
 
 After applying the above-described optimization rules, the output is optimal levels to enter and exit trades
 as well as number of shares to trade per leg of the cointegration pair. These outputs can be used in the Minimum
-Profit Trading Rule described in the :ref:`Spread Trading <spread_trading-z_score>` section of the documentation.
+Profit Trading Rule described in the :ref:`Spread Trading <spread_trading-minimum_profit>` section of the documentation.
 
 Implementation
 **************
