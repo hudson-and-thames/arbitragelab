@@ -7,7 +7,6 @@ Module for signal generation for Minimum Profit Optimization Trading strategy.
 """
 
 from collections import deque
-from statistics import mean, stdev
 from uuid import UUID
 
 import numpy as np
