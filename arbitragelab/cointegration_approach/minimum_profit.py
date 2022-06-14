@@ -31,7 +31,7 @@ class MinimumProfit:
 
     The implementation is based on the method described by Lin, Y.-X., McCrae, M., and Gulati, C. in
     `"Loss protection in pairs trading through minimum profit bounds: a cointegration approach"
-    <link_to_paper>`_
+    <http://downloads.hindawi.com/archive/2006/073803.pdf>`_
     """
 
     def __init__(self):

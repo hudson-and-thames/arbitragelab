@@ -7,7 +7,6 @@ Module for signal generation for Multivariate Cointegration Trading strategy.
 """
 
 import warnings
-from collections import deque
 from uuid import UUID
 
 import numpy as np
@@ -23,10 +22,10 @@ class MultivariateCointegrationTradingRule:
     `"Trading in the presence of cointegration" <http://www.ntuzov.com/Nik_Site/Niks_files/Research/papers/stat_arb/Galenko_2007.pdf>`_
 
     The strategy generates a signal based on the notional values from the MultivariateCointegration
-    class, in particular the number of shares to go long and short per each asset in a portfilio.
+    class, in particular the number of shares to go long and short per each asset in a portfolio.
 
     It's advised to re-estimate the cointegration vector (i.e. re-run the MultivariateCointegration)
-    each month.
+    each month or more frequently, if the data had higher than daily granularity.
 
     The strategy rebalances the portfolio of assets with each new entry, meaning that the opened at time t
     should be closed at time t+1, and the new trade should be opened.
@@ -34,8 +33,7 @@ class MultivariateCointegrationTradingRule:
     This strategy allows only one open trade at a time.
     """
 
-    def __init__(self, coint_vec: np.array, nlags: int = 30,
-                 dollar_invest: float = 1.e7):
+    def __init__(self, coint_vec: np.array, nlags: int = 30, dollar_invest: float = 1.e7):
         """
         Class constructor.
 
@@ -65,14 +63,6 @@ class MultivariateCointegrationTradingRule:
         :param latest_price_values: (pd.Series) Latest price values.
         """
 
-        # Update the training dataframe and keep the last nlags values
-        #print('AAA')
-        #print(type(self.price_series))
-        #print(type(latest_price_values))
-        #print(self.price_series)
-        #print(latest_price_values)
-
-
         self.price_series = self.price_series.append(latest_price_values)
         self.price_series = self.price_series.iloc[-self.nlags:]
 
@@ -91,7 +81,7 @@ class MultivariateCointegrationTradingRule:
     def get_signal(self) -> tuple:
         """
         Function which calculates the number of shares to trade in the current timestamp based on
-        the price changes and cointegration vector from the MultivariateCointegration class.
+        the price changes, dollar investment, and cointegration vector from the MultivariateCointegration class.
 
         :return: (np.array, np.array, np.array, np.array) The number of shares to trade;
             the notional values of positions.
@@ -100,7 +90,7 @@ class MultivariateCointegrationTradingRule:
         # Get last price of assets
         if self.price_series.empty:
             warnings.warn("No price series found. Please first use update_price_values.")
-            return
+            return None, None, None, None
 
         last_price = self.price_series.iloc[-1]
 
@@ -147,7 +137,7 @@ class MultivariateCointegrationTradingRule:
         :param start_timestamp: (pd.Timestamp) Timestamp of the future label.
         :param pos_shares: (np.array) Number of shares bought per asset.
         :param neg_shares: (np.array) Number of shares sold per asset.
-        :param uuid: (str) Unique identifier used to link label to tradelog action..
+        :param uuid: (str) Unique identifier used to link label to tradelog action.
         """
 
         self.open_trades[start_timestamp] = {
@@ -164,11 +154,11 @@ class MultivariateCointegrationTradingRule:
         Closes previously opened trade and updates list of closed trades.
 
         :param update_timestamp: (pd.Timestamp) New timestamp to check vertical threshold.
-        :return: (list) of closed trades.
+        :return: (list) List of closed trades.
         """
 
         formed_trades_uuid = []  # Array of trades formed (uuid)
-        to_close = {}  # Trades to close.
+        to_close = {}  # Trades to close
 
         for timestamp, data in self.open_trades.items():
             data['latest_update_timestamp'] = update_timestamp

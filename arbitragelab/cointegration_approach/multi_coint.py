@@ -6,7 +6,6 @@ This module optimizes the upper and lower bounds for mean-reversion trading of t
 """
 
 import warnings
-from copy import deepcopy
 from typing import Tuple, Optional
 
 import matplotlib.dates as mdates
@@ -103,7 +102,7 @@ class MultivariateCointegration:
     @staticmethod
     def calc_price_diff(price_df: pd.DataFrame) -> pd.DataFrame:
         """
-        Calculate the price difference of day t and day t-1 of each asset for P&L calculation.
+        Calculate the price difference of day t and day t-1 of each asset.
 
         :param price_df: (pd.DataFrame) Dataframe that contains the raw asset price.
         :return: (pd.DataFrame) Log prices of the assets.
@@ -122,15 +121,12 @@ class MultivariateCointegration:
 
         return self.__asset_df
 
-    def fit(self, log_price: pd.DataFrame, sig_level: str = "95%", rolling_window_size: Optional[int] = 1500,
-            suppress_warnings: bool = False) -> np.array:
+    def fit(self, log_price: pd.DataFrame, sig_level: str = "95%", suppress_warnings: bool = False) -> np.array:
         """
         Use Johansen test to retrieve the cointegration vector.
 
         :param log_price: (pd.DataFrame) Log price dataframe used to derive cointegration vector.
         :param sig_level: (str) Cointegration test significance level. Possible options are "90%", "95%", and "99%".
-        :param rolling_window_size: (int) Number of data points used for training with rolling window. If None,
-            then use cumulative window, i.e. the entire dataset.
         :param suppress_warnings: (bool) Boolean flag to suppress the cointegration warning message.
         :return: (np.array) The cointegration vector, b.
         """
@@ -143,11 +139,8 @@ class MultivariateCointegration:
         # Calculate the cointegration vector with Johansen test
         jo_portfolio = JohansenPortfolio()
 
-        # Select if applying rolling window
-        if rolling_window_size is None:
-            jo_portfolio.fit(log_price, det_order=0)
-        else:
-            jo_portfolio.fit(log_price.iloc[-rolling_window_size:], det_order=0)
+        # Fir portfolio
+        jo_portfolio.fit(log_price, det_order=0)
 
         # Check statistics to see if the pairs are cointegrated at the specified significance level
         eigen_stats = jo_portfolio.johansen_eigen_statistic
@@ -231,20 +224,16 @@ class MultivariateCointegration:
         return long_pnl, short_pnl
 
     # pylint: disable=invalid-name, too-many-locals
-    def get_coint_vec(self, rolling_window_size: Optional[int] = None) -> Tuple[pd.DataFrame, ...]:
+    def get_coint_vec(self) -> Tuple[pd.DataFrame, ...]:
         """
         Generate contegration vector to generate trading signals.
 
-        :param nlags: (int) Amount of lags for cointegrated returns sum, corresponding to the parameter P in the paper.
-        :param dollar_invest: (float) The value of long/short positions, corresponding to the parameter C in the paper.
-        :param rolling_window_size: (int) Number of data points used for training with rolling window. If None,
-            then use cumulative window, i.e. the entire dataset.
         :return: (np.array) The cointegration vector, b.
         """
 
         # As it is in sample, calculate the cointegration vector first as it will not change anymore
         all_data = self.calc_log_price(pd.concat([self.__asset_df, self.__trade_df]))
-        coint_vec = self.fit(all_data, rolling_window_size=rolling_window_size, suppress_warnings=True)
+        coint_vec = self.fit(all_data, suppress_warnings=True)
 
         return coint_vec
 
