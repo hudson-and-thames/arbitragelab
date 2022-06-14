@@ -2,7 +2,7 @@
 # All rights reserved
 # Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 """
-This module generates trading signals of three or more cointegrated assets.
+This module optimizes the upper and lower bounds for mean-reversion trading of three or more cointegrated assets.
 """
 
 import warnings
@@ -20,26 +20,36 @@ from arbitragelab.util import segment
 
 class MultivariateCointegration:
     """
-    This class generates the trading signals for a daily rebalancing strategy, calculate the returns of the strategy,
-    and plot the equity curves and cointegration vector time evolution.
+    This class optimizes bounds for mean-reversion trading of a spread consisting of three and more assets.
+
+    The implementation is based on the method described by Galenko, A., Popova, E. and Popova, I. in
+    `"Trading in the presence of cointegration" <http://www.ntuzov.com/Nik_Site/Niks_files/Research/papers/stat_arb/Galenko_2007.pdf>`_
     """
 
-    def __init__(self, asset_df: pd.DataFrame, trade_df: pd.DataFrame):
+    def __init__(self):
         """
         Constructor of the multivariate cointegration trading signal class.
 
         The log price dataframe and the cointegration vectors are stored for repeating use.
-
-        :param asset_df: (pd.DataFrame) Raw in-sample price dataframe of the assets.
-        :param trade_df: (pd.DataFrame) Raw out-of-sample price dataframe of the assets. Use None if only in-sample
-            properties are desired.
         """
 
-        self.__asset_df = asset_df
-        self.__trade_df = trade_df
+        self.__asset_df = None
+        self.__trade_df = None
         self.__coint_vec = None
 
         segment.track('MultivariateCointegration')
+
+    def set_train_dataset(self, price_df: pd.DataFrame):
+        """
+        Provide price series for model to calculate the cointegration coefficient and beta.
+
+        :param price_df: (pd.DataFrame) Price series dataframe which contains both series.
+        """
+
+        # Verify the index is indeed pd.DatetimeIndex
+        assert price_df.index.is_all_dates, "Index is not of pd.DatetimeIndex type."
+
+        self.__asset_df = price_df
 
     @staticmethod
     def _missing_impute(price_df: pd.DataFrame, nan_method: str = 'ffill', order: int = 3) -> pd.DataFrame:
@@ -68,17 +78,15 @@ class MultivariateCointegration:
 
     def fillna_inplace(self, nan_method: str = 'ffill', order: int = 3):
         """
-        Replace the class attribute dataframes with imputed training dataframe and trading dataframe.
+        Replace the class attribute dataframes with imputed training dataframe.
 
         :param nan_method: (str) Missing value imputation method. If "ffill" then use front-fill;
             if "spline" then use cubic spline.
         :param order: (int) Polynomial order for spline function.
         """
 
-        total_df = self._missing_impute(pd.concat([self.__asset_df, self.__trade_df]),
-                                        nan_method=nan_method, order=order)
-        self.__asset_df = total_df.loc[self.__asset_df.index]
-        self.__trade_df = total_df.loc[self.__trade_df.index]
+        total_df = self._missing_impute(self.__asset_df, nan_method=nan_method, order=order)
+        self.__asset_df = total_df
 
     @staticmethod
     def calc_log_price(price_df: pd.DataFrame) -> pd.DataFrame:
@@ -113,16 +121,6 @@ class MultivariateCointegration:
         """
 
         return self.__asset_df
-
-    @property
-    def trade_df(self) -> pd.DataFrame:
-        """
-        Property that gives read-only access to the out-of-sample asset price dataframe.
-
-        :return: (pd.DataFrame) Dataframe of log asset prices.
-        """
-
-        return self.__trade_df
 
     def fit(self, log_price: pd.DataFrame, sig_level: str = "95%", rolling_window_size: Optional[int] = 1500,
             suppress_warnings: bool = False) -> np.array:
@@ -168,17 +166,15 @@ class MultivariateCointegration:
 
         return coint_vec
 
-    def num_of_shares(self, log_price: pd.DataFrame, last_price: pd.Series, nlags: int = 30,
+    def num_of_shares(self, log_price: pd.DataFrame, nlags: int = 30,
                       dollar_invest: float = 1.e7) -> Tuple[np.array, ...]:
         """
-        Calculate the number of shares that needs to be traded given a notional value.
+        Calculate the notional value of trades.
 
         :param log_price: (pd.DataFrame) Dataframe of log prices of training data.
-        :param last_price: (pd.Series) Last price for trading signal generation.
         :param nlags: (int) Amount of lags for cointegrated returns sum, corresponding to the parameter P in the paper.
         :param dollar_invest: (float) The value of long-short positions, corresponding to the parameter C in the paper.
-        :return: (np.array, np.array, np.array, np.array) The number of shares to trade;
-            the notional values of positions.
+        :return: (np.array, np.array) The notional values of positions.
         """
 
         # Calculate the cointegration error Y_t, recover the date index
@@ -200,16 +196,7 @@ class MultivariateCointegration:
         pos_notional = pos_coef_asset * sign * dollar_invest / pos_coef_asset.sum()
         neg_notional = neg_coef_asset * sign * dollar_invest / neg_coef_asset.sum()
 
-        # Calculate number of shares
-        pos_shares = pos_notional / last_price[pos_coef_asset.index]
-        neg_shares = neg_notional / last_price[neg_coef_asset.index]
-
-        # Calculate actual notional values due to rounding
-        pos_notional = np.floor(pos_shares) * last_price[pos_coef_asset.index]
-        neg_notional = np.floor(neg_shares) * last_price[neg_coef_asset.index]
-
-        # Assign the correct sign to the number of shares according to the sign of CC
-        return -1. * np.floor(pos_shares), np.floor(neg_shares), -1. * pos_notional, neg_notional
+        return -1. * pos_notional, neg_notional
 
     @staticmethod
     def _rebal_pnl(signal: pd.Series, price_diff: pd.Series) -> Tuple[float, float]:
@@ -244,80 +231,22 @@ class MultivariateCointegration:
         return long_pnl, short_pnl
 
     # pylint: disable=invalid-name, too-many-locals
-    def trading_signal(self, nlags: int, dollar_invest: float = 1.e7, rolling_window_size: Optional[int] = None,
-                       update_freq: int = 22, insample: bool = False) -> Tuple[pd.DataFrame, ...]:
+    def get_coint_vec(self, rolling_window_size: Optional[int] = None) -> Tuple[pd.DataFrame, ...]:
         """
-        Generate trading signal, i.e. the number of shares to trade each day.
+        Generate contegration vector to generate trading signals.
 
         :param nlags: (int) Amount of lags for cointegrated returns sum, corresponding to the parameter P in the paper.
         :param dollar_invest: (float) The value of long/short positions, corresponding to the parameter C in the paper.
         :param rolling_window_size: (int) Number of data points used for training with rolling window. If None,
             then use cumulative window, i.e. the entire dataset.
-        :param update_freq: (int) Frequency to update the cointegration vector for out-of-sample test. Default is
-            monthly (22 trading days).
-        :param insample: (bool) If True, run an in-sample test where the cointegration vector will be estimated using
-            all available data and will not be recalculated monthly.
-        :return: (pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame) Trading signal dataframe;
-            trading signal notional dataframe;  cointegration vector time evolution dataframe; daily returns dataframe.
+        :return: (np.array) The cointegration vector, b.
         """
 
-        # Signal DF, cointegration vector evolution DF, and portfolio value DF for PnL and returns calculation
-        signals, signals_notional, coint_vec_evo, returns_df = [], [], [], []
+        # As it is in sample, calculate the cointegration vector first as it will not change anymore
+        all_data = self.calc_log_price(pd.concat([self.__asset_df, self.__trade_df]))
+        coint_vec = self.fit(all_data, rolling_window_size=rolling_window_size, suppress_warnings=True)
 
-        # Create a copy of the original training DF so we can preserve the data because we will update the original
-        # training data with incoming trading data
-        train_df = deepcopy(self.__asset_df)
-
-        # Get trading period and daily price difference
-        price_diff = self.calc_price_diff(self.__trade_df)
-        trading_period = price_diff.shape[0]
-
-        # If in sample, calculate the cointegration vector first as it will not change anymore
-        if insample:
-            all_data = self.calc_log_price(pd.concat([self.__asset_df, self.__trade_df]))
-            self.fit(all_data, rolling_window_size=rolling_window_size, suppress_warnings=True)
-
-        # Generate the trading signal for each day using a loop
-        for t in range(trading_period):
-            # Calculate log prices
-            log_train_df = self.calc_log_price(train_df)
-
-            # Update the cointegration vector if out-of-sample
-            if not insample and t % update_freq == 0:
-                self.fit(log_train_df, rolling_window_size=rolling_window_size, suppress_warnings=True)
-
-            # Calculate number of shares to trade
-            pos_shares, neg_shares, pos_ntn, neg_ntn = self.num_of_shares(log_train_df, self.__trade_df.iloc[t],
-                                                                          nlags=nlags, dollar_invest=dollar_invest)
-
-            # Calculate the PnL for one day's trade and daily percentage returns
-            long_pnl, short_pnl = self._rebal_pnl(pd.concat([pos_shares, neg_shares]), price_diff.iloc[t])
-            returns = (long_pnl + short_pnl) / (2 * dollar_invest)
-
-            # Bookkeeping: Record the signals and the cointegration vector time evolution
-            signals.append(pd.concat([pos_shares, neg_shares]))
-            signals_notional.append(pd.concat([pos_ntn, neg_ntn]))
-            coint_vec_evo.append(self.__coint_vec)
-            returns_df.append(returns)
-
-            # Update the training dataframe
-            train_df = train_df.append(self.__trade_df.iloc[t])
-
-        # Concatenate the signals and convert the signal into a dataframe
-        signals_df = pd.concat(signals, axis=1).T
-        signals_ntn_df = pd.concat(signals_notional, axis=1).T
-        signals_df.index = price_diff.index
-        signals_ntn_df.index = price_diff.index
-
-        # Concatenate the time evolution of cointegration vectors and convert it into a dataframe
-        coint_vec_evo_df = pd.concat(coint_vec_evo, axis=1).T
-        coint_vec_evo_df.index = self.__trade_df.index[:-1]
-
-        # Generate the returns DF
-        returns_df = pd.DataFrame(returns_df)
-        returns_df.index = signals_df.index
-
-        return signals_df, signals_ntn_df, coint_vec_evo_df, returns_df
+        return coint_vec
 
     @staticmethod
     def summary(returns_df: pd.DataFrame) -> pd.DataFrame:
@@ -377,77 +306,6 @@ class MultivariateCointegration:
         }
 
         return pd.Series(summary_dict).to_frame()
-
-    @staticmethod
-    def plot_all(signals: pd.DataFrame, signals_ntn: pd.DataFrame, coint_vec_evo: pd.DataFrame, returns: pd.DataFrame,
-                 figw: float = 15., figh: float = 15., title: str = "", use_weights: bool = False,
-                 start_date: Optional[pd.Timestamp] = None, end_date: Optional[pd.Timestamp] = None) -> plt.Figure:
-        """
-        Plot the equity curve, the cointegration vector time evolution, and the trading signals.
-
-        :param signals: (pd.DataFrame) Trading signal dataframe.
-        :param signals_ntn: (pd.DataFrame) Trading signal dataframe in notional values.
-        :param coint_vec_evo: (pd.DataFrame) Cointegration vector time evolution dataframe.
-        :param returns: (pd.DataFrame) Daily returns dataframe.
-        :param figw: (float) Figure width.
-        :param figh: (float) Figure height.
-        :param title: (str) Figure title details.
-        :param use_weights: (bool) If True, use percentage of notional value of each position to represent signals;
-            otherwise, use number of shares to represent signals.
-        :param start_date: (pd.Timestamp) Start point of the plot.
-        :param end_date: (pd.Timestamp) End point of the plot.
-        :return: (plt.Figure) The full plot including 3 subplots: equity curve, cointegration vector, and trading
-            signals.
-        """
-
-        # Define the ticks on the x-axis
-        years = mdates.YearLocator()  # every year
-        months = mdates.MonthLocator()  # every month
-        years_fmt = mdates.DateFormatter('%Y')
-
-        # Set up the grid
-        fig, axes = plt.subplots(3, 1, sharex=True, figsize=(figw, figh), gridspec_kw={'height_ratios': [2.5, 1.5, 1]})
-
-        # Equity curve
-        cumul_rt = (1. + returns).cumprod().squeeze() - 1.
-        axes[0].plot(cumul_rt, label='Cumulative Returns')
-        axes[0].legend(loc='upper left', fontsize=12)
-        axes[0].tick_params(axis='y', labelsize=14)
-        axes[0].set_ylabel("Cumul. Returns", fontsize=14)
-
-        # Cointegration vector time evolution
-        lines = axes[1].plot(coint_vec_evo)
-        axes[1].legend(iter(lines), list(coint_vec_evo.columns), loc='lower center', fontsize=12,
-                       ncol=4, bbox_to_anchor=(0.5, -0.2))
-        axes[1].tick_params(axis='y', labelsize=14)
-        axes[1].set_ylabel("Coint. Vector", fontsize=14)
-
-        # Signal lines
-        if use_weights:
-            weights = signals_ntn.apply(lambda x: x / x.abs().sum(), axis=1)
-            axes[2].plot(weights)
-            axes[2].set_ylabel("Portfolio Weights", fontsize=14)
-        else:
-            axes[2].plot(signals)
-            axes[2].set_ylabel("Num. of Shares", fontsize=14)
-        axes[2].tick_params(axis='y', labelsize=14)
-
-        # Formatting the tick labels
-        axes[0].xaxis.set_major_locator(years)
-        axes[0].xaxis.set_major_formatter(years_fmt)
-        axes[0].xaxis.set_minor_locator(months)
-        axes[0].tick_params(axis='x', labelsize=14)
-        axes[0].tick_params(axis='y', labelsize=14)
-
-        # Define the date range of the plot
-        if start_date is not None and end_date is not None:
-            axes[2].set_xlim((start_date, end_date))
-
-        # Set up a title for the entire plot
-        fig.suptitle("Returns, Cointegration Vector Time-Evolution, and Trading Signals\n"
-                     "{}".format(title), fontsize=20)
-        fig.subplots_adjust(top=0.92)
-        return fig
 
     @staticmethod
     def plot_returns(returns: pd.DataFrame, figw: float = 15., figh: float = 15., title: str = "Returns",
