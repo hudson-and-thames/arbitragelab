@@ -33,7 +33,6 @@ class MultivariateCointegration:
         """
 
         self.__asset_df = None
-        self.__trade_df = None
         self.__coint_vec = None
 
         segment.track('MultivariateCointegration')
@@ -44,9 +43,6 @@ class MultivariateCointegration:
 
         :param price_df: (pd.DataFrame) Price series dataframe which contains both series.
         """
-
-        # Verify the index is indeed pd.DatetimeIndex
-        assert price_df.index.is_all_dates, "Index is not of pd.DatetimeIndex type."
 
         self.__asset_df = price_df
 
@@ -159,70 +155,6 @@ class MultivariateCointegration:
 
         return coint_vec
 
-    def num_of_shares(self, log_price: pd.DataFrame, nlags: int = 30,
-                      dollar_invest: float = 1.e7) -> Tuple[np.array, ...]:
-        """
-        Calculate the notional value of trades.
-
-        :param log_price: (pd.DataFrame) Dataframe of log prices of training data.
-        :param nlags: (int) Amount of lags for cointegrated returns sum, corresponding to the parameter P in the paper.
-        :param dollar_invest: (float) The value of long-short positions, corresponding to the parameter C in the paper.
-        :return: (np.array, np.array) The notional values of positions.
-        """
-
-        # Calculate the cointegration error Y_t, recover the date index
-        coint_error = np.dot(log_price, self.__coint_vec)
-        coint_error_df = pd.DataFrame(coint_error)
-        coint_error_df.index = log_price.index
-
-        # Calculate the return Z_t by taking the difference. Drop the NaN of the first data point
-        realization = coint_error_df.diff().dropna()
-
-        # Calculate the direction of the trade
-        sign = np.sign(realization.iloc[-nlags:].sum()).values[0]
-
-        # Classify the assets into positive cointegration coefficient (CC) group and negative CC group
-        pos_coef_asset = self.__coint_vec[self.__coint_vec >= 0]
-        neg_coef_asset = self.__coint_vec[self.__coint_vec < 0]
-
-        # Calculate notional values
-        pos_notional = pos_coef_asset * sign * dollar_invest / pos_coef_asset.sum()
-        neg_notional = neg_coef_asset * sign * dollar_invest / neg_coef_asset.sum()
-
-        return -1. * pos_notional, neg_notional
-
-    @staticmethod
-    def _rebal_pnl(signal: pd.Series, price_diff: pd.Series) -> Tuple[float, float]:
-        """
-        Calculate the P&L of one day's trade.
-
-        Suppose the current time is T. The signals generated are based on price history up to time T-1. We open the
-        positions at T and exit the positions at T+1, and calculate the P&L for long positions and short positions,
-        respectively.
-
-        By construction, both the variables `signal` and `price_diff` have the asset names
-
-        :param signal: (pd.Series) Trade signal of the most recent day.
-        :param price_diff: (pd.Series) The price difference of the assets between T and T+1.
-        :return: (float, float) Long P&L; Short P&L.
-        """
-
-        # Join the trading signal and price difference by asset names
-        day_pnl_df = pd.concat([signal, price_diff], axis=1)
-
-        # Rename the columns
-        day_pnl_df.columns = ["Shares", "Price Diff"]
-
-        # Retrieve the long positions and short positions
-        long_df = day_pnl_df[day_pnl_df['Shares'] >= 0]
-        short_df = day_pnl_df[day_pnl_df['Shares'] < 0]
-
-        # Calculate the long PnL and short PnL
-        long_pnl = (long_df['Shares'] * long_df['Price Diff']).sum()
-        short_pnl = (short_df['Shares'] * short_df['Price Diff']).sum()
-
-        return long_pnl, short_pnl
-
     # pylint: disable=invalid-name, too-many-locals
     def get_coint_vec(self) -> Tuple[pd.DataFrame, ...]:
         """
@@ -232,7 +164,7 @@ class MultivariateCointegration:
         """
 
         # As it is in sample, calculate the cointegration vector first as it will not change anymore
-        all_data = self.calc_log_price(pd.concat([self.__asset_df, self.__trade_df]))
+        all_data = self.calc_log_price(self.__asset_df)
         coint_vec = self.fit(all_data, suppress_warnings=True)
 
         return coint_vec
@@ -248,6 +180,9 @@ class MultivariateCointegration:
         :param returns_df: (pd.DataFrame) Daily percentage returns dataframe.
         :return: (pd.DataFrame) Trading strategy returns statistics dataframe.
         """
+
+        # Reset column name
+        returns_df.columns = [0]
 
         # Get the mean, standard deviation, and total trading days
         basic_stats = returns_df.describe()
