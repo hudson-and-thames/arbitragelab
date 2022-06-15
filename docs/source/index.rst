@@ -199,6 +199,7 @@ This project is licensed under an all rights reserved license and is NOT open-so
 
     spread_trading/z_score
     spread_trading/minimum_profit
+    spread_trading/multi_coint
 
 .. toctree::
     :maxdepth: 2
