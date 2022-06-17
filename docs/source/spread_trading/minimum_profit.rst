@@ -108,6 +108,20 @@ Example
     # Checking all closed trades
     closed_trades = strategy.closed_trades
 
+Research Notebooks
+##################
+
+The following research notebook can be used to better understand the Strategy described above.
+
+* `Minimum Profit Optimization`_
+
+.. _`Minimum Profit Optimization`: https://hudsonthames.org/notebooks/arblab/minimum_profit_optimization.html
+
+.. raw:: html
+
+    <a href="https://hudthames.tech/3iIGDvv"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
+    <a href="https://hudthames.tech/2S03R58"><button style="margin: 20px; margin-top: 0px">Download Sample Data</button></a>
+
 References
 ##########
 
