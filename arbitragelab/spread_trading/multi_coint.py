@@ -17,18 +17,18 @@ from arbitragelab.util import segment
 
 class MultivariateCointegrationTradingRule:
     """
-    This class implements trading strategy from the Multivariate Contegration method from the paper
+    This class implements trading strategy from the Multivariate Cointegration method from the paper
     by Galenko, A., Popova, E. and Popova, I. in
     `"Trading in the presence of cointegration" <http://www.ntuzov.com/Nik_Site/Niks_files/Research/papers/stat_arb/Galenko_2007.pdf>`_
 
-    The strategy generates a signal based on the notional values from the MultivariateCointegration
-    class, in particular the number of shares to go long and short per each asset in a portfolio.
+    The strategy generates a signal - number of shares to go long and short per each asset, based on
+    the cointegration vector from the MultivariateCointegration class.
 
     It's advised to re-estimate the cointegration vector (i.e. re-run the MultivariateCointegration)
-    each month or more frequently, if the data had higher than daily granularity.
+    each month or more frequently, if the data has higher than daily granularity.
 
-    The strategy rebalances the portfolio of assets with each new entry, meaning that the opened at time t
-    should be closed at time t+1, and the new trade should be opened.
+    The strategy rebalances the portfolio of assets with each new entry, meaning that the position opened
+    at time t should be closed at time t+1, and the new trade should be opened.
 
     This strategy allows only one open trade at a time.
     """
@@ -124,13 +124,8 @@ class MultivariateCointegrationTradingRule:
         # Assign the correct sign to the number of shares according to the sign of CC
         return -1. * np.floor(pos_shares), np.floor(neg_shares), -1. * pos_notional, neg_notional
 
-    def add_trade(
-            self,
-            start_timestamp: pd.Timestamp,
-            pos_shares: np.array,
-            neg_shares: np.array,
-            uuid: UUID = None,
-    ):
+    def add_trade(self, start_timestamp: pd.Timestamp, pos_shares: np.array,
+                  neg_shares: np.array, uuid: UUID = None):
         """
         Adds a new trade to track.
 

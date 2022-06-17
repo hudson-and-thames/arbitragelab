@@ -20,7 +20,7 @@ class MinimumProfitTradingRule:
     This class implements trading strategy from the Minimum Profit Optimization method from the paper
     by Lin, Y.-X., McCrae, M., and Gulati, C.
     `"Loss protection in pairs trading through minimum profit bounds: a cointegration approach"
-    <link_to_paper>`_
+    <http://downloads.hindawi.com/archive/2006/073803.pdf>`_
 
     The strategy generates a signal by when
     ``spread <= buy_level`` or ``spread => sell_level`` and exit from a position when
@@ -84,13 +84,8 @@ class MinimumProfitTradingRule:
 
         return False, None
 
-    def add_trade(
-            self,
-            start_timestamp: pd.Timestamp,
-            side_prediction: int,
-            uuid: UUID = None,
-            shares: np.array = None,
-    ):
+    def add_trade(self, start_timestamp: pd.Timestamp, side_prediction: int,
+                  uuid: UUID = None, shares: np.array = None):
         """
         Adds a new trade to track. Calculates trigger prices and trigger timestamp.
 
@@ -115,11 +110,11 @@ class MinimumProfitTradingRule:
         Checks whether any of the thresholds are triggered and currently open trades should be closed.
 
         :param update_timestamp: (pd.Timestamp) New timestamp to check vertical threshold.
-        :return: (list) of closed trades.
+        :return: (list) List of closed trades.
         """
 
         formed_trades_uuid = []  # Array of trades formed (uuid)
-        to_close = {}  # Trades to close.
+        to_close = {}  # Trades to close
 
         for timestamp, data in self.open_trades.items():
             data['latest_update_timestamp'] = update_timestamp

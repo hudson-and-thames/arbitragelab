@@ -140,8 +140,8 @@ introduced and the infinite summation will be replaced by a finite sum :math:`\s
 Trading the Strategy
 ####################
 
-The ``MultivariateCointegration`` class can be used to generate the cointegration vector, after what the trading
-signals (number of shares to long/short per each asset) can be generated using in the Multivariate Cointegration
+The ``MultivariateCointegration`` class can be used to generate the cointegration vector, so that later the trading
+signals (number of shares to long/short per each asset) can be generated using the Multivariate Cointegration
 Trading Rule described in the :ref:`Spread Trading <spread_trading-multi_coint>` section of the documentation.
 
 The strategy is trading at daily frequency and always in the market.

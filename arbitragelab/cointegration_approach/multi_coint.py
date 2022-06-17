@@ -2,7 +2,7 @@
 # All rights reserved
 # Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 """
-This module optimizes the upper and lower bounds for mean-reversion trading of three or more cointegrated assets.
+This module generates a cointegration vector for mean-reversion trading of three or more cointegrated assets.
 """
 
 import warnings
@@ -135,7 +135,7 @@ class MultivariateCointegration:
         # Calculate the cointegration vector with Johansen test
         jo_portfolio = JohansenPortfolio()
 
-        # Fir portfolio
+        # Fit portfolio
         jo_portfolio.fit(log_price, det_order=0)
 
         # Check statistics to see if the pairs are cointegrated at the specified significance level

@@ -17,8 +17,8 @@ def get_half_life_of_mean_reversion(data: pd.Series) -> float:
     """
     Get half-life of mean-reversion under the assumption that data follows the Ornstein-Uhlenbeck process.
 
-    :param data: (np.array) Data points
-    :return: (float) Half-life of mean reversion
+    :param data: (np.array) Data points.
+    :return: (float) Half-life of mean reversion.
     """
 
     segment.track('get_half_life_of_mean_reversion')

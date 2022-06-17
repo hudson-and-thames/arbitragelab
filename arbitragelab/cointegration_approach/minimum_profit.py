@@ -303,7 +303,7 @@ class MinimumProfit:
     def get_optimal_levels(upper_bound: float, minimum_profit: float, beta: float,
                            epsilon_t: np.array) -> Tuple[pd.DataFrame, np.array, np.array]:
         """
-        Generate the optimal trading levels tu use in a strategy.
+        Generate the optimal trading levels to use in a strategy.
 
         :param upper_bound: (float) Optimized upper bound based on mean passage time optimization.
         :param minimum_profit: (float) Optimized minimum profit based on mean passage time optimization.
@@ -343,8 +343,7 @@ class MinimumProfit:
     @staticmethod
     def construct_spread(price_series: pd.DataFrame, beta: float) -> pd.Series:
         """
-        Constructs spread using Johansen/Engle-Granger beta coefficient and
-        number of shares used in each leg of the spread.
+        Constructs spread using Johansen/Engle-Granger beta coefficient.
 
         Spread is simply calculated as:
             Spread = Asset_A_Price + beta * Asset_B_Price

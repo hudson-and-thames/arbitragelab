@@ -7,7 +7,7 @@ Multivariate Cointegration Strategy
 Introduction
 ############
 
-This trading strategy takes new spread values one by one and allow checking if the conditions to open a position
+This trading strategy takes new spread values one by one and allows checking if the conditions to open a position
 are fulfilled with each new timestamp and value provided. This allows for easier integration of these strategies
 into an existing data pipeline. Also, the strategy object keeps track of open and closed trades and the supporting
 information related to them.
@@ -89,7 +89,7 @@ Example
     strategy.update_price_values(data.iloc[0])
 
     # Feeding price values to the strategy one by one
-    for ind in range(data.shape[1]):
+    for ind in range(data.shape[0]):
 
         time = spread.index[ind]
         value = spread.iloc[ind]

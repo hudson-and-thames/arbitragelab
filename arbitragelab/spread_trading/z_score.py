@@ -26,9 +26,8 @@ class BollingerBandsTradingRule:
     ``|z_score| <= |entry_z_score + z_score_delta|``.
     """
 
-    def __init__(
-            self, sma_window: int, std_window: int, entry_z_score: float = 3, exit_z_score_delta: float = 6,
-    ):
+    def __init__(self, sma_window: int, std_window: int, entry_z_score: float = 3,
+                 exit_z_score_delta: float = 6):
         """
         Class constructor.
 
@@ -40,6 +39,7 @@ class BollingerBandsTradingRule:
                                            enter a position when z-score is >= 3 or <= -3, and exit when z-score
                                            <= -3 or >= 3 respectively.
         """
+
         segment.track('BollingerBandsTradingRule')
 
         self.open_trades = {}
@@ -55,16 +55,18 @@ class BollingerBandsTradingRule:
     @staticmethod
     def get_z_score(spread_slice: deque, sma_window: int, std_window: int) -> float:
         """
-        Calculate z score of recent spread values.
+        Calculate z-score of recent spread values.
 
         :param spread_slice: (deque) Spread deque to take values from.
         :param sma_window: (int) Window for SMA (Simple Moving Average).
         :param std_window: (int) Window for SMD (Simple Moving st. Deviation).
         :return: (float) Z score.
         """
+
         spread_slice_list = list(spread_slice)
         mean_spread = mean(spread_slice_list[-sma_window:])
         std_spread = stdev(spread_slice_list[-std_window:])
+
         return (spread_slice[-1] - mean_spread) / std_spread
 
     def update_spread_value(self, latest_spread_value: float):
@@ -73,6 +75,7 @@ class BollingerBandsTradingRule:
 
         :param latest_spread_value: (float) Latest spread value.
         """
+
         self.spread_series.append(latest_spread_value)
 
     def check_entry_signal(self) -> tuple:
@@ -81,7 +84,8 @@ class BollingerBandsTradingRule:
 
         :return: (tuple) Tuple of boolean entry flag and side (if entry flag is True).
         """
-        # Check if std is non-zero, otherwise it will return np.inf which is not tradable.
+
+        # Check if std is non-zero, otherwise it will return np.inf which is not tradable
         if np.std(self.spread_series, ddof=1) == 0:
             return False, None
 
@@ -98,12 +102,8 @@ class BollingerBandsTradingRule:
             return True, side
         return False, None
 
-    def add_trade(
-            self,
-            start_timestamp: pd.Timestamp,
-            side_prediction: int,
-            uuid: UUID = None,
-    ):
+    def add_trade(self, start_timestamp: pd.Timestamp, side_prediction: int,
+                  uuid: UUID = None):
         """
         Adds a new trade to track. Calculates trigger prices and trigger timestamp.
 
@@ -128,11 +128,11 @@ class BollingerBandsTradingRule:
         Checks whether any of the thresholds are triggered and currently open trades should be closed.
 
         :param update_timestamp: (pd.Timestamp) New timestamp to check vertical threshold.
-        :return: (list) of closed trades.
+        :return: (list) List of closed trades.
         """
 
         formed_trades_uuid = []  # Array of trades formed (uuid)
-        to_close = {}  # Trades to close.
+        to_close = {}  # Trades to close
         z_score = self.get_z_score(self.spread_series, self.sma_window, self.std_window)
         for timestamp, data in self.open_trades.items():
             data['latest_update_timestamp'] = update_timestamp
