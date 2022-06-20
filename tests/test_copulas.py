@@ -581,7 +581,7 @@ class TestCopulas(unittest.TestCase):
         expected_theta = np.array([4.823917032678924, 7.6478340653578485, 17.479858671919537, 8.416268109560686,
                                    13.006445455285089, 4.323917032678924, 0.9431138949207484, 0.9471157685912241])
 
-        np.testing.assert_array_almost_equal(theta_hats, expected_theta, decimal=6)
+        np.testing.assert_array_almost_equal(theta_hats, expected_theta, decimal=3)
 
     def test_fit_copula(self):
         """

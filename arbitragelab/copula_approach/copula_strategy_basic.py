@@ -21,6 +21,7 @@ import pandas as pd
 import scipy.stats as ss
 
 from arbitragelab.copula_approach.elliptical import (GaussianCopula, StudentCopula)
+from arbitragelab.copula_approach.switcher import Switcher
 import arbitragelab.copula_approach.base as cop
 import arbitragelab.copula_approach.copula_calculation as copcalc
 import arbitragelab.copula_approach.mixed_copulas as copmix
@@ -235,7 +236,7 @@ class BasicCopulaStrategy:
         x = data.iloc[:, 0].to_numpy()
         y = data.iloc[:, 1].to_numpy()
 
-        switch = cop.Switcher()  # Initiate a switcher class to initiate copula by its name in string.
+        switch = Switcher()  # Initiate a switcher class to initiate copula by its name in string.
 
         # Calculate Kendall's tau from data.
         tau = ss.kendalltau(x, y)[0]
