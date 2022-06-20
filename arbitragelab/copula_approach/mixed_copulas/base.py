@@ -15,7 +15,7 @@ Statistical Association, 109(506), pp.788-801.
 <https://www.tandfonline.com/doi/pdf/10.1080/01621459.2013.873366?casa_token=sey8HrojSgYAAAAA:TEMBX8wLYdGFGyM78UXSYm6hXl1Qp_K6wiLgRJf6kPcqW4dYT8z3oA3I_odrAL48DNr3OSoqkQsEmQ>`__
 """
 
-# pylint: disable = invalid-name, too-many-locals
+# pylint: disable = invalid-name, too-many-locals, arguments-differ
 from abc import ABC, abstractmethod
 
 import numpy as np
@@ -29,11 +29,13 @@ class MixedCopula(Copula, ABC):
     Class template for mixed copulas.
     """
 
-    def __init__(self):
+    def __init__(self, copula_name: str):
         """
         Initiate the MixedCopula class.
+
+        :param copula_name: (str) Copula name.
         """
-        super().__init__()
+        super().__init__(copula_name)
         self.weights = None
         self.copulas = None
 

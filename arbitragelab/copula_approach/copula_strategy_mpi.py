@@ -14,8 +14,8 @@ import numpy as np
 import pandas as pd
 
 from arbitragelab.copula_approach.copula_strategy_basic import BasicCopulaStrategy
-import arbitragelab.copula_approach.copula_generate as cg
-import arbitragelab.copula_approach.copula_generate_mixedcopula as cgmix
+import arbitragelab.copula_approach.base as cop
+import arbitragelab.copula_approach.mixed_copulas.base as copmix
 from arbitragelab.util import segment
 
 
@@ -39,7 +39,7 @@ class CopulaStrategyMPI(BasicCopulaStrategy):
 
     """
 
-    def __init__(self, copula: Union[cg.Copula, cgmix.MixedCopula] = None,
+    def __init__(self, copula: Union[cop.Copula, copmix.MixedCopula] = None,
                  opening_triggers: tuple = (-0.6, 0.6), stop_loss_positions: tuple = (-2, 2)):
         """
         Initiate a CopulaStrategyMPI class.

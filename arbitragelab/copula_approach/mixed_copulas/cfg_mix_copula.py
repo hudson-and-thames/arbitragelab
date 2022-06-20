@@ -15,9 +15,9 @@ Statistical Association, 109(506), pp.788-801.
 <https://www.tandfonline.com/doi/pdf/10.1080/01621459.2013.873366?casa_token=sey8HrojSgYAAAAA:TEMBX8wLYdGFGyM78UXSYm6hXl1Qp_K6wiLgRJf6kPcqW4dYT8z3oA3I_odrAL48DNr3OSoqkQsEmQ>`__
 """
 
+# pylint: disable = invalid-name, too-many-locals, arguments-differ
 import numpy as np
 import pandas as pd
-# pylint: disable = invalid-name, too-many-locals
 from scipy.optimize import minimize
 
 import arbitragelab.copula_approach.copula_calculation as ccalc
@@ -39,7 +39,7 @@ class CFGMixCop(MixedCopula):
         :param weights: (list) (3, ) size. Copulas weights for Clayton, Frank and Gumbel respectively. Need to be
             positive and sum up to 1.
         """
-        super().__init__()
+        super().__init__('CFGMixCop')
         self.cop_params = cop_params
         self.weights = weights
         self.clayton_cop, self.frank_cop, self.gumbel_cop = None, None, None

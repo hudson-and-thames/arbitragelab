@@ -1,3 +1,7 @@
+"""
+This module implements Archimedean Copulas.
+"""
+
 from arbitragelab.copula_approach.archimedean.gumbel import Gumbel
 from arbitragelab.copula_approach.archimedean.clayton import Clayton
 from arbitragelab.copula_approach.archimedean.frank import Frank

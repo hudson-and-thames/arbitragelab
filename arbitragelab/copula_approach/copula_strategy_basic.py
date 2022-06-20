@@ -13,16 +13,17 @@ better structure, native pandas support, and supports mixed copulas. The trading
 wrapped in one method for easier adjustment when needed, due to the ambiguities from the paper.
 """
 
-# pylint: disable = invalid-name, too-many-instance-attributes
+# pylint: disable = invalid-name, too-many-instance-attributes, abstract-class-instantiated
 from typing import Callable, Tuple, Union
 from scipy.optimize import minimize
 import numpy as np
 import pandas as pd
 import scipy.stats as ss
 
-import arbitragelab.copula_approach.copula_generate as cg
-import arbitragelab.copula_approach.copula_calculation as ccalc
-import arbitragelab.copula_approach.copula_generate_mixedcopula as cgmix
+from arbitragelab.copula_approach.elliptical import (GaussianCopula, StudentCopula)
+import arbitragelab.copula_approach.base as cop
+import arbitragelab.copula_approach.copula_calculation as copcalc
+import arbitragelab.copula_approach.mixed_copulas as copmix
 from arbitragelab.util import segment
 
 
@@ -39,7 +40,7 @@ class BasicCopulaStrategy:
 
     """
 
-    def __init__(self, copula: Union[cg.Copula, cgmix.MixedCopula] = None, open_thresholds: tuple = (0.05, 0.95),
+    def __init__(self, copula: Union[cop.Copula, copmix.MixedCopula] = None, open_thresholds: tuple = (0.05, 0.95),
                  exit_thresholds: tuple = (0.5, 0.5)):
         """
         Initiate a BasicCopulaStrategy class.
@@ -101,7 +102,7 @@ class BasicCopulaStrategy:
 
         # Loop through all columns.
         for i in range(column_count):
-            cdf_lst[i] = ccalc.construct_ecdf_lin(data.iloc[:, i])
+            cdf_lst[i] = copcalc.construct_ecdf_lin(data.iloc[:, i])
             quantile_data_lst[i] = data.iloc[:, i].map(cdf_lst[i])
 
         quantile_data = pd.concat(quantile_data_lst, axis=1)  # Form the quantile DataFrame.
@@ -213,9 +214,9 @@ class BasicCopulaStrategy:
         :return: (tuple) Result of SIC, AIC and HQIC.
         """
 
-        sic_value = ccalc.sic(log_likelihood, n, k)
-        aic_value = ccalc.aic(log_likelihood, n, k)
-        hqic_value = ccalc.hqic(log_likelihood, n, k)
+        sic_value = copcalc.sic(log_likelihood, n, k)
+        aic_value = copcalc.aic(log_likelihood, n, k)
+        hqic_value = copcalc.hqic(log_likelihood, n, k)
 
         return sic_value, aic_value, hqic_value
 
@@ -234,7 +235,7 @@ class BasicCopulaStrategy:
         x = data.iloc[:, 0].to_numpy()
         y = data.iloc[:, 1].to_numpy()
 
-        switch = cg.Switcher()  # Initiate a switcher class to initiate copula by its name in string.
+        switch = cop.Switcher()  # Initiate a switcher class to initiate copula by its name in string.
 
         # Calculate Kendall's tau from data.
         tau = ss.kendalltau(x, y)[0]
@@ -266,11 +267,11 @@ class BasicCopulaStrategy:
         tau = ss.kendalltau(x, y)[0]
         # Calculate rho hat from the specific copula using Kendall's tau.
         dud_cov = [[1, 0.5], [0.5, 1]]
-        temp_gaussian_copula = cg.GaussianCopula(cov=dud_cov)
+        temp_gaussian_copula = GaussianCopula(cov=dud_cov)
         rho_hat = temp_gaussian_copula.theta_hat(tau)
         cov_hat = [[1, rho_hat], [rho_hat, 1]]
         # Use the result to instantiate a copula as the fitted copula
-        fitted_copula = cg.GaussianCopula(cov=cov_hat)
+        fitted_copula = GaussianCopula(cov=cov_hat)
         # Calculate the sum of log likelihood
         log_likelihood = np.sum(np.log([fitted_copula.get_cop_density(xi, yi) for (xi, yi) in zip(x, y)]))
 
@@ -300,7 +301,7 @@ class BasicCopulaStrategy:
         tau = ss.kendalltau(x, y)[0]
         dud_cov = [[1, 0.5], [0.5, 1]]  # Dud param to initiate a t copula for calculation.
         dud_nu = 4  # Dud param to initiate a t copula for calculation.
-        temp_t_copula = cg.Student(cov=dud_cov, nu=dud_nu)
+        temp_t_copula = StudentCopula(cov=dud_cov, nu=dud_nu)
         # Calculate rho hat from the specific copula using Kendall's tau.
         rho_hat = temp_t_copula.theta_hat(tau)
         cov_hat = [[1, rho_hat], [rho_hat, 1]]
@@ -309,7 +310,7 @@ class BasicCopulaStrategy:
         # Define the objective function.
         def neg_log_likelihood_for_t_copula(nu):
 
-            temp_t_cop = cg.Student(cov=cov_hat, nu=nu)
+            temp_t_cop = StudentCopula(cov=cov_hat, nu=nu)
             log_likelihood_local = np.sum(np.log([temp_t_cop.get_cop_density(xi, yi) for (xi, yi) in zip(x, y)]))
 
             return -1 * log_likelihood_local  # Minimizing the negative of likelihood.
@@ -326,7 +327,7 @@ class BasicCopulaStrategy:
 
         # 3. Return result
         # Use the result to instantiate a copula as the fitted copula
-        fitted_copula = cg.Student(cov=cov_hat, nu=nu_hat)
+        fitted_copula = StudentCopula(cov=cov_hat, nu=nu_hat)
         # Calculate the sum of log likelihood
         log_likelihood = np.sum(np.log([fitted_copula.get_cop_density(xi, yi) for (xi, yi) in zip(x, y)]))
 
@@ -357,11 +358,11 @@ class BasicCopulaStrategy:
 
         # Wrapping around each mixed copula's own fit function.
         if copula_name == 'CFGMixCop':
-            copula = cgmix.CFGMixCop()
+            copula = copmix.CFGMixCop()
             log_likelihood = copula.fit(data, max_iter, gamma_scad, a_scad, weight_margin)
 
         if copula_name == 'CTGMixCop':
-            copula = cgmix.CTGMixCop()
+            copula = copmix.CTGMixCop()
             log_likelihood = copula.fit(data, max_iter, gamma_scad, a_scad, weight_margin)
 
         return log_likelihood, copula
