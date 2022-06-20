@@ -4,7 +4,7 @@
 """
 Unit tests for generating and fitting mixed copulas.
 """
-# pylint: disable = invalid-name,  protected-access
+# pylint: disable = invalid-name, protected-access, no-name-in-module
 import os
 import unittest
 import datetime as dt

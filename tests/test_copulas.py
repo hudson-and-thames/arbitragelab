@@ -4,7 +4,7 @@
 """
 Unit tests for copula functions.
 """
-# pylint: disable = invalid-name,  protected-access, too-many-locals
+# pylint: disable = invalid-name,  protected-access, too-many-locals, unexpected-keyword-arg
 
 import os
 import unittest
@@ -499,7 +499,8 @@ class TestCopulas(unittest.TestCase):
             if copula_names[i] in elliptics:
                 self.assertAlmostEqual(0.5, thetas[copula_names[i]], delta=0.05)  # Compare rho (corr)
 
-    def test_series_condi_prob(self):
+    @staticmethod
+    def test_series_condi_prob():
         """
         Test calculating the conditional probabilities of a series.
         """

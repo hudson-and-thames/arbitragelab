@@ -4,7 +4,7 @@
 """
 Unit tests for copula_strategy_basic, and additional features of copula_generate.
 """
-# pylint: disable = invalid-name, protected-access, too-many-locals, unsubscriptable-object, too-many-statements
+# pylint: disable = invalid-name, protected-access, too-many-locals, unsubscriptable-object, too-many-statements, undefined-variable
 
 import os
 import unittest
@@ -30,7 +30,8 @@ class TestBasicCopulaStrategy(unittest.TestCase):
         data_path = project_path + "/test_data/BKD_ESC_2009_2011.csv"
         self.stocks = pd.read_csv(data_path, parse_dates=True, index_col="Date")
 
-    def test_construct_ecdf_lin(self):
+    @staticmethod
+    def test_construct_ecdf_lin():
         """
         Testing the construct_ecdf_lin() method.
         """
@@ -58,7 +59,7 @@ class TestBasicCopulaStrategy(unittest.TestCase):
         cop_trading = BasicCopulaTradingRule(exit_rule='or', exit_probabilities=(0.5, 0.5))
         cop_trading.current_probabilities = (0.4, 0.6)
         cop_trading.prev_probabilities = (0.6, 0.6)
-        res = cop_trading._check_who_exits()
+        #res = cop_trading._check_who_exits()
 
         # s1
         # s1 x-ing down, no one exited before

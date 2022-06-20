@@ -13,6 +13,7 @@ better structure, native pandas support, and supports mixed copulas. The trading
 wrapped in one method for easier adjustment when needed, due to the ambiguities from the paper.
 """
 
+# pylint: disable = invalid-name
 from typing import Tuple, Callable, Dict
 from uuid import UUID
 

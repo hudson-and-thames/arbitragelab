@@ -5,6 +5,7 @@
 T-Student copula implementation.
 """
 
+# pylint: disable = invalid-name, arguments-differ
 import numpy as np
 import scipy.stats as ss
 from scipy.integrate import dblquad

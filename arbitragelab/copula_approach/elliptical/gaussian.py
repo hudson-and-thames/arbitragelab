@@ -5,6 +5,7 @@
 Gaussian copula implementation.
 """
 
+# pylint: disable = invalid-name, too-many-lines, arguments-differ
 import numpy as np
 import scipy.stats as ss
 from sklearn.covariance import EmpiricalCovariance
@@ -13,7 +14,6 @@ from arbitragelab.copula_approach.base import Copula
 from arbitragelab.util import segment
 
 
-# pylint: disable = invalid-name, too-many-lines
 class GaussianCopula(Copula):
     """
     Bivariate Gaussian Copula.
