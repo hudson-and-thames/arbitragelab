@@ -144,19 +144,16 @@ class Copula(ABC):
         log_likelihood_sum = np.sum(np.log(likelihood_list))
         return log_likelihood_sum
 
-    @abstractmethod
     def c(self, u: float, v: float) -> float:
         """
         Place holder for calculating copula density.
         """
 
-    @abstractmethod
     def C(self, u: float, v: float) -> float:
         """
         Place holder for calculating copula evaluation.
         """
 
-    @abstractmethod
     def condi_cdf(self, u: float, v: float) -> float:
         """
         Place holder for calculating copula conditional probability.
@@ -280,14 +277,17 @@ class Copula(ABC):
 
     def plot_scatter(self, num_points: int = 100):
         """
-        Plot copula scatter plot of generated pseudo-observations..
+        Plot copula scatter plot of generated pseudo-observations.
 
         :param num_points: (int) Number of samples to generate.
+        :return: (plt.axis) Axis object.
         """
+
         samples = self.sample(num=num_points)
-        plt.title('Scatter/heat plot for generated copula samples.')
-        sns.kdeplot(samples[:, 0], samples[:, 1], shade=True)
-        plt.show()
+        ax = sns.kdeplot(samples[:, 0], samples[:, 1], shade=True)
+        ax.set_title('Scatter/heat plot for generated copula samples.')
+
+        return ax
 
     def plot_pdf(self, plot_type: str = '3d', grid_size: int = 50, levels: list = None, **kwargs) -> plt.axis:
         """

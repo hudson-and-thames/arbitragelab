@@ -130,20 +130,20 @@ class MixedCopula(Copula, ABC):
 
         return result
 
-    def sample(self, num_points: int) -> np.array:
+    def sample(self, num: int) -> np.array:
         """
         Generate pairs according to P.D.F., stored in a 2D np.array of shape (num, 2).
 
-        :param num_points: (int) Number of points to generate.
+        :param num: (int) Number of points to generate.
         :return sample_pairs: (np.array) Shape=(num, 2) array, sampled data for this copula.
         """
 
         # Generate a list of identities in {0, 1, 2} with given probability to determine which copula each
         # observation comes from. e.g. cop_identities[100, 2] means the 100th observation comes from copula 2
-        cop_identities = np.random.choice([0, 1, 2], num_points, p=self.weights)
+        cop_identities = np.random.choice([0, 1, 2], num, p=self.weights)
 
         # Generate random pairs from the copula given by cop_identities
-        sample_pairs = np.zeros(shape=(num_points, 2))
+        sample_pairs = np.zeros(shape=(num, 2))
         for i, cop_id in enumerate(cop_identities):
             sample_pairs[i] = self.copulas[cop_id].sample(num=1).flatten()
 
