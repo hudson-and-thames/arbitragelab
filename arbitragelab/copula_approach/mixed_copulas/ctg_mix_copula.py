@@ -21,7 +21,7 @@ class CTGMixCop(MixedCopula):
     """
     Clayton, Student-t and Gumbel mixed copula.
 
-     Mixed copula for trading strategy method described in the following article:
+    Mixed copula for trading strategy method described in the following article
     `B Sabino da Silva, F., Ziegelman, F. and Caldeira, J., 2017. Mixed Copula Pairs Trading Strategy on the S&P 500.
     Flávio and Caldeira, João, Mixed Copula Pairs Trading Strategy on the S&P, 500.
     <https://www.researchgate.net/profile/Fernando_Sabino_Da_Silva/publication/315878098_Mixed_Copula_Pairs_Trading_Strategy_on_the_SP_500/links/5c6f080b92851c695036785f/Mixed-Copula-Pairs-Trading-Strategy-on-the-S-P-500.pdf>`__

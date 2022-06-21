@@ -253,7 +253,7 @@ def fit_copula_to_empirical_data(x: np.array, y: np.array, copula: Copula) -> tu
     Fit copula to empirical data and generate goodness-of-fit statistics as well as empirical CDFs used in estimation.
 
 
-     If fitting a Student-t copula, it also includes a max likelihood fit for nu using COBYLA method from
+    If fitting a Student-t copula, it also includes a max likelihood fit for nu using COBYLA method from
     scipy.optimize.minimize. nu's fit range is [1, 15]. When the user wishes to use nu > 15, please delegate to
     Gaussian copula instead. This step is relatively slow.
 
@@ -271,6 +271,7 @@ def fit_copula_to_empirical_data(x: np.array, y: np.array, copula: Copula) -> tu
         The fitted copula with parameters satisfying maximum likelihood;
         The cumulative density function for series 1, using training data;
         The cumulative density function for series 2, using training data.
+
     """
 
     num_of_instances = len(x)  # Number of instances

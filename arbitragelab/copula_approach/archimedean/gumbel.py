@@ -26,7 +26,6 @@ class Gumbel(Copula):
 
         :param theta: (float) Range in [1, +inf), measurement of copula dependency.
         :param threshold: (float) Optional. Below this threshold, a percentile will be rounded to the threshold.
-
         """
 
         super().__init__('Gumbel')

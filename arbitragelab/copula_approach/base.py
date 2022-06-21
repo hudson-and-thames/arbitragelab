@@ -255,11 +255,11 @@ class Copula(ABC):
 
     def plot_cdf(self, plot_type: str = '3d', grid_size: int = 50, levels: list = None, **kwargs) -> plt.axis:
         """
-        Plot either `3d` or `contour` plot of copula CDF.
+        Plot either '3d' or 'contour' plot of copula CDF.
 
-        :param plot_type: (str) Either ``3d` or `contour`(2D) plot.
+        :param plot_type: (str) Either '3d' or 'contour'(2D) plot.
         :param grid_size: (int) Mesh grid granularity.
-        :param kwargs: (dict) User-specified params for `ax.plot_surface`/`plt.contour`.
+        :param kwargs: (dict) User-specified params for 'ax.plot_surface'/'plt.contour'.
         :param levels: (list) List of float values that determine the number and levels of lines in a contour plot.
             If not provided, these are calculated automatically.
         :return: (plt.axis) Axis object.
@@ -309,9 +309,9 @@ class Copula(ABC):
 
     def plot_pdf(self, plot_type: str = '3d', grid_size: int = 50, levels: list = None, **kwargs) -> plt.axis:
         """
-        Plot either `3d` or `contour` plot of copula PDF.
+        Plot either '3d' or 'contour' plot of copula PDF.
 
-        :param plot_type: (str) Either ``3d` or `contour`(2D) plot.
+        :param plot_type: (str) Either '3d' or 'contour'(2D) plot.
         :param grid_size: (int) Mesh grid granularity.
         :param levels: (list) List of float values that determine the number and levels of lines in a contour plot.
             If not provided, these are calculated automatically.
