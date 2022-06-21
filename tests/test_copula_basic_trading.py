@@ -791,23 +791,23 @@ class TestBasicCopulaStrategy(unittest.TestCase):
         BCS = BasicCopulaStrategy()
         result_dict, fitted_copula, _, _ = BCS.fit_copula(data_df, copula_name='CFGMixCop', gamma_scad=0.6)
         self.assertEqual(result_dict['Copula Name'], 'CFGMixCop')
-        self.assertAlmostEqual(result_dict['SIC'], -118.65262, delta=1e-3)
-        self.assertAlmostEqual(result_dict['AIC'], -131.04017, delta=1e-3)
-        self.assertAlmostEqual(result_dict['HQIC'], -126.40667, delta=1e-3)
-        self.assertAlmostEqual(result_dict['Log-likelihood'], 70.83923, delta=1e-3)
+        self.assertAlmostEqual(result_dict['SIC'], -118.65262, delta=1e-1)
+        self.assertAlmostEqual(result_dict['AIC'], -131.04017, delta=1e-1)
+        self.assertAlmostEqual(result_dict['HQIC'], -126.40667, delta=1e-1)
+        self.assertAlmostEqual(result_dict['Log-likelihood'], 70.83923, delta=1e-1)
         np.testing.assert_array_almost_equal(np.array([3.72838561, 9.14453931, 3.15724219]), fitted_copula.cop_params, decimal=2)
         np.testing.assert_array_almost_equal(np.array([0.63727115, 0., 0.36272885]), fitted_copula.weights, decimal=2)
 
         # Fit CTGMixCop to data using BCS
         result_dict, fitted_copula, _, _ = BCS.fit_copula(data_df, copula_name='CTGMixCop', gamma_scad=0.1)
         self.assertEqual(result_dict['Copula Name'], 'CTGMixCop')
-        self.assertAlmostEqual(result_dict['SIC'], -111.33409, delta=1e-3)
-        self.assertAlmostEqual(result_dict['AIC'], -126.06189, delta=1e-3)
-        self.assertAlmostEqual(result_dict['HQIC'], -120.63896, delta=1e-3)
-        self.assertAlmostEqual(result_dict['Log-likelihood'], 69.48256, delta=1e-3)
+        self.assertAlmostEqual(result_dict['SIC'], -111.33409, delta=1e-1)
+        self.assertAlmostEqual(result_dict['AIC'], -126.06189, delta=1e-1)
+        self.assertAlmostEqual(result_dict['HQIC'], -120.63896, delta=1e-1)
+        self.assertAlmostEqual(result_dict['Log-likelihood'], 69.48256, delta=1e-1)
         np.testing.assert_array_almost_equal(np.array([3.47253382, 0.53975521, 3.99536284, 3.3839099]),
-                                             fitted_copula.cop_params, decimal=3)
-        np.testing.assert_array_almost_equal(np.array([ 0.86451042, -0., 0.13548958]), fitted_copula.weights, decimal=3)
+                                             fitted_copula.cop_params, decimal=2)
+        np.testing.assert_array_almost_equal(np.array([ 0.86451042, -0., 0.13548958]), fitted_copula.weights, decimal=2)
         # Reset the random seed
         np.random.seed(None)
 
