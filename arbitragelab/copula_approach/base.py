@@ -304,7 +304,7 @@ class Copula(ABC):
 
         if plot_type == "3d":
             bounds = [0 + 1e-1 / 2, 1 - 1e-1 / 2]
-        elif plot_type == "contour":
+        else:  # plot_type == "contour"
             bounds = [0 + 1e-2, 1 - 1e-2]
 
         u_grid, v_grid = np.meshgrid(

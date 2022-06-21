@@ -579,6 +579,27 @@ class TestBasicCopulaStrategy(unittest.TestCase):
         condi_probs = BCS.get_condi_probs(quantiles)
         pd.testing.assert_frame_equal(expec_condi_probs, condi_probs, check_dtype=False, check_less_precise=3)
 
+        # Initiate a BasicCopulaStrategy Class with a mixed CFG copula
+        ctg = copmix.CFGMixCop(cop_params=(4, 0.9, 4, 4), weights=(0.2, 0.4, 0.4))
+        BCS = BasicCopulaStrategy(copula=ctg)
+
+        # Check exception handling for NaN
+        nan_data = {'s1': [0, 1 / 6, 2 / 6, 3 / 6, 4 / 6, 5 / 6, 1, 0, 1],
+                    's2': [1, np.nan, 2 / 5, 3 / 5, 1 / 5, 4 / 5, 5 / 9, 0, 1]}
+        quantiles = pd.DataFrame.from_dict(nan_data)
+        with self.assertRaises(ValueError):
+            BCS.get_condi_probs(quantiles)
+
+        # Check conditional probs
+        data = {'s1': [0, 1 / 6, 2 / 6, 2 / 5, 4 / 6, 5 / 6, 1 / 9, 0, 1],
+                's2': [1, 1 / 2, 2 / 5, 2 / 6, 1 / 5, 4 / 5, 5 / 9, 0, 1]}
+        quantiles = pd.DataFrame.from_dict(data)
+        expec_data = {'s1': [2.46645e-06, 0.073760, 0.318442, 0.562979, 0.886932, 0.742168, 0.043110, 0.111026, 0.837824],
+                      's2': [0.999997533, 0.816436, 0.562979, 0.318442, 0.072054, 0.559472, 0.853131, 0.111026, 0.837824]}
+        expec_condi_probs = pd.DataFrame.from_dict(expec_data)
+        condi_probs = BCS.get_condi_probs(quantiles)
+        pd.testing.assert_frame_equal(expec_condi_probs, condi_probs, check_dtype=False, check_less_precise=3)
+
         # Initiate a BasicCopulaStrategy Class with a N14 copula
         n14 = coparc.N14(theta=4)
         BCS = BasicCopulaStrategy(copula=n14)
@@ -764,31 +785,31 @@ class TestBasicCopulaStrategy(unittest.TestCase):
         """
 
         np.random.seed(724)
-        data_df = self.stocks
+        data_df = self.stocks.iloc[:100]
 
         # Fit CFGMixCop to data using BCS
         BCS = BasicCopulaStrategy()
         result_dict, fitted_copula, _, _ = BCS.fit_copula(data_df, copula_name='CFGMixCop', gamma_scad=0.6)
         self.assertEqual(result_dict['Copula Name'], 'CFGMixCop')
-        self.assertAlmostEqual(result_dict['SIC'], -2216.2580056272263, delta=1e-3)
-        self.assertAlmostEqual(result_dict['AIC'], -2240.761659669632, delta=1e-3)
-        self.assertAlmostEqual(result_dict['HQIC'], -2231.488054789991, delta=1e-3)
-        self.assertAlmostEqual(result_dict['Log-likelihood'], 1125.410859864846, delta=1e-3)
-        np.testing.assert_array_almost_equal(np.array([6.626, 4, 4.787]), fitted_copula.cop_params, decimal=2)
-        np.testing.assert_array_almost_equal(np.array([0.504756, 0, 0.495244]), fitted_copula.weights, decimal=2)
+        self.assertAlmostEqual(result_dict['SIC'], -118.65262, delta=1e-3)
+        self.assertAlmostEqual(result_dict['AIC'], -131.04017, delta=1e-3)
+        self.assertAlmostEqual(result_dict['HQIC'], -126.40667, delta=1e-3)
+        self.assertAlmostEqual(result_dict['Log-likelihood'], 70.83923, delta=1e-3)
+        np.testing.assert_array_almost_equal(np.array([3.72838561, 9.14453931, 3.15724219]), fitted_copula.cop_params, decimal=2)
+        np.testing.assert_array_almost_equal(np.array([0.63727115, 0., 0.36272885]), fitted_copula.weights, decimal=2)
 
         # Fit CTGMixCop to data using BCS
-        #result_dict, fitted_copula, _, _ = BCS.fit_copula(data_df, copula_name='CTGMixCop', gamma_scad=0.6)
-        #self.assertEqual(result_dict['Copula Name'], 'CTGMixCop')
-        #self.assertAlmostEqual(result_dict['SIC'], -2209.358326366888, delta=1e-3)
-        #self.assertAlmostEqual(result_dict['AIC'], -2238.7506149531737, delta=1e-3)
-        #self.assertAlmostEqual(result_dict['HQIC'], -2227.6343853622056, delta=1e-3)
-        #self.assertAlmostEqual(result_dict['Log-likelihood'], 1125.4173916449236, delta=1e-3)
-        #np.testing.assert_array_almost_equal(np.array([6.61214214, 0.51157163, 3.99975286, 4.79351409]),
-        #                                     fitted_copula.cop_params, decimal=3)
-        #np.testing.assert_array_almost_equal(np.array([0.51051289, 0, 0.48948711]), fitted_copula.weights, decimal=3)
+        result_dict, fitted_copula, _, _ = BCS.fit_copula(data_df, copula_name='CTGMixCop', gamma_scad=0.1)
+        self.assertEqual(result_dict['Copula Name'], 'CTGMixCop')
+        self.assertAlmostEqual(result_dict['SIC'], -111.33409, delta=1e-3)
+        self.assertAlmostEqual(result_dict['AIC'], -126.06189, delta=1e-3)
+        self.assertAlmostEqual(result_dict['HQIC'], -120.63896, delta=1e-3)
+        self.assertAlmostEqual(result_dict['Log-likelihood'], 69.48256, delta=1e-3)
+        np.testing.assert_array_almost_equal(np.array([3.47253382, 0.53975521, 3.99536284, 3.3839099]),
+                                             fitted_copula.cop_params, decimal=3)
+        np.testing.assert_array_almost_equal(np.array([ 0.86451042, -0., 0.13548958]), fitted_copula.weights, decimal=3)
         # Reset the random seed
-        #np.random.seed(None)
+        np.random.seed(None)
 
     @staticmethod
     def test_get_cop_density_abs_class_method():

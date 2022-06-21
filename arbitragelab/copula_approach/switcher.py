@@ -13,7 +13,6 @@ to emulate a switch functionality.
 from typing import Callable
 
 from arbitragelab.copula_approach.archimedean import (Gumbel, Frank, Clayton, Joe, N13, N14)
-from arbitragelab.copula_approach.elliptical import (GaussianCopula, StudentCopula)
 from arbitragelab.util import segment
 
 
@@ -41,8 +40,6 @@ class Switcher:
         :param kwargs: (dict) Keyword arguments to generate a copula by its name.
             copula_name: (str) Name of the copula.
             theta: (float) A measurement of correlation.
-            cov: (np.array) Covariance matrix, only useful for Gaussian and Student-t.
-            nu: (float) Degree of freedom, only useful for Student-t.
         :return method: (func) The method that creates the wanted copula. Eventually the returned object
             is a copula.
         """
@@ -50,8 +47,6 @@ class Switcher:
         # Taking parameters from kwargs.
         copula_name = kwargs.get('copula_name')
         self.theta = kwargs.get('theta', None)
-        self.cov = kwargs.get('cov', None)
-        self.nu = kwargs.get('nu', None)
 
         # Create copula from string names, by using class attributes/methods.
         method_name = '_create_' + str(copula_name).lower()
@@ -110,23 +105,5 @@ class Switcher:
         """
 
         my_copula = N14(theta=self.theta)
-
-        return my_copula
-
-    def _create_gaussian(self) -> GaussianCopula:
-        """
-        Create Gaussian copula.
-        """
-
-        my_copula = GaussianCopula(cov=self.cov)
-
-        return my_copula
-
-    def _create_student(self) -> StudentCopula:
-        """
-        Create Student copula.
-        """
-
-        my_copula = StudentCopula(nu=self.nu, cov=self.cov)
 
         return my_copula
