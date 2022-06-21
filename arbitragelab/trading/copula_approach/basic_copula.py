@@ -191,7 +191,7 @@ class BasicCopulaTradingRule:
         exit_flag = self._check_who_exits()
         for timestamp, data in self.open_trades.items():
             data['latest_update_timestamp'] = update_timestamp
-            if exit_flag[data['side']] is True:
+            if exit_flag[data['side']]:
                 to_close[timestamp] = data
 
         if len(to_close) != 0:
