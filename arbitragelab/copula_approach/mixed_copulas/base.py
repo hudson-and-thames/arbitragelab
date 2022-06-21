@@ -2,17 +2,7 @@
 # All rights reserved
 # Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 """
-Module that uses copula for trading strategy based method described in the following article.
-
-`B Sabino da Silva, F., Ziegelman, F. and Caldeira, J., 2017. Mixed Copula Pairs Trading Strategy on the S&P 500.
-Flávio and Caldeira, João, Mixed Copula Pairs Trading Strategy on the S&P, 500.
-<https://www.researchgate.net/profile/Fernando_Sabino_Da_Silva/publication/315878098_Mixed_Copula_Pairs_Trading_Strategy_on_the_SP_500/links/5c6f080b92851c695036785f/Mixed-Copula-Pairs-Trading-Strategy-on-the-S-P-500.pdf>`__
-
-Note: Algorithm for fitting mixed copula was adapted from
-
-`Cai, Z. and Wang, X., 2014. Selection of mixed copula model via penalized likelihood. Journal of the American
-Statistical Association, 109(506), pp.788-801.
-<https://www.tandfonline.com/doi/pdf/10.1080/01621459.2013.873366?casa_token=sey8HrojSgYAAAAA:TEMBX8wLYdGFGyM78UXSYm6hXl1Qp_K6wiLgRJf6kPcqW4dYT8z3oA3I_odrAL48DNr3OSoqkQsEmQ>`__
+Class template for mixed copulas.
 """
 
 # pylint: disable = invalid-name, too-many-locals, arguments-differ
@@ -35,6 +25,7 @@ class MixedCopula(Copula, ABC):
 
         :param copula_name: (str) Copula name.
         """
+
         super().__init__(copula_name)
         self.weights = None
         self.copulas = None
@@ -73,7 +64,7 @@ class MixedCopula(Copula, ABC):
         :return: (float) The probability density (aka copula density).
         """
 
-        # Mapping u, v back to the valid computational interval.
+        # Mapping u, v back to the valid computational interval
         u = min(max(eps, u), 1 - eps)
         v = min(max(eps, v), 1 - eps)
 
@@ -96,7 +87,7 @@ class MixedCopula(Copula, ABC):
         :return: (float) The cumulative density.
         """
 
-        # Mapping u, v back to the valid computational interval.
+        # Mapping u, v back to the valid computational interval
         u = min(max(eps, u), 1 - eps)
         v = min(max(eps, v), 1 - eps)
 
@@ -121,7 +112,7 @@ class MixedCopula(Copula, ABC):
         :return: (float) The conditional probability.
         """
 
-        # Mapping u, v back to the valid computational interval.
+        # Mapping u, v back to the valid computational interval
         u = min(max(eps, u), 1 - eps)
         v = min(max(eps, v), 1 - eps)
 
@@ -166,7 +157,7 @@ class MixedCopula(Copula, ABC):
         small_neg_bool = (lower_limit < x < 0)  # Whether it is a small negative number
         small_bool = small_pos_bool or small_neg_bool  # Whether it is a small number
         # If not small, then return the param
-        # If small, then return the corresponding limit.
+        # If small, then return the corresponding limit
         remapped_param = (x * int(not small_bool)
                           + upper_limit * int(small_pos_bool) + lower_limit * int(small_neg_bool))
 

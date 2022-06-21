@@ -2,12 +2,10 @@
 # All rights reserved
 # Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 """
-Module that houses all copula classes and the parent copula class.
-
-Also include a Switcher class to create copula by its name and parameters,
-to emulate a switch functionality.
+Module that houses Frank copula class.
 """
 
+# pylint: disable = invalid-name, too-many-lines
 import numpy as np
 from scipy.integrate import quad
 from scipy.optimize import brentq
@@ -15,8 +13,6 @@ from scipy.optimize import brentq
 from arbitragelab.copula_approach.base import Copula
 from arbitragelab.util import segment
 
-
-# pylint: disable = invalid-name, too-many-lines
 
 class Frank(Copula):
     """
@@ -47,19 +43,19 @@ class Frank(Copula):
         :param num: (int) Number of points to generate.
         :param unif_vec: (np.array) Shape=(num, 2) array, two independent uniformly distributed sets of data.
             Default uses numpy pseudo-random generators.
-        :return sample_pairs: (np.array) Shape=(num, 2) array, sampled data for this copula.
+        :return: (np.array) Shape=(num, 2) array, sampled data for this copula.
         """
 
         if num is None and unif_vec is None:
             raise ValueError("Please either input num or unif_vec.")
 
-        theta = self.theta  # Use the default input.
+        theta = self.theta  # Use the default input
 
-        # Generate pairs of indep uniform dist vectors. Use numpy to generate.
+        # Generate pairs of indep uniform dist vectors. Use numpy to generate
         if unif_vec is None:
             unif_vec = np.random.uniform(low=0, high=1, size=(num, 2))
 
-        # Compute Frank copulas from the unif pairs.
+        # Compute Frank copulas from the unif pairs
         sample_pairs = np.zeros_like(unif_vec)
         for row, pair in enumerate(unif_vec):
             sample_pairs[row] = self._generate_one_pair(pair[0],
@@ -186,7 +182,7 @@ class Frank(Copula):
 
             return 1 - 4 / theta + 4 * debye1(theta) / theta
 
-        # Numerically find the root.
+        # Numerically find the root
         result = brentq(lambda theta: kendall_tau(theta) - tau, -100, 100)
 
         return result

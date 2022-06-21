@@ -2,10 +2,7 @@
 # All rights reserved
 # Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 """
-Module that houses all copula classes and the parent copula class.
-
-Also include a Switcher class to create copula by its name and parameters,
-to emulate a switch functionality.
+Module that houses N13 copula class.
 """
 
 # pylint: disable = invalid-name, too-many-lines
@@ -48,7 +45,7 @@ class N13(Copula):
         :param num: (int) Number of points to generate.
         :param unif_vec: (np.array) Shape=(num, 2) array, two independent uniformly distributed sets of data.
             Default uses numpy pseudo-random generators.
-        :return sample_pairs: (np.array) Shape=(num, 2) array, sampled data for this copula.
+        :return: (np.array) Shape=(num, 2) array, sampled data for this copula.
         """
 
         if num is None and unif_vec is None:
@@ -60,7 +57,7 @@ class N13(Copula):
             return w + 1 / theta * (
                     w - w * np.power((1 - np.log(w)), 1 - theta) - w * np.log(w))
 
-        # Generate pairs of indep uniform dist vectors. Use numpy to generate.
+        # Generate pairs of indep uniform dist vectors. Use numpy to generate
         if unif_vec is None:
             unif_vec = np.random.uniform(low=0, high=1, size=(num, 2))
 
@@ -89,7 +86,7 @@ class N13(Copula):
             w = brentq(lambda w1: Kc(w1, theta) - v2,
                        self.threshold, 1 - self.threshold)
         else:
-            w = self.threshold  # Below the threshold, gives threshold as the root.
+            w = self.threshold  # Below the threshold, gives threshold as the root
         u1 = np.exp(
             1 - (v1 * ((1 - np.log(w)) ** theta - 1) + 1) ** (1 / theta))
 
@@ -195,7 +192,7 @@ class N13(Copula):
 
         # Calculate tau(theta) = 1 + 4*intg_0^1[phi(t)/d(phi(t)) dt]
         def kendall_tau(theta):
-            # phi(t)/d(phi(t)), phi is the generator function for this copula.
+            # phi(t)/d(phi(t)), phi is the generator function for this copula
             pddp = lambda x: -((x - x * (1 - np.log(x)) ** (1 - theta) - x * np.log(x)) / theta)
             result = quad(pddp, 0, 1, full_output=1)[0]
             return 1 + 4 * result

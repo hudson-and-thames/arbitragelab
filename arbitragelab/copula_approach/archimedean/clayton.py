@@ -2,25 +2,22 @@
 # All rights reserved
 # Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 """
-Module that houses all copula classes and the parent copula class.
-
-Also include a Switcher class to create copula by its name and parameters,
-to emulate a switch functionality.
+Module that houses Clayton copula class.
 """
 
+# pylint: disable = invalid-name, too-many-lines
 import numpy as np
 
 from arbitragelab.copula_approach.base import Copula
 from arbitragelab.util import segment
 
 
-# pylint: disable = invalid-name, too-many-lines
 class Clayton(Copula):
     """
     Clayton copula.
     """
 
-    def __init__(self, theta: float = None, threshold: float = 1e-10, ):
+    def __init__(self, theta: float = None, threshold: float = 1e-10):
         r"""
         Initiate a Clayton copula object.
 
@@ -46,7 +43,7 @@ class Clayton(Copula):
         :param num: (int) Number of points to generate.
         :param unif_vec: (np.array) Shape=(num, 2) array, two independent uniformly distributed sets of data.
             Default uses numpy pseudo-random generators.
-        :return sample_pairs: (np.array) Shape=(num, 2) array, sampled data for this copula.
+        :return: (np.array) Shape=(num, 2) array, sampled data for this copula.
         """
 
         if num is None and unif_vec is None:
@@ -54,7 +51,7 @@ class Clayton(Copula):
 
         theta = self.theta  # Use the default input
 
-        # Generate pairs of indep uniform dist vectors. Use numpy to generate.
+        # Generate pairs of indep uniform dist vectors. Use numpy to generate
         if unif_vec is None:
             unif_vec = np.random.uniform(low=0, high=1, size=(num, 2))
 

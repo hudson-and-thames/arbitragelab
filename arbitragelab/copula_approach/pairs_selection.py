@@ -4,6 +4,7 @@
 """
 Module for implementing some quick pairs selection algorithms for copula-based strategies.
 """
+
 # pylint: disable = invalid-name
 from typing import Union, List, Tuple
 from itertools import combinations
@@ -78,7 +79,7 @@ class PairsSelector:
         # 3. Ranks pairs based on the scores
         scores.sort_values(ascending=False, inplace=True)
 
-        # 4. Return the result in a data frame with columns 'Pair Name', 'Score'. Row index is the rank.
+        # 4. Return the result in a data frame with columns 'Pair Name', 'Score'. Row index is the rank
         if keep_num_pairs is not None:
             scores = scores[:keep_num_pairs]
 
@@ -138,10 +139,10 @@ class PairsSelector:
         :return: (pd.Series) The calculated scores stored in a series.
         """
 
-        # Initialize the scores dictionary for each available pairs.
+        # Initialize the scores dictionary for each available pairs
         scores = {pair_names: None for pair_names in pairs_names}
 
-        # Calculate the scores for each pair for each method.
+        # Calculate the scores for each pair for each method
         if method == 'spearman rho':
             for pair_names in pairs_names:
                 scores[pair_names] = self.spearman_rho(s1=stocks_universe[pair_names[0]],
@@ -157,7 +158,7 @@ class PairsSelector:
                 scores[pair_names] = self.euc_distance(s1=stocks_universe[pair_names[0]],
                                                        s2=stocks_universe[pair_names[1]])
 
-        # Convert the scores dictionary to a multi-indexed pd.Series.
+        # Convert the scores dictionary to a multi-indexed pd.Series
         scores_series = pd.Series(data=scores, name='Score')
         scores_series.index.set_names(['Stock 1', 'Stock 2'], inplace=True)
 
@@ -208,11 +209,11 @@ class PairsSelector:
         :return: (float) Negative sum of Euclidean distance value.
         """
 
-        # Convert to normalized prices.
+        # Convert to normalized prices
         s1_normalized = s1 / s1[0]
         s2_normalized = s2 / s2[0]
 
-        # Calculate the sum of Euclidean distance on normalized prices.
+        # Calculate the sum of Euclidean distance on normalized prices
         result = np.linalg.norm(s1_normalized - s2_normalized)
 
         return result * (-1)

@@ -2,10 +2,7 @@
 # All rights reserved
 # Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 """
-Module that houses all copula classes and the parent copula class.
-
-Also include a Switcher class to create copula by its name and parameters,
-to emulate a switch functionality.
+Module that houses N14 copula class.
 """
 
 # pylint: disable = invalid-name, too-many-lines
@@ -32,9 +29,9 @@ class N14(Copula):
         """
 
         super().__init__('N14')
-        # Lower than this amount will be rounded to threshold.
+        # Lower than this amount will be rounded to threshold
         self.threshold = threshold
-        self.theta = theta  # Default input.
+        self.theta = theta  # Default input
 
         segment.track('N14Copula')
 
@@ -47,22 +44,22 @@ class N14(Copula):
         :param num: (int) Number of points to generate.
         :param unif_vec: (np.array) Shape=(num, 2) array, two independent uniformly distributed sets of data.
             Default uses numpy pseudo-random generators.
-        :return sample_pairs: (np.array) Shape=(num, 2) array, sampled data for this copula.
+        :return: (np.array) Shape=(num, 2) array, sampled data for this copula.
         """
 
         if num is None and unif_vec is None:
             raise ValueError("Please either input num or unif_vec")
 
-        theta = self.theta  # Use the default input.
+        theta = self.theta  # Use the default input
 
         def _Kc(w: float, theta: float):
             return -w * (-2 + w ** (1 / theta))
 
-        # Generate pairs of indep uniform dist vectors. Use numpy to generate.
+        # Generate pairs of indep uniform dist vectors. Use numpy to generate
         if unif_vec is None:
             unif_vec = np.random.uniform(low=0, high=1, size=(num, 2))
 
-        # Compute Gumbel copulas from the unif pairs.
+        # Compute Gumbel copulas from the unif pairs
         sample_pairs = np.zeros_like(unif_vec)
         for row, pair in enumerate(unif_vec):
             sample_pairs[row] = self._generate_one_pair(pair[0], pair[1], theta=theta, Kc=_Kc)
@@ -84,7 +81,7 @@ class N14(Copula):
             w = brentq(lambda w1: Kc(w1, theta) - v2,
                        self.threshold, 1 - self.threshold)
         else:
-            w = self.threshold  # Below the threshold, gives threshold as the root.
+            w = self.threshold  # Below the threshold, gives threshold as the root
         u1 = (1 + (v1 * (w ** (-1 / theta) - 1) ** theta) ** (1 / theta)) ** (-theta)
         u2 = (1 + ((1 - v1) * (w ** (-1 / theta) - 1) ** theta) ** (1 / theta)) ** (-theta)
 
@@ -164,6 +161,7 @@ class N14(Copula):
         :param v: (float) A real number in [0, 1].
         :return: (float) The conditional probability.
         """
+
         theta = self.theta
         v_ker = -1 + np.power(v, -1 / theta)
         u_part = (-1 + np.power(u, -1 / theta)) ** theta

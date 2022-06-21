@@ -3,10 +3,7 @@
 # Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 
 """
-Abstract class for pairs copulas implementation.
-
-Also include a Switcher class to create copula by its name and parameters,
-to emulate a switch functionality.
+Abstract class for bivariate copula implementation.
 """
 
 # pylint: disable = invalid-name, too-many-function-args
@@ -33,7 +30,7 @@ class Copula(ABC):
         :param copula_name: (str) Copula name.
         """
 
-        # Name of each types of copula.
+        # Name of each types of copula
         self.archimedean_names = ('Gumbel', 'Clayton', 'Frank', 'Joe', 'N13', 'N14')
         self.elliptic_names = ('Gaussian', 'Student')
         self.theta = None
@@ -79,11 +76,11 @@ class Copula(ABC):
         :return: (float) The probability density (aka copula density).
         """
 
-        # Mapping u, v back to the valid computational interval.
+        # Mapping u, v back to the valid computational interval
         u = min(max(eps, u), 1 - eps)
         v = min(max(eps, v), 1 - eps)
 
-        # Wrapper around individual copula's c method.
+        # Wrapper around individual copula's c method
         return self.c(u, v)
 
     def get_cop_eval(self, u: float, v: float, eps: float = 1e-5) -> float:
@@ -100,11 +97,11 @@ class Copula(ABC):
         :return: (float) The evaluation of copula (aka cumulative joint distribution).
         """
 
-        # Mapping u, v back to the valid computational interval.
+        # Mapping u, v back to the valid computational interval
         u = min(max(eps, u), 1 - eps)
         v = min(max(eps, v), 1 - eps)
 
-        # Wrapper around individual copula's C method.
+        # Wrapper around individual copula's C method
         return self.C(u, v)
 
     def get_condi_prob(self, u: float, v: float, eps: float = 1e-5) -> float:
@@ -123,11 +120,11 @@ class Copula(ABC):
         :return: (float) The conditional probability.
         """
 
-        # Mapping u, v back to the valid computational interval.
+        # Mapping u, v back to the valid computational interval
         u = min(max(eps, u), 1 - eps)
         v = min(max(eps, v), 1 - eps)
 
-        # Wrapper around individual copula's condi_cdf method.
+        # Wrapper around individual copula's condi_cdf method
         return self.condi_cdf(u, v)
 
     def get_log_likelihood_sum(self, u: np.array, v: np.array) -> float:
@@ -138,31 +135,46 @@ class Copula(ABC):
         :param v: (np.array) 1D vector data of Y pseudo-observations. Need to be uniformly distributed [0, 1].
         :return: (float) Log-likelihood sum value.
         """
-        # Likelihood quantity for each pair of data, stored in a list.
+
+        # Likelihood quantity for each pair of data, stored in a list
         likelihood_list = [self.c(xi, yi) for (xi, yi) in zip(u, v)]
-        # Sum of logarithm of likelihood data.
+
+        # Sum of logarithm of likelihood data
         log_likelihood_sum = np.sum(np.log(likelihood_list))
+
         return log_likelihood_sum
 
     def c(self, u: float, v: float) -> float:
         """
-        Place holder for calculating copula density.
+        Placeholder for calculating copula density.
+
+        :param u: (float) A real number in [0, 1].
+        :param v: (float) A real number in [0, 1].
         """
 
     def C(self, u: float, v: float) -> float:
         """
-        Place holder for calculating copula evaluation.
+        Placeholder for calculating copula evaluation.
+
+        :param u: (float) A real number in [0, 1].
+        :param v: (float) A real number in [0, 1].
         """
 
     def condi_cdf(self, u: float, v: float) -> float:
         """
-        Place holder for calculating copula conditional probability.
+        Placeholder for calculating copula conditional probability.
+
+        :param u: (float) A real number in [0, 1].
+        :param v: (float) A real number in [0, 1].
         """
 
     @abstractmethod
     def sample(self, num: int = None, unif_vec: np.array = None) -> np.array:
         """
         Place holder for sampling from copula.
+
+        :param num: (int) Number of points to generate.
+        :param unif_vec: (np.array) Shape=(num, 2) array, two independent uniformly distributed sets of data.
         """
 
     def fit(self, u: np.array, v: np.array) -> float:
@@ -173,18 +185,20 @@ class Copula(ABC):
         :param v: (np.array) 1D vector data of Y pseudo-observations. Need to be uniformly distributed [0, 1].
         :return: (float) Theta hat estimate for fit copula.
         """
-        # Calculate Kendall's tau from data.
+
+        # Calculate Kendall's tau from data
         tau = ss.kendalltau(u, v)[0]
 
-        # Translate Kendall's tau into theta.
+        # Translate Kendall's tau into theta
         theta_hat = self.theta_hat(tau)
         self.theta = theta_hat
+
         return theta_hat
 
     @abstractmethod
     def _get_param(self):
         """
-        Place holder for getting the parameter(s) of the specific copula.
+        Placeholder for getting the parameter(s) of the specific copula.
         """
 
     @staticmethod
@@ -210,6 +224,7 @@ class Copula(ABC):
         ax.plot_surface(x, y, z, **kwargs)
         plt.title(title)
         plt.show()
+
         return ax
 
     @staticmethod
@@ -227,6 +242,7 @@ class Copula(ABC):
         :param kwargs: (dict) User-specified params for `plt.contour`.
         :return: (plt.axis) Axis object.
         """
+
         plt.figure()
         contour_plot = plt.contour(x, y, z, levels, colors='k', linewidths=1., linestyles=None, **kwargs)
         plt.clabel(contour_plot, fontsize=8, inline=1)
@@ -234,6 +250,7 @@ class Copula(ABC):
         plt.ylim(bounds)
         plt.title(title)
         plt.show()
+
         return contour_plot
 
     def plot_cdf(self, plot_type: str = '3d', grid_size: int = 50, levels: list = None, **kwargs) -> plt.axis:
@@ -247,6 +264,7 @@ class Copula(ABC):
             If not provided, these are calculated automatically.
         :return: (plt.axis) Axis object.
         """
+
         title = "Copula CDF"
 
         bounds = [0 + 1e-2, 1 - 1e-2]
@@ -275,7 +293,7 @@ class Copula(ABC):
 
         return ax
 
-    def plot_scatter(self, num_points: int = 100):
+    def plot_scatter(self, num_points: int = 100) -> plt.axis:
         """
         Plot copula scatter plot of generated pseudo-observations.
 

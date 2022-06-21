@@ -3,9 +3,7 @@
 # Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 
 """
-Abstract class for pairs copulas implementation.
-
-Also include a Switcher class to create copula by its name and parameters,
+Module that implements a Switcher class to create copula by its name and parameters,
 to emulate a switch functionality.
 """
 
@@ -44,11 +42,11 @@ class Switcher:
             is a copula.
         """
 
-        # Taking parameters from kwargs.
+        # Taking parameters from kwargs
         copula_name = kwargs.get('copula_name')
         self.theta = kwargs.get('theta', None)
 
-        # Create copula from string names, by using class attributes/methods.
+        # Create copula from string names, by using class attributes/methods
         method_name = '_create_' + str(copula_name).lower()
         method = getattr(self, method_name)
 

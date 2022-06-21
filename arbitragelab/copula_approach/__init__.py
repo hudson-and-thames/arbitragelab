@@ -1,5 +1,5 @@
 """
-This module implements Copula-based Statistical Arbitrage strategies.
+This module implements Copula-based Statistical Arbitrage tools.
 """
 
 from arbitragelab.copula_approach.copula_calculation import (

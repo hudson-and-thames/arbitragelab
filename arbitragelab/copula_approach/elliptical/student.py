@@ -28,18 +28,18 @@ class StudentCopula(Copula):
 
         :param nu: (float) Degrees of freedom.
         :param cov: (np.array) Covariance matrix (NOT correlation matrix), measurement of covariance. The class will
-        calculate correlation internally once the covariance matrix is given.
+            calculate correlation internally once the covariance matrix is given.
         """
 
         super().__init__('Student')
-        self.nu = nu  # Degree of freedom.
+        self.nu = nu  # Degree of freedom
         self.theta = None
         self.cov = None
         self.rho = None
 
         if cov is not None:
-            self.cov = cov  # Covariance matrix.
-            # Correlation from covariance matrix.
+            self.cov = cov  # Covariance matrix
+            # Correlation from covariance matrix
             self.rho = cov[0][1] / (np.sqrt(cov[0][0]) * np.sqrt(cov[1][1]))
 
         segment.track('StudentCopula')
@@ -74,10 +74,11 @@ class StudentCopula(Copula):
         :return: (tuple) The sampled pair in [0, 1]x[0, 1].
         """
 
-        # Sample from bivariate Normal with cov=cov.
+        # Sample from bivariate Normal with cov=cov
         rand_generator = np.random.default_rng()
         normal = rand_generator.multivariate_normal(mean=[0, 0], cov=cov, size=num)
-        # Sample from Chi-square with df=nu.
+
+        # Sample from Chi-square with df=nu
         chisq = rand_generator.chisquare(df=nu, size=num)
         result = np.zeros((num, 2))
         for row_idx, row in enumerate(result):
@@ -149,10 +150,11 @@ class StudentCopula(Copula):
         :param v: (float) A real number in [0, 1].
         :return: (float) The cumulative density.
         """
+
         # Avoid errors when u, v too close to 0
         u = max(u, 1e-6)
         v = max(v, 1e-6)
-        corr = [[1, self.rho], [self.rho, 1]]  # Correlation matrix.
+        corr = [[1, self.rho], [self.rho, 1]]  # Correlation matrix
 
         # Get raw result from integration on pdf
         def t_pdf_local(x1, x2):
@@ -160,6 +162,7 @@ class StudentCopula(Copula):
 
         inv_t = (ss.t(df=self.nu)).ppf
         raw_result = dblquad(t_pdf_local, -np.inf, inv_t(u), -np.inf, inv_t(v), epsabs=1e-4, epsrel=1e-4)[0]
+
         # Map result back to [0, 1]
         cdf = max(min(raw_result, 1), 0)
 
@@ -210,16 +213,19 @@ class StudentCopula(Copula):
         :param v: (np.array) 1D vector data of Y pseudo-observations. Need to be uniformly distributed [0, 1].
         :return: (float) Rho(correlation) parameter value.
         """
+
         super().fit(u, v)
-        # 1. Calculate covariance matrix using sklearn.
-        # Correct matrix dimension for fitting in sklearn.
+        # 1. Calculate covariance matrix using sklearn
+        # Correct matrix dimension for fitting in sklearn
         unif_data = np.array([u, v]).reshape(2, -1).T
         t_dist = ss.t(df=self.nu)
-        value_data = t_dist.ppf(unif_data)  # Change from quantile to value.
-        # Getting empirical covariance matrix.
+        value_data = t_dist.ppf(unif_data)  # Change from quantile to value
+
+        # Getting empirical covariance matrix
         cov_hat = EmpiricalCovariance().fit(value_data).covariance_
         self.cov = cov_hat
         self.rho = cov_hat[0][1] / (np.sqrt(cov_hat[0][0]) * np.sqrt(cov_hat[1][1]))
+
         return self.rho
 
     @staticmethod
@@ -233,6 +239,7 @@ class StudentCopula(Copula):
         :param df: (float) Degree of freedom.
         :return: (float) The probability density.
         """
+
         x1 = x[0] - mu[0]
         x2 = x[1] - mu[1]
         c11 = cov[0][0]
@@ -268,21 +275,21 @@ def fit_nu_for_t_copula(u: np.array, v: np.array, nu_tol: float = None) -> float
 
     # Define the objective function
     def neg_log_likelihood_for_t_copula(nu):
-        # 1. Calculate covariance matrix using sklearn.
-        # Correct matrix dimension for fitting in sklearn.
+        # 1. Calculate covariance matrix using sklearn
+        # Correct matrix dimension for fitting in sklearn
         unif_data = np.array([u, v]).reshape(2, -1).T
         t_dist = ss.t(df=nu)
-        value_data = t_dist.ppf(unif_data)  # Change from quantile to value.
-        # Getting empirical covariance matrix.
+        value_data = t_dist.ppf(unif_data)  # Change from quantile to value
+        # Getting empirical covariance matrix
         cov_hat = EmpiricalCovariance().fit(value_data).covariance_
         cop = StudentCopula(nu=nu, cov=cov_hat)
         log_likelihood = cop.get_log_likelihood_sum(u, v)
 
-        return -log_likelihood  # Minimizing the negative of likelihood.
+        return -log_likelihood  # Minimizing the negative of likelihood
 
     # Optimizing to find best nu
     nu0 = np.array([3])
-    # Constraint: nu between [1, 15]. Too large nu value will lead to calculation issues for gamma function.
+    # Constraint: nu between [1, 15]. Too large nu value will lead to calculation issues for gamma function
     cons = ({'type': 'ineq', 'fun': lambda nu: nu + 1},  # x - 1 > 0
             {'type': 'ineq', 'fun': lambda nu: -nu + 15})  # -x + 15 > 0 (i.e., x - 10 < 0)
 

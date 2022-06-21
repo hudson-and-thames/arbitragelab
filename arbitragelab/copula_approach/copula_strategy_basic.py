@@ -4,10 +4,6 @@
 """
 Master module that implements the basic copula trading strategy.
 
-This module is a realization of the methodology in the following paper:
-`Liew, R.Q. and Wu, Y., 2013. Pairs trading: A copula approach. Journal of Derivatives & Hedge Funds, 19(1), pp.12-30.
-<https://dr.ntu.edu.sg/bitstream/10220/17826/1/jdhf20131a.pdf>`__
-
 This module is almost identical in terms of functionality as copula_strategy. But is designed with better efficiency,
 better structure, native pandas support, and supports mixed copulas. The trading logic is more clearly defined and all
 wrapped in one method for easier adjustment when needed, due to the ambiguities from the paper.
@@ -32,13 +28,16 @@ class BasicCopulaStrategy:
     """
     Analyze a pair of stock prices using copulas.
 
+    This module is a realization of the methodology in the following paper:
+    `Liew, R.Q. and Wu, Y., 2013. Pairs trading: A copula approach. Journal of Derivatives & Hedge Funds, 19(1), pp.12-30.
+    <https://dr.ntu.edu.sg/bitstream/10220/17826/1/jdhf20131a.pdf>`__
+
     We use the convention that the spread is defined as stock 1 in relation to stock 2.
     This class provides the following functionalities:
 
         1. Maximum likelihood fitting to training data. User provides the name and necessary parameters.
         2. Use a given copula to generate trading positions based on test data. By default it uses
            the fitted copula generated in fit_copula() method.
-
     """
 
     def __init__(self, copula: Union[cop.Copula, copmix.MixedCopula] = None, open_thresholds: tuple = (0.05, 0.95),
@@ -63,16 +62,16 @@ class BasicCopulaStrategy:
         self.mixed_cop_names = ['CFGMixCop', 'CTGMixCop']
         self.all_copula_names = self.archimedean_names + self.elliptical_names + self.mixed_cop_names
 
-        # To be used for the test data set.
+        # To be used for the test data set
         self.copula = copula
 
-        # Default thresholds for opening trading positions.
+        # Default thresholds for opening trading positions
         self.l_open_threshold = open_thresholds[0]
         self.u_open_threshold = open_thresholds[1]
-        # Default thresholds for exiting trading positions.
+        # Default thresholds for exiting trading positions
         self.l_exit_threshold = exit_thresholds[0]
         self.u_exit_threshold = exit_thresholds[1]
-        # Internal counters for different signal triggers.
+        # Internal counters for different signal triggers
         self._long_count = 0
         self._short_count = 0
         self._exit_count = 0
@@ -97,16 +96,16 @@ class BasicCopulaStrategy:
             cdf_list: (list) The list of marginal cumulative density functions.
         """
 
-        column_count = len(data.columns)  # Number of columns.
-        cdf_lst = [None] * column_count  # List to store all marginal cdf functions.
-        quantile_data_lst = [None] * column_count  # List to store all quantile data in pd.Series.
+        column_count = len(data.columns)  # Number of columns
+        cdf_lst = [None] * column_count  # List to store all marginal cdf functions
+        quantile_data_lst = [None] * column_count  # List to store all quantile data in pd.Series
 
-        # Loop through all columns.
+        # Loop through all columns
         for i in range(column_count):
             cdf_lst[i] = copcalc.construct_ecdf_lin(data.iloc[:, i])
             quantile_data_lst[i] = data.iloc[:, i].map(cdf_lst[i])
 
-        quantile_data = pd.concat(quantile_data_lst, axis=1)  # Form the quantile DataFrame.
+        quantile_data = pd.concat(quantile_data_lst, axis=1)  # Form the quantile DataFrame
 
         return quantile_data, cdf_lst
 
@@ -153,51 +152,51 @@ class BasicCopulaStrategy:
             marginal cdf for the 0th column of data and the marginal cdf for the 1st column of data.
         """
 
-        # Converting to quantile data for some of the methods.
+        # Converting to quantile data for some of the methods
         num_of_instances = len(data)
         quantile_data, cdfs = self.to_quantile(data)
         cdf1 = cdfs[0]
         cdf2 = cdfs[1]
 
-        # Initiate variables to be returned.
+        # Initiate variables to be returned
         fitted_copula = None
         sic_value, aic_value, hqic_value, log_likelihood = None, None, None, None
 
-        # Fitting an Archimedean copula.
+        # Fitting an Archimedean copula
         if copula_name in self.archimedean_names:
             log_likelihood, fitted_copula = self._pseudo_ml_archimedean_fit(quantile_data, copula_name)
             # Only 1 param (theta) is estimated.
             sic_value, aic_value, hqic_value = self.get_info_criterion(log_likelihood, n=num_of_instances, k=1)
 
-        # Fitting a Gaussian copula.
+        # Fitting a Gaussian copula
         if copula_name == 'Gaussian':
             log_likelihood, fitted_copula = self._gaussian_cop_fit(quantile_data)
-            # Only 1 param (rho) is estimated.
+            # Only 1 param (rho) is estimated
             sic_value, aic_value, hqic_value = self.get_info_criterion(log_likelihood, n=num_of_instances, k=1)
 
-        # Fitting a Student-t copula.
+        # Fitting a Student-t copula
         if copula_name == 'Student':
             log_likelihood, fitted_copula = self._t_cop_fit_two_step(quantile_data, **fit_params_kwargs)
-            # 2 params (rho, nu) are estimated.
+            # 2 params (rho, nu) are estimated
             sic_value, aic_value, hqic_value = self.get_info_criterion(log_likelihood, n=num_of_instances, k=2)
 
-        # Fitting mixed copulas. This is a wrapper around their own fit method so we use the original data.
+        # Fitting mixed copulas. This is a wrapper around their own fit method so we use the original data
         if copula_name in self.mixed_cop_names:
             log_likelihood, fitted_copula = self._fit_mixed_cop(data, copula_name, **fit_params_kwargs)
-            # Calculate scores in terms of various information criteria.
+            # Calculate scores in terms of various information criteria
             if copula_name == 'CFGMixCop':
-                # 3 copula params, 2 weights are estimated.
+                # 3 copula params, 2 weights are estimated
                 sic_value, aic_value, hqic_value = self.get_info_criterion(log_likelihood, n=num_of_instances, k=5)
 
             if copula_name == 'CTGMixCop':
-                # 4 copula params, 2 weights are estimated.
+                # 4 copula params, 2 weights are estimated
                 sic_value, aic_value, hqic_value = self.get_info_criterion(log_likelihood, n=num_of_instances, k=6)
 
         # Put the name of the copula and score in the dictionary
         result_dict = {'Copula Name': copula_name, 'SIC': sic_value, 'AIC': aic_value, 'HQIC': hqic_value,
                        'Log-likelihood': log_likelihood}
 
-        if if_renew:  # Whether to renew the class's copula using the fitted copula.
+        if if_renew:  # Whether to renew the class's copula using the fitted copula
             self.copula = fitted_copula
 
         return result_dict, fitted_copula, cdf1, cdf2
@@ -236,11 +235,11 @@ class BasicCopulaStrategy:
         x = data.iloc[:, 0].to_numpy()
         y = data.iloc[:, 1].to_numpy()
 
-        switch = Switcher()  # Initiate a switcher class to initiate copula by its name in string.
+        switch = Switcher()  # Initiate a switcher class to initiate copula by its name in string
 
-        # Calculate Kendall's tau from data.
+        # Calculate Kendall's tau from data
         tau = ss.kendalltau(x, y)[0]
-        # Calculate theta hat from the specific copula using Kendall's tau.
+        # Calculate theta hat from the specific copula using Kendall's tau
         temp_arch_copula = switch.choose_copula(copula_name=copula_name)
         theta_hat = temp_arch_copula.theta_hat(tau)
         # Use the result to instantiate a copula as the fitted copula
@@ -264,9 +263,9 @@ class BasicCopulaStrategy:
         x = data.iloc[:, 0].to_numpy()
         y = data.iloc[:, 1].to_numpy()
 
-        # Calculate Kendall's tau from data.
+        # Calculate Kendall's tau from data
         tau = ss.kendalltau(x, y)[0]
-        # Calculate rho hat from the specific copula using Kendall's tau.
+        # Calculate rho hat from the specific copula using Kendall's tau
         dud_cov = [[1, 0.5], [0.5, 1]]
         temp_gaussian_copula = GaussianCopula(cov=dud_cov)
         rho_hat = temp_gaussian_copula.theta_hat(tau)
@@ -291,34 +290,34 @@ class BasicCopulaStrategy:
         :return: (tuple) The calculated log-likelihood for the fitted copula, the fitted copula.
         """
 
-        # Default the nu_tol to 0.05.
+        # Default the nu_tol to 0.05
         nu_tol = fit_params_kwargs.get('nu_tol', 0.05)
 
         x = data.iloc[:, 0].to_numpy()
         y = data.iloc[:, 1].to_numpy()
 
-        # 1. Fit data to find the correlation matrix.
-        # Calculate Kendall's tau from data.
+        # 1. Fit data to find the correlation matrix
+        # Calculate Kendall's tau from data
         tau = ss.kendalltau(x, y)[0]
-        dud_cov = [[1, 0.5], [0.5, 1]]  # Dud param to initiate a t copula for calculation.
-        dud_nu = 4  # Dud param to initiate a t copula for calculation.
+        dud_cov = [[1, 0.5], [0.5, 1]]  # Dud param to initiate a t copula for calculation
+        dud_nu = 4  # Dud param to initiate a t copula for calculation
         temp_t_copula = StudentCopula(cov=dud_cov, nu=dud_nu)
-        # Calculate rho hat from the specific copula using Kendall's tau.
+        # Calculate rho hat from the specific copula using Kendall's tau
         rho_hat = temp_t_copula.theta_hat(tau)
         cov_hat = [[1, rho_hat], [rho_hat, 1]]
 
-        # 2. Max likelihood to find the degree of freedom nu.
-        # Define the objective function.
+        # 2. Max likelihood to find the degree of freedom nu
+        # Define the objective function
         def neg_log_likelihood_for_t_copula(nu):
 
             temp_t_cop = StudentCopula(cov=cov_hat, nu=nu)
             log_likelihood_local = np.sum(np.log([temp_t_cop.get_cop_density(xi, yi) for (xi, yi) in zip(x, y)]))
 
-            return -1 * log_likelihood_local  # Minimizing the negative of likelihood.
+            return -1 * log_likelihood_local  # Minimizing the negative of likelihood
 
-        # Optimizing to find best nu.
+        # Optimizing to find best nu
         nu0 = np.array([3])
-        # Constraint: nu between [1, 15]. Too large nu value will lead to calculation issues for gamma function.
+        # Constraint: nu between [1, 15]. Too large nu value will lead to calculation issues for gamma function
         bnds = ((2, 15),)
 
         res = minimize(neg_log_likelihood_for_t_copula, nu0, method='L-BFGS-B', bounds=bnds,
@@ -348,7 +347,7 @@ class BasicCopulaStrategy:
         :return: (tuple) The calculated log-likelihood for the fitted copula, the fitted copula.
         """
 
-        # Set the default fitting params.
+        # Set the default fitting params
         max_iter = fit_params_kwargs.get('max_iter', 25)
         gamma_scad = fit_params_kwargs.get('gamma_scad', 0.6)
         a_scad = fit_params_kwargs.get('a_scad', 6)
@@ -357,7 +356,7 @@ class BasicCopulaStrategy:
         copula = None
         log_likelihood = None
 
-        # Wrapping around each mixed copula's own fit function.
+        # Wrapping around each mixed copula's own fit function
         if copula_name == 'CFGMixCop':
             copula = copmix.CFGMixCop()
             log_likelihood = copula.fit(data, max_iter, gamma_scad, a_scad, weight_margin)
@@ -406,7 +405,7 @@ class BasicCopulaStrategy:
         :return: (pd.Series) The suggested positions for the given price data.
         """
 
-        # Map to quantile data using the trained marginal cdfs.
+        # Map to quantile data using the trained marginal cdfs
         quantile_data_1 = data.iloc[:, 0].map(cdf1)
         quantile_data_2 = data.iloc[:, 1].map(cdf2)
         quantile_data = pd.concat((quantile_data_1, quantile_data_2), axis=1)
@@ -416,22 +415,22 @@ class BasicCopulaStrategy:
 
         num_of_instances = len(data)
 
-        # Initiate positions Series.
+        # Initiate positions Series
         positions = pd.Series(np.nan, index=quantile_data_1.index)
         positions[0] = init_pos
 
-        # Updating open thresholds. Otherwise keep the class default value.
+        # Updating open thresholds. Otherwise keep the class default value
         if open_thresholds is not None:
             self.l_open_threshold = open_thresholds[0]
             self.u_open_threshold = open_thresholds[1]
-        # Updating exit thresholds. Otherwise keep the class default value.
+        # Updating exit thresholds. Otherwise keep the class default value
         if exit_thresholds is not None:
             self.l_exit_threshold = exit_thresholds[0]
             self.u_exit_threshold = exit_thresholds[1]
 
-        condi_probs = self.get_condi_probs(quantile_data)  # All conditional probabilities.
-        who_exits = np.zeros(2)  # Initially there is no crossing.
-        for i in range(1, num_of_instances):  # Loop through the conditional probs to form positions.
+        condi_probs = self.get_condi_probs(quantile_data)  # All conditional probabilities
+        who_exits = np.zeros(2)  # Initially there is no crossing
+        for i in range(1, num_of_instances):  # Loop through the conditional probs to form positions
             positions[i], who_exits = self.get_cur_position(condi_probs=condi_probs.iloc[i, :],
                                                             pre_condi_probs=condi_probs.iloc[i-1, :],
                                                             pre_pos=positions[i-1],
@@ -456,7 +455,7 @@ class BasicCopulaStrategy:
         if has_nan:
             raise ValueError('Must not have NaN values in quantile_data.')
 
-        # Initiate a data frame with zeros and the same index.
+        # Initiate a data frame with zeros and the same index
         condi_probs = pd.DataFrame(np.nan, index=quantile_data.index, columns=quantile_data.columns)
 
         for row_count, row in enumerate(quantile_data.iterrows()):
@@ -502,15 +501,15 @@ class BasicCopulaStrategy:
         :return: (tuple) The current position, and the updated who_exit variable.
         """
 
-        # Check open signals.
+        # Check open signals
         # Stock 2 over-valued, stock 1 under-valued, long the spread
         long_signal = (condi_probs[1] >= self.u_open_threshold and condi_probs[0] <= self.l_open_threshold)
         # Stock 1 over-valued, stock 2 under-valued, short the spread
         short_signal = (condi_probs[0] >= self.u_open_threshold and condi_probs[1] <= self.l_open_threshold)
-        # Net result for the open signal. Change here for precedence within open signals.
+        # Net result for the open signal. Change here for precedence within open signals
         open_signal = int(long_signal) - int(short_signal)
 
-        # Check the exit signal and also update who_exit.
+        # Check the exit signal and also update who_exit
         exit_signal, who_exits = self._exit_trigger(condi_probs, pre_condi_probs, exit_rule, who_exits,
                                                     exit_thresholds=(self.l_exit_threshold, self.u_exit_threshold))
 
@@ -519,17 +518,17 @@ class BasicCopulaStrategy:
         self._short_count += int(short_signal)
         self._exit_count += exit_signal
 
-        # Check if there is any valid open or close signal.
+        # Check if there is any valid open or close signal
         any_signal = bool(abs(open_signal) + abs(exit_signal))
 
-        cur_pos = pre_pos  # Defaults to the previous position.
+        cur_pos = pre_pos  # Defaults to the previous position
 
-        if any_signal:  # Update the signal when there is any valid signal.
-            # The current position is the net open signal when there is no exit signal. 0 When there is an exit signal.
+        if any_signal:  # Update the signal when there is any valid signal
+            # The current position is the net open signal when there is no exit signal, 0 When there is an exit signal
             # Change here for precedence of open and exit signals.
             cur_pos = open_signal * int((not bool(exit_signal)))
 
-        if open_signal != 0:  # Reset who_exits when there is an open signal.
+        if open_signal != 0:  # Reset who_exits when there is an open signal
             who_exits = pd.Series(np.zeros(2))
 
         return cur_pos, who_exits
@@ -556,11 +555,11 @@ class BasicCopulaStrategy:
         :return: (tuple) The exit signal in integer with 1 meaning exit, the updated who_exit variable.
         """
 
-        exit_signal = 0  # Default exit signal is not exiting.
+        exit_signal = 0  # Default exit signal is not exiting
 
         lower_exit_threshold = exit_thresholds[0]
         upper_exit_threshold = exit_thresholds[1]
-        # Check if there are any crossings.
+        # Check if there are any crossings
         prob_u1_x_up = (pre_condi_probs[0] <= lower_exit_threshold
                         and condi_probs[0] >= upper_exit_threshold)  # Prob u1 crosses upward
         prob_u1_x_down = (pre_condi_probs[0] >= upper_exit_threshold
@@ -571,23 +570,23 @@ class BasicCopulaStrategy:
                           and condi_probs[1] <= lower_exit_threshold)  # Prob u2 crosses downward
         cross_events = [prob_u1_x_up, prob_u1_x_down, prob_u2_x_up, prob_u2_x_down]
 
-        # Check at this step which variable crossed the band.
+        # Check at this step which variable crossed the band
         u1_cross = (prob_u1_x_up or prob_u1_x_down)
         u2_cross = (prob_u2_x_up or prob_u2_x_down)
         who_exits_now = np.array([int(u1_cross), int(u2_cross)])
 
         # Update for the who_exits variable.
-        who_exits_bool = (who_exits_now + who_exits).astype(bool)  # Add the current info to the previous info.
-        who_exits = who_exits_bool.astype(int)  # Keep who_exits binary.
+        who_exits_bool = (who_exits_now + who_exits).astype(bool)  # Add the current info to the previous info
+        who_exits = who_exits_bool.astype(int)  # Keep who_exits binary
         if np.all(who_exits_bool):  # Reset who_exits to [0, 0] when it is [1, 1]
             who_exits = pd.Series(np.zeros(2))
 
-        # Under 'or' logic, if any crossing behavior happens, it exits.
+        # Under 'or' logic, if any crossing behavior happens, it exits
         if exit_rule == 'or':
             exit_signal = int(any(cross_events))
             return exit_signal, who_exits
 
-        # Under 'and' logic, when both series are registered crossing, it exits.
+        # Under 'and' logic, when both series are registered crossing, it exits
         if exit_rule == 'and' and np.all(who_exits_bool):
             exit_signal = 1
             return exit_signal, who_exits

@@ -2,10 +2,7 @@
 # All rights reserved
 # Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 """
-Module that houses all copula classes and the parent copula class.
-
-Also include a Switcher class to create copula by its name and parameters,
-to emulate a switch functionality.
+Module that houses Joe copula class.
 """
 
 # pylint: disable = invalid-name, too-many-lines
@@ -48,7 +45,7 @@ class Joe(Copula):
         :param num: (int) Number of points to generate.
         :param unif_vec: (np.array) Shape=(num, 2) array, two independent uniformly distributed sets of data.
             Default uses numpy pseudo-random generators.
-        :return sample_pairs: (np.array) Shape=(num, 2) array, sampled data for this copula.
+        :return: (np.array) Shape=(num, 2) array, sampled data for this copula.
         """
 
         if num is None and unif_vec is None:
@@ -61,11 +58,11 @@ class Joe(Copula):
                     (np.log(1 - (1 - w) ** theta)) * (1 - (1 - w) ** theta)
                     / ((1 - w) ** (theta - 1)))
 
-        # Generate pairs of indep uniform dist vectors. Use numpy to generate.
+        # Generate pairs of indep uniform dist vectors. Use numpy to generate
         if unif_vec is None:
             unif_vec = np.random.uniform(low=0, high=1, size=(num, 2))
 
-        # Compute Joe copulas from the unif i.i.d. pairs.
+        # Compute Joe copulas from the unif i.i.d. pairs
         sample_pairs = np.zeros_like(unif_vec)
         for row, pair in enumerate(unif_vec):
             sample_pairs[row] = self._generate_one_pair(pair[0], pair[1], theta=theta, Kc=_Kc)
@@ -79,7 +76,7 @@ class Joe(Copula):
         :param v1: (float) I.I.D. uniform random variable in [0,1].
         :param v2: (float) I.I.D. uniform random variable in [0,1].
         :param theta: (float) Range in [1, +inf), measurement of copula dependency.
-        :param Kc: (func) conditional probability function, for numerical inverse.
+        :param Kc: (func) Conditional probability function, for numerical inverse.
         :return: (tuple) The sampled pair in [0, 1]x[0, 1].
         """
 
@@ -180,12 +177,12 @@ class Joe(Copula):
 
         # Calculate tau(theta) = 1 + 4*intg_0^1[phi(t)/d(phi(t)) dt]
         def kendall_tau(theta):
-            # phi(t)/d(phi(t)), phi is the generator function for this copula.
+            # phi(t)/d(phi(t)), phi is the generator function for this copula
             pddp = lambda x: (1 - (1 - x) ** theta) * (1 - x) ** (1 - theta) * np.log(1 - (1 - x) ** theta) / theta
             result = quad(pddp, 0, 1, full_output=1)[0]
             return 1 + 4 * result
 
-        # Numerically find the root.
+        # Numerically find the root
         result = brentq(lambda theta: kendall_tau(theta) - tau, 1, 100)
 
         return result

@@ -46,7 +46,8 @@ class CVineCop(RVineCop):
         """
 
         super().__init__()
-        # All the bivariate classes used to construct the vine copula.
+
+        # All the bivariate classes used to construct the vine copula
         self._bicop_family = [pv.BicopFamily.bb1, pv.BicopFamily.bb6, pv.BicopFamily.bb7, pv.BicopFamily.bb8,
                               pv.BicopFamily.clayton, pv.BicopFamily.student, pv.BicopFamily.frank,
                               pv.BicopFamily.gaussian, pv.BicopFamily.gumbel, pv.BicopFamily.indep]
@@ -82,19 +83,19 @@ class CVineCop(RVineCop):
         :return: (pv.Vinecop) The fitted pv.Vinecop object.
         """
 
-        # Initializing.
-        data_np = data.to_numpy()  # pyvinecopulib uses numpy arrays for fitting.
-        data_dim = len(data.columns)  # Number of stocks.
-        # List of all possible C-vine structures, a list of tuples.
-        if alt_cvine_structure:  # Alternative method to generate C-vine structures.
+        # Initializing
+        data_np = data.to_numpy()  # pyvinecopulib uses numpy arrays for fitting
+        data_dim = len(data.columns)  # Number of stocks
+        # List of all possible C-vine structures, a list of tuples
+        if alt_cvine_structure:  # Alternative method to generate C-vine structures
             possible_cvine_structures = self._get_possible_cvine_structs_alt(data_dim, pv_target_idx)
-        else:  # The original method to generate C-vine structures.
+        else:  # The original method to generate C-vine structures
             possible_cvine_structures = self._get_possible_cvine_structs(data_dim, pv_target_idx)
 
         # Fit among all possible structures.
-        controls = pv.FitControlsVinecop(family_set=self._bicop_family)  # Bivar copula constituents for the C-vine.
-        aics = dict()  # Dictionary for AIC values for all candidate C-vine copulas.
-        cvine_cops = dict()  # Dictionary for storing all candidate C-vine copulas.
+        controls = pv.FitControlsVinecop(family_set=self._bicop_family)  # Bivar copula constituents for the C-vine
+        aics = dict()  # Dictionary for AIC values for all candidate C-vine copulas
+        cvine_cops = dict()  # Dictionary for storing all candidate C-vine copulas
         for cvine_structure in possible_cvine_structures:
             temp_cvine_struct = pv.CVineStructure(order=cvine_structure)  # Specific C-vine structure
             temp_cvine_cop = pv.Vinecop(structure=temp_cvine_struct)  # Construct the C-vine copula
@@ -109,7 +110,7 @@ class CVineCop(RVineCop):
         # Generate a C-vine copula for the system
         fitted_cvine_cop = cvine_cops[fitted_cvine_structure]
 
-        if if_renew:  # Whether to renew the class C-vine copula.
+        if if_renew:  # Whether to renew the class C-vine copula
             self.cvine_cop = fitted_cvine_cop
 
         return fitted_cvine_cop
