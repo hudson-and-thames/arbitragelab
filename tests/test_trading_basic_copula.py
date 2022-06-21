@@ -2,12 +2,13 @@
 # All rights reserved
 # Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 """
-Unit tests for copula_strategy_basic, and additional features of copula_generate.
+Unit tests for new basic_copula strategy.
 """
 # pylint: disable = invalid-name, protected-access, too-many-locals, unsubscriptable-object, too-many-statements, undefined-variable
 
 import os
 import unittest
+
 import pandas as pd
 
 from arbitragelab.trading.copula_approach import BasicCopulaTradingRule
@@ -60,13 +61,16 @@ class TestBasicCopulaTradingRule(unittest.TestCase):
             x_price = values['BKD']
             y_price = values['ESC']
 
+            # Adding values
             cop_trading.update_probabilities(x_price, y_price)
 
+            # Check if it's time to enter a trade
             trade, side = cop_trading.check_entry_signal()
 
+            # Close previous trades if needed
             cop_trading.update_trades(update_timestamp=time)
 
-            if trade:
+            if trade:  # Open a new trade if needed
                 cop_trading.add_trade(start_timestamp=time, side_prediction=side)
 
         # Test correct number of trades
@@ -117,13 +121,16 @@ class TestBasicCopulaTradingRule(unittest.TestCase):
             x_price = values['BKD']
             y_price = values['ESC']
 
+            # Adding values
             cop_trading.update_probabilities(x_price, y_price)
 
+            # Check if it's time to enter a trade
             trade, side = cop_trading.check_entry_signal()
 
+            # Close previous trades if needed
             cop_trading.update_trades(update_timestamp=time)
 
-            if trade:
+            if trade:  # Open a new trade if needed
                 cop_trading.add_trade(start_timestamp=time, side_prediction=side)
 
         self.assertEqual(len(cop_trading.open_trades), 21)

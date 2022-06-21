@@ -4,11 +4,14 @@
 """
 Unit tests for copula strategy using mispricing index (MPI).
 """
+
 # pylint: disable = invalid-name, protected-access
 import os
 import unittest
+
 import numpy as np
 import pandas as pd
+
 from arbitragelab.copula_approach import copula_strategy_mpi
 
 
@@ -106,7 +109,7 @@ class TestCopulaStrategyMPI(unittest.TestCase):
         flag_0_n1 = pd.Series([0, -1])
         flag_3_0 = pd.Series([3, 0])
 
-        # Long trigger test.
+        # Long trigger test
         result = CS._get_position_and_reset_flag(pre_flag=flag_0_0, raw_cur_flag=flag_0_1, open_rule='or',
                                                  exit_rule='or', pre_position=0, open_based_on=[0, 0])
         self.assertEqual(result, (1, False, [1, 2]))
@@ -114,7 +117,7 @@ class TestCopulaStrategyMPI(unittest.TestCase):
                                                  exit_rule='or', pre_position=0, open_based_on=[0, 0])
         self.assertEqual(result, (1, False, [1, 1]))
 
-        # Short trigger test.
+        # Short trigger test
         result = CS._get_position_and_reset_flag(pre_flag=flag_0_0, raw_cur_flag=flag_1_0, open_rule='or',
                                                  exit_rule='or', pre_position=0, open_based_on=[0, 0])
         self.assertEqual(result, (-1, False, [-1, 1]))
@@ -142,7 +145,7 @@ class TestCopulaStrategyMPI(unittest.TestCase):
         result = CS._get_position_and_reset_flag(pre_flag=flag_0_0, raw_cur_flag=flag_3_0, open_rule='or',
                                                  exit_rule='or', pre_position=-1, open_based_on=[-1, 1])
         self.assertEqual(result, (0, True, [0, 0]))
-        # The following is ambiguous. The author did not specify the following situation.
+        # The following is ambiguous. The author did not specify the following situation
         result = CS._get_position_and_reset_flag(pre_flag=flag_0_0, raw_cur_flag=flag_3_0, open_rule='or',
                                                  exit_rule='or', pre_position=-1, open_based_on=[-1, 2])
         self.assertEqual(result, (-1, False, [-1, 1]))
@@ -155,37 +158,37 @@ class TestCopulaStrategyMPI(unittest.TestCase):
         CS = copula_strategy_mpi.CopulaStrategyMPI()
 
         # result = (cur_flag: pd.Series, cur_position: int, open_based_on: list)
-        # Check long.
+        # Check long
         result = CS._cur_flag_and_position(mpi=pd.Series([0.4, 0.9]), pre_flag=pd.Series([0.3, 0.3]),
                                            pre_position=0, open_based_on=[0, 0], enable_reset_flag=True,
                                            open_rule='or', exit_rule='or')
         np.testing.assert_array_almost_equal(result[0], pd.Series([0.2, 0.7]), decimal=6)
         self.assertEqual(result[1:], (1, [1, 2]))
-        # Check short.
+        # Check short
         result = CS._cur_flag_and_position(mpi=pd.Series([0.9, 0.4]), pre_flag=pd.Series([0.3, 0.3]),
                                            pre_position=0, open_based_on=[0, 0], enable_reset_flag=True,
                                            open_rule='or', exit_rule='or')
         np.testing.assert_array_almost_equal(result[0], pd.Series([0.7, 0.2]), decimal=6)
         self.assertEqual(result[1:], (-1, [-1, 1]))
-        # Check exit by x-ing 0, reset flag.
+        # Check exit by x-ing 0, reset flag
         result = CS._cur_flag_and_position(mpi=pd.Series([0.9, 0.4]), pre_flag=pd.Series([-0.3, -0.3]),
                                            pre_position=1, open_based_on=[1, 1], enable_reset_flag=True,
                                            open_rule='or', exit_rule='or')
         np.testing.assert_array_almost_equal(result[0], pd.Series([0, 0]), decimal=6)
         self.assertEqual(result[1:], (0, [0, 0]))
-        # Check exit by reaching stop loss position, reset flag.
+        # Check exit by reaching stop loss position, reset flag
         result = CS._cur_flag_and_position(mpi=pd.Series([0.9, 0.4]), pre_flag=pd.Series([1.7, 0]),
                                            pre_position=1, open_based_on=[1, 1], enable_reset_flag=True,
                                            open_rule='or', exit_rule='or')
         np.testing.assert_array_almost_equal(result[0], pd.Series([0, 0]), decimal=6)
         self.assertEqual(result[1:], (0, [0, 0]))
-        # Check exit by x-ing 0, no reset flag.
+        # Check exit by x-ing 0, no reset flag
         result = CS._cur_flag_and_position(mpi=pd.Series([0.9, 0.4]), pre_flag=pd.Series([-0.3, -0.3]),
                                            pre_position=1, open_based_on=[1, 1], enable_reset_flag=False,
                                            open_rule='or', exit_rule='or')
         np.testing.assert_array_almost_equal(result[0], pd.Series([0.1, -0.4]), decimal=6)
         self.assertEqual(result[1:], (0, [0, 0]))
-        # Check exit by reaching stop loss position, no reset flag.
+        # Check exit by reaching stop loss position, no reset flag
         result = CS._cur_flag_and_position(mpi=pd.Series([0.9, 0.4]), pre_flag=pd.Series([1.7, 0]),
                                            pre_position=1, open_based_on=[1, 1], enable_reset_flag=False,
                                            open_rule='or', exit_rule='or')
@@ -199,13 +202,13 @@ class TestCopulaStrategyMPI(unittest.TestCase):
 
         CSMPI = copula_strategy_mpi.CopulaStrategyMPI(opening_triggers=(-0.6, 0.6), stop_loss_positions=(-2, 2))
         returns = CSMPI.to_returns(pair_prices=self.pair_prices)
-        # Fit an N14 copula.
+        # Fit an N14 copula
         _, copula, cdf1, cdf2 = CSMPI.fit_copula(returns, copula_name='N14')
-        # Forming positions and flags.
+        # Forming positions and flags
         _, _ = CSMPI.get_positions_and_flags(returns, cdf1, cdf2, enable_reset_flag=True)
-        # Check goodness of copula fit by its coefficient.
+        # Check goodness of copula fit by its coefficient
         self.assertAlmostEqual(copula.theta, 1.3951538673040886)
-        # Check numbers of triggers.
+        # Check numbers of triggers
         self.assertEqual(CSMPI._long_count, 339)
         self.assertEqual(CSMPI._exit_count, 32)
         self.assertEqual(CSMPI._short_count, 476)
@@ -324,45 +327,45 @@ class TestCopulaStrategyMPI(unittest.TestCase):
         CS = copula_strategy_mpi.CopulaStrategyMPI()
 
         # result = (cur_flag: pd.Series, cur_position: int, open_based_on: list)
-        # Check long.
+        # Check long
         result = CS._cur_flag_and_position(mpi=pd.Series([0.4, 0.9]), pre_flag=pd.Series([0.3, 0.3]),
                                            pre_position=0, open_based_on=[0, 0], enable_reset_flag=True,
                                            open_rule='or', exit_rule='and')
         np.testing.assert_array_almost_equal(result[0], pd.Series([0.2, 0.7]), decimal=6)
         self.assertEqual(result[1:], (1, [1, 2]))
-        # Check short.
+        # Check short
         result = CS._cur_flag_and_position(mpi=pd.Series([0.9, 0.4]), pre_flag=pd.Series([0.3, 0.3]),
                                            pre_position=0, open_based_on=[0, 0], enable_reset_flag=True,
                                            open_rule='or', exit_rule='and')
         np.testing.assert_array_almost_equal(result[0], pd.Series([0.7, 0.2]), decimal=6)
         self.assertEqual(result[1:], (-1, [-1, 1]))
-        # The following tests will not exit because exit_rule='and'.
-        # Check exit by x-ing 0, reset flag.
+        # The following tests will not exit because exit_rule='and'
+        # Check exit by x-ing 0, reset flag
         result = CS._cur_flag_and_position(mpi=pd.Series([0.9, 0.4]), pre_flag=pd.Series([-0.3, -0.3]),
                                            pre_position=1, open_based_on=[1, 1], enable_reset_flag=True,
                                            open_rule='or', exit_rule='and')
         np.testing.assert_array_almost_equal(result[0], pd.Series([0.1, -0.4]), decimal=6)
         self.assertEqual(result[1:], (1, [1, 1]))
-        # Check exit by reaching stop loss position, reset flag.
+        # Check exit by reaching stop loss position, reset flag
         result = CS._cur_flag_and_position(mpi=pd.Series([0.9, 0.4]), pre_flag=pd.Series([1.7, 0]),
                                            pre_position=1, open_based_on=[1, 1], enable_reset_flag=True,
                                            open_rule='or', exit_rule='and')
         np.testing.assert_array_almost_equal(result[0], pd.Series([2.1, -0.1]), decimal=6)
         self.assertEqual(result[1:], (-1, [-1, 1]))
-        # Check exit by x-ing 0, no reset flag.
+        # Check exit by x-ing 0, no reset flag
         result = CS._cur_flag_and_position(mpi=pd.Series([0.9, 0.4]), pre_flag=pd.Series([-0.3, -0.3]),
                                            pre_position=1, open_based_on=[1, 1], enable_reset_flag=False,
                                            open_rule='or', exit_rule='and')
         np.testing.assert_array_almost_equal(result[0], pd.Series([0.1, -0.4]), decimal=6)
         self.assertEqual(result[1:], (1, [1, 1]))
-        # Check exit by reaching stop loss position, no reset flag.
+        # Check exit by reaching stop loss position, no reset flag
         result = CS._cur_flag_and_position(mpi=pd.Series([0.9, 0.4]), pre_flag=pd.Series([1.7, 0]),
                                            pre_position=1, open_based_on=[1, 1], enable_reset_flag=False,
                                            open_rule='or', exit_rule='and')
         np.testing.assert_array_almost_equal(result[0], pd.Series([2.1, -0.1]), decimal=6)
         self.assertEqual(result[1:], (-1, [-1, 1]))
-        # The following tests will have postions exit successfully.
-        # Check exit by reaching 0, no reset flag.
+        # The following tests will have postions exit successfully
+        # Check exit by reaching 0, no reset flag
         result = CS._cur_flag_and_position(mpi=pd.Series([0.6, 0.4]), pre_flag=pd.Series([-0.01, 0.01]),
                                            pre_position=1, open_based_on=[1, 1], enable_reset_flag=False,
                                            open_rule='or', exit_rule='and')
@@ -376,14 +379,14 @@ class TestCopulaStrategyMPI(unittest.TestCase):
 
         CSMPI = copula_strategy_mpi.CopulaStrategyMPI(opening_triggers=(-0.6, 0.6), stop_loss_positions=(-2, 2))
         returns = CSMPI.to_returns(pair_prices=self.pair_prices)
-        # Fit an N14 copula.
+        # Fit an N14 copula
         _, copula, cdf1, cdf2 = CSMPI.fit_copula(returns, copula_name='N14')
-        # Forming positions and flags.
+        # Forming positions and flags
         _, _ = CSMPI.get_positions_and_flags(returns, cdf1, cdf2, enable_reset_flag=True,
                                              open_rule='or', exit_rule='and')
-        # Check goodness of copula fit by its coefficient.
+        # Check goodness of copula fit by its coefficient
         self.assertAlmostEqual(copula.theta, 1.3951538673040886)
-        # Check numbers of triggers.
+        # Check numbers of triggers
         self.assertEqual(CSMPI._long_count, 429)
         self.assertEqual(CSMPI._exit_count, 32)
         self.assertEqual(CSMPI._short_count, 400)
@@ -477,43 +480,43 @@ class TestCopulaStrategyMPI(unittest.TestCase):
         CS = copula_strategy_mpi.CopulaStrategyMPI()
 
         # result = (cur_flag: pd.Series, cur_position: int, open_based_on: list)
-        # Check long.
+        # Check long
         result = CS._cur_flag_and_position(mpi=pd.Series([0.4, 0.9]), pre_flag=pd.Series([0.3, 0.3]),
                                            pre_position=0, open_based_on=[0, 0], enable_reset_flag=True,
                                            open_rule='and', exit_rule='or')
         np.testing.assert_array_almost_equal(result[0], pd.Series([0.2, 0.7]), decimal=6)
         self.assertEqual(result[1:], (0, [1, 2]))
-        # Check short.
+        # Check short
         result = CS._cur_flag_and_position(mpi=pd.Series([0.9, 0.4]), pre_flag=pd.Series([0.3, 0.3]),
                                            pre_position=0, open_based_on=[0, 0], enable_reset_flag=True,
                                            open_rule='and', exit_rule='or')
         np.testing.assert_array_almost_equal(result[0], pd.Series([0.7, 0.2]), decimal=6)
         self.assertEqual(result[1:], (0, [-1, 1]))
-        # Check exit by x-ing 0, reset flag.
+        # Check exit by x-ing 0, reset flag
         result = CS._cur_flag_and_position(mpi=pd.Series([0.9, 0.4]), pre_flag=pd.Series([-0.3, -0.3]),
                                            pre_position=1, open_based_on=[1, 1], enable_reset_flag=True,
                                            open_rule='and', exit_rule='or')
         np.testing.assert_array_almost_equal(result[0], pd.Series([0, 0]), decimal=6)
         self.assertEqual(result[1:], (0, [0, 0]))
-        # Check exit by reaching stop loss position, reset flag.
+        # Check exit by reaching stop loss position, reset flag
         result = CS._cur_flag_and_position(mpi=pd.Series([0.9, 0.4]), pre_flag=pd.Series([1.7, 0]),
                                            pre_position=1, open_based_on=[1, 1], enable_reset_flag=True,
                                            open_rule='and', exit_rule='or')
         np.testing.assert_array_almost_equal(result[0], pd.Series([0, 0]), decimal=6)
         self.assertEqual(result[1:], (0, [0, 0]))
-        # Check exit by x-ing 0, no reset flag.
+        # Check exit by x-ing 0, no reset flag
         result = CS._cur_flag_and_position(mpi=pd.Series([0.9, 0.4]), pre_flag=pd.Series([-0.3, -0.3]),
                                            pre_position=1, open_based_on=[1, 1], enable_reset_flag=False,
                                            open_rule='and', exit_rule='or')
         np.testing.assert_array_almost_equal(result[0], pd.Series([0.1, -0.4]), decimal=6)
         self.assertEqual(result[1:], (0, [0, 0]))
-        # Check exit by reaching stop loss position, no reset flag.
+        # Check exit by reaching stop loss position, no reset flag
         result = CS._cur_flag_and_position(mpi=pd.Series([0.9, 0.4]), pre_flag=pd.Series([1.7, 0]),
                                            pre_position=1, open_based_on=[1, 1], enable_reset_flag=False,
                                            open_rule='and', exit_rule='or')
         np.testing.assert_array_almost_equal(result[0], pd.Series([2.1, -0.1]), decimal=6)
         self.assertEqual(result[1:], (0, [0, 0]))
-        # Check exit by reaching 0, no reset flag.
+        # Check exit by reaching 0, no reset flag
         result = CS._cur_flag_and_position(mpi=pd.Series([0.6, 0.4]), pre_flag=pd.Series([-0.01, 0.01]),
                                            pre_position=1, open_based_on=[1, 1], enable_reset_flag=False,
                                            open_rule='and', exit_rule='or')
@@ -527,14 +530,14 @@ class TestCopulaStrategyMPI(unittest.TestCase):
 
         CSMPI = copula_strategy_mpi.CopulaStrategyMPI(opening_triggers=(-0.6, 0.6), stop_loss_positions=(-2, 2))
         returns = CSMPI.to_returns(pair_prices=self.pair_prices)
-        # Fit an N14 copula.
+        # Fit an N14 copula
         _, copula, cdf1, cdf2 = CSMPI.fit_copula(returns, copula_name='N14')
-        # Forming positions and flags.
+        # Forming positions and flags
         _, _ = CSMPI.get_positions_and_flags(returns, cdf1, cdf2, enable_reset_flag=True,
                                              open_rule='and', exit_rule='or')
-        # Check goodness of copula fit by its coefficient.
+        # Check goodness of copula fit by its coefficient
         self.assertAlmostEqual(copula.theta, 1.3951538673040886)
-        # Check numbers of triggers.
+        # Check numbers of triggers
         self.assertEqual(CSMPI._long_count, 129)
         self.assertEqual(CSMPI._exit_count, 195)
         self.assertEqual(CSMPI._short_count, 73)
@@ -633,43 +636,43 @@ class TestCopulaStrategyMPI(unittest.TestCase):
         CS = copula_strategy_mpi.CopulaStrategyMPI()
 
         # result = (cur_flag: pd.Series, cur_position: int, open_based_on: list)
-        # Check long.
+        # Check long
         result = CS._cur_flag_and_position(mpi=pd.Series([0.4, 0.9]), pre_flag=pd.Series([0.3, 0.3]),
                                            pre_position=0, open_based_on=[0, 0], enable_reset_flag=True,
                                            open_rule='and', exit_rule='and')
         np.testing.assert_array_almost_equal(result[0], pd.Series([0.2, 0.7]), decimal=6)
         self.assertEqual(result[1:], (0, [1, 2]))
-        # Check short.
+        # Check short
         result = CS._cur_flag_and_position(mpi=pd.Series([0.9, 0.4]), pre_flag=pd.Series([0.3, 0.3]),
                                            pre_position=0, open_based_on=[0, 0], enable_reset_flag=True,
                                            open_rule='and', exit_rule='and')
         np.testing.assert_array_almost_equal(result[0], pd.Series([0.7, 0.2]), decimal=6)
         self.assertEqual(result[1:], (0, [-1, 1]))
-        # Check exit by x-ing 0, reset flag.
+        # Check exit by x-ing 0, reset flag
         result = CS._cur_flag_and_position(mpi=pd.Series([0.9, 0.4]), pre_flag=pd.Series([-0.3, -0.3]),
                                            pre_position=1, open_based_on=[1, 1], enable_reset_flag=True,
                                            open_rule='and', exit_rule='and')
         np.testing.assert_array_almost_equal(result[0], pd.Series([0.1, -0.4]), decimal=6)
         self.assertEqual(result[1:], (1, [1, 1]))
-        # Check exit by reaching stop loss position, reset flag.
+        # Check exit by reaching stop loss position, reset flag
         result = CS._cur_flag_and_position(mpi=pd.Series([0.9, 0.4]), pre_flag=pd.Series([1.7, 0]),
                                            pre_position=1, open_based_on=[1, 1], enable_reset_flag=True,
                                            open_rule='and', exit_rule='and')
         np.testing.assert_array_almost_equal(result[0], pd.Series([2.1, -0.1]), decimal=6)
         self.assertEqual(result[1:], (1, [-1, 1]))
-        # Check exit by x-ing 0, no reset flag.
+        # Check exit by x-ing 0, no reset flag
         result = CS._cur_flag_and_position(mpi=pd.Series([0.9, 0.4]), pre_flag=pd.Series([-0.3, -0.3]),
                                            pre_position=1, open_based_on=[1, 1], enable_reset_flag=False,
                                            open_rule='and', exit_rule='and')
         np.testing.assert_array_almost_equal(result[0], pd.Series([0.1, -0.4]), decimal=6)
         self.assertEqual(result[1:], (1, [1, 1]))
-        # Check exit by reaching stop loss position, no reset flag.
+        # Check exit by reaching stop loss position, no reset flag
         result = CS._cur_flag_and_position(mpi=pd.Series([0.9, 0.4]), pre_flag=pd.Series([1.7, 0]),
                                            pre_position=1, open_based_on=[1, 1], enable_reset_flag=False,
                                            open_rule='and', exit_rule='and')
         np.testing.assert_array_almost_equal(result[0], pd.Series([2.1, -0.1]), decimal=6)
         self.assertEqual(result[1:], (1, [-1, 1]))
-        # Check exit by reaching 0, no reset flag.
+        # Check exit by reaching 0, no reset flag
         result = CS._cur_flag_and_position(mpi=pd.Series([0.6, 0.4]), pre_flag=pd.Series([-0.01, 0.01]),
                                            pre_position=1, open_based_on=[1, 1], enable_reset_flag=False,
                                            open_rule='and', exit_rule='and')
@@ -683,17 +686,17 @@ class TestCopulaStrategyMPI(unittest.TestCase):
 
         CSMPI = copula_strategy_mpi.CopulaStrategyMPI(opening_triggers=(-0.6, 0.6), stop_loss_positions=(-2, 2))
         returns = CSMPI.to_returns(pair_prices=self.pair_prices)
-        # Fit an N14 copula.
+        # Fit an N14 copula
         _, copula, cdf1, cdf2 = CSMPI.fit_copula(returns, copula_name='N14')
-        # Forming positions and flags. Change the default opening triggers threshold and stop loss positions.
+        # Forming positions and flags. Change the default opening triggers threshold and stop loss positions
         _, _ = CSMPI.get_positions_and_flags(returns, cdf1, cdf2, enable_reset_flag=True,
                                              open_rule='and', exit_rule='and',
                                              opening_triggers=(-0.5, 0.5), stop_loss_positions=(-3, 3))
         np.testing.assert_array_almost_equal(CSMPI.opening_triggers, (-0.5, 0.5))
         np.testing.assert_array_almost_equal(CSMPI.stop_loss_positions, (-3, 3))
-        # Check goodness of copula fit by its coefficient.
+        # Check goodness of copula fit by its coefficient
         self.assertAlmostEqual(copula.theta, 1.3951538673040886)
-        # Check numbers of triggers.
+        # Check numbers of triggers
         self.assertEqual(CSMPI._long_count, 154)
         self.assertEqual(CSMPI._exit_count, 11)
         self.assertEqual(CSMPI._short_count, 420)

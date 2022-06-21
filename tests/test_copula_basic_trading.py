@@ -8,6 +8,7 @@ Unit tests for copula_strategy_basic, and additional features of copula_generate
 
 import os
 import unittest
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd

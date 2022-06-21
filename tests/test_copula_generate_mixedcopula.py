@@ -8,6 +8,7 @@ Unit tests for generating and fitting mixed copulas.
 import os
 import unittest
 import datetime as dt
+
 import numpy as np
 import pandas as pd
 
@@ -19,7 +20,7 @@ from arbitragelab.copula_approach import copula_calculation as ccalc
 
 class TestCopulaGenerateMixedCopula(unittest.TestCase):
     """
-    Testing module copula_generate_mixedcopula.py and also methods in copula_calculation related to mixed copulas.
+    Testing module copula_approach/mixed_copulas/* and also methods in copula_calculation related to mixed copulas.
 
     Does not include fitting methods since those are tested under BasicCopulaStrategy.
     """
@@ -83,6 +84,7 @@ class TestCopulaGenerateMixedCopula(unittest.TestCase):
         """
         Testing CTGMixCop initiation and related methods in its abstract parent class.
         """
+
         # Initiate an empty CTG
         ctg_empty = copmix.CTGMixCop()
         self.assertIsNone(ctg_empty.weights)
@@ -166,11 +168,11 @@ class TestCopulaGenerateMixedCopula(unittest.TestCase):
         for i in range(3):
             self.assertIsNone(cfg_empty.copulas[i])
 
-        # Initiate a CTG mixed copula with given parameters.
+        # Initiate a CTG mixed copula with given parameters
         cop_params = [3, 4, 5]
         weights = [0.5, 0.25, 0.25]
         cfg = copmix.CFGMixCop(cop_params, weights)
-        # Check initiation and description.
+        # Check initiation and description
         description = cfg.describe()
         expected_descrb = {'Descriptive Name': 'Bivariate Clayton-Frank-Gumbel Mixed Copula',
                            'Class Name': 'CFGMixCop',
@@ -198,19 +200,19 @@ class TestCopulaGenerateMixedCopula(unittest.TestCase):
         us = [0, 1, 1, 0, 0.3, 0.7, 0.5]
         vs = [0, 1, 0, 1, 0.7, 0.3, 0.5]
 
-        # Check get_cop_density(u, v), i.e., prob densities of the mixed cop.
+        # Check get_cop_density(u, v), i.e., prob densities of the mixed cop
         expected_densities = [41624.98642234784, 28720.660686591415, 0.01865885301119625, 0.018658853011196245,
                               0.3816145685458273, 0.3816145685458273, 2.1471963217627814]
         densities = [cfg.get_cop_density(u, v) for (u, v) in zip(us, vs)]
         np.testing.assert_array_almost_equal(expected_densities, densities, decimal=6)
 
-        # Check get_cop_eval(u, v), i.e., cumulative densities of the mixed cop.
+        # Check get_cop_eval(u, v), i.e., cumulative densities of the mixed cop
         expected_cumdensities = [4.6050662931472644e-05, 0.9998213129311458, 9.999981335175073e-05,
                                  9.999981335175073e-05, 0.2914772991528678, 0.2914772991528678, 0.40510936419358706]
         cumdensities = [cfg.get_cop_eval(u, v) for (u, v) in zip(us, vs)]
         np.testing.assert_array_almost_equal(expected_cumdensities, cumdensities, decimal=6)
 
-        # Check get_condi_prob(u, v), i.e., conditional probs of the mixed cop.
+        # Check get_condi_prob(u, v), i.e., conditional probs of the mixed cop
         expected_cumdensities = [0.22435467527472625, 0.8935568957992956, 0.9999998134152023,
                                  1.8658479839651037e-07, 0.049245024408386615, 0.9342460479433407, 0.4707809952066607]
         cumdensities = [cfg.get_condi_prob(u, v) for (u, v) in zip(us, vs)]
@@ -224,7 +226,7 @@ class TestCopulaGenerateMixedCopula(unittest.TestCase):
 
     def test_plot_abs_class_method(self):
         """
-        Testing the plot method in the Copula abstract class.
+        Testing the plot method in the Copula abstract class
         """
 
         rho = 0.5
