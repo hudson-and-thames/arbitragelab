@@ -57,7 +57,7 @@ They share some common repertoire of methods and attributes.
 
 Users can create and fit copulas to data and use them directly. Also, the fitted copulas can be used in trading
 strategies such as :code:`BasicCopulaTradingRule` and :code:`MispricingIndexCopulaTradingRule` class described in the
-Trading Strategies Section of the documentation.
+:ref:`Trading Strategies <trading-basic_copula>` section of the documentation.
 
 The user may choose to fit the pair's data to all provided copulas, then compare the information criterion scores (AIC,
 SIC, HQIC, Log-likelihood) to decide the best copula. One can further use the fitted copula to generate trading positions

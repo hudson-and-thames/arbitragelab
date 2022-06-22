@@ -27,10 +27,8 @@ class BasicCopulaTradingRule:
     quantiles of the current price u1 and u2. If we define the spread as stock 1 in relation to stock 2, then the
     logic is as follows (All the thresholds can be customized via open_thresholds, exit_thresholds parameters):
 
-        - If P(U1 <= u1 | U2 = u2) <= 0.05 AND P(U2 <= u2 | U1 = u1) >= 0.95, then stock 1 is under-valued and
-          stock 2 is over-valued. Thus we long the spread.
-        - If P(U1 <= u1 | U2 = u2) >= 0.95 AND P(U2 <= u2 | U1 = u1) <= 0.05, then stock 2 is under-valued and
-          stock 1 is over-valued. Thus we short the spread.
+        - If P(U1 <= u1 | U2 = u2) <= 0.05 AND P(U2 <= u2 | U1 = u1) >= 0.95, then stock 1 is under-valued and stock 2 is over-valued. Thus we long the spread.
+        - If P(U1 <= u1 | U2 = u2) >= 0.95 AND P(U2 <= u2 | U1 = u1) <= 0.05, then stock 2 is under-valued and stock 1 is over-valued. Thus we short the spread.
         - We close the position if the conditional probabilities cross with 0.5 (`exit_probabilities`).
 
     For the exiting condition, the author proposed a closure when stock 1 AND 2's conditional probabilities cross
@@ -80,7 +78,6 @@ class BasicCopulaTradingRule:
         Set marginal C.D.Fs functions which transform X, Y values into probabilities, usually ECDFs are used. One can
         use `construct_ecdf_lin` function from copula_calculations module.
 
-
         :param cdf_x: (func) Marginal C.D.F. for series X.
         :param cdf_y: (func) Marginal C.D.F. for series Y.
         """
@@ -91,7 +88,8 @@ class BasicCopulaTradingRule:
     def update_probabilities(self, x_value: float, y_value: float):
         """
         Update latest probabilities (p1,p2) values from empirical `x_value` and `y_value`,
-        where
+        where:
+
             p1=self.copula.get_condi_prob(self.cdf_x(x_value), self.cdf_y(y_value)),
             p2=self.copula.get_condi_prob(self.cdf_y(y_value), self.cdf_x(x_value)),
 
@@ -118,10 +116,8 @@ class BasicCopulaTradingRule:
         """
         Function which checks entry condition based on `self.current_probabilities`.
 
-        - If P(U1 <= u1 | U2 = u2) <= 0.05 AND P(U2 <= u2 | U1 = u1) >= 0.95, then stock 1 is under-valued and
-              stock 2 is over-valued. Thus we long the spread.
-        - If P(U1 <= u1 | U2 = u2) >= 0.95 AND P(U2 <= u2 | U1 = u1) <= 0.05, then stock 2 is under-valued and
-          stock 1 is over-valued. Thus we short the spread.
+        - If P(U1 <= u1 | U2 = u2) <= 0.05 AND P(U2 <= u2 | U1 = u1) >= 0.95, then stock 1 is under-valued and stock 2 is over-valued. Thus we long the spread.
+        - If P(U1 <= u1 | U2 = u2) >= 0.95 AND P(U2 <= u2 | U1 = u1) <= 0.05, then stock 2 is under-valued and stock 1 is over-valued. Thus we short the spread.
 
         :return: (tuple) Tuple of boolean entry flag and side (if entry flag is True).
         """

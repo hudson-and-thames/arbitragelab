@@ -194,6 +194,14 @@ This project is licensed under an all rights reserved license and is NOT open-so
 
 .. toctree::
     :maxdepth: 2
+    :caption: Trading Strategies
+    :hidden:
+
+    trading/basic_copula
+    copula_approach/mispricing_index_strategy
+
+.. toctree::
+    :maxdepth: 2
     :caption: Distance Approach
     :hidden:
 
@@ -235,8 +243,6 @@ This project is licensed under an all rights reserved license and is NOT open-so
     copula_approach/introduction
     copula_approach/copula_brief_intro
     copula_approach/copula_deeper_intro
-    copula_approach/basic_trading_strategy
-    copula_approach/mispricing_index_strategy
     copula_approach/vine_copula_intro
     copula_approach/cvine_copula_strategy
     copula_approach/partner_selection
