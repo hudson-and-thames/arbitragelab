@@ -12,7 +12,8 @@ import unittest
 import numpy as np
 import pandas as pd
 
-from arbitragelab.copula_approach import copula_strategy_mpi
+from arbitragelab.copula_approach import (copula_strategy_mpi, construct_ecdf_lin)
+from arbitragelab.copula_approach.archimedean import N14
 
 
 class TestCopulaStrategyMPI(unittest.TestCase):
@@ -201,18 +202,27 @@ class TestCopulaStrategyMPI(unittest.TestCase):
         """
 
         CSMPI = copula_strategy_mpi.CopulaStrategyMPI(opening_triggers=(-0.6, 0.6), stop_loss_positions=(-2, 2))
-        _ = CSMPI.to_returns(pair_prices=self.pair_prices)
+        returns = CSMPI.to_returns(pair_prices=self.pair_prices)
 
-        # Fit an N14 copula
-        #_, copula, cdf1, cdf2 = CSMPI.fit_copula(returns, copula_name='N14')
+        # Add copula
+        cop = N14(theta=2)
+        CSMPI.set_copula(cop)
+
+        # Constructing cdf for x and y
+        cdf_x = construct_ecdf_lin(returns['BKD'])
+        cdf_y = construct_ecdf_lin(returns['ESC'])
+        CSMPI.set_cdf(cdf_x, cdf_y)
+
         # Forming positions and flags
-        #_, _ = CSMPI.get_positions_and_flags(returns, cdf1, cdf2, enable_reset_flag=True)
+        _, _ = CSMPI.get_positions_and_flags(returns, enable_reset_flag=True)
+
         # Check goodness of copula fit by its coefficient
-        #self.assertAlmostEqual(copula.theta, 1.3951538673040886)
+        self.assertAlmostEqual(CSMPI.copula.theta, 2)
+
         # Check numbers of triggers
-        #self.assertEqual(CSMPI._long_count, 339)
-        #self.assertEqual(CSMPI._exit_count, 32)
-        #self.assertEqual(CSMPI._short_count, 476)
+        self.assertEqual(CSMPI._long_count, 506)
+        self.assertEqual(CSMPI._exit_count, 37)
+        self.assertEqual(CSMPI._short_count, 274)
 
     @staticmethod
     def test_positions_to_units_dollar_neutral():
