@@ -10,13 +10,12 @@ from typing import Callable, Sequence, Union
 import numpy as np
 import pandas as pd
 
-from arbitragelab.copula_approach.copula_strategy_basic import BasicCopulaStrategy
 import arbitragelab.copula_approach.base as cop
 import arbitragelab.copula_approach.mixed_copulas.base as copmix
 from arbitragelab.util import segment
 
 
-class CopulaStrategyMPI(BasicCopulaStrategy):
+class CopulaStrategyMPI():
     """
     Copula trading strategy based on mispricing index(MPI).
 
@@ -55,7 +54,15 @@ class CopulaStrategyMPI(BasicCopulaStrategy):
             trading signal. Defaults to (-2, 2).
         """
 
-        super().__init__(copula=copula)
+        # Copulas that uses theta as parameter
+        self.archimedean_names = ['Gumbel', 'Clayton', 'Frank', 'Joe', 'N13', 'N14']
+        self.elliptical_names = ['Gaussian', 'Student']
+        self.mixed_cop_names = ['CFGMixCop', 'CTGMixCop']
+        self.all_copula_names = self.archimedean_names + self.elliptical_names + self.mixed_cop_names
+
+        # To be used for the test data set
+        self.copula = copula
+
         self.opening_triggers = opening_triggers
         self.stop_loss_positions = stop_loss_positions
 
