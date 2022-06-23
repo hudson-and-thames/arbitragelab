@@ -569,6 +569,7 @@ Implementation
     :members: __init__, describe, get_cop_density, get_cop_eval, get_condi_prob, get_log_likelihood_sum, sample, fit, theta_hat, plot_cdf, plot_pdf, plot_scatter
 
 .. autoclass:: CFGMixCop
+    :members: __init__
 
 Interesting Open Problems
 #########################

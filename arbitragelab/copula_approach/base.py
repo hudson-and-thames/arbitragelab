@@ -302,7 +302,7 @@ class Copula(ABC):
         """
 
         samples = self.sample(num=num_points)
-        ax = sns.kdeplot(samples[:, 0], samples[:, 1], shade=True)
+        ax = sns.kdeplot(x=samples[:, 0], y=samples[:, 1], shade=True)
         ax.set_title('Scatter/heat plot for generated copula samples.')
 
         return ax
