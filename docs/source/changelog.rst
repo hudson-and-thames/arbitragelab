@@ -12,6 +12,12 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+* :feature:`73` Refactored all Copulas to allow independent use and fitting in the Copula Approach Module.
+* :feature:`73` Created a separate Basic Copula Trading Strategy in the Trading Strategies Module.
+* :feature:`72` Created a separate Mispricing Index Copula Trading Strategy in the Trading Strategies Module.
+* :support:`72` Adjusted Copula Approach Module documentation.
+* :support:`72` Added Basic Copula Trading Strategy documentation.
+* :support:`72` Added Mispricing Index Copula Trading Strategy documentation.
 * :support:`71` Added Raw Docs for debugging to documentation.
 * :support:`71` Added UML Diagram for debugging to documentation.
 * :feature:`70` Updated requirements versions to the newest stable numpy, pandas etc.
