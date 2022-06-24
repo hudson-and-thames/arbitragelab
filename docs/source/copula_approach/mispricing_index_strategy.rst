@@ -1,8 +1,8 @@
 .. _copula_approach-mispricing_index_strategy:
 
-=================================
-Mispricing Index Trading Strategy
-=================================
+========================================
+Mispricing Index Copula Trading Strategy
+========================================
 
 .. raw:: html
 
@@ -247,7 +247,7 @@ Implementation
 .. automodule:: arbitragelab.copula_approach.copula_strategy_mpi
         
     .. autoclass:: CopulaStrategyMPI
-	:members: __init__, to_returns, calc_mpi, fit_copula, positions_to_units_dollar_neutral, get_positions_and_flags
+	:members: __init__, to_returns, set_copula, set_cdf, calc_mpi, get_condi_probs, positions_to_units_dollar_neutral, get_positions_and_flags
 
 Example
 *******
@@ -256,11 +256,13 @@ Example
 
    # Importing the module and other libraries
    from arbitragelab.copula_approach.copula_strategy_mpi import CopulaStrategyMPI
+   from arbitragelab.copula_approach import construct_ecdf_lin
+   from arbitragelab.copula_approach.archimedean import N14
    import matplotlib.pyplot as plt
    import pandas as pd
 
    # Instantiating the module
-   CSMPI = CopulaStrategyMPI()
+   CSMPI = CopulaStrategyMPI(opening_triggers=(-0.6, 0.6), stop_loss_positions=(-2, 2))
 
    # Loading the data in prices of stock X and stock Y
    prices = pd.read_csv('FILE_PATH' + 'stock_X_Y_prices.csv').set_index('Date').dropna()
@@ -275,33 +277,29 @@ Example
    prices_train = prices.iloc[:training_len, :]
    prices_test = prices.iloc[training_len:, :]
 
-   # Fitting to a N14 copula
-   result_dict, copula, s1_cdf, s2_cdf = CSMPI.fit_copula(returns=returns_train,
-                                                          copula_name='N14')
+   # Adding the N14 copula (it can be fitted with tools from the Copula Approach)
+   cop = N14(theta=2)
+   CSMPI.set_copula(cop)
 													   
-   # Printing fit scores in AIC, SIC, HQIC and log-likelihood
-   print(result_dict)
+   # Constructing cdf for x and y
+   cdf_x = construct_ecdf_lin(returns['BKD'])
+   cdf_y = construct_ecdf_lin(returns['ESC'])
+   CSMPI.set_cdf(cdf_x, cdf_y)
 
-   # Forming positions and flags using trading period data, assuming holding no position initially.
+   # Forming positions and flags using trading data, assuming holding no position initially.
    # Default uses OR-OR logic for open-exit.
-   positions, flags = CSMPI.get_positions_and_flags(returns=returns_test,
-                                                    cdf1=s1_cdf, cdf2=s2_cdf)
+   positions, flags = CSMPI.get_positions_and_flags(returns=returns_test)
+
    # Use AND-OR logic.                       
    positions_and_or, flags_and_or = CSMPI.get_positions_and_flags(returns=returns_test,
-                                                                  cdf1=s1_cdf, cdf2=s2_cdf,
-                                                                  open_rule='and', exit_rule='or')
+                                                                  open_rule='and',
+                                                                  exit_rule='or')
    
-   # Changing the positions series to units to hold for a dollar-neutral strategy for $10000 investment
-   units = CSMPI.positions_to_units_dollar_neutral(prices_df=prices_test, positions=positions,
+   # Changing the positions series to units to hold for
+   # a dollar-neutral strategy for $10000 investment
+   units = CSMPI.positions_to_units_dollar_neutral(prices_df=prices_test,
+                                                   positions=positions,
                                                    multiplier=10000)
-   
-   # Graph from the fitted copula
-   ax = plt.subplot()
-   CSMPI.graph_copula(copula_name='N14', ax=ax, theta=copula.theta)
-   plt.show()
-   
-   # Sample 2000 times from the fitted copula
-   samples = copula.generate_pairs(num=2000)
 
 
 Possible Issues
