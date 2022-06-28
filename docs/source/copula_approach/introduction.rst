@@ -54,8 +54,10 @@ There are 8 commonly used pure copulas that are now available: :code:`Gumbel`, :
 Also there are 2 mixed copulas :code:`CTGMixCop` (Clayton-Student-Gumbel) and :code:`CFGMixCop` (Clayton-Frank-Gumbel) under
 :code:`MixedCopula`.
 They share some common repertoire of methods and attributes.
-However, most of the time for trading purposes, the user is not expected to directly use the copulas.
-All trading related functionalities are included in the :code:`BasicCopulaStrategy` and :code:`CopulaStrategyMPI` class.
+
+Users can create and fit copulas to data and use them directly. Also, the fitted copulas can be used in trading
+strategies such as :code:`BasicCopulaTradingRule` and :code:`MispricingIndexCopulaTradingRule` class described in the
+:ref:`Trading Strategies <trading-basic_copula>` section of the documentation.
 
 The user may choose to fit the pair's data to all provided copulas, then compare the information criterion scores (AIC,
 SIC, HQIC, Log-likelihood) to decide the best copula. One can further use the fitted copula to generate trading positions

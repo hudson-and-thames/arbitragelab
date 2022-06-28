@@ -7,8 +7,10 @@ Unit tests for pairs selection module under copula_approach.
 # pylint: disable = invalid-name, protected-access
 import os
 import unittest
+
 import numpy as np
 import pandas as pd
+
 import arbitragelab.copula_approach.pairs_selection as pairs_selection
 
 
@@ -94,7 +96,7 @@ class TestPairsSelector(unittest.TestCase):
         ff_expect = pd.DataFrame(data=ff_expect_data, dtype=float)
         li_expect = pd.DataFrame(data=li_expect_data, dtype=float)
 
-        # Checking with the result.
+        # Checking with the result
         pd.testing.assert_frame_equal(forward_fill_df, ff_expect, check_dtype=False)
         pd.testing.assert_frame_equal(linear_interp_df, li_expect, check_dtype=False)
         pd.testing.assert_frame_equal(none_df, toy_df, check_dtype=False)

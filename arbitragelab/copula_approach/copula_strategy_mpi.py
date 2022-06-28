@@ -3,23 +3,17 @@
 # Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 """
 Module that uses copula for trading strategy based on (cumulative) mispricing index.
-
-`Xie, W., Liew, R.Q., Wu, Y. and Zou, X., 2014. Pairs Trading with Copulas.
-<https://efmaefm.org/0efmameetings/EFMA%20ANNUAL%20MEETINGS/2014-Rome/papers/EFMA2014_0222_FullPaper.pdf>`__
 """
 
 # pylint: disable = invalid-name, too-many-locals, dangerous-default-value
-from typing import Callable, Sequence, Union
+from typing import Callable, Sequence
 import numpy as np
 import pandas as pd
 
-from arbitragelab.copula_approach.copula_strategy_basic import BasicCopulaStrategy
-import arbitragelab.copula_approach.copula_generate as cg
-import arbitragelab.copula_approach.copula_generate_mixedcopula as cgmix
 from arbitragelab.util import segment
 
 
-class CopulaStrategyMPI(BasicCopulaStrategy):
+class CopulaStrategyMPI:
     """
     Copula trading strategy based on mispricing index(MPI).
 
@@ -31,40 +25,63 @@ class CopulaStrategyMPI(BasicCopulaStrategy):
     is higher or opening a position priority is higher. In this implementation as CopulaStrategyMPI, the reset priority
     is the highest. If one wishes to change the precedence, it is in method _get_position_and_reset_flag.
 
+    The implementation is based on the following paper:
+    `Xie, W., Liew, R.Q., Wu, Y. and Zou, X., 2014. Pairs Trading with Copulas.
+    <https://efmaefm.org/0efmameetings/EFMA%20ANNUAL%20MEETINGS/2014-Rome/papers/EFMA2014_0222_FullPaper.pdf>`__
+
     Compared to the original BasicCopulaStrategy class, it includes the following fundamental functionalities:
 
         1. Convert price series to return series.
         2. Calculate MPI and flags (essentially cumulative mispricing index).
         3. Use flags to form positions.
-
     """
 
-    def __init__(self, copula: Union[cg.Copula, cgmix.MixedCopula] = None,
-                 opening_triggers: tuple = (-0.6, 0.6), stop_loss_positions: tuple = (-2, 2)):
+    def __init__(self, opening_triggers: tuple = (-0.6, 0.6), stop_loss_positions: tuple = (-2, 2)):
         """
         Initiate a CopulaStrategyMPI class.
 
-        One can choose to initiate with no arguments, or to initiate with a given copula as the system's
-        Copula.
+        One can choose to initiate with no arguments, and later set a copula as the system's Copula.
 
-        :param copula: (Copula, MixedCopula) Optional. A copula object that the class will use for all analysis. If
-            there is no input then fit_copula method will create one when called.
         :param opening_triggers: (tuple) Optional. The thresholds for MPI to trigger a long/short position for the
             pair's trading framework. Format is (long trigger, short trigger). Defaults to (-0.6, 0.6).
         :param stop_loss_positions: (tuple) Optional. One of the conditions for MPI to trigger an exiting
             trading signal. Defaults to (-2, 2).
         """
 
-        super().__init__(copula=copula)
         self.opening_triggers = opening_triggers
         self.stop_loss_positions = stop_loss_positions
 
-        # Counters on how many times each position is triggered.
+        # Counters on how many times each position is triggered
         self._long_count = 0
         self._short_count = 0
         self._exit_count = 0
 
+        self.copula = None  # Fit copula
+        self.cdf_x = None
+        self.cdf_y = None
+
         segment.track('CopulaStrategyMPI')
+
+    def set_copula(self, copula: object):
+        """
+        Set fit copula to `self.copula`.
+
+        :param copula: (object) Fit copula object.
+        """
+
+        self.copula = copula
+
+    def set_cdf(self, cdf_x: Callable[[float], float], cdf_y: Callable[[float], float]):
+        """
+        Set marginal C.D.Fs functions which transform X, Y values into probabilities, usually ECDFs are used. One can
+        use `construct_ecdf_lin` function from copula_calculations module.
+
+        :param cdf_x: (func) Marginal C.D.F. for series X.
+        :param cdf_y: (func) Marginal C.D.F. for series Y.
+        """
+
+        self.cdf_x = cdf_x
+        self.cdf_y = cdf_y
 
     @staticmethod
     def to_returns(pair_prices: pd.DataFrame, fill_init_nan: Sequence[float] = (0, 0)) -> pd.DataFrame:
@@ -87,8 +104,7 @@ class CopulaStrategyMPI(BasicCopulaStrategy):
 
         return returns
 
-    def calc_mpi(self, returns: pd.DataFrame, cdf1: Callable[[float], float],
-                 cdf2: Callable[[float], float]) -> pd.DataFrame:
+    def calc_mpi(self, returns: pd.DataFrame) -> pd.DataFrame:
         r"""
         Calculate mispricing indices from returns.
 
@@ -97,19 +113,35 @@ class CopulaStrategyMPI(BasicCopulaStrategy):
         Similarly MPI_2(r1, r2) = P(R2 <= r2 | R1 = r1).
 
         :param returns: (pd.DataFrame) Return data frame for the stock pair.
-        :param cdf1: (func) Cumulative density function for stock 1's returns series.
-        :param cdf2: (func) Cumulative density function for stock 2's returns series.
         :return: (pd.DataFrame) Mispricing indices for the pair of stocks.
         """
 
         # Convert to quantile data
-        quantile_c1 = returns.iloc[:, 0].map(cdf1)
-        quantile_c2 = returns.iloc[:, 1].map(cdf2)
+        quantile_c1 = returns.iloc[:, 0].map(self.cdf_x)
+        quantile_c2 = returns.iloc[:, 1].map(self.cdf_y)
         quantile_data = pd.concat([quantile_c1, quantile_c2], axis=1)
-        # Calculate conditional probabilities using returns and cdfs. This is the definition of MPI.
-        mpis = super().get_condi_probs(quantile_data)
+        # Calculate conditional probabilities using returns and cdfs. This is the definition of MPI
+        mpis = self.get_condi_probs(quantile_data)
 
         return mpis
+
+    def get_condi_probs(self, quantile_data: pd.DataFrame) -> pd.DataFrame:
+        """
+        Get conditional probabilities given the data.
+        The input data needs to be quantile. The system should have a copula fitted to use. Make sure the quantile data
+        does not have any NaN values.
+        :param quantile_data: (pd.DataFrame) Data frame in quantiles with two columns.
+        :return: (pd.DataFrame) The conditional probabilities calculated.
+        """
+
+        # Initiate a data frame with zeros and the same index
+        condi_probs = pd.DataFrame(np.nan, index=quantile_data.index, columns=quantile_data.columns)
+
+        for row_count, row in enumerate(quantile_data.iterrows()):
+            condi_probs.iloc[row_count] = [self.copula.get_condi_prob(row[1][0], row[1][1]),
+                                           self.copula.get_condi_prob(row[1][1], row[1][0])]
+
+        return condi_probs
 
     @staticmethod
     def positions_to_units_dollar_neutral(prices_df: pd.DataFrame, positions: pd.Series,
@@ -143,22 +175,22 @@ class CopulaStrategyMPI(BasicCopulaStrategy):
         units_df.iloc[0, 1] = - 0.5 / prices_df.iloc[1, 0] * positions[0]
         nums = len(positions)
         for i in range(1, nums):
-            # By default the new amount of units to be held is the same as the previous step.
+            # By default the new amount of units to be held is the same as the previous step
             units_df.iloc[i, :] = units_df.iloc[i-1, :]
-            # Updating if there are position changes.
-            # From not short to short.
+            # Updating if there are position changes
+            # From not short to short
             if positions[i-1] != -1 and positions[i] == -1:  # Short 1, long 2
                 long_units = 0.5 / prices_df.iloc[i, 1]
                 short_units = 0.5 / prices_df.iloc[i, 0]
                 units_df.iloc[i, 0] = - short_units
                 units_df.iloc[i, 1] = long_units
-            # From not long to long.
+            # From not long to long
             if positions[i-1] != 1 and positions[i] == 1:  # Short 2, long 1
                 long_units = 0.5 / prices_df.iloc[i, 0]
                 short_units = 0.5 / prices_df.iloc[i, 1]
                 units_df.iloc[i, 0] = long_units
                 units_df.iloc[i, 1] = - short_units
-            # From long/short to none.
+            # From long/short to none
             if positions[i-1] != 0 and positions[i] == 0:  # Exiting
                 units_df.iloc[i, 0] = 0
                 units_df.iloc[i, 1] = 0
@@ -166,10 +198,8 @@ class CopulaStrategyMPI(BasicCopulaStrategy):
         return units_df.multiply(multiplier)
 
     def get_positions_and_flags(self, returns: pd.DataFrame,
-                                cdf1: Callable[[float], float], cdf2: Callable[[float], float],
                                 init_pos: int = 0, enable_reset_flag: bool = True,
-                                open_rule: str = 'or', exit_rule: str = 'or', opening_triggers: tuple = None,
-                                stop_loss_positions: tuple = None) -> (pd.Series, pd.DataFrame):
+                                open_rule: str = 'or', exit_rule: str = 'or') -> (pd.Series, pd.DataFrame):
         """
         Get the positions and flag series based on returns series.
 
@@ -204,8 +234,6 @@ class CopulaStrategyMPI(BasicCopulaStrategy):
         forming an equity curve, backtesting or actual trading, one should forward-roll the position by at least 1.
 
         :param returns: (pd.DataFrame) Returns data frame for the stock pair.
-        :param cdf1: (func) Cumulative density function for stock 1's returns series.
-        :param cdf2: (func) Cumulative density function for stock 2's returns series.
         :param init_pos: (int) Optional. Initial position. Takes value 0, 1, -1, corresponding to no
             position, long or short. Defaults to 0.
         :param enable_reset_flag: (bool) Optional. Whether allowing the flag series to be reset by
@@ -216,25 +244,14 @@ class CopulaStrategyMPI(BasicCopulaStrategy):
         :param exit_rule: (str) Optional. The logic for deciding to exit a position from combining mispricing info from
             the two stocks. Choices are ['and', 'or']. 'and' means both stocks need to be considered to justify an
             exit. 'or' means only one stock need to be considered to exit a position. Defaults to 'or'.
-        :param opening_triggers: (tuple) Optional. The thresholds for MPI to trigger a long/short position for the
-            pair's trading framework. Format is (long trigger, short trigger). Defaults to (-0.6, 0.6).
-        :param stop_loss_positions: (tuple) Optional. One of the conditions for MPI to trigger an exiting
-            trading signal. Defaults to (-2, 2).
         :return: (pd.Series, pd.DataFrame)
             The calculated position series in a pd.Series, and the two flag series in a pd.DataFrame.
         """
 
         # Initialization
-        # Update default opening triggers
-        if opening_triggers is not None:
-            self.opening_triggers = opening_triggers
-        # Update default stop loss positions
-        if stop_loss_positions is not None:
-            self.stop_loss_positions = stop_loss_positions
-
-        open_based_on = [0, 0]  # Initially no position was opened based on stocks.
-        mpis = self.calc_mpi(returns, cdf1, cdf2)  # Mispricing indices from stock 1 and 2.
-        flags = pd.DataFrame(data=0, index=returns.index, columns=returns.columns)  # Initialize flag values.
+        open_based_on = [0, 0]  # Initially no position was opened based on stocks
+        mpis = self.calc_mpi(returns)  # Mispricing indices from stock 1 and 2
+        flags = pd.DataFrame(data=0, index=returns.index, columns=returns.columns)  # Initialize flag values
         positions = pd.Series(data=[np.nan]*len(returns), index=returns.index)
         positions[0] = init_pos
         # Reset the counters
@@ -281,15 +298,15 @@ class CopulaStrategyMPI(BasicCopulaStrategy):
         """
 
         centered_mpi = mpi.subtract(0.5)  # Center to 0
-        # Raw value means it is not (potentially) reset by exit triggers.
-        raw_cur_flag = centered_mpi + pre_flag  # Definition.
+        # Raw value means it is not (potentially) reset by exit triggers
+        raw_cur_flag = centered_mpi + pre_flag  # Definition
 
         cur_position, if_reset_flag, open_based_on = self._get_position_and_reset_flag(
             pre_flag, raw_cur_flag, pre_position, open_rule, exit_rule, open_based_on)
 
-        # if if_reset_flag: reset.
-        # if not if_reset_flag: do nothing.
-        cur_flag = raw_cur_flag  # If not enable flag reset, then current flag value is just its raw value.
+        # if if_reset_flag: reset
+        # if not if_reset_flag: do nothing
+        cur_flag = raw_cur_flag  # If not enable flag reset, then current flag value is just its raw value
         if enable_reset_flag:
             cur_flag = raw_cur_flag * int(not if_reset_flag)
 
@@ -344,8 +361,8 @@ class CopulaStrategyMPI(BasicCopulaStrategy):
         lower_open_threshold = self.opening_triggers[0]
         upper_open_threshold = self.opening_triggers[1]
 
-        # Check if positions should be open. If so, based on which stock.
-        # Uncomment for the next four lines to allow for openinig positions only when there's no position currently.
+        # Check if positions should be open. If so, based on which stock
+        # Uncomment for the next four lines to allow for openinig positions only when there's no position currently
         long_based_on_1 = (flag_1 <= lower_open_threshold)  # and (pre_position == 0)
         long_based_on_2 = (flag_2 >= upper_open_threshold)  # and (pre_position == 0)
         short_based_on_1 = (flag_1 >= upper_open_threshold)  # and (pre_position == 0)
@@ -361,7 +378,7 @@ class CopulaStrategyMPI(BasicCopulaStrategy):
             short_trigger = (short_based_on_1 and short_based_on_2)
         exit_trigger = self._exit_trigger_mpi(pre_flag, raw_cur_flag, open_based_on, open_rule, exit_rule)
         any_trigger = any([long_trigger, short_trigger, exit_trigger])
-        # Updating trigger counts.
+        # Updating trigger counts
         self._long_count += int(long_trigger)
         self._short_count += int(short_trigger)
         self._exit_count += int(exit_trigger)
@@ -385,7 +402,7 @@ class CopulaStrategyMPI(BasicCopulaStrategy):
             if open_exit_triggers[i]:
                 open_based_on = open_based_on_values[i]
 
-        # Update positions. Defaults to previous position unless there is a trigger to update it.
+        # Update positions. Defaults to previous position unless there is a trigger to update it
         cur_position = pre_position
         # Updating logic:
         # If there is a long trigger, take long position (1);
@@ -394,7 +411,7 @@ class CopulaStrategyMPI(BasicCopulaStrategy):
         if any_trigger:
             cur_position = (int(long_trigger) - int(short_trigger)) * int(not exit_trigger)
 
-        # When there is an exit_trigger, we reset the flag value.
+        # When there is an exit_trigger, we reset the flag value
         if_reset_flag = exit_trigger
 
         return cur_position, if_reset_flag, open_based_on
@@ -429,17 +446,17 @@ class CopulaStrategyMPI(BasicCopulaStrategy):
         raw_cur_flag_1 = raw_cur_flag[0]  # Current raw flag1 value
         raw_cur_flag_2 = raw_cur_flag[1]  # Current raw flag2 value
 
-        slp_lower = self.stop_loss_positions[0]  # Lower end of stop loss value for flag.
-        slp_upper = self.stop_loss_positions[1]  # Upper end of stop loss value for flag.
+        slp_lower = self.stop_loss_positions[0]  # Lower end of stop loss value for flag
+        slp_upper = self.stop_loss_positions[1]  # Upper end of stop loss value for flag
 
         # Check if crossing 0 from above & below 0
-        stock_1_x_from_above = (pre_flag_1 > 0 >= raw_cur_flag_1)  # flag1 crossing 0 from above.
-        stock_1_x_from_below = (pre_flag_1 < 0 <= raw_cur_flag_1)  # flag1 crossing 0 from below.
-        stock_2_x_from_above = (pre_flag_2 > 0 >= raw_cur_flag_2)  # flag2 crossing 0 from above.
-        stock_2_x_from_below = (pre_flag_2 < 0 <= raw_cur_flag_2)  # flag2 crossing 0 from below.
+        stock_1_x_from_above = (pre_flag_1 > 0 >= raw_cur_flag_1)  # flag1 crossing 0 from above
+        stock_1_x_from_below = (pre_flag_1 < 0 <= raw_cur_flag_1)  # flag1 crossing 0 from below
+        stock_2_x_from_above = (pre_flag_2 > 0 >= raw_cur_flag_2)  # flag2 crossing 0 from above
+        stock_2_x_from_below = (pre_flag_2 < 0 <= raw_cur_flag_2)  # flag2 crossing 0 from below
 
-        # Check if current flag reaches stop-loss positions.
-        # If flag >= slp_upper or flag <= slp_lower, then it reaches the stop-loss position.
+        # Check if current flag reaches stop-loss positions
+        # If flag >= slp_upper or flag <= slp_lower, then it reaches the stop-loss position
         stock_1_stop_loss = (raw_cur_flag_1 <= slp_lower or raw_cur_flag_1 >= slp_upper)
         stock_2_stop_loss = (raw_cur_flag_2 <= slp_lower or raw_cur_flag_2 >= slp_upper)
 
@@ -448,11 +465,11 @@ class CopulaStrategyMPI(BasicCopulaStrategy):
         # Case: open OR, exit OR (method in the paper [Xie et al. 2014])
         # If trades were open based on flag1, then they are closed if flag1 returns to 0, or reaches stop loss
         # position. Same for flag2. Thus in total there are 4 possibilities:
-        # 1. If current pos is long based on 1: flag 1 returns to 0 from below, or reaches stop loss.
-        # 2. If current pos is short based on 1: flag 1 returns to 0 from above, or reaches stop loss.
-        # 3. If current pos is long based on 2: flag 2 returns to 0 from below, or reaches stop loss.
-        # 4. If current pos is short based on 2: flag 2 returns to 0 from above, or reaches stop loss.
-        # Hence, as long as 1 of the 4 exit condition is satisfied, we exit.
+        # 1. If current pos is long based on 1: flag 1 returns to 0 from below, or reaches stop loss
+        # 2. If current pos is short based on 1: flag 1 returns to 0 from above, or reaches stop loss
+        # 3. If current pos is long based on 2: flag 2 returns to 0 from below, or reaches stop loss
+        # 4. If current pos is short based on 2: flag 2 returns to 0 from above, or reaches stop loss
+        # Hence, as long as 1 of the 4 exit condition is satisfied, we exit
         if open_rule == 'or' and exit_rule == 'or':
             exit_based_on_1 = any([open_based_on == [1, 1] and (stock_1_x_from_below or stock_1_stop_loss),
                                    open_based_on == [-1, 1] and (stock_1_x_from_above or stock_1_stop_loss)])
@@ -465,13 +482,13 @@ class CopulaStrategyMPI(BasicCopulaStrategy):
         exit_for_2 = any([stock_2_x_from_above or stock_2_stop_loss, stock_2_x_from_below or stock_2_stop_loss])
         # Case: open AND, exit OR (method in the paper [Rad et al. 2016])
         # In this case, it makes no sense to have the open_based_on variable. So we are just directly looking at the
-        # thresholds. If the flag1 OR flag2 series reaches the thresholdsm, then exit.
+        # thresholds. If the flag1 OR flag2 series reaches the thresholdsm, then exit
         if open_rule == 'and' and exit_rule == 'or':
             exit_trigger = exit_for_1 or exit_for_2
 
         # Case: open AND or OR, exit OR (method in the paper [Rad et al. 2016])
         # In this case, it makes no sense to have the open_based_on variable. So we are just directly looking at the
-        # thresholds. If the flag1 AND flag2 series reaches the thresholdsm, then exit.
+        # thresholds. If the flag1 AND flag2 series reaches the thresholdsm, then exit
         if exit_rule == 'and':
             exit_trigger = exit_for_1 and exit_for_2
 

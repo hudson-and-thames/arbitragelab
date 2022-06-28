@@ -1,8 +1,8 @@
-.. _copula_approach-basic_trading_strategy:
+.. _trading-basic_copula:
 
-======================
-Basic Trading Strategy
-======================
+=============================
+Basic Copula Trading Strategy
+=============================
 
 .. Note::
     The following strategy closely follows the implementations:
@@ -104,60 +104,82 @@ However, we found this too strict and sometimes fails to exit a position when it
 Implementation
 ##############
 
-.. Warning::
-    The original :code:`CopulaStrategy` class is still available in Arbitrage Lab but is considered a legacy module.
-    One can keep using it if it is already in use, but we highly recommend new users to use :code:`BasicCopulaStrategy`
-    exclusively for more flexibility, better consistency with other copula modules, and full support of :code:`pandas`.
+.. Note::
+    The new :code:`BasicCopulaTradingRule` class is created to allow on-the-go generation of trading signals and
+    better management of opened and closed positions. It is a refactored version of the old :code:`BasicCopulaStrategy`
+    class that worked as a monolith, outputting trading signals for a pandas DataFrame. The new class takes price
+    values one by one and generates signals to enter or exit the trade, making its integration into an existing
+    trading pipeline easier.
 
-.. automodule:: arbitragelab.copula_approach.copula_strategy_basic
+.. automodule:: arbitragelab.trading.copula_approach.basic_copula
         
-    .. autoclass:: BasicCopulaStrategy
-	:members: __init__, fit_copula, get_positions, to_quantile, get_info_criterion, get_condi_probs, get_cur_position
+.. autoclass:: BasicCopulaTradingRule
+    :members: __init__, set_copula, set_cdf, update_probabilities, check_entry_signal, add_trade, update_trades
 
 Example
 *******
 
 .. code-block::
 
-   # Importing the module and other libraries
-   from arbitragelab.copula_approach.copula_strategy_basic import BasicCopulaStrategy
-   import matplotlib.pyplot as plt
-   import pandas as pd
+    # Importing the module and other libraries
+    from arbitragelab.copula_approach import fit_copula_to_empirical_data
+    from arbitragelab.copula_approach.archimedean import Gumbel
+    from arbitragelab.trading.copula_approach.basic_copula import BasicCopulaTradingRule
+    import pandas as pd
 
-   # Instantiating the module
-   BCS = BasicCopulaStrategy()
+    # Instantiating the module with set open and exit probabilities
+    # and using the 'AND' exit logic:
+    cop_trading = BasicCopulaTradingRule(exit_rule='and', open_probabilities=(0.5, 0.95),
+                                         exit_probabilities=(0.9, 0.5))
 
-   # Loading the data
-   pair_prices = pd.read_csv('PRICE_DATA.csv', index_col='Dates', parse_dates=True)
+    # Loading the data
+    pair_prices = pd.read_csv('PRICE_DATA.csv', index_col='Dates', parse_dates=True)
 
-   # Split data into train and test sets
-   prices_train = pair_prices.iloc[:int(len(s1_price)*0.7)]
-   prices_test = pair_prices.iloc[int(len(s1_price)*0.7):]
+    # Split data into train and test sets
+    prices_train = pair_prices.iloc[:int(len(s1_price)*0.7)]
+    prices_test = pair_prices.iloc[int(len(s1_price)*0.7):]
 
-   # Fitting to a Student-t copula
-   result_dict, copula, s1_cdf, s2_cdf = BCS.fit_copula(data=prices_train,
-                                                        copula_name='Student')
-													   
-   # Printing fit scores (AIC, SIC, HQIC, log-likelihood)
-   print(result_dict)
+    # Fitting copula to data and getting cdf for X and Y series
+    info_crit, fit_copula, ecdf_x, ecdf_y = fit_copula_to_empirical_data(x=prices_train['BKD'],
+                                                                         y=prices_train['ESC'],
+                                                                         copula=Gumbel)
 
-   # Forming position series using trading period data, assuming holding no position initially.
-   # Also changing lower and upper bound to 0.1 and 0.9 respectively.
-   # 'AND' exit logic:
-   positions_and = BCS.get_positions(data=prices_test, cdf1=s1_cdf, cdf2=s2_cdf,
-                                     init_pos=0, open_thresholds=(0.1, 0.9))
+    # Printing fit scores (AIC, SIC, HQIC, log-likelihood)
+    print(info_crit)
 
-   # 'OR' exit logic:
-   positions_or = BCS.get_positions(data=prices_test, cdf1=s1_cdf, cdf2=s2_cdf,
-                                    init_pos=0, open_thresholds=(0.1, 0.9), exit_rule='or')
-   
-   # Graph from the fitted copula
-   ax = plt.subplot()
-   copula.plot(num=1000, ax=ax)
-   plt.show()
-   
-   # Sample 2000 times from the fitted copula
-   samples = copula.generate_pairs(num=2000)
+    # Setting initial probabilities
+    cop_trading.current_probabilities = (0.5, 0.5)
+    cop_trading.prev_probabilities = (0.5, 0.5)
+
+    # Adding copula to strategy
+    cop_trading.set_copula(fit_copula)
+
+    # Adding cdf for X and Y to strategy
+    cop_trading.set_cdf(cdf_x, cdf_y)
+
+    # Trading simulation
+    for time, values in prices_test.iterrows():
+        x_price = values['BKD']
+        y_price = values['ESC']
+
+        # Adding price values
+        cop_trading.update_probabilities(x_price, y_price)
+
+        # Check if it's time to enter a trade
+        trade, side = cop_trading.check_entry_signal()
+
+        # Close previous trades if needed
+        cop_trading.update_trades(update_timestamp=time)
+
+        if trade:  # Open a new trade if needed
+            cop_trading.add_trade(start_timestamp=time, side_prediction=side)
+
+    # Finally, check open trades at the end of the simulation
+    open_trades = cop_trading.open_trades
+
+    # And all trades that were opened and closed
+    closed_trades = cop_trading.closed_trades
+
 
 Research Notebooks
 ##################

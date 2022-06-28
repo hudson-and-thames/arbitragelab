@@ -1,16 +1,14 @@
 """
-This module implements Copula-based Statistical Arbitrage strategies.
+This module implements Copula-based Statistical Arbitrage tools.
 """
 
 from arbitragelab.copula_approach.copula_calculation import (
-    find_marginal_cdf, ml_theta_hat, log_ml, sic, aic, hqic, construct_ecdf_lin, fit_nu_for_t_copula, scad_penalty,
-    scad_derivative, adjust_weights, to_quantile)
-from arbitragelab.copula_approach.copula_generate import (
-    Copula, Gumbel, Frank, Clayton, Joe, N13, N14, Gaussian, Student, Switcher)
-from arbitragelab.copula_approach.copula_strategy import CopulaStrategy
-from arbitragelab.copula_approach.copula_strategy_basic import BasicCopulaStrategy
+    find_marginal_cdf, sic, aic, hqic, construct_ecdf_lin, scad_penalty,
+    scad_derivative, adjust_weights, to_quantile, fit_copula_to_empirical_data)
+from arbitragelab.copula_approach import archimedean
+from arbitragelab.copula_approach import elliptical
+from arbitragelab.copula_approach import mixed_copulas
 from arbitragelab.copula_approach.copula_strategy_mpi import CopulaStrategyMPI
-from arbitragelab.copula_approach.copula_generate_mixedcopula import (MixedCopula, CFGMixCop, CTGMixCop)
 from arbitragelab.copula_approach.vine_copula_partner_selection import PartnerSelection
 from arbitragelab.copula_approach.vinecop_generate import (RVineCop, CVineCop)
 from arbitragelab.copula_approach.vinecop_strategy import CVineCopStrat
