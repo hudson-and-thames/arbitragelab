@@ -12,7 +12,8 @@ import unittest
 import numpy as np
 import pandas as pd
 
-from arbitragelab.copula_approach import (copula_strategy_mpi, construct_ecdf_lin)
+from arbitragelab.copula_approach import (construct_ecdf_lin)
+from arbitragelab.trading import copula_strategy_mpi
 from arbitragelab.copula_approach.archimedean import N14
 
 

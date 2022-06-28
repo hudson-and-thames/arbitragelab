@@ -4,7 +4,7 @@
 
 """
 Tests class of the Spread Trading module:
-spread_trading/minimum_profit.py
+trading/cointegration_approach/minimum_profit.py
 """
 
 import os
@@ -13,7 +13,7 @@ import unittest
 import pandas as pd
 import numpy as np
 
-from arbitragelab.spread_trading import MinimumProfitTradingRule
+from arbitragelab.trading.minimum_profit import MinimumProfitTradingRule
 
 
 class TestMinimumProfitTradingRule(unittest.TestCase):

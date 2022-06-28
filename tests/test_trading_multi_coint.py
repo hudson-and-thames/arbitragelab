@@ -4,7 +4,7 @@
 
 """
 Tests class of the Spread Trading module:
-spread_trading/multi_coint.py
+trading/cointegration_approach/multi_coint.py
 """
 
 import os
@@ -12,7 +12,7 @@ import unittest
 
 import pandas as pd
 
-from arbitragelab.spread_trading.multi_coint import MultivariateCointegrationTradingRule
+from arbitragelab.trading.multi_coint import MultivariateCointegrationTradingRule
 
 
 class TestMultivariateCointegrationTradingRule(unittest.TestCase):

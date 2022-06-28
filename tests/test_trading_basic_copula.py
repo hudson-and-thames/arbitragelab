@@ -11,7 +11,7 @@ import unittest
 
 import pandas as pd
 
-from arbitragelab.trading.copula_approach import BasicCopulaTradingRule
+from arbitragelab.trading.basic_copula import BasicCopulaTradingRule
 from arbitragelab.copula_approach import construct_ecdf_lin
 import arbitragelab.copula_approach.archimedean as coparc
 

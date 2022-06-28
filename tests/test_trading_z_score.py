@@ -4,7 +4,7 @@
 
 """
 Tests class of the Spread Trading module:
-spread_trading/z_score.py
+trading/cointegration_approach/z_score.py
 """
 
 import os
@@ -13,7 +13,7 @@ from collections import deque
 
 import pandas as pd
 
-from arbitragelab.spread_trading import BollingerBandsTradingRule
+from arbitragelab.trading.z_score import BollingerBandsTradingRule
 
 
 class TestBollingerBandsTradingRule(unittest.TestCase):
