@@ -36,7 +36,7 @@ Mispricing Index Copula Trading Strategy
 
 .. Note::
     The authors claimed a relatively robust 8-10% returns from this strategy in the formation period (6 mo).
-    We are pretty positive that the rules proposed in the paper were implemented correctly in the :code:`CopulaStrategyMPI`
+    We are pretty positive that the rules proposed in the paper were implemented correctly in the :code:`MPICopulaTradingRule`
     module with thorough unit testing on every possible case, and thus it is very unlikely that we made logical mistakes.
     However the P&L is very sensitive to the opening and exiting logic and parameter values, input data and copula choice,
     and it cannot lead to the claimed returns, after trying all the possible interpretations of ambiguities.
@@ -246,7 +246,7 @@ Implementation
 
 .. automodule:: arbitragelab.trading.copula_strategy_mpi
         
-    .. autoclass:: CopulaStrategyMPI
+    .. autoclass:: MPICopulaTradingRule
 	:members: __init__, to_returns, set_copula, set_cdf, calc_mpi, get_condi_probs, positions_to_units_dollar_neutral, get_positions_and_flags
 
 Example
@@ -255,14 +255,14 @@ Example
 .. code-block::
 
    # Importing the module and other libraries
-   from arbitragelab.trading.copula_strategy_mpi import CopulaStrategyMPI
+   from arbitragelab.trading.copula_strategy_mpi import MPICopulaTradingRule
    from arbitragelab.copula_approach import construct_ecdf_lin
    from arbitragelab.copula_approach.archimedean import N14
    import matplotlib.pyplot as plt
    import pandas as pd
 
    # Instantiating the module
-   CSMPI = CopulaStrategyMPI(opening_triggers=(-0.6, 0.6), stop_loss_positions=(-2, 2))
+   CSMPI = MPICopulaTradingRule(opening_triggers=(-0.6, 0.6), stop_loss_positions=(-2, 2))
 
    # Loading the data in prices of stock X and stock Y
    prices = pd.read_csv('FILE_PATH' + 'stock_X_Y_prices.csv').set_index('Date').dropna()

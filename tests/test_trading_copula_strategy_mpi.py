@@ -17,7 +17,7 @@ from arbitragelab.trading import copula_strategy_mpi
 from arbitragelab.copula_approach.archimedean import N14
 
 
-class TestCopulaStrategyMPI(unittest.TestCase):
+class TestMPICopulaTradingRule(unittest.TestCase):
     """
     Testing methods in CopulaStrategyMPI
     """
@@ -37,7 +37,7 @@ class TestCopulaStrategyMPI(unittest.TestCase):
         Testing the exiting trigger logic from _exit_trigger method, open_rule=or, exit_rule=or.
         """
 
-        CS = copula_strategy_mpi.CopulaStrategyMPI()
+        CS = copula_strategy_mpi.MPICopulaTradingRule()
         flag_0_0 = pd.Series([0, 0])
         flag_05_05 = pd.Series([0.5, 0.5])
         flag_n05_n05 = pd.Series([-0.5, -0.5])
@@ -103,7 +103,7 @@ class TestCopulaStrategyMPI(unittest.TestCase):
         Testing position opening logic from _get_positions_and_reset_flag method, open_rule=or, exit_rule=or.
         """
 
-        CS = copula_strategy_mpi.CopulaStrategyMPI()
+        CS = copula_strategy_mpi.MPICopulaTradingRule()
         flag_0_0 = pd.Series([0, 0])
         flag_1_0 = pd.Series([1, 0])
         flag_0_1 = pd.Series([0, 1])
@@ -157,7 +157,7 @@ class TestCopulaStrategyMPI(unittest.TestCase):
         Testing current flag and positions generating from _cur_flag_and_position method, open_rule=or, exit_rule=or.
         """
 
-        CS = copula_strategy_mpi.CopulaStrategyMPI()
+        CS = copula_strategy_mpi.MPICopulaTradingRule()
 
         # result = (cur_flag: pd.Series, cur_position: int, open_based_on: list)
         # Check long
@@ -202,7 +202,7 @@ class TestCopulaStrategyMPI(unittest.TestCase):
         Testing positions and flags generation from get_position_and_flags method, open_rule=or, exit_rule=or.
         """
 
-        CSMPI = copula_strategy_mpi.CopulaStrategyMPI(opening_triggers=(-0.6, 0.6), stop_loss_positions=(-2, 2))
+        CSMPI = copula_strategy_mpi.MPICopulaTradingRule(opening_triggers=(-0.6, 0.6), stop_loss_positions=(-2, 2))
         returns = CSMPI.to_returns(pair_prices=self.pair_prices)
 
         # Add copula
@@ -231,7 +231,7 @@ class TestCopulaStrategyMPI(unittest.TestCase):
         Testing positions_to_units_dollar_neutral method.
         """
 
-        CSMPI = copula_strategy_mpi.CopulaStrategyMPI()
+        CSMPI = copula_strategy_mpi.MPICopulaTradingRule()
 
         # Getting some arbitrary positions
         positions = pd.Series([0, 0, 1, 0, 0, -1, 0, 0, 1, -1, 0, 0, -1, 1, 0, 0], dtype=int)
@@ -257,7 +257,7 @@ class TestCopulaStrategyMPI(unittest.TestCase):
         Testing the exiting trigger logic from _exit_trigger method, open = or, exit = and.
         """
 
-        CS = copula_strategy_mpi.CopulaStrategyMPI()
+        CS = copula_strategy_mpi.MPICopulaTradingRule()
         flag_0_0 = pd.Series([0, 0])
         flag_05_05 = pd.Series([0.5, 0.5])
         flag_n05_n05 = pd.Series([-0.5, -0.5])
@@ -294,7 +294,7 @@ class TestCopulaStrategyMPI(unittest.TestCase):
         We check mostly open positions here since the exit trigger is already checked.
         """
 
-        CS = copula_strategy_mpi.CopulaStrategyMPI()
+        CS = copula_strategy_mpi.MPICopulaTradingRule()
         flag_0_0 = pd.Series([0, 0])
         flag_1_0 = pd.Series([1, 0])
         flag_0_1 = pd.Series([0, 1])
@@ -336,7 +336,7 @@ class TestCopulaStrategyMPI(unittest.TestCase):
         Testing current flag and positions generating from _cur_flag_and_position method, open_rule=or, exit_rule=and.
         """
 
-        CS = copula_strategy_mpi.CopulaStrategyMPI()
+        CS = copula_strategy_mpi.MPICopulaTradingRule()
 
         # result = (cur_flag: pd.Series, cur_position: int, open_based_on: list)
         # Check long
@@ -389,19 +389,28 @@ class TestCopulaStrategyMPI(unittest.TestCase):
         Testing positions and flags generation from get_position_and_flags method, open_rule=or, exit_rule=and.
         """
 
-        CSMPI = copula_strategy_mpi.CopulaStrategyMPI(opening_triggers=(-0.6, 0.6), stop_loss_positions=(-2, 2))
-        _ = CSMPI.to_returns(pair_prices=self.pair_prices)
-        # Fit an N14 copula
-        #_, copula, cdf1, cdf2 = CSMPI.fit_copula(returns, copula_name='N14')
+        CSMPI = copula_strategy_mpi.MPICopulaTradingRule(opening_triggers=(-0.6, 0.6), stop_loss_positions=(-2, 2))
+        returns = CSMPI.to_returns(pair_prices=self.pair_prices)
+
+        # Add copula
+        cop = N14(theta=2)
+        CSMPI.set_copula(cop)
+
+        # Constructing cdf for x and y
+        cdf_x = construct_ecdf_lin(returns['BKD'])
+        cdf_y = construct_ecdf_lin(returns['ESC'])
+        CSMPI.set_cdf(cdf_x, cdf_y)
+
         # Forming positions and flags
-        #_, _ = CSMPI.get_positions_and_flags(returns, cdf1, cdf2, enable_reset_flag=True,
-        #                                     open_rule='or', exit_rule='and')
+        _, _ = CSMPI.get_positions_and_flags(returns, enable_reset_flag=True,
+                                             open_rule='or', exit_rule='and')
+
         # Check goodness of copula fit by its coefficient
-        #self.assertAlmostEqual(copula.theta, 1.3951538673040886)
+        self.assertAlmostEqual(cop.theta, 2)
         # Check numbers of triggers
-        #self.assertEqual(CSMPI._long_count, 429)
-        #self.assertEqual(CSMPI._exit_count, 32)
-        #self.assertEqual(CSMPI._short_count, 400)
+        self.assertEqual(CSMPI._long_count, 318)
+        self.assertEqual(CSMPI._exit_count, 20)
+        self.assertEqual(CSMPI._short_count, 511)
 
     @staticmethod
     def test_exit_trigger_and_or():
@@ -409,7 +418,7 @@ class TestCopulaStrategyMPI(unittest.TestCase):
         Testing the exiting trigger logic from _exit_trigger method, open = and, exit = or.
         """
 
-        CS = copula_strategy_mpi.CopulaStrategyMPI()
+        CS = copula_strategy_mpi.MPICopulaTradingRule()
         flag_0_0 = pd.Series([0, 0])
         flag_05_05 = pd.Series([0.5, 0.5])
         flag_n05_n05 = pd.Series([-0.5, -0.5])
@@ -446,7 +455,7 @@ class TestCopulaStrategyMPI(unittest.TestCase):
         We check mostly open positions here since the exit trigger is already checked.
         """
 
-        CS = copula_strategy_mpi.CopulaStrategyMPI()
+        CS = copula_strategy_mpi.MPICopulaTradingRule()
         flag_0_0 = pd.Series([0, 0])
         flag_1_0 = pd.Series([1, 0])
         flag_0_1 = pd.Series([0, 1])
@@ -489,7 +498,7 @@ class TestCopulaStrategyMPI(unittest.TestCase):
         Testing current flag and positions generating from _cur_flag_and_position method, open_rule=and, exit_rule=or.
         """
 
-        CS = copula_strategy_mpi.CopulaStrategyMPI()
+        CS = copula_strategy_mpi.MPICopulaTradingRule()
 
         # result = (cur_flag: pd.Series, cur_position: int, open_based_on: list)
         # Check long
@@ -540,19 +549,28 @@ class TestCopulaStrategyMPI(unittest.TestCase):
         Testing positions and flags generation from get_position_and_flags method, open_rule=and, exit_rule=or.
         """
 
-        CSMPI = copula_strategy_mpi.CopulaStrategyMPI(opening_triggers=(-0.6, 0.6), stop_loss_positions=(-2, 2))
-        _ = CSMPI.to_returns(pair_prices=self.pair_prices)
-        # Fit an N14 copula
-        #_, copula, cdf1, cdf2 = CSMPI.fit_copula(returns, copula_name='N14')
+        CSMPI = copula_strategy_mpi.MPICopulaTradingRule(opening_triggers=(-0.6, 0.6), stop_loss_positions=(-2, 2))
+        returns = CSMPI.to_returns(pair_prices=self.pair_prices)
+
+        # Add copula
+        cop = N14(theta=2)
+        CSMPI.set_copula(cop)
+
+        # Constructing cdf for x and y
+        cdf_x = construct_ecdf_lin(returns['BKD'])
+        cdf_y = construct_ecdf_lin(returns['ESC'])
+        CSMPI.set_cdf(cdf_x, cdf_y)
+
         # Forming positions and flags
-        #_, _ = CSMPI.get_positions_and_flags(returns, cdf1, cdf2, enable_reset_flag=True,
-        #                                     open_rule='and', exit_rule='or')
+        _, _ = CSMPI.get_positions_and_flags(returns, enable_reset_flag=True,
+                                             open_rule='and', exit_rule='or')
+
         # Check goodness of copula fit by its coefficient
-        #self.assertAlmostEqual(copula.theta, 1.3951538673040886)
+        self.assertAlmostEqual(cop.theta, 2)
         # Check numbers of triggers
-        #self.assertEqual(CSMPI._long_count, 129)
-        #self.assertEqual(CSMPI._exit_count, 195)
-        #self.assertEqual(CSMPI._short_count, 73)
+        self.assertEqual(CSMPI._long_count, 187)
+        self.assertEqual(CSMPI._exit_count, 167)
+        self.assertEqual(CSMPI._short_count, 155)
 
     @staticmethod
     def test_exit_trigger_and_and():
@@ -560,7 +578,7 @@ class TestCopulaStrategyMPI(unittest.TestCase):
         Testing the exiting trigger logic from _exit_trigger method, open = and, exit = and.
         """
 
-        CS = copula_strategy_mpi.CopulaStrategyMPI()
+        CS = copula_strategy_mpi.MPICopulaTradingRule()
         flag_0_0 = pd.Series([0, 0])
         flag_05_05 = pd.Series([0.5, 0.5])
         flag_n05_n05 = pd.Series([-0.5, -0.5])
@@ -601,7 +619,7 @@ class TestCopulaStrategyMPI(unittest.TestCase):
         We check mostly open positions here since the exit trigger is already checked.
         """
 
-        CS = copula_strategy_mpi.CopulaStrategyMPI()
+        CS = copula_strategy_mpi.MPICopulaTradingRule()
         flag_0_0 = pd.Series([0, 0])
         flag_1_0 = pd.Series([1, 0])
         flag_0_1 = pd.Series([0, 1])
@@ -645,7 +663,7 @@ class TestCopulaStrategyMPI(unittest.TestCase):
         Testing current flag and positions generating from _cur_flag_and_position method, open_rule=and, exit_rule=or.
         """
 
-        CS = copula_strategy_mpi.CopulaStrategyMPI()
+        CS = copula_strategy_mpi.MPICopulaTradingRule()
 
         # result = (cur_flag: pd.Series, cur_position: int, open_based_on: list)
         # Check long
@@ -696,19 +714,25 @@ class TestCopulaStrategyMPI(unittest.TestCase):
         Testing positions and flags generation from get_position_and_flags method, open_rule=and, exit_rule=or.
         """
 
-        CSMPI = copula_strategy_mpi.CopulaStrategyMPI(opening_triggers=(-0.6, 0.6), stop_loss_positions=(-2, 2))
-        _ = CSMPI.to_returns(pair_prices=self.pair_prices)
-        # Fit an N14 copula
-        #_, copula, cdf1, cdf2 = CSMPI.fit_copula(returns, copula_name='N14')
-        # Forming positions and flags. Change the default opening triggers threshold and stop loss positions
-        #_, _ = CSMPI.get_positions_and_flags(returns, cdf1, cdf2, enable_reset_flag=True,
-        #                                     open_rule='and', exit_rule='and',
-        #                                     opening_triggers=(-0.5, 0.5), stop_loss_positions=(-3, 3))
-        #np.testing.assert_array_almost_equal(CSMPI.opening_triggers, (-0.5, 0.5))
-        #np.testing.assert_array_almost_equal(CSMPI.stop_loss_positions, (-3, 3))
+        CSMPI = copula_strategy_mpi.MPICopulaTradingRule(opening_triggers=(-0.6, 0.6), stop_loss_positions=(-2, 2))
+        returns = CSMPI.to_returns(pair_prices=self.pair_prices)
+
+        # Add copula
+        cop = N14(theta=2)
+        CSMPI.set_copula(cop)
+
+        # Constructing cdf for x and y
+        cdf_x = construct_ecdf_lin(returns['BKD'])
+        cdf_y = construct_ecdf_lin(returns['ESC'])
+        CSMPI.set_cdf(cdf_x, cdf_y)
+
+        # Forming positions and flags
+        _, _ = CSMPI.get_positions_and_flags(returns, enable_reset_flag=True,
+                                             open_rule='and', exit_rule='and')
+
         # Check goodness of copula fit by its coefficient
-        #self.assertAlmostEqual(copula.theta, 1.3951538673040886)
+        self.assertAlmostEqual(cop.theta, 2)
         # Check numbers of triggers
-        #self.assertEqual(CSMPI._long_count, 154)
-        #self.assertEqual(CSMPI._exit_count, 11)
-        #self.assertEqual(CSMPI._short_count, 420)
+        self.assertEqual(CSMPI._long_count, 113)
+        self.assertEqual(CSMPI._exit_count, 20)
+        self.assertEqual(CSMPI._short_count, 259)

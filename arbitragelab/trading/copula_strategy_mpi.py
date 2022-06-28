@@ -13,7 +13,7 @@ import pandas as pd
 from arbitragelab.util import segment
 
 
-class CopulaStrategyMPI:
+class MPICopulaTradingRule:
     """
     Copula trading strategy based on mispricing index(MPI).
 
@@ -29,7 +29,7 @@ class CopulaStrategyMPI:
     `Xie, W., Liew, R.Q., Wu, Y. and Zou, X., 2014. Pairs Trading with Copulas.
     <https://efmaefm.org/0efmameetings/EFMA%20ANNUAL%20MEETINGS/2014-Rome/papers/EFMA2014_0222_FullPaper.pdf>`__
 
-    Compared to the original BasicCopulaStrategy class, it includes the following fundamental functionalities:
+    Compared to the original BasicCopulaTradingRule class, it includes the following fundamental functionalities:
 
         1. Convert price series to return series.
         2. Calculate MPI and flags (essentially cumulative mispricing index).
@@ -38,7 +38,7 @@ class CopulaStrategyMPI:
 
     def __init__(self, opening_triggers: tuple = (-0.6, 0.6), stop_loss_positions: tuple = (-2, 2)):
         """
-        Initiate a CopulaStrategyMPI class.
+        Initiate an MPICopulaTradingRule class.
 
         One can choose to initiate with no arguments, and later set a copula as the system's Copula.
 
@@ -60,7 +60,7 @@ class CopulaStrategyMPI:
         self.cdf_x = None
         self.cdf_y = None
 
-        segment.track('CopulaStrategyMPI')
+        segment.track('MPICopulaTradingRule')
 
     def set_copula(self, copula: object):
         """
