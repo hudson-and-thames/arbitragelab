@@ -32,11 +32,12 @@ class EngleGrangerPortfolio(CointegratedPortfolio):
         self.residuals = None  # OLS model residuals.
         self.dependent_variable = None  # Column name for dependent variable used in OLS estimation.
         self.cointegration_vectors = None  # Regression coefficients used as hedge-ratios.
+        self.hedge_ratios = None  # Engle-Granger hedge ratios.
         self.adf_statistics = None  # ADF statistics.
 
         segment.track('EngleGrangerPortfolio')
 
-    def _perform_eg_test(self, residuals: pd.Series):
+    def perform_eg_test(self, residuals: pd.Series):
         """
         Perform Engle-Granger test on model residuals and generate test statistics and p values.
 
@@ -71,9 +72,13 @@ class EngleGrangerPortfolio(CointegratedPortfolio):
             [hedge for ticker, hedge in hedge_ratios.items() if ticker != self.dependent_variable]))],
                                                   columns=price_data.columns)
 
+        self.hedge_ratios = pd.DataFrame([np.append(1, np.array(
+            [hedge for ticker, hedge in hedge_ratios.items() if ticker != self.dependent_variable]))],
+                                                  columns=price_data.columns)
+
         # Get model residuals
         self.residuals = residuals
-        self._perform_eg_test(self.residuals)
+        self.perform_eg_test(self.residuals)
 
     @staticmethod
     def get_ols_hedge_ratio(price_data: pd.DataFrame, dependent_variable: str, add_constant: bool = False) -> \

@@ -30,7 +30,7 @@ def _min_adf_stat(beta: np.array, X: pd.DataFrame, y: pd.Series) -> float:
     # Performing Engle-Granger test on spread
     portfolio = EngleGrangerPortfolio()
     spread = y - (beta * X).sum(axis=1)
-    portfolio._perform_eg_test(spread)
+    portfolio.perform_eg_test(spread)
 
     return portfolio.adf_statistics.loc['statistic_value'].iloc[0]
 

@@ -163,11 +163,11 @@ Examples
    # Getting results for the trace statistic test
    trace_statistics = portfolio.johansen_eigen_statistic
 
-   # Resulting cointegration vectors that can be used for portfolio construction
+   # Resulting cointegration vectors
    cointegration_vectors = portfolio.cointegration_vectors
 
-   # Constructing series of portfolio prices
-   portfolio_price = portfolio.construct_mean_reverting_portfolio(data, cointegration_vectors.loc[0])
+   # Hedge ratios that can be used for spread construction
+   hedge_ratios = portfolio.hedge_ratios
 
 Engle-Granger Cointegration Test
 ################################
@@ -245,11 +245,11 @@ Examples
    # Getting results for the ADF test in the last step of the method
    adf_statistics = portfolio.adf_statistics
 
-   # Resulting cointegration vector that can be used for portfolio construction
+   # Resulting cointegration vector
    cointegration_vectors = portfolio.cointegration_vectors
 
-   # Constructing series of portfolio prices
-   portfolio_price = portfolio.construct_mean_reverting_portfolio(data, cointegration_vectors.loc[0])
+   # Hedge ratios that can be used for spread construction
+   hedge_ratios = portfolio.hedge_ratios
 
 
 Research Notebooks

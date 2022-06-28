@@ -194,6 +194,15 @@ This project is licensed under an all rights reserved license and is NOT open-so
 
 .. toctree::
     :maxdepth: 2
+    :caption: Spread Trading
+    :hidden:
+
+    spread_trading/z_score
+    spread_trading/minimum_profit
+    spread_trading/multi_coint
+
+.. toctree::
+    :maxdepth: 2
     :caption: Trading Strategies
     :hidden:
 
@@ -229,7 +238,6 @@ This project is licensed under an all rights reserved license and is NOT open-so
     cointegration_approach/introduction
     cointegration_approach/cointegration_tests
     cointegration_approach/half_life
-    cointegration_approach/trading_strategies
     cointegration_approach/minimum_profit_simulation
     cointegration_approach/minimum_profit
     cointegration_approach/multivariate_cointegration
