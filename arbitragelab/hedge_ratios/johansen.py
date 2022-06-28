@@ -13,6 +13,7 @@ import pandas as pd
 
 from arbitragelab.cointegration_approach import JohansenPortfolio
 from arbitragelab.hedge_ratios.spread_construction import construct_spread
+from arbitragelab.util import segment
 
 
 def get_johansen_hedge_ratio(price_data: pd.DataFrame, dependent_variable: str) -> Tuple[
@@ -24,6 +25,8 @@ def get_johansen_hedge_ratio(price_data: pd.DataFrame, dependent_variable: str) 
     :param dependent_variable: (str) Column name which represents the dependent variable (y).
     :return: (Tuple) Hedge ratios, X, and y and OLS fit residuals.
     """
+
+    segment.track('get_johansen_hedge_ratio')
 
     # Construct a Johansen portfolio
     port = JohansenPortfolio()

@@ -33,6 +33,7 @@ from statsmodels.distributions.empirical_distribution import ECDF
 
 from arbitragelab.copula_approach.base import Copula
 from arbitragelab.copula_approach.elliptical import StudentCopula, fit_nu_for_t_copula
+from arbitragelab.util import segment
 
 
 def find_marginal_cdf(x: np.array, empirical: bool = True, **kwargs) -> Callable[[float], float]:
@@ -80,6 +81,8 @@ def construct_ecdf_lin(train_data: np.array, upper_bound: float = 1 - 1e-5, lowe
     :param lower_bound: (float) The lower bound value for the returned ecdf function.
     :return: (Callable) The constructed ecdf function.
     """
+
+    segment.track('construct_ecdf_lin')
 
     train_data_np = np.array(train_data)  # Convert to numpy array for the next step in case the input is not
     train_data_np = train_data_np[~np.isnan(train_data_np)]  # Remove nan value from the array
@@ -273,6 +276,8 @@ def fit_copula_to_empirical_data(x: np.array, y: np.array, copula: Copula) -> tu
         The cumulative density function for series 2, using training data.
 
     """
+
+    segment.track('fit_copula_to_empirical_data')
 
     num_of_instances = len(x)  # Number of instances
 

@@ -15,6 +15,7 @@ import numpy as np
 from scipy.optimize import minimize
 
 from arbitragelab.cointegration_approach import EngleGrangerPortfolio
+from arbitragelab.util import segment
 
 
 def _min_adf_stat(beta: np.array, X: pd.DataFrame, y: pd.Series) -> float:
@@ -44,6 +45,8 @@ def get_adf_optimal_hedge_ratio(price_data: pd.DataFrame, dependent_variable: st
     :param dependent_variable: (str) Column name which represents the dependent variable (y).
     :return: (Tuple) Hedge ratios, X, and y, OLS fit residuals and optimization object.
     """
+
+    segment.track('get_adf_optimal_hedge_ratio')
 
     X = price_data.copy()
     X.drop(columns=dependent_variable, axis=1, inplace=True)

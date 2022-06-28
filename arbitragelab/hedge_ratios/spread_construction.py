@@ -8,6 +8,8 @@ Utility functions used to construct spreads.
 
 import pandas as pd
 
+from arbitragelab.util import segment
+
 
 def construct_spread(price_data: pd.DataFrame, hedge_ratios: pd.Series, dependent_variable: str = None) -> pd.Series:
     """
@@ -22,6 +24,8 @@ def construct_spread(price_data: pd.DataFrame, hedge_ratios: pd.Series, dependen
     :param dependent_variable: (str) Dependent variable to use. Set None for dependent variable being equal to 0 column.
     :return: (pd.Series) Spread series.
     """
+
+    segment.track('construct_spread')
 
     weighted_prices = price_data * hedge_ratios  # price * hedge
 

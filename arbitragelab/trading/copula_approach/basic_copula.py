@@ -15,6 +15,8 @@ from uuid import UUID
 
 import pandas as pd
 
+from arbitragelab.util import segment
+
 
 class BasicCopulaTradingRule:
     """
@@ -49,6 +51,8 @@ class BasicCopulaTradingRule:
         :param exit_rule: (str) Optional. The logic for triggering an exit signal. Available choices are 'and', 'or'.
             They indicate whether both conditional probabilities need to cross 0.5. Defaults to 'and'.
         """
+
+        segment.track('BasicCopulaTradingRule')
 
         self.open_probabilities = open_probabilities
         self.exit_probabilities = exit_probabilities
