@@ -187,6 +187,9 @@ Implementation
 Examples
 ########
 
+Code Example
+************
+
 .. code-block::
 
     # Importing packages
@@ -224,6 +227,20 @@ Examples
                                                                        dependent_variable='GLD')
     print(f'Minimum ADF t-statistic hedge ratio for SPY/QQQ spread is {adf_hedge_ratio}')
     print(opt_object.status)
+
+Research Notebooks
+******************
+
+The following research notebook can be used to better understand the hedge ratios described above.
+
+* `Hedge Ratios`_
+
+.. _`Hedge Ratios`: https://hudsonthames.org/notebooks/arblab/hedge_ratios.html
+
+.. raw:: html
+
+    <a href="https://hudsonthames.org/notebooks_zip/arblab/hedge_ratios.zip"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
+    <a href="https://hudsonthames.org/notebooks_zip/arblab/Sample-Data.zip"><button style="margin: 20px; margin-top: 0px">Download Sample Data</button></a>
 
 Research Article
 ################

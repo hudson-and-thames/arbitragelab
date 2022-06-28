@@ -12,6 +12,7 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+* :support:`73` Moved research notebooks to .zip format for distribution.
 * :feature:`73` Refactored all Copulas to allow independent use and fitting in the Copula Approach Module.
 * :feature:`73` Created a separate Basic Copula Trading Strategy in the Trading Strategies Module.
 * :feature:`72` Created a separate Mispricing Index Copula Trading Strategy in the Trading Strategies Module.
