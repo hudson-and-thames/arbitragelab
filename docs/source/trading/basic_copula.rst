@@ -111,7 +111,7 @@ Implementation
     values one by one and generates signals to enter or exit the trade, making its integration into an existing
     trading pipeline easier.
 
-.. automodule:: arbitragelab.trading.copula_approach.basic_copula
+.. automodule:: arbitragelab.trading.basic_copula
         
 .. autoclass:: BasicCopulaTradingRule
     :members: __init__, set_copula, set_cdf, update_probabilities, check_entry_signal, add_trade, update_trades
@@ -124,7 +124,7 @@ Example
     # Importing the module and other libraries
     from arbitragelab.copula_approach import fit_copula_to_empirical_data
     from arbitragelab.copula_approach.archimedean import Gumbel
-    from arbitragelab.trading.copula_approach.basic_copula import BasicCopulaTradingRule
+    from arbitragelab.trading.basic_copula import BasicCopulaTradingRule
     import pandas as pd
 
     # Instantiating the module with set open and exit probabilities

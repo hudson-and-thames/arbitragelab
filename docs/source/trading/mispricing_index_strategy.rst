@@ -1,4 +1,4 @@
-.. _copula_approach-mispricing_index_strategy:
+.. _trading-mispricing_index_strategy:
 
 ========================================
 Mispricing Index Copula Trading Strategy
@@ -244,7 +244,7 @@ For instance :code:`open_rule='and'`, :code:`exit_rule='or'`.
 Implementation
 ##############
 
-.. automodule:: arbitragelab.copula_approach.copula_strategy_mpi
+.. automodule:: arbitragelab.trading.copula_strategy_mpi
         
     .. autoclass:: CopulaStrategyMPI
 	:members: __init__, to_returns, set_copula, set_cdf, calc_mpi, get_condi_probs, positions_to_units_dollar_neutral, get_positions_and_flags
@@ -255,7 +255,7 @@ Example
 .. code-block::
 
    # Importing the module and other libraries
-   from arbitragelab.copula_approach.copula_strategy_mpi import CopulaStrategyMPI
+   from arbitragelab.trading.copula_strategy_mpi import CopulaStrategyMPI
    from arbitragelab.copula_approach import construct_ecdf_lin
    from arbitragelab.copula_approach.archimedean import N14
    import matplotlib.pyplot as plt

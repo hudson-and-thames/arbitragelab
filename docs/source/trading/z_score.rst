@@ -1,4 +1,4 @@
-.. _spread_trading-z_score:
+.. _trading-z_score:
 
 ========================
 Bollinger Bands Strategy
@@ -66,7 +66,7 @@ If so, the internal dictionaries are updated, and the list of the closed trades 
 Implementation
 **************
 
-.. py:currentmodule:: arbitragelab.spread_trading.z_score
+.. py:currentmodule:: arbitragelab.trading.z_score
 .. autoclass:: BollingerBandsTradingRule
     :members:
     :inherited-members:
@@ -84,7 +84,7 @@ Example
 
     # Tools to construct and trade spread
     from arbitragelab.hedge_ratios import construct_spread
-    from arbitragelab.spread_trading import BollingerBandsTradingRule
+    from arbitragelab.trading import BollingerBandsTradingRule
 
     data = pd.read_csv('data.csv', index_col=0, parse_dates=[0])
     hedge_ratios = pd.Series({'A': 1, 'AVB': 0.832406370860649})

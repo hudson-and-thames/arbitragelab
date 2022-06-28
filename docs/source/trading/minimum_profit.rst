@@ -1,4 +1,4 @@
-.. _spread_trading-minimum_profit:
+.. _trading-minimum_profit:
 
 =======================
 Minimum Profit Strategy
@@ -51,7 +51,7 @@ If so, the internal dictionaries are updated, and the list of the closed trades 
 Implementation
 **************
 
-.. py:currentmodule:: arbitragelab.spread_trading.minimum_profit
+.. py:currentmodule:: arbitragelab.trading.minimum_profit
 .. autoclass:: MinimumProfitTradingRule
     :members:
     :inherited-members:
@@ -69,7 +69,7 @@ Example
 
     # Importing ArbitrageLab tools
     from arbitragelab.cointegration_approach.minimum_profit import MinimumProfit
-    from arbitragelab.spread_trading import MinimumProfitTradingRule
+    from arbitragelab.trading import MinimumProfitTradingRule
 
     # Using MinimumProfit as optimizer ...
 

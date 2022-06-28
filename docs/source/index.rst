@@ -197,17 +197,17 @@ This project is licensed under an all rights reserved license and is NOT open-so
     :caption: Spread Trading
     :hidden:
 
-    spread_trading/z_score
-    spread_trading/minimum_profit
-    spread_trading/multi_coint
+    trading/z_score
+    trading/minimum_profit
+    trading/multi_coint
 
 .. toctree::
     :maxdepth: 2
-    :caption: Trading Strategies
+    :caption: Copula Trading
     :hidden:
 
     trading/basic_copula
-    copula_approach/mispricing_index_strategy
+    trading/mispricing_index_strategy
 
 .. toctree::
     :maxdepth: 2

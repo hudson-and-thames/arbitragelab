@@ -1,4 +1,4 @@
-.. _spread_trading-multi_coint:
+.. _trading-multi_coint:
 
 ===================================
 Multivariate Cointegration Strategy
@@ -57,7 +57,7 @@ If so, the internal dictionaries are updated, and the list of the closed trades 
 Implementation
 **************
 
-.. py:currentmodule:: arbitragelab.spread_trading.multi_coint
+.. py:currentmodule:: arbitragelab.trading.multi_coint
 .. autoclass:: MultivariateCointegrationTradingRule
     :members:
     :inherited-members:
@@ -75,7 +75,7 @@ Example
 
     # Importing ArbitrageLab tools
     from arbitragelab.cointegration_approach.multi_coint import MultivariateCointegration
-    from arbitragelab.spread_trading.multi_coint import MultivariateCointegrationTradingRule
+    from arbitragelab.trading.multi_coint import MultivariateCointegrationTradingRule
 
     # Using MultivariateCointegration as optimizer ...
 
