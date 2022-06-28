@@ -32,10 +32,10 @@ class Golem:
         import arbitragelab.optimal_mean_reversion as optimal_mean_reversion
         import arbitragelab.other_approaches as other_approaches
         import arbitragelab.spread_selection as spread_selection
-        import arbitragelab.spread_trading as spread_trading
         import arbitragelab.stochastic_control_approach as stochastic_control_approach
         import arbitragelab.tearsheet as tearsheet
         import arbitragelab.time_series_approach as time_series_approach
+        import arbitragelab.trading as trading
         import arbitragelab.util as util
         segment.track('Import')
 
