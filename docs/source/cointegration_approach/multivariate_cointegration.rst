@@ -70,8 +70,8 @@ For equity markets, the log-returns time series can be assumed as stationary and
 Therefore, when it comes to empirical applications, the Johansen test could be directly applied to the log price series
 to derive the vector :math:`\mathbf{b}`.
 
-Trading Strategy
-################
+Strategy Idea
+#############
 
 The core idea of the strategy is to bet on the spread formed by the cointegrated :math:`N` assets that have gone apart
 but are expected to mean revert in the future. The trading strategy, using the notations in the previous section, can be
@@ -137,29 +137,12 @@ suggest that returns of further history do not have predictability about the cur
 (:math:`\lim_{p \to \infty} \text{Cov} \lbrack Y_t, Y_{t-p} \rbrack = 0`). Therefore, a lag parameter :math:`P` will be
 introduced and the infinite summation will be replaced by a finite sum :math:`\sum_{p=1}^P Z_{t-p}`.
 
-**The trading strategy will be fleshed out based on the above theoretical results:**
+Trading the Strategy
+####################
 
-1. Estimate the cointegration vector :math:`\hat{\mathbf{b}}` with Johansen test using training data.
-2. Construct the realization :math:`\hat{Y}_t` of the process :math:`Y_t` by calculating :math:`\hat{\mathbf{b}}^T \ln P_t`, and calculate :math:`\hat{Z}_t = \hat{Y}_t - \hat{Y}_{t-1}`.
-3. Compute the finite sum :math:`\sum_{p=1}^P \hat{Z}_{t-p}`, where the lag :math:`P` is an input argument.
-4. Partition the assets into two sets :math:`L` and :math:`S` according to the sign of the element in the cointegration vector :math:`\hat{\mathbf{b}}`.
-5. Following the formulae below, calculate the number of assets to trade so that the notional of the positions would equal to :math:`C`.
-
-.. math::
-
-    \Bigg \lfloor \frac{-b^i C \text{ sgn} \bigg( \sum_{p=1}^{P} Z_{t-p} \bigg)}{P_t^i \sum_{j \in L} b^j} \Bigg \rfloor, \: i \in L
-
-    \Bigg \lfloor \frac{b^i C \text{ sgn} \bigg( \sum_{p=1}^{P} Z_{t-p} \bigg)}{P_t^i \sum_{j \in L} b^j} \Bigg \rfloor, \: i \in S
-
-.. note::
-
-    The trading signal is determined by :math:`\sum_{p=1}^{\infty} Z_{t-p}`, which sums to time period :math:`t-1`.
-    The price used to convert the notional to the number of shares/contracts to trade is the closing price of time :math:`t`.
-    This ensures that no look-ahead bias will be introduced.
-
-6. Open the positions on time :math:`t` and close the positions on time :math:`t+1`.
-7. Update the training data with the closing price.
-8. The cointegration vector will be re-estimated monthly (22 trading days). If it is time for a re-estimate, go to step 1; otherwise, go to step 2.
+The ``MultivariateCointegration`` class can be used to generate the cointegration vector, so that later the trading
+signals (number of shares to long/short per each asset) can be generated using the Multivariate Cointegration
+Trading Rule described in the :ref:`Spread Trading <spread_trading-multi_coint>` section of the documentation.
 
 The strategy is trading at daily frequency and always in the market.
 
@@ -187,21 +170,17 @@ Example
     data = pd.read_csv('X_FILE_PATH.csv', parse_dates=['Date'])
     data.set_index('Date', inplace=True)
 
-    # Split the data into training and trading dataset
-    split_point = pd.Timestamp(2001, 11, 6)
-    train_data = data.loc[:split_point]
-    test_data = data.loc[split_point:]
+    # Initialize the optimizer
+    optimizer = MultivariateCointegration()
 
-    # Initialize the trading signal generator
-    multi_coint_signal = MultivariateCointegration(train_data, test_data)
+    # Set the training dataset
+    optimizer = optimizer.set_train_dataset(data)
 
     # Fill NaN values
-    multi_coint_signal.fillna_inplace(nan_method='ffill')
+    optimizer.fillna_inplace(nan_method='ffill')
 
-    # Generating the signal, signal by notional value, recording the cointegration vector time evolution,
-    # and calculate portfolio daily percentage returns
-    signal, signal_ntn, coint_vec, returns = multi_coint_signal.trading_signal(nlags=30,
-                                                                               rolling_window_size=1500)
+    # Generating the cointegration vector to later use in a trading strategy
+    coint_vec = optimizer.get_coint_vec()
 
 Research Notebooks
 ##################
