@@ -187,6 +187,30 @@ This project is licensed under an all rights reserved license and is NOT open-so
 
 .. toctree::
     :maxdepth: 2
+    :caption: Hedge Ratios
+    :hidden:
+
+    hedge_ratios/hedge_ratios
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Spread Trading
+    :hidden:
+
+    trading/z_score
+    trading/minimum_profit
+    trading/multi_coint
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Copula Trading
+    :hidden:
+
+    trading/basic_copula
+    trading/mispricing_index_strategy
+
+.. toctree::
+    :maxdepth: 2
     :caption: Distance Approach
     :hidden:
 
@@ -214,7 +238,6 @@ This project is licensed under an all rights reserved license and is NOT open-so
     cointegration_approach/introduction
     cointegration_approach/cointegration_tests
     cointegration_approach/half_life
-    cointegration_approach/trading_strategies
     cointegration_approach/minimum_profit_simulation
     cointegration_approach/minimum_profit
     cointegration_approach/multivariate_cointegration
@@ -228,8 +251,6 @@ This project is licensed under an all rights reserved license and is NOT open-so
     copula_approach/introduction
     copula_approach/copula_brief_intro
     copula_approach/copula_deeper_intro
-    copula_approach/basic_trading_strategy
-    copula_approach/mispricing_index_strategy
     copula_approach/vine_copula_intro
     copula_approach/cvine_copula_strategy
     copula_approach/partner_selection
@@ -244,6 +265,13 @@ This project is licensed under an all rights reserved license and is NOT open-so
     stochastic_control_approach/ou_model_jurek
     stochastic_control_approach/ou_model_mudchanatongsuk
     stochastic_control_approach/optimal_convergence
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Spread Selection Tools
+    :hidden:
+
+    spread_selection/cointegration_spread_selection.rst
 
 .. toctree::
     :maxdepth: 2
@@ -288,16 +316,11 @@ This project is licensed under an all rights reserved license and is NOT open-so
     ml_approach/neural_networks
     ml_approach/filters
 
-.. toctree::
-    :maxdepth: 2
-    :caption: Hedge Ratios
-    :hidden:
-
-    hedge_ratios/hedge_ratios
 
 .. toctree::
     :maxdepth: 3
     :caption: Developer Guide
     :hidden:
 
+    developer/debugging
     changelog

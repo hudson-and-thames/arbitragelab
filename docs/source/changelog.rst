@@ -12,6 +12,31 @@ Changelog
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
 
+* :release:`0.7.0 <2022-07-04>`
+* :support:`73` Moved research notebooks to .zip format for distribution.
+* :feature:`73` Refactored all Copulas to allow independent use and fitting in the Copula Approach Module.
+* :feature:`73` Created a separate Basic Copula Trading Strategy in the Trading Strategies Module.
+* :feature:`72` Created a separate Mispricing Index Copula Trading Strategy in the Trading Strategies Module.
+* :support:`72` Adjusted Copula Approach Module documentation.
+* :support:`72` Added Basic Copula Trading Strategy documentation.
+* :support:`72` Added Mispricing Index Copula Trading Strategy documentation.
+* :feature:`72` Added Bollinger Band Strategy to the Trading Strategies Module.
+* :feature:`72` Created a separate Minimum Profit Trading Strategy in the Trading Strategies Module.
+* :feature:`72` Created a separate Multivariate Cointegration Trading Strategy in the Trading Strategies Module.
+* :support:`72` Added Bollinger Band Strategy documentation.
+* :support:`72` Added Minimum Profit Trading Strategy documentation.
+* :support:`72` Added Multivariate Cointegration Trading Strategy documentation.
+* :support:`71` Added Raw Docs for debugging to documentation.
+* :support:`71` Added UML Diagram for debugging to documentation.
+* :feature:`70` Updated requirements versions to the newest stable numpy, pandas etc.
+* :bug:`70 major` Fixed package breaking due to faulty werkzeug version.
+* :bug:`69 major` Fixed SCS package version breaking Sparse MR Module.
+* :feature:`68` Updated Cointegration Pairs Selection Module to work with any type of spread (3-leg, N-leg spread).
+* :feature:`68` Updated Hedge Ratios Module to work with any type of spread (3-leg, N-leg spread).
+* :feature:`68` Added Johansen Eigenvector, Box-Tiao Canonical Decomposition, Minimum ADF Test T-statistic methods to Hedge Ratios Module.
+* :support:`68` Added Spread Selection Tools Module to the documentation.
+* :support:`68` Reflected changes to Hedge Ratios Module in the documentation.
+* :support:`67` Added blog post links to documentation.
 * :support:`66` Added presentation slides and videos to documentation.
 
 * :release:`0.6.0 <2021-11-15>`

@@ -7,17 +7,6 @@
     - `d'Aspremont, A. (2011). Identifying small mean-reverting portfolios. Quantitative Finance, 11(3), pp.351-364. <https://arxiv.org/pdf/0708.3048.pdf>`__
     - `Cuturi, M. and d'Aspremont, A. (2015). Mean-reverting portfolios: Tradeoffs between sparsity and volatility. arXiv preprint arXiv:1509.05954. <https://arxiv.org/abs/1509.05954>`__
 
-.. warning::
-
-    In order for this module to work correctly on Windows machines, please install the cvxpy package
-    from conda:
-
-    .. code-block::
-
-      conda install -c conda-forge "cvxpy=1.1.10"
-
-    For more information on the installation process, please visit :ref:`ArbitrageLab installation guide <getting_started-installation>`.
-
 =========================================
 Sparse Mean-reverting Portfolio Selection
 =========================================
@@ -731,8 +720,59 @@ portfolio selection module.
 
 .. raw:: html
 
-    <a href="https://hudthames.tech/3iIGDvv"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
-    <a href="https://hudthames.tech/2S03R58"><button style="margin: 20px; margin-top: 0px">Download Sample Data</button></a>
+    <a href="https://hudsonthames.org/notebooks_zip/arblab/sparse_mean-reverting_portfolio_selection.zip"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
+    <a href="https://hudsonthames.org/notebooks_zip/arblab/Sample-Data.zip"><button style="margin: 20px; margin-top: 0px">Download Sample Data</button></a>
+
+Research Article
+################
+
+.. raw:: html
+
+    <style>
+      .special {
+        display: inline-block;
+        background-color: #0399AB;
+        color: #eeeeee;
+        text-align: center;
+        font-size: 180%;
+        padding: 15px;
+        width: 100%;
+        transition: all 0.5s;
+        cursor: pointer;
+        font-family: 'Josefin Sans';
+      }
+      .special span {
+        cursor: pointer;
+        display: inline-block;
+        position: relative;
+        transition: 0.5s;
+      }
+      .special span:after {
+        content: '\00bb';
+        position: absolute;
+        opacity: 0;
+        top: 0;
+        right: -20px;
+        transition: 0.5s;
+      }
+      .special:hover {
+        background-color: #e7f2fa;
+        color: #000000;
+      }
+      .special:hover span {
+        padding-right: 25px;
+      }
+      .special:hover span:after {
+        opacity: 1;
+        right: 0;
+      }
+    </style>
+
+    <button class="special" onclick="window.open('https://hudsonthames.org/sparse-mean-reverting-portfolio-selection/','_blank')">
+      <span>Read our article on the topic</span>
+    </button>
+
+|
 
 Presentation Slides
 ###################

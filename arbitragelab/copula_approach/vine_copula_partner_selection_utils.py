@@ -4,6 +4,7 @@
 """
 Utils for implementing partner selection approaches for vine copulas.
 """
+
 # pylint: disable = invalid-name
 from contextlib import suppress
 import itertools
@@ -59,7 +60,7 @@ def get_sum_correlations_vectorized(data_subset: pd.DataFrame, all_possible_comb
     d = all_possible_combinations.shape[-1]
     corr_sums = (corr_sums - d) / 2
 
-    # Return the maximum index for the sums.
+    # Return the maximum index for the sums
     max_index = np.argmax(corr_sums)
     final_quadruple = data_subset.columns[list(all_possible_combinations[max_index])].tolist()
 
@@ -157,7 +158,7 @@ def extremal_measure(u: pd.DataFrame, co_variance_matrix: np.array):
 
     # Calculating array T_(4,n) from proposition 3.3
     t = t_calc(u).mean(axis=1).reshape(-1, 1)  # Shape :(16, 1), Taking the mean w.r.t n.
-    # Calculating the final test statistic.
+    # Calculating the final test statistic
     t_test_statistic = n * np.matmul(t.T, np.matmul(co_variance_matrix, t))
 
     return t_test_statistic[0, 0]
@@ -177,13 +178,13 @@ def get_co_variance_matrix(d: int):
     for i, l_i in enumerate(itertools.product(*args)):
         for j, l_j in enumerate(itertools.product(*args)):
             if j < i:
-                # Integrals in lower triangle are skipped.
+                # Integrals in lower triangle are skipped
                 continue
 
-            # Numerical Integration of d dimensions.
+            # Numerical Integration of d dimensions
             co_variance_matrix[i, j] = scipy.integrate.nquad(variance_integral_func, [(0, 1)] * d, args=(l_i, l_j))[0]
 
-    inds = np.tri(2**d, k=-1, dtype=bool)  # Storing the indices of elements in lower triangle.
+    inds = np.tri(2**d, k=-1, dtype=bool)  # Storing the indices of elements in lower triangle
     co_variance_matrix[inds] = co_variance_matrix.T[inds]
 
     return np.linalg.inv(co_variance_matrix)
@@ -241,8 +242,8 @@ def variance_integral_func(*args):
     :return: (float) Integrand value.
     """
 
-    l_i = args[-2] # Tuple represents the variable forms of (u_1, u_2, ..., u_d) beside $\theta_i$ in the density function.
-    l_j = args[-1] # Tuple represents the variable forms of (u_1, u_2, ..., u_d) beside $\theta_j$ in the density function.
+    l_i = args[-2] # Tuple represents the variable forms of (u_1, u_2, ..., u_d) beside $\theta_i$ in the density function
+    l_j = args[-1] # Tuple represents the variable forms of (u_1, u_2, ..., u_d) beside $\theta_j$ in the density function
 
     res = 1
     for ind in range(len(args[:-2])):

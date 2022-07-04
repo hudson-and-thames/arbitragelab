@@ -4,6 +4,7 @@
 """
 Module for implementing partner selection approaches for vine copulas.
 """
+
 # pylint: disable = invalid-name
 import functools
 import itertools

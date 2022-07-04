@@ -8,11 +8,13 @@ Module which implements Minimum Half-Life Hedge Ratio detection algorithm.
 # pylint: disable=invalid-name
 
 from typing import Tuple
+import warnings
 import pandas as pd
 import numpy as np
 from scipy.optimize import minimize
 
-from arbitragelab.cointegration_approach.signals import get_half_life_of_mean_reversion
+from arbitragelab.cointegration_approach.utils import get_half_life_of_mean_reversion
+from arbitragelab.util import segment
 
 
 def _min_hl_function(beta: np.array, X: pd.DataFrame, y: pd.Series) -> float:
@@ -27,18 +29,20 @@ def _min_hl_function(beta: np.array, X: pd.DataFrame, y: pd.Series) -> float:
 
     spread = y - (beta * X).sum(axis=1)
 
-    return get_half_life_of_mean_reversion(spread)
+    return abs(get_half_life_of_mean_reversion(spread))
 
 
 def get_minimum_hl_hedge_ratio(price_data: pd.DataFrame, dependent_variable: str) -> \
-        Tuple[object, pd.DataFrame, pd.Series, pd.Series]:
+        Tuple[dict, pd.DataFrame, pd.Series, pd.Series, object]:
     """
     Get hedge ratio by minimizing spread half-life of mean reversion.
 
     :param price_data: (pd.DataFrame) DataFrame with security prices.
     :param dependent_variable: (str) Column name which represents the dependent variable (y).
-    :return: (Tuple) Fit OLS, X, and y and OLS fit residuals.
+    :return: (Tuple) Hedge ratios, X, and y, OLS fit residuals and optimization object.
     """
+
+    segment.track('get_minimum_hl_hedge_ratio')
 
     X = price_data.copy()
     X.drop(columns=dependent_variable, axis=1, inplace=True)
@@ -48,4 +52,9 @@ def get_minimum_hl_hedge_ratio(price_data: pd.DataFrame, dependent_variable: str
     result = minimize(_min_hl_function, x0=initial_guess, method='BFGS', tol=1e-5, args=(X, y))
     residuals = y - (result.x * X).sum(axis=1)
 
-    return result, X, y, residuals
+    hedge_ratios = result.x
+    hedge_ratios_dict = dict(zip([dependent_variable] + X.columns.tolist(), np.insert(hedge_ratios, 0, 1.0)))
+    if result.status != 0:
+        warnings.warn('Optimization failed to converge. Please check output hedge ratio! The result can be unstable!')
+
+    return hedge_ratios_dict, X, y, residuals, result

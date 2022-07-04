@@ -422,6 +422,57 @@ Finally, we use the out-of-sample test data to calculate the delta neutral portf
     
     phi_1, phi_2, phi_m = oc.delta_neutral_portfolio_weights_continuous(data_test_dataframe, gamma=4)
 
+Research Article
+################
+
+.. raw:: html
+
+    <style>
+      .special {
+        display: inline-block;
+        background-color: #0399AB;
+        color: #eeeeee;
+        text-align: center;
+        font-size: 180%;
+        padding: 15px;
+        width: 100%;
+        transition: all 0.5s;
+        cursor: pointer;
+        font-family: 'Josefin Sans';
+      }
+      .special span {
+        cursor: pointer;
+        display: inline-block;
+        position: relative;
+        transition: 0.5s;
+      }
+      .special span:after {
+        content: '\00bb';
+        position: absolute;
+        opacity: 0;
+        top: 0;
+        right: -20px;
+        transition: 0.5s;
+      }
+      .special:hover {
+        background-color: #e7f2fa;
+        color: #000000;
+      }
+      .special:hover span {
+        padding-right: 25px;
+      }
+      .special:hover span:after {
+        opacity: 1;
+        right: 0;
+      }
+    </style>
+
+    <button class="special" onclick="window.open('https://hudsonthames.org/extended-optimal-arbitrage-strategies/','_blank')">
+      <span>Read our article on the topic</span>
+    </button>
+
+|
+
 Presentation Slides
 ###################
 

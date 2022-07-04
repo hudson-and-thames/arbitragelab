@@ -3,9 +3,6 @@
 # Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 """
 Module that houses vine copula trading strategies.
-
-Method based on `Stübinger, J., Mangold, B. and Krauss, C., 2018. Statistical arbitrage with vine copulas.
-<https://www.iwf.rw.fau.de/files/2015/12/11-2016-1.pdf>`__
 """
 
 from typing import List, Union, Callable, Tuple
@@ -19,6 +16,9 @@ from arbitragelab.util import segment
 class CVineCopStrat:
     """
     Trading strategy class using C-vine copulas.
+
+    Method based on `Stübinger, J., Mangold, B. and Krauss, C., 2018. Statistical arbitrage with vine copulas.
+    <https://www.iwf.rw.fau.de/files/2015/12/11-2016-1.pdf>`__
     """
 
     def __init__(self, cvinecop: CVineCop = None, signal_to_position_table: pd.DataFrame = None):
@@ -31,10 +31,10 @@ class CVineCopStrat:
         """
 
         self.cvinecop = cvinecop
-        self.past_obs = None  # Number of past observations for Bollinger band.
-        self.threshold_std = None  # Standard deviation threshold for Bollinger band.
-        # Signal to position table: Row indexed by previous position, column indexed by signal.
-        # Refer to doc string of self._signal_to_position() for more detail.
+        self.past_obs = None  # Number of past observations for Bollinger band
+        self.threshold_std = None  # Standard deviation threshold for Bollinger band
+        # Signal to position table: Row indexed by previous position, column indexed by signal
+        # Refer to doc string of self._signal_to_position() for more detail
         if signal_to_position_table is None:
             self.signal_to_position_table = pd.DataFrame({1: {0: 1, 1: 1, -1: 0},
                                                           -1: {0: -1, 1: 0, -1: -1},
@@ -62,12 +62,12 @@ class CVineCopStrat:
         :return: (pd.Series) The MPIs calculated from returns and vine copula.
         """
 
-        # 1. Map all the returns to quantiles.
+        # 1. Map all the returns to quantiles
         quantiles = pd.DataFrame(data=0, index=returns.index, columns=returns.columns)
         for i, column_name in enumerate(returns):
             quantiles[column_name] = returns[column_name].apply(cdfs[i])
 
-        # 2. Calculate the conditional probabilities. This step is relatively slow.
+        # 2. Calculate the conditional probabilities. This step is relatively slow
         mpis = self.cvinecop.get_condi_probs(quantiles, pv_target_idx)
 
         if subtract_mean:
@@ -110,8 +110,8 @@ class CVineCopStrat:
             together with the Bollinger band data.
         """
 
-        self.past_obs = past_obs  # Number of past observations for the Bollinger band.
-        self.threshold_std = threshold_std  # How many std away from the running avg for the Bollinger band.
+        self.past_obs = past_obs  # Number of past observations for the Bollinger band
+        self.threshold_std = threshold_std  # How many std away from the running avg for the Bollinger band
 
         # 1. Get the initial mean and std of CMPI
         if mpis is None:
@@ -200,7 +200,7 @@ class CVineCopStrat:
         :return: (int) The current position.
         """
 
-        # Generate a new position according to the table.
+        # Generate a new position according to the table
         new_position = self.signal_to_position_table.loc[past_pos, signal]
 
         return new_position
@@ -276,22 +276,22 @@ class CVineCopStrat:
         units_df.iloc[0, 0] = 0.5 / prices_df.iloc[0, 0] * positions[0]
         units_df.iloc[0, 1] = - 0.5 / prices_df.iloc[1, 0] * positions[0]
         for i in range(1, len(positions)):
-            # By default the new amount of units to be held is the same as the previous step.
+            # By default the new amount of units to be held is the same as the previous step
             units_df.iloc[i, :] = units_df.iloc[i - 1, :]
-            # Updating if there are position changes.
-            # From not short to short.
+            # Updating if there are position changes
+            # From not short to short
             if positions[i - 1] != -1 and positions[i] == -1:  # Short 1, long 2
                 long_units = 0.5 / prices_df.iloc[i, 1]
                 short_units = 0.5 / prices_df.iloc[i, 0]
                 units_df.iloc[i, 0] = - short_units
                 units_df.iloc[i, 1] = long_units
-            # From not long to long.
+            # From not long to long
             if positions[i - 1] != 1 and positions[i] == 1:  # Short 2, long 1
                 long_units = 0.5 / prices_df.iloc[i, 0]
                 short_units = 0.5 / prices_df.iloc[i, 1]
                 units_df.iloc[i, 0] = long_units
                 units_df.iloc[i, 1] = - short_units
-            # From long/short to none.
+            # From long/short to none
             if positions[i - 1] != 0 and positions[i] == 0:  # Exiting
                 units_df.iloc[i, 0] = 0
                 units_df.iloc[i, 1] = 0

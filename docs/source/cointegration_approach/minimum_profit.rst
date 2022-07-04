@@ -253,6 +253,13 @@ given as follows.
 
     N_{S_1} = \Big \lceil \frac{N_{S_2}}{\beta} \Big \rceil
 
+Trading the Strategy
+####################
+
+After applying the above-described optimization rules, the output is optimal levels to enter and exit trades
+as well as number of shares to trade per leg of the cointegration pair. These outputs can be used in the Minimum
+Profit Trading Rule described in the :ref:`Spread Trading <trading-minimum_profit>` section of the documentation.
+
 Implementation
 **************
 
@@ -277,11 +284,11 @@ Example
     data = pd.read_csv('X_FILE_PATH.csv', parse_dates=['Date'])
     data.set_index('Date', inplace=True)
 
-    # Initialize the optimizer for this data
-    optimizer = MinimumProfit(data)
+    # Initialize the optimizer
+    optimizer = MinimumProfit()
 
-    # Split the data into train and trade set
-    train_df, trade_df = optimizer.train_test_split(date_cutoff=pd.Timestamp(2019, 1, 1))
+    # Set the training dataset
+    optimizer = optimizer.set_train_dataset(data)
 
     # Run an Engle-Granger test to retrieve cointegration coefficient
     beta_eg, epsilon_t_eg, ar_coeff_eg, ar_resid_eg = optimizer.fit(use_johansen=False)
@@ -293,12 +300,11 @@ Example
                                                                               ar_resid_eg,
                                                                               len(train_df))
 
-    # Generate trading signals based on these optimized parameters
-    minimum_profit = 100.
-    trade_signals, num_of_shares, cond_values = optimizer.trade_signal(optimal_ub,
-                                                                       minimum_profit,
-                                                                       beta_eg,
-                                                                       epsilon_t_eg)
+    # Generate optimal trading levels and number of shares to trade
+    num_of_shares, optimal_levels = optimizer.get_optimal_levels(optimal_ub,
+                                                                 minimum_profit,
+                                                                 beta_eg,
+                                                                 epsilon_t_eg)
 
 Research Notebooks
 ##################
@@ -309,8 +315,59 @@ Research Notebooks
 
 .. raw:: html
 
-    <a href="https://hudthames.tech/3iIGDvv"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
-    <a href="https://hudthames.tech/2S03R58"><button style="margin: 20px; margin-top: 0px">Download Sample Data</button></a>
+    <a href="https://hudsonthames.org/notebooks_zip/arblab/minimum_profit_optimization.zip"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
+    <a href="https://hudsonthames.org/notebooks_zip/arblab/Sample-Data.zip"><button style="margin: 20px; margin-top: 0px">Download Sample Data</button></a>
+
+Research Article
+################
+
+.. raw:: html
+
+    <style>
+      .special {
+        display: inline-block;
+        background-color: #0399AB;
+        color: #eeeeee;
+        text-align: center;
+        font-size: 180%;
+        padding: 15px;
+        width: 100%;
+        transition: all 0.5s;
+        cursor: pointer;
+        font-family: 'Josefin Sans';
+      }
+      .special span {
+        cursor: pointer;
+        display: inline-block;
+        position: relative;
+        transition: 0.5s;
+      }
+      .special span:after {
+        content: '\00bb';
+        position: absolute;
+        opacity: 0;
+        top: 0;
+        right: -20px;
+        transition: 0.5s;
+      }
+      .special:hover {
+        background-color: #e7f2fa;
+        color: #000000;
+      }
+      .special:hover span {
+        padding-right: 25px;
+      }
+      .special:hover span:after {
+        opacity: 1;
+        right: 0;
+      }
+    </style>
+
+    <button class="special" onclick="window.open('https://hudsonthames.org/minimum-profit-optimization/','_blank')">
+      <span>Read our article on the topic</span>
+    </button>
+
+|
 
 Presentation Slides
 ###################

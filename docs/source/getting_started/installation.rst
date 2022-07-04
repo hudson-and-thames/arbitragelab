@@ -39,9 +39,17 @@ Ubuntu Linux
 
        Example: "26303adb02cb759b2"
 
-6. Add API key as an environment variable:
+6. Install ArbitrageLab into your python environment via the terminal.
 
-   6.1 The Best Way:
+   Please make sure to use this exact statement:
+
+   .. code-block::
+
+      pip install https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@raw.githubusercontent.com/hudson-and-thames-clients/arbitragelab/master/arbitragelab-0.7.0-py3-none-any.whl
+
+7. Add API key as an environment variable:
+
+   7.1 The Best Way:
 
       By adding the API key as an environment variable, you won't need to constantly add the key every time you import the library.
 
@@ -59,7 +67,7 @@ Ubuntu Linux
            be loaded each time you start the virtual machine, which in turn ensured that Python can pick it up.
 
 
-   6.2 The Easy Way:
+   7.2 The Easy Way:
 
       If you don't want the key to persist on your local machine, you can always declare it each time, before you import ArbitrageLab.
 
@@ -75,51 +83,15 @@ Ubuntu Linux
 
          If you are running Ubuntu on a virtual machine, you may find it easiest to use the ``os.environ`` method.
 
-7. Install ArbitrageLab into your python environment via the terminal.
+8. (Optional) **Only if you want to use the ML Approach Module**, install the TensorFlow and Keras packages.
+   Supported TensorFlow and Keras versions are "tensorflow==2.8.0" and "keras==2.3.1".
 
-   Please make sure to use this exact statement:
-
-   .. code-block::
-
-      pip install https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@raw.githubusercontent.com/hudson-and-thames-clients/arbitragelab/master/arbitragelab-0.6.0-py3-none-any.whl
-
-8. Install CVXPY (this library is used for convex optimization problems).
-
-    .. code-block::
-
-        pip install --no-cache-dir -I cvxpy==1.1.10
-
-9. (Optional) **Only if you want to use the ML Approach Module**, install the TensorFlow, Keras packages, and update the NumPy version.
-   Note that you should have pip version "pip==20.1.1" to do this. Supported TensorFlow and Keras versions
-   are "tensorflow==2.2.1" and "keras==2.3.1".
-
-   To change the pip version:
+   To install TensorFlow and Keras:
 
    .. code-block::
 
-      pip install --user "pip==20.1.1"
-
-   To install TensorFlow, Keras, and update the NumPy version:
-
-   .. code-block::
-
-      pip install "tensorflow==2.2.1"
+      pip install "tensorflow==2.8.0"
       pip install "keras==2.3.1"
-      pip install "numpy==1.20.1"
-
-   .. warning::
-
-      You may be encountering the following errors during the installation:
-
-      ``ERROR: tensorflow 2.2.1 has requirement h5py<2.11.0,>=2.10.0,``
-      ``but you'll have h5py 3.1.0 which is incompatible.``
-
-      ``ERROR: tensorflow 2.2.1 has requirement numpy<1.19.0,>=1.16.0,``
-      ``but you'll have numpy 1.20.1 which is incompatible.``
-
-      You can ignore these messages. They appear due to the updated dependency versions in the ArbitrageLab package.
-
-      All the ArbitrageLab functionality still works as expected.
 
 .. tip::
 
@@ -153,9 +125,17 @@ Mac OS X
 
       Example: "26303adb02cb759b2"
 
-6. Add API key as an environment variable:
+6. Install ArbitrageLab into your python environment via the terminal.
 
-   6.1 The Best Way:
+   Please make sure to use this exact statement:
+
+   .. code-block::
+
+      pip install https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@raw.githubusercontent.com/hudson-and-thames-clients/arbitragelab/master/arbitragelab-0.7.0-py3-none-any.whl
+
+7. Add API key as an environment variable:
+
+   7.1 The Best Way:
 
       By adding the API key as an environment variable, you won't need to constantly add the key every time you import the library.
 
@@ -167,7 +147,7 @@ Mac OS X
       * Restart your computer. (If you skip this step, it won't register the change). The following may work to refresh your environment: ``source ~/.bash_profile``
       * To confirm your new env variable is active: ``echo $ARBLAB_API_KEY``
 
-   6.2 The Easy Way:
+   7.2 The Easy Way:
 
       If you don't want the key to persist on your local machine, you can always declare it each time, before you import ArbitrageLab.
 
@@ -179,51 +159,15 @@ Mac OS X
          os.environ['ARBLAB_API_KEY'] = "426303b02cb7475984b2d4843"
          import arbitragelab as al
 
-7. Install ArbitrageLab into your python environment via the terminal.
+8. (Optional) **Only if you want to use the ML Approach Module**, install the TensorFlow and Keras packages.
+   Supported TensorFlow and Keras versions are "tensorflow==2.8.0" and "keras==2.3.1".
 
-   Please make sure to use this exact statement:
-
-   .. code-block::
-
-      pip install https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@raw.githubusercontent.com/hudson-and-thames-clients/arbitragelab/master/arbitragelab-0.6.0-py3-none-any.whl
-
-8. Install CVXPY (this library is used for convex optimization problems).
-
-    .. code-block::
-
-        pip install --no-cache-dir -I cvxpy==1.1.10
-
-9. (Optional) **Only if you want to use the ML Approach Module**, install the TensorFlow, Keras packages, and update the NumPy version.
-   Note that you should have pip version "pip==20.1.1" to do this. Supported TensorFlow and Keras versions
-   are "tensorflow==2.2.1" and "keras==2.3.1".
-
-   To change the pip version:
+   To install TensorFlow and Keras:
 
    .. code-block::
 
-      pip install --user "pip==20.1.1"
-
-   To install TensorFlow, Keras, and update the NumPy version:
-
-   .. code-block::
-
-      pip install "tensorflow==2.2.1"
+      pip install "tensorflow==2.8.0"
       pip install "keras==2.3.1"
-      pip install "numpy==1.20.1"
-
-   .. warning::
-
-      You may be encountering the following errors during the installation:
-
-      ``ERROR: tensorflow 2.2.1 has requirement h5py<2.11.0,>=2.10.0,``
-      ``but you'll have h5py 3.1.0 which is incompatible.``
-
-      ``ERROR: tensorflow 2.2.1 has requirement numpy<1.19.0,>=1.16.0,``
-      ``but you'll have numpy 1.20.1 which is incompatible.``
-
-      You can ignore these messages. They appear due to the updated dependency versions in the ArbitrageLab package.
-
-      All the ArbitrageLab functionality still works as expected.
 
 .. tip::
 
@@ -261,9 +205,17 @@ Windows
 
       Example: "26303adb02cb759b2d484233"
 
-6. Add API key as an environment variable:
+6. Install ArbitrageLab into your python environment via the terminal.
 
-   6.1 The Best Way:
+   Please make sure to use this exact statement:
+
+   .. code-block::
+
+      pip install https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@raw.githubusercontent.com/hudson-and-thames-clients/arbitragelab/master/arbitragelab-0.7.0-py3-none-any.whl
+
+7. Add API key as an environment variable:
+
+   7.1 The Best Way:
 
       By adding the API key as an environment variable, you won't need to constantly add the key every time you import the library.
 
@@ -273,7 +225,7 @@ Windows
       * Close and open a new command prompt
       * Validate that your variable has been added: ``echo %ARBLAB_API_KEY%``
 
-   6.2 The Easy Way:
+   7.2 The Easy Way:
 
       If you don't want the key to persist on your local machine, you can always declare it each time, before you import ArbitrageLab.
 
@@ -285,57 +237,15 @@ Windows
          os.environ['ARBLAB_API_KEY'] = "26303adb02cb759b2"
          import arbitragelab as al
 
-7. Install cvxpy into your conda environment via the terminal.
+8. (Optional) **Only if you want to use the ML Approach Module**, install the TensorFlow and Keras packages.
+   Supported TensorFlow and Keras versions are "tensorflow==2.8.0" and "keras==2.3.1".
 
-   .. warning::
-
-        Please make sure to perform this step in order for the Sparse Mean-reverting Portfolio Module to work properly.
-
-   This is needed for the cvxpy optimizers to work properly on Windows:
+   To install TensorFlow and Keras:
 
    .. code-block::
 
-      conda install -c conda-forge "cvxpy=1.1.10"
-
-8. Install ArbitrageLab into your python environment via the terminal.
-
-   Please make sure to use this exact statement:
-
-   .. code-block::
-
-      pip install https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@raw.githubusercontent.com/hudson-and-thames-clients/arbitragelab/master/arbitragelab-0.6.0-py3-none-any.whl
-
-9. (Optional) **Only if you want to use the ML Approach Module**, install the TensorFlow, Keras packages, and update the NumPy version.
-   Note that you should have pip version "pip==20.1.1" to do this. Supported TensorFlow and Keras versions
-   are "tensorflow==2.2.1" and "keras==2.3.1".
-
-   To change the pip version:
-
-   .. code-block::
-
-      pip install --user "pip==20.1.1"
-
-   To install TensorFlow, Keras, and update the NumPy version:
-
-   .. code-block::
-
-      pip install "tensorflow==2.2.1"
+      pip install "tensorflow==2.8.0"
       pip install "keras==2.3.1"
-      pip install "numpy==1.20.1"
-
-   .. warning::
-
-      You may be encountering the following errors during the installation:
-
-      ``ERROR: tensorflow 2.2.1 has requirement h5py<2.11.0,>=2.10.0,``
-      ``but you'll have h5py 3.1.0 which is incompatible.``
-
-      ``ERROR: tensorflow 2.2.1 has requirement numpy<1.19.0,>=1.16.0,``
-      ``but you'll have numpy 1.20.1 which is incompatible.``
-
-      You can ignore these messages. They appear due to the updated dependency versions in the ArbitrageLab package.
-
-      All the ArbitrageLab functionality still works as expected.
 
 .. tip::
 

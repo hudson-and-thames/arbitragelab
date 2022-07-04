@@ -521,8 +521,59 @@ The following research notebook can be used to better understand the approach de
 
 .. raw:: html
 
-    <a href="https://hudthames.tech/3wyIJSK"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
-    <a href="https://hudthames.tech/2S03R58"><button style="margin: 20px; margin-top: 0px">Download Sample Data</button></a>
+    <a href="https://hudsonthames.org/notebooks_zip/arblab/OU_Model_Jurek.zip"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
+    <a href="https://hudsonthames.org/notebooks_zip/arblab/Sample-Data.zip"><button style="margin: 20px; margin-top: 0px">Download Sample Data</button></a>
+
+Research Article
+################
+
+.. raw:: html
+
+    <style>
+      .special {
+        display: inline-block;
+        background-color: #0399AB;
+        color: #eeeeee;
+        text-align: center;
+        font-size: 180%;
+        padding: 15px;
+        width: 100%;
+        transition: all 0.5s;
+        cursor: pointer;
+        font-family: 'Josefin Sans';
+      }
+      .special span {
+        cursor: pointer;
+        display: inline-block;
+        position: relative;
+        transition: 0.5s;
+      }
+      .special span:after {
+        content: '\00bb';
+        position: absolute;
+        opacity: 0;
+        top: 0;
+        right: -20px;
+        transition: 0.5s;
+      }
+      .special:hover {
+        background-color: #e7f2fa;
+        color: #000000;
+      }
+      .special:hover span {
+        padding-right: 25px;
+      }
+      .special:hover span:after {
+        opacity: 1;
+        right: 0;
+      }
+    </style>
+
+    <button class="special" onclick="window.open('https://hudsonthames.org/pairs-trading-with-stochastic-control-and-ou-process/','_blank')">
+      <span>Read our article on the topic</span>
+    </button>
+
+|
 
 Presentation Slides
 ###################

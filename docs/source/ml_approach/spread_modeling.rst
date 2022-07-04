@@ -4,7 +4,7 @@
    The following documentation closely follows the work of Dunis et al. (2015)
 
 .. warning::
-   In order to use this module, you should additionally install *TensorFlow v2.2.1.* and *Keras v2.3.1.*
+   In order to use this module, you should additionally install *TensorFlow v2.8.0.* and *Keras v2.3.1.*
    For more details, please visit our :ref:`ArbitrageLab installation guide <getting_started-installation>`.
 
 ===============
@@ -129,7 +129,7 @@ The following research notebooks can be used to better understand the components
 
 .. raw:: html
 
-    <a href="https://hudthames.tech/3gFGwy8"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
+    <a href="https://hudsonthames.org/notebooks_zip/arblab/crack_spread_modeling.zip"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
 
 * `Fair Value Modeling`_ - showcases the use of the TAR model on the crack spread.
 
@@ -137,8 +137,8 @@ The following research notebooks can be used to better understand the components
 
 .. raw:: html
 
-    <a href="https://hudthames.tech/3gFGwy8"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
-    <a href="https://hudthames.tech/2S03R58"><button style="margin: 20px; margin-top: 0px">Download Sample Data</button></a>
+    <a href="https://hudsonthames.org/notebooks_zip/arblab/fair_value_modeling.zip"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
+    <a href="https://hudsonthames.org/notebooks_zip/arblab/Sample-Data.zip"><button style="margin: 20px; margin-top: 0px">Download Sample Data</button></a>
 
 Presentation Slides
 ###################

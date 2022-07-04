@@ -163,11 +163,11 @@ Examples
    # Getting results for the trace statistic test
    trace_statistics = portfolio.johansen_eigen_statistic
 
-   # Resulting cointegration vectors that can be used for portfolio construction
+   # Resulting cointegration vectors
    cointegration_vectors = portfolio.cointegration_vectors
 
-   # Constructing series of portfolio prices
-   portfolio_price = portfolio.construct_mean_reverting_portfolio(data, cointegration_vectors.loc[0])
+   # Hedge ratios that can be used for spread construction
+   hedge_ratios = portfolio.hedge_ratios
 
 Engle-Granger Cointegration Test
 ################################
@@ -245,11 +245,11 @@ Examples
    # Getting results for the ADF test in the last step of the method
    adf_statistics = portfolio.adf_statistics
 
-   # Resulting cointegration vector that can be used for portfolio construction
+   # Resulting cointegration vector
    cointegration_vectors = portfolio.cointegration_vectors
 
-   # Constructing series of portfolio prices
-   portfolio_price = portfolio.construct_mean_reverting_portfolio(data, cointegration_vectors.loc[0])
+   # Hedge ratios that can be used for spread construction
+   hedge_ratios = portfolio.hedge_ratios
 
 
 Research Notebooks
@@ -261,8 +261,59 @@ Research Notebooks
 
 .. raw:: html
 
-    <a href="https://hudthames.tech/3iIGDvv"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
-    <a href="https://hudthames.tech/2S03R58"><button style="margin: 20px; margin-top: 0px">Download Sample Data</button></a>
+    <a href="https://hudsonthames.org/notebooks_zip/arblab/mean_reversion.zip"><button style="margin: 20px; margin-top: 0px">Download Notebook</button></a>
+    <a href="https://hudsonthames.org/notebooks_zip/arblab/Sample-Data.zip"><button style="margin: 20px; margin-top: 0px">Download Sample Data</button></a>
+
+Research Article
+################
+
+.. raw:: html
+
+    <style>
+      .special {
+        display: inline-block;
+        background-color: #0399AB;
+        color: #eeeeee;
+        text-align: center;
+        font-size: 180%;
+        padding: 15px;
+        width: 100%;
+        transition: all 0.5s;
+        cursor: pointer;
+        font-family: 'Josefin Sans';
+      }
+      .special span {
+        cursor: pointer;
+        display: inline-block;
+        position: relative;
+        transition: 0.5s;
+      }
+      .special span:after {
+        content: '\00bb';
+        position: absolute;
+        opacity: 0;
+        top: 0;
+        right: -20px;
+        transition: 0.5s;
+      }
+      .special:hover {
+        background-color: #e7f2fa;
+        color: #000000;
+      }
+      .special:hover span {
+        padding-right: 25px;
+      }
+      .special:hover span:after {
+        opacity: 1;
+        right: 0;
+      }
+    </style>
+
+    <button class="special" onclick="window.open('https://hudsonthames.org/an-introduction-to-cointegration/','_blank')">
+      <span>Read our article on the topic</span>
+    </button>
+
+|
 
 Presentation Slides
 ###################

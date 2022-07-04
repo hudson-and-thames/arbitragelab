@@ -175,7 +175,7 @@ If one uses empirical CDFs, then it is identical to our first definition.
     
 
 "Pure" Copulas
-###################
+##############
 
 .. Note::
     "Pure" copula is not an official name.
@@ -254,19 +254,175 @@ It is tabled below from [Demarta, McNeil, The t Copula and Related Copulas, 2005
      - 0
      - 1
 
-Implementation
-**************
+Creating own copulas
+####################
+
+A user can create one of Archimedean or elliptical copula object and play around with it.
+
+Archimedean copulas
+*******************
 
 .. Note::
-    
-    All copula classes share the basic public methods in this module.
-    Hence here we only demonstrate one of them for example.
-    
-.. automodule:: arbitragelab.copula_approach.copula_generate
-        
-    .. autoclass:: Gumbel
-	:members: __init__, get_cop_density, get_cop_eval, get_condi_prob, generate_pairs, plot, describe
-    
+
+    All copula classes in this module share the same basic public methods.
+
+    Here we only demonstrate all methods for the Gumbel copula class, as an example.
+    All other classes have the same methods available
+
+.. automodule:: arbitragelab.copula_approach.archimedean
+
+.. autoclass:: Gumbel
+    :members: __init__, describe, get_cop_density, get_cop_eval, get_condi_prob, get_log_likelihood_sum, sample, fit, theta_hat, plot_cdf, plot_pdf, plot_scatter
+
+.. autoclass:: Clayton
+    :members: __init__
+
+.. autoclass:: Joe
+    :members: __init__
+
+.. autoclass:: Frank
+    :members: __init__
+
+.. autoclass:: N13
+    :members: __init__
+
+.. autoclass:: N14
+    :members: __init__
+
+Elliptical copulas
+******************
+
+.. Note::
+
+    Elliptical copulas (Gaussian and T-Student copulas) can also work in N-dimensional space, however current implementations
+    only support a 2-dimensional case. Multi-dimensional elliptical copulas will be added in future updates of ArbitrageLab.
+
+.. automodule:: arbitragelab.copula_approach.elliptical
+
+.. autoclass:: GaussianCopula
+    :members: __init__
+
+.. Note::
+
+    For Student copula, there is a special function used to find optimal :math:`\nu` parameter for
+    Student distribution used in Student Copula.
+
+.. autofunction:: fit_nu_for_t_copula
+
+.. autoclass:: StudentCopula
+    :members: __init__
+
+Examples
+********
+
+.. code-block::
+
+   # Importing the functionality
+   from arbitragelab.copula_approach.archimedean import Gumbel
+   from arbitragelab.copula_approach.elliptical import StudentCopula, fit_nu_for_t_copula
+
+   cop = Gumbel(theta=2)
+   # Check copula description
+   descr = cop.describe()
+
+   # Get cdf, pdf, conditional cdf
+   cdf = cop.get_cop_density(0.5, 0.7)
+   pdf = cop.get_cop_eval(0.5, 0.7)
+   cond_cdf = cop.get_condi_prob(0.5, 0.7)
+
+   # Sample from copula
+   sample = cop.sample(num=100)
+
+   # Fit copula to some data
+   cop.fit([0.5, 0.2, 0.3, 0.2, 0.1, 0.99],
+           [0.1, 0.02, 0.9, 0.22, 0.11, 0.79])
+   print(cop.theta)
+
+   # Generate copula plots
+   cop.plot_scatter(200)
+   cop.plot_pdf('3d')
+   cop.plot_pdf('contour')
+   cop.plot_cdf('3d')
+   cop.plot_cdf('contour')
+
+   # Creating Student copula
+   nu = fit_nu_for_t_copula([0.5, 0.2, 0.3, 0.2, 0.1, 0.99],
+                            [0.1, 0.02, 0.9, 0.22, 0.11, 0.79])
+   student_cop = StudentCopula(nu=nu, cov=None)
+   student_cop.fit([0.5, 0.2, 0.3, 0.2, 0.1, 0.99],
+                   [0.1, 0.02, 0.9, 0.22, 0.11, 0.79])
+
+
+Applying copula to empirical data
+#################################
+
+As it was previously discussed, in order to use copula, one first needs to fit it on empirical data and find its corresponding
+parameter - theta for Archimedean copulas and rho/cov for elliptical.
+
+However, copulas take only **pseudo-observations** distributed in
+:math:`[0, 1]`. One can either use :code:`statsmodels.distributions.empirical_distribution.ECDF` or ArbitrageLab's function
+:code:`construct_ecdf_lin` which is a slight modification of statsmodels' ECDF with linear interpolation between data points.
+
+.. py:currentmodule:: arbitragelab.copula_approach.copula_calculation
+
+.. autofunction:: construct_ecdf_lin
+   :noindex:
+
+However, one can fit several copulas to the same dataset. The question is: **"Which copula suits best for the empirical data?"**
+
+Usually, one can either use:
+
+1. Akaike Information Criterion (AIC).
+2. Schwarz information criterion (SIC).
+3. Hannan-Quinn information criterion(HQIC).
+
+All of the information criteria use **log_likelihood** from :code:`get_log_likelihood_sum` function for estimation.
+The best copula is the one that yields the minimum AIC, SIC or HQIC value.
+
+.. autofunction:: aic
+
+.. autofunction:: sic
+
+.. autofunction:: hqic
+
+On the other hand, one can just use  the ArbitrageLab function which takes empirical data -> gets ECDFs -> fits copula, and
+returns fit copula object. It also returns fit ECDF(x), ECDF(y) functions, and information criterion values which can be used to
+find the best copula for the current dataset.
+
+.. autofunction:: fit_copula_to_empirical_data
+
+Examples
+********
+
+.. code-block::
+
+   # Importing the functionality
+   import pandas as pd
+   from arbitragelab.copula_approach import fit_copula_to_empirical_data
+   from arbitragelab.copula_approach.archimedean import (Gumbel, Clayton, Frank,
+                                                         Joe, N13, N14)
+   from arbitragelab.copula_approach.elliptical import (StudentCopula,
+                                                        GaussianCopula)
+
+   # Importing data
+   bkd_prices = pd.read_csv('BKD.csv', index_col=0)
+   esc_prices = pd.read_csv('ECS.csv', index_col=0)
+
+   bkd_returns = bkd_prices.pct_change().dropna()
+   esc_returns = esc_prices.pct_change().dropna()
+
+   # All Archimedean and Elliptical copulas to fit
+   copulas = [Gumbel, Clayton, Frank, Joe, N13, N14, GaussianCopula, StudentCopula]
+   aics = dict()
+
+   for cop in copulas:
+       info_crit_logs, fit_copula, ecdf_x, ecdf_y = fit_copula_to_empirical_data(x=bkd_prices,
+                                                                                 y=esc_returns,
+                                                                                 copula=cop)
+       aics[info_crit_logs['Copula Name']] = info_crit_logs['AIC']
+
+   # AIC values for all copulas
+   print(aics)
 
 
 Mixed Copulas
@@ -407,10 +563,13 @@ Implementation
     Hence here we only demonstrate one of them for example.
     Mixed copulas have their own dedicated fitting method, compared to "pure" copulas.
     
-.. automodule:: arbitragelab.copula_approach.copula_generate_mixedcopula
+.. automodule:: arbitragelab.copula_approach.mixed_copulas
         
-    .. autoclass:: CTGMixCop
-	:members: __init__, get_cop_density, get_cop_eval, get_condi_prob, generate_pairs, plot, describe, fit
+.. autoclass:: CTGMixCop
+    :members: __init__, describe, get_cop_density, get_cop_eval, get_condi_prob, get_log_likelihood_sum, sample, fit, theta_hat, plot_cdf, plot_pdf, plot_scatter
+
+.. autoclass:: CFGMixCop
+    :members: __init__
 
 Interesting Open Problems
 #########################
