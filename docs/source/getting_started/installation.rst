@@ -84,14 +84,14 @@ Ubuntu Linux
          If you are running Ubuntu on a virtual machine, you may find it easiest to use the ``os.environ`` method.
 
 8. (Optional) **Only if you want to use the ML Approach Module**, install the TensorFlow and Keras packages.
-   Supported TensorFlow and Keras versions are "tensorflow==2.8.0" and "keras==2.3.1".
+   Supported TensorFlow and Keras versions are "tensorflow==2.8.0" and "keras==2.8.0".
 
    To install TensorFlow and Keras:
 
    .. code-block::
 
       pip install "tensorflow==2.8.0"
-      pip install "keras==2.3.1"
+      pip install "keras==2.8.0"
 
 .. tip::
 
@@ -160,14 +160,14 @@ Mac OS X
          import arbitragelab as al
 
 8. (Optional) **Only if you want to use the ML Approach Module**, install the TensorFlow and Keras packages.
-   Supported TensorFlow and Keras versions are "tensorflow==2.8.0" and "keras==2.3.1".
+   Supported TensorFlow and Keras versions are "tensorflow==2.8.0" and "keras==2.8.0".
 
    To install TensorFlow and Keras:
 
    .. code-block::
 
       pip install "tensorflow==2.8.0"
-      pip install "keras==2.3.1"
+      pip install "keras==2.8.0"
 
 .. tip::
 
@@ -245,7 +245,7 @@ Windows
    .. code-block::
 
       pip install "tensorflow==2.8.0"
-      pip install "keras==2.3.1"
+      pip install "keras==2.8.0"
 
 .. tip::
 
