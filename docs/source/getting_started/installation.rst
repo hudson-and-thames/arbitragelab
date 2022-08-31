@@ -238,7 +238,7 @@ Windows
          import arbitragelab as al
 
 8. (Optional) **Only if you want to use the ML Approach Module**, install the TensorFlow and Keras packages.
-   Supported TensorFlow and Keras versions are "tensorflow==2.8.0" and "keras==2.3.1".
+   Supported TensorFlow and Keras versions are "tensorflow==2.8.0" and "keras==2.8.0".
 
    To install TensorFlow and Keras:
 
