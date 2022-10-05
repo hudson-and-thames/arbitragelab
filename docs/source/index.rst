@@ -138,8 +138,8 @@ latest techniques and focus on what matters most: **creating your own winning st
 Community
 +++++++++
 
-With the purchase of the library, our clients get access to the Hudson & Thames Slack community, where our engineers and other quants
-are always ready to answer your questions.
+With the purchase of the library, our clients get access to the Hudson & Thames Slack community, where they and other quants
+can provide and receive community support.
 
 Alternatively, you can email us at: research@hudsonthames.org.
 
