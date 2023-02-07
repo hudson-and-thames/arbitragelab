@@ -45,7 +45,7 @@ Ubuntu Linux
 
    .. code-block::
 
-      pip install https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@raw.githubusercontent.com/hudson-and-thames-clients/arbitragelab/master/arbitragelab-0.7.0-py3-none-any.whl
+      pip install https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@raw.githubusercontent.com/hudson-and-thames-clients/arbitragelab/master/arbitragelab-0.7.0-py38-none-any.whl
 
 7. Add API key as an environment variable:
 
@@ -131,7 +131,7 @@ Mac OS X
 
    .. code-block::
 
-      pip install https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@raw.githubusercontent.com/hudson-and-thames-clients/arbitragelab/master/arbitragelab-0.7.0-py3-none-any.whl
+      pip install https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@raw.githubusercontent.com/hudson-and-thames-clients/arbitragelab/master/arbitragelab-0.7.0-py38-none-any.whl
 
 7. Add API key as an environment variable:
 
@@ -211,7 +211,7 @@ Windows
 
    .. code-block::
 
-      pip install https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@raw.githubusercontent.com/hudson-and-thames-clients/arbitragelab/master/arbitragelab-0.7.0-py3-none-any.whl
+      pip install https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@raw.githubusercontent.com/hudson-and-thames-clients/arbitragelab/master/arbitragelab-0.7.0-py38-none-any.whl
 
 7. Add API key as an environment variable:
 
