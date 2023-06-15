@@ -29,7 +29,6 @@ mpmath==1.2.1
 # Develop
 bump2version==1.0.1
 bumpversion==0.6.0
-codecov==2.1.11
 coverage==5.4
 pylint==2.6.0
 sphinx==3.4.3 # Docs

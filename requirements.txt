@@ -29,7 +29,6 @@ werkzeug==2.0.0
 protobuf<=3.20.1
 
 # Develop
-codecov==2.1.11
 coverage==5.4
 pylint==2.6.0
 sphinx==3.4.3 # Docs

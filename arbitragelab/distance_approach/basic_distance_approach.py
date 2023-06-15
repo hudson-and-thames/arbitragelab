@@ -494,7 +494,7 @@ class DistanceStrategy:
         of the second element.
 
         :param data: (pd.DataFrame) Dataframe with price series for elements.
-        :param pairs: (list) List of tuples with two elements to use for calculation.
+        :param pairs: (list) List of tuples with two str elements to use for calculation.
         :return: (pd.DataFrame) Dataframe with pairs as columns and their portfolio
             values as rows.
         """
@@ -504,20 +504,9 @@ class DistanceStrategy:
 
         # Iterating through pairs
         for pair in pairs:
-            # Getting two price series for elements in a pair
-            par = data[list(pair)]
-
             # Difference between price series - a portfolio
-            par_diff = par.iloc[:, 0] - par.iloc[:, 1]
-
-            # Naming the portfolio
-            par_diff.name = str(pair)
-
-            # Adding portfolio series to dataframe
-            portfolios = portfolios.append(par_diff)
-
-        # Transposing to make portfolios as columns
-        portfolios = portfolios.transpose()
+            par_diff = data.loc[:, pair[0]] - data.loc[:, pair[1]]
+            portfolios[str(pair)] = par_diff
 
         return portfolios
 
@@ -579,10 +568,6 @@ class DistanceStrategy:
             portfolio['target_quantity'] = portfolio['long_units'] + portfolio['short_units']
 
             # Adding target quantity to signals dataframe
-            signals = signals.append(portfolio['target_quantity'])
-
-        # Adjusting the final signals dataframe
-        signals = signals.transpose()
-        signals.columns = portfolios.columns
+            signals[str(pair)] = portfolio['target_quantity']
 
         return signals
