@@ -1,40 +1,41 @@
 # Production
-numpy==1.20.1
-cvxpy==1.2.0
-scs==3.2.0
-matplotlib==3.4.3
-pandas==1.1.5
-scikit-learn==0.24.2
-scipy>=1.2.0, <2.0.0
-statsmodels>=0.9.0, <1.0.0
+POT==0.9.0
+analytics-python>=1.2.7, <2.0.0
+arch==5.5.0
+cvxpy==1.3.1
 cython==0.29.28
-POT==0.8.2
-yfinance==0.1.63
-yahoo-fin==0.8.6
-lxml==4.6.2
-requests_html==0.10.0
-seaborn==0.11.1
-pmdarima==1.8.5
-keras==2.8.0
-tensorflow==2.8.0
-arch==4.16.1
-pyvinecopulib==0.5.5
 dash>=1.0.0, <2.0.0
+getmac>=0.8.0, <1.0.0
+jupyter-dash>=0.2.0, <1.0.0
+keras==2.12.0
+lxml>=4.9.1
+matplotlib==3.7.1
 mpmath==1.2.1
 networkx>=2.2, <2.6
-jupyter-dash>=0.2.0, <1.0.0
-getmac>=0.8.0, <1.0.0
-analytics-python>=1.2.7, <2.0.0
+numpy==1.23.5
+pandas==1.5.3
+pmdarima==2.0.3
+protobuf>=3.20.3
+pyvinecopulib==0.5.5
+requests_html==0.10.0
+scikit-learn==1.1.3
+scipy>=1.2.0, <2.0.0
+scs==3.2.0
+seaborn==0.12.2
+statsmodels>=0.9.0, <1.0.0
+tensorflow-macos==2.12.0; sys_platform == 'darwin' and platform_machine == 'arm64'
+tensorflow==2.12.0; sys_platform != 'darwin' or platform_machine != 'arm64'
 werkzeug==2.0.0
-protobuf<=3.20.1
+yahoo-fin==0.8.6
+yfinance==0.2.18
 
 # Develop
 coverage==5.4
-pylint==2.6.0
-sphinx==3.4.3 # Docs
-hudsonthames-sphinx-theme==0.1.5 # Docs
-sphinx-rtd-theme==0.5.2 # Docs
-releases==1.6.3 # Docs
 docutils==0.16 # Docs
-pyarmor==6.8.0 # Encryption
+hudsonthames-sphinx-theme==0.1.5 # Docs
 jinja2<3.1 # Docs
+pyarmor==8.2.5 # Encryption
+pylint==2.6.0
+releases==1.6.3 # Docs
+sphinx-rtd-theme==0.5.2 # Docs
+sphinx==3.4.3 # Docs
