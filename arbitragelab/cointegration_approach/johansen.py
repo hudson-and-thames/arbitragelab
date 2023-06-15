@@ -87,12 +87,13 @@ class JohansenPortfolio(CointegratedPortfolio):
             hedge_ratios = cointegration_vectors.iloc[vector].to_dict()
             for ticker, ratio in hedge_ratios.items():
                 if ticker != dependent_variable:
-                    hedge_ratios[ticker] = -ratio / hedge_ratios[dependent_variable]
-            hedge_ratios[dependent_variable] = 1.0
+                    # Set value to be list to make it easier to read into pandas DataFrame
+                    hedge_ratios[ticker] = [-ratio / hedge_ratios[dependent_variable]]
+            # Set value to be list to make it easier to read into pandas DataFrame
+            hedge_ratios[dependent_variable] = [1.0]
 
-            # Add all to one dataframe
-            all_hedge_ratios = all_hedge_ratios.append(hedge_ratios, ignore_index=True)
-            all_hedge_ratios = all_hedge_ratios[price_data.columns]
+            # Concat together in one DataFrame
+            all_hedge_ratios = pd.concat([all_hedge_ratios, pd.DataFrame(hedge_ratios)])
 
         self.hedge_ratios = all_hedge_ratios
 
