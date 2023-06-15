@@ -82,7 +82,7 @@ class AutoARIMAForecast:
         self, y_train: pd.Series, verbose: bool = False, silence_warnings: bool = True
     ):
         """
-        Using the AIC approach from pmdarima library, choose the best fir ARIMA(d, p, q) parameters.
+        Using the AIC approach from pmdarima library, choose the best fit ARIMA(d, p, q) parameters.
 
         :param y_train: (pd.Series) Training series.
         :param verbose: (bool) Flag to print model fit logs.
@@ -181,28 +181,31 @@ class AutoARIMAForecast:
                 warnings.filterwarnings("ignore")
 
             # Iterating through observations
-            for i in range(1, y.shape[0]):
+            for i in range(1, len(y)):
                 if retrain_idx >= retrain_freq:  # Retraining model
                     retrain_idx = 0
 
                     if (
                         train_window is None
-                    ):  # If no window provided, fitting to all previous observations
+                    ):  # If no training window, fit to all previous observations
                         # i-1 to avoid look-ahead bias.
+                        out_of_sample_y_train = pd.concat(
+                            [self.y_train, y.iloc[: i - 1]]
+                        )
                         prediction.loc[y.index[i]] = self.arima_model.fit_predict(
-                            self.y_train.append(y.iloc[: i - 1]), n_periods=1
+                            out_of_sample_y_train, n_periods=1
                         ).values[0]
 
                     else:
+                        out_of_sample_y_train = pd.concat(
+                            [self.y_train.iloc[-train_window:], y.iloc[: i - 1]]
+                        )
                         prediction.loc[y.index[i]] = self.arima_model.fit_predict(
-                            self.y_train.iloc[(-1 * train_window) :].append(
-                                y.iloc[: i - 1]
-                            ),
+                            out_of_sample_y_train,
                             n_periods=1,
                         ).values[0]
 
                 else:  # Using trained model
-                    breakpoint()
                     prediction.loc[y.index[i]] = self.arima_model.predict(
                         n_periods=1
                     ).values[0]
