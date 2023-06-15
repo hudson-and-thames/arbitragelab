@@ -198,7 +198,7 @@ class AutoARIMAForecast:
 
                     else:
                         out_of_sample_y_train = pd.concat(
-                            [self.y_train.iloc[-train_window:], y.iloc[: i - 1]]
+                            [self.y_train.iloc[-1 * train_window :], y.iloc[: i - 1]]
                         )
                         prediction.loc[y.index[i]] = self.arima_model.fit_predict(
                             out_of_sample_y_train,
