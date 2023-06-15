@@ -43,7 +43,7 @@ def get_trend_order(y_train: pd.Series, max_order: int = 10) -> int:
             stationarity_flag = True
 
         # Avoiding infinite loop
-        if (order >= max_order):
+        if order >= max_order:
             stationarity_flag = True
 
         order += 1
@@ -56,7 +56,9 @@ class AutoARIMAForecast:
     Auto ARIMA forecast generator function.
     """
 
-    def __init__(self, start_p: int = 0, start_q: int = 0, max_p: int = 5, max_q: int = 5):
+    def __init__(
+        self, start_p: int = 0, start_q: int = 0, max_p: int = 5, max_q: int = 5
+    ):
         """
         Init AutoARIMA (p, i, q)  prediction class.
 
@@ -74,9 +76,11 @@ class AutoARIMAForecast:
         self.arima_model = None
         self.y_train = None
 
-        segment.track('AutoARIMAForecast')
+        segment.track("AutoARIMAForecast")
 
-    def get_best_arima_model(self, y_train: pd.Series, verbose: bool = False, silence_warnings: bool = True):
+    def get_best_arima_model(
+        self, y_train: pd.Series, verbose: bool = False, silence_warnings: bool = True
+    ):
         """
         Using the AIC approach from pmdarima library, choose the best fir ARIMA(d, p, q) parameters.
 
@@ -95,17 +99,25 @@ class AutoARIMAForecast:
             context = nullcontext()
 
         with context:  # Silencing Warnings
-
             if silence_warnings:
-                warnings.filterwarnings('ignore')
+                warnings.filterwarnings("ignore")
 
             # Fitting the ARIMA model without warnings
-            self.arima_model = auto_arima(y=y_train, d=trend_order, start_p=self.start_p, start_q=self.start_q,
-                                          max_p=self.max_p, max_q=self.max_q,
-                                          max_order=self.max_q + self.max_p + trend_order, trace=verbose)
+            self.arima_model = auto_arima(
+                y=y_train,
+                d=trend_order,
+                start_p=self.start_p,
+                start_q=self.start_q,
+                max_p=self.max_p,
+                max_q=self.max_q,
+                max_order=self.max_q + self.max_p + trend_order,
+                trace=verbose,
+            )
 
     @staticmethod
-    def _print_progress(iteration, max_iterations, prefix='', suffix='', decimals=1, bar_length=50):
+    def _print_progress(
+        iteration, max_iterations, prefix="", suffix="", decimals=1, bar_length=50
+    ):
         # pylint: disable=expression-not-assigned
         """
         Calls in a loop to create a terminal progress bar.
@@ -126,17 +138,22 @@ class AutoARIMAForecast:
         filled_length = int(round(bar_length * iteration / float(max_iterations)))
 
         # Fill the bar
-        block = '█' * filled_length + '-' * (bar_length - filled_length)
+        block = "█" * filled_length + "-" * (bar_length - filled_length)
         # Print new line
-        sys.stdout.write('\r%s |%s| %s%s %s' % (prefix, block, percents, '%', suffix)),
+        sys.stdout.write("\r%s |%s| %s%s %s" % (prefix, block, percents, "%", suffix)),
 
         if iteration == max_iterations:
-            sys.stdout.write('\n')
+            sys.stdout.write("\n")
         sys.stdout.flush()
 
     # pylint: disable=invalid-name
-    def predict(self, y: pd.Series, retrain_freq: int = 1, train_window: int = None,
-                silence_warnings: bool = True) -> pd.Series:
+    def predict(
+        self,
+        y: pd.Series,
+        retrain_freq: int = 1,
+        train_window: int = None,
+        silence_warnings: bool = True,
+    ) -> pd.Series:
         """
         Predict out-of-sample series using already fit ARIMA model. The algorithm retrains the model with `retrain_freq`
         either by appending new observations to train data (`train_window` = None) or by using the latest `train_window`
@@ -160,31 +177,41 @@ class AutoARIMAForecast:
             context = nullcontext()
 
         with context:  # Silencing Warnings
-
             if silence_warnings:
-                warnings.filterwarnings('ignore')
+                warnings.filterwarnings("ignore")
 
             # Iterating through observations
             for i in range(1, y.shape[0]):
-                if retrain_idx >= retrain_freq: # Retraining model
+                if retrain_idx >= retrain_freq:  # Retraining model
                     retrain_idx = 0
 
-                    if train_window is None: # If no window provided, fitting to all previous observations
+                    if (
+                        train_window is None
+                    ):  # If no window provided, fitting to all previous observations
                         # i-1 to avoid look-ahead bias.
-                        prediction.loc[y.index[i]] = \
-                            self.arima_model.fit_predict(self.y_train.append(y.iloc[:i - 1]), n_periods=1)[0]
+                        prediction.loc[y.index[i]] = self.arima_model.fit_predict(
+                            self.y_train.append(y.iloc[: i - 1]), n_periods=1
+                        ).values[0]
 
                     else:
-                        prediction.loc[y.index[i]] = \
-                            self.arima_model.fit_predict(self.y_train.iloc[(-1 * train_window):].append(y.iloc[:i - 1]),
-                                                         n_periods=1)[0]
+                        prediction.loc[y.index[i]] = self.arima_model.fit_predict(
+                            self.y_train.iloc[(-1 * train_window) :].append(
+                                y.iloc[: i - 1]
+                            ),
+                            n_periods=1,
+                        ).values[0]
 
-                else: # Using trained model
-                    prediction.loc[y.index[i]] = self.arima_model.predict(n_periods=1)[0]
+                else:  # Using trained model
+                    breakpoint()
+                    prediction.loc[y.index[i]] = self.arima_model.predict(
+                        n_periods=1
+                    ).values[0]
 
                 retrain_idx += 1
 
                 # Print progress to inform user
-                self._print_progress(i + 1, y.shape[0], prefix='Progress:', suffix='Complete')
+                self._print_progress(
+                    i + 1, y.shape[0], prefix="Progress:", suffix="Complete"
+                )
 
         return prediction
