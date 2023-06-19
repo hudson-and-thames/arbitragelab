@@ -7,6 +7,7 @@ Tests functionality of Futures Rolling module.
 import os
 import unittest
 import matplotlib
+from matplotlib.axes import Axes
 import numpy as np
 import pandas as pd
 
@@ -155,5 +156,4 @@ class TestFuturesRoller(unittest.TestCase):
         """
 
         result_plot = plot_historical_future_slope_state(self.eh1_data['PX_LAST'], self.eh2_data['PX_OPEN'])
-
-        self.assertTrue(issubclass(type(result_plot), matplotlib.axes.SubplotBase))
+        self.assertTrue(isinstance(result_plot, Axes))
