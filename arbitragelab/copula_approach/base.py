@@ -8,6 +8,8 @@ Abstract class for bivariate copula implementation.
 
 # pylint: disable = invalid-name, too-many-function-args
 from abc import ABC, abstractmethod
+from matplotlib.axes import Axes
+from matplotlib.figure import Figure
 
 import numpy as np
 import pandas as pd
@@ -202,7 +204,7 @@ class Copula(ABC):
         """
 
     @staticmethod
-    def _3d_surface_plot(x: np.array, y: np.array, z: np.array, bounds: list, title: str, **kwargs) -> plt.axis:
+    def _3d_surface_plot(x: np.array, y: np.array, z: np.array, bounds: list, title: str, **kwargs) -> Figure:
         """
         Helper function to plot 3-d plot.
 
@@ -223,13 +225,12 @@ class Copula(ABC):
         ax.set_ylim(bounds)
         ax.plot_surface(x, y, z, **kwargs)
         plt.title(title)
-        plt.show()
 
-        return ax
+        return fig
 
     @staticmethod
     def _2d_contour_plot(x: np.array, y: np.array, z: np.array, bounds: float, title: str,
-                         levels: list, **kwargs) -> plt.axis:
+                         levels: list, **kwargs) -> Figure:
         """
         Helper function to plot 2-d contour plot.
 
@@ -243,15 +244,14 @@ class Copula(ABC):
         :return: (plt.axis) Axis object.
         """
 
-        plt.figure()
+        fig = plt.figure()
         contour_plot = plt.contour(x, y, z, levels, colors='k', linewidths=1., linestyles=None, **kwargs)
         plt.clabel(contour_plot, fontsize=8, inline=1)
         plt.xlim(bounds)
         plt.ylim(bounds)
         plt.title(title)
-        plt.show()
 
-        return contour_plot
+        return fig
 
     def plot_cdf(self, plot_type: str = '3d', grid_size: int = 50, levels: list = None, **kwargs) -> plt.axis:
         """
@@ -293,7 +293,7 @@ class Copula(ABC):
 
         return ax
 
-    def plot_scatter(self, num_points: int = 100) -> plt.axis:
+    def plot_scatter(self, num_points: int = 100) -> Axes:
         """
         Plot copula scatter plot of generated pseudo-observations.
 
@@ -307,7 +307,7 @@ class Copula(ABC):
 
         return ax
 
-    def plot_pdf(self, plot_type: str = '3d', grid_size: int = 50, levels: list = None, **kwargs) -> plt.axis:
+    def plot_pdf(self, plot_type: str = '3d', grid_size: int = 50, levels: list = None, **kwargs) -> Figure:
         """
         Plot either '3d' or 'contour' plot of copula PDF.
 

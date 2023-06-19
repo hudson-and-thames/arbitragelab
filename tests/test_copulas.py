@@ -9,6 +9,8 @@ Unit tests for copula functions.
 import os
 import unittest
 import warnings
+from matplotlib.axes import Axes
+from matplotlib.figure import Figure
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -108,11 +110,20 @@ class TestCopulas(unittest.TestCase):
         np.testing.assert_array_almost_equal(result, expected, decimal=3)
 
         # Test plot methods
-        cop.plot_scatter(200)
-        cop.plot_pdf('3d')
-        cop.plot_pdf('contour')
-        cop.plot_cdf('3d')
-        cop.plot_cdf('contour')
+        ax = cop.plot_scatter(200)
+        self.assertTrue(isinstance(ax, Axes))
+
+        fig = cop.plot_pdf('3d')
+        self.assertTrue(isinstance(fig, Figure))
+
+        fig = cop.plot_pdf('contour')
+        self.assertTrue(isinstance(fig, Figure))
+
+        fig = cop.plot_cdf('3d')
+        self.assertTrue(isinstance(fig, Figure))
+
+        fig = cop.plot_cdf('contour')
+        self.assertTrue(isinstance(fig, Figure))
 
     def test_frank(self):
         """
@@ -154,11 +165,20 @@ class TestCopulas(unittest.TestCase):
             cop.sample()
 
         # Test plot methods
-        cop.plot_scatter(200)
-        cop.plot_pdf('3d')
-        cop.plot_pdf('contour')
-        cop.plot_cdf('3d')
-        cop.plot_cdf('contour')
+        ax = cop.plot_scatter(200)
+        self.assertTrue(isinstance(ax, Axes))
+
+        fig = cop.plot_pdf('3d')
+        self.assertTrue(isinstance(fig, Figure))
+
+        fig = cop.plot_pdf('contour')
+        self.assertTrue(isinstance(fig, Figure))
+
+        fig = cop.plot_cdf('3d')
+        self.assertTrue(isinstance(fig, Figure))
+
+        fig = cop.plot_cdf('contour')
+        self.assertTrue(isinstance(fig, Figure))
 
     def test_clayton(self):
         """
@@ -200,11 +220,20 @@ class TestCopulas(unittest.TestCase):
             cop.sample()
 
         # Test plot methods
-        cop.plot_scatter(200)
-        cop.plot_pdf('3d')
-        cop.plot_pdf('contour')
-        cop.plot_cdf('3d')
-        cop.plot_cdf('contour')
+        ax = cop.plot_scatter(200)
+        self.assertTrue(isinstance(ax, Axes))
+
+        fig = cop.plot_pdf('3d')
+        self.assertTrue(isinstance(fig, Figure))
+
+        fig = cop.plot_pdf('contour')
+        self.assertTrue(isinstance(fig, Figure))
+
+        fig = cop.plot_cdf('3d')
+        self.assertTrue(isinstance(fig, Figure))
+
+        fig = cop.plot_cdf('contour')
+        self.assertTrue(isinstance(fig, Figure))
 
     def test_joe(self):
         """
@@ -255,11 +284,21 @@ class TestCopulas(unittest.TestCase):
         np.testing.assert_array_almost_equal(result, expected, decimal=3)
 
         # Test plot methods
-        cop.plot_scatter(200)
-        cop.plot_pdf('3d')
-        cop.plot_pdf('contour')
-        cop.plot_cdf('3d')
-        cop.plot_cdf('contour')
+        ax = cop.plot_scatter(200)
+        self.assertTrue(isinstance(ax, Axes))
+
+        fig = cop.plot_pdf('3d')
+        self.assertTrue(isinstance(fig, Figure))
+
+        fig = cop.plot_pdf('contour')
+        self.assertTrue(isinstance(fig, Figure))
+
+        fig = cop.plot_cdf('3d')
+        self.assertTrue(isinstance(fig, Figure))
+
+        fig = cop.plot_cdf('contour')
+        self.assertTrue(isinstance(fig, Figure))
+
 
     def test_n13(self):
         """
@@ -307,11 +346,20 @@ class TestCopulas(unittest.TestCase):
         np.testing.assert_array_almost_equal(result, expected, decimal=3)
 
         # Test plot methods
-        cop.plot_scatter(200)
-        cop.plot_pdf('3d')
-        cop.plot_pdf('contour')
-        cop.plot_cdf('3d')
-        cop.plot_cdf('contour')
+        ax = cop.plot_scatter(200)
+        self.assertTrue(isinstance(ax, Axes))
+
+        fig = cop.plot_pdf('3d')
+        self.assertTrue(isinstance(fig, Figure))
+
+        fig = cop.plot_pdf('contour')
+        self.assertTrue(isinstance(fig, Figure))
+
+        fig = cop.plot_cdf('3d')
+        self.assertTrue(isinstance(fig, Figure))
+
+        fig = cop.plot_cdf('contour')
+        self.assertTrue(isinstance(fig, Figure))
 
     def test_n14(self):
         """
@@ -394,11 +442,20 @@ class TestCopulas(unittest.TestCase):
         self.assertEqual(str(type(cop.sample(num=1))), "<class 'numpy.ndarray'>")
 
         # Test plot methods
-        cop.plot_scatter(200)
-        cop.plot_pdf('3d')
-        cop.plot_pdf('contour')
-        cop.plot_cdf('3d')
-        cop.plot_cdf('contour')
+        ax = cop.plot_scatter(200)
+        self.assertTrue(isinstance(ax, Axes))
+
+        fig = cop.plot_pdf('3d')
+        self.assertTrue(isinstance(fig, Figure))
+
+        fig = cop.plot_pdf('contour')
+        self.assertTrue(isinstance(fig, Figure))
+
+        fig = cop.plot_cdf('3d')
+        self.assertTrue(isinstance(fig, Figure))
+
+        fig = cop.plot_cdf('contour')
+        self.assertTrue(isinstance(fig, Figure))
 
     def test_student(self):
         """
@@ -448,11 +505,20 @@ class TestCopulas(unittest.TestCase):
         self.assertEqual(str(type(cop.sample(num=1))), "<class 'numpy.ndarray'>")
 
         # Test plot methods
-        cop.plot_scatter(200)
-        cop.plot_pdf('3d')
-        cop.plot_pdf('contour')
-        cop.plot_cdf('3d')
-        cop.plot_cdf('contour')
+        ax = cop.plot_scatter(200)
+        self.assertTrue(isinstance(ax, Axes))
+
+        fig = cop.plot_pdf('3d')
+        self.assertTrue(isinstance(fig, Figure))
+
+        fig = cop.plot_pdf('contour')
+        self.assertTrue(isinstance(fig, Figure))
+
+        fig = cop.plot_cdf('3d')
+        self.assertTrue(isinstance(fig, Figure))
+
+        fig = cop.plot_cdf('contour')
+        self.assertTrue(isinstance(fig, Figure))
 
     def test_plot_cdf(self):
         """
@@ -467,7 +533,7 @@ class TestCopulas(unittest.TestCase):
         # Test plotting with given levels
         levels = [0.01, 0.04, 0.08, 0.12, 0.5, 0.7]
         plot = cop.plot_cdf('contour', levels=levels)
-        self.assertEqual(str(type(plot)), "<class 'matplotlib.contour.QuadContourSet'>")
+        self.assertTrue(isinstance(plot, Figure))
 
         # Test error when wrong option is used
         with self.assertRaises(ValueError):
@@ -486,7 +552,7 @@ class TestCopulas(unittest.TestCase):
         # Test plotting with given levels
         levels = [0.01, 0.04, 0.08, 0.12, 0.5, 0.7]
         plot = cop.plot_pdf('contour', levels=levels)
-        self.assertEqual(str(type(plot)), "<class 'matplotlib.contour.QuadContourSet'>")
+        self.assertTrue(isinstance(plot, Figure))
 
         # Test error when wrong option is used
         with self.assertRaises(ValueError):
@@ -771,5 +837,5 @@ class TestCopulas(unittest.TestCase):
         axs['Student'] = student.plot_scatter(200)
         plt.close()
 
-        for key in axs:
-            self.assertEqual(str(type(axs[key])), "<class 'matplotlib.axes._subplots.AxesSubplot'>")
+        for plot in axs.values():
+            self.assertTrue(isinstance(plot, Axes))
