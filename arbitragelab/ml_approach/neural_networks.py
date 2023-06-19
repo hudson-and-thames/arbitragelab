@@ -13,6 +13,12 @@ import logging
 logging.getLogger('tensorflow').setLevel(logging.ERROR)
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
+
+# Importing needed packages
+import tensorflow as tf
+from keras.models import Model
+from keras.callbacks import History
+from keras.layers import Input, LSTM, Dense, Activation, Lambda
 import matplotlib.pyplot as plt
 
 from arbitragelab.util import segment
@@ -26,12 +32,6 @@ class BaseNeuralNetwork:
         """
         Initializing variables.
         """
-
-        # Importing needed packages
-        import tensorflow as tf
-        from keras.models import Model
-        from keras.callbacks import History
-        from keras.layers import Input, LSTM, Dense, Activation, Lambda
 
         self.fitted_model = None
 
@@ -130,6 +130,7 @@ class MultiLayerPerceptron(BaseNeuralNetwork):
 
         return model
 
+
 class RecurrentNeuralNetwork(BaseNeuralNetwork):
     """
     Recurrent Neural Network implementation.
@@ -195,6 +196,7 @@ class RecurrentNeuralNetwork(BaseNeuralNetwork):
         self.model = model
 
         return model
+
 
 class PiSigmaNeuralNetwork(BaseNeuralNetwork):
     """
