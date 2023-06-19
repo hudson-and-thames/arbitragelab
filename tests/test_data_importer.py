@@ -80,10 +80,10 @@ class TestDataImporter(unittest.TestCase):
         # as follows: [ticker_symbol, industry, sector].
         expected_result = pd.DataFrame(data=[
             ('GOOG', 'Internet Content & Information', 'Communication Services'),
-            ('FB', 'Internet Content & Information', 'Communication Services')
+            ('META', 'Internet Content & Information', 'Communication Services')
         ])
         expected_result.columns = ['ticker', 'industry', 'sector']
 
         # Call the get_ticker_sector_info method to request the necessary data.
-        augmented_ticker_df = data_importer.get_ticker_sector_info(['GOOG', 'FB'], 1)
+        augmented_ticker_df = data_importer.get_ticker_sector_info(['GOOG', 'META'], 1)
         pd.testing.assert_frame_equal(augmented_ticker_df, expected_result)
