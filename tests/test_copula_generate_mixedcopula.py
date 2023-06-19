@@ -11,6 +11,7 @@ import datetime as dt
 
 import numpy as np
 import pandas as pd
+from matplotlib.axes import Axes
 
 import arbitragelab.copula_approach.mixed_copulas as copmix
 import arbitragelab.copula_approach.archimedean as coparc
@@ -237,8 +238,8 @@ class TestCopulaGenerateMixedCopula(unittest.TestCase):
         cfg = copmix.CFGMixCop(cop_params=(theta, theta, theta), weights=weights)
 
         # Initiate without an axes
-        axs = dict()
-        axs['CTG'] = ctg.plot_scatter(200)
-        axs['CFG'] = cfg.plot_scatter(200)
-        for key in axs:
-            self.assertEqual(str(type(axs[key])), "<class 'matplotlib.axes._subplots.AxesSubplot'>")
+        ctg_plot = ctg.plot_scatter(200)
+        cfg_plot = cfg.plot_scatter(200)
+
+        self.assertTrue(isinstance(ctg_plot, Axes))
+        self.assertTrue(isinstance(cfg_plot, Axes))
