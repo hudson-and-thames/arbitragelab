@@ -228,8 +228,6 @@ class OPTICSDBSCANPairsClustering:
         # Set the chart title.
         ax_object.set_title('Automatic Clustering\n' + method)
 
-        plt.show()
-
         return ax_object
 
     def plot_2d_scatter_plot(self, fig: Figure, tsne_df: pd.DataFrame, no_of_classes: int,
@@ -286,8 +284,6 @@ class OPTICSDBSCANPairsClustering:
 
         # Set the chart title.
         ax_object.set_title('Automatic Clustering\n' + method)
-
-        plt.show()
 
         return ax_object
 

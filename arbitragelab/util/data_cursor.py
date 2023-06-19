@@ -452,7 +452,8 @@ class DataCursor(object):
 
         # Place the annotation in the figure instead of the axes so that it
         # doesn't get hidden behind other subplots (zorder won't fix that).
-        ax.figure.texts.append(ax.texts.pop())
+        ax.figure.texts.append(ax.texts[0])
+        ax.texts[0].remove()
 
         # Create a draggable annotation box, if required.
         if self.draggable:
