@@ -9,8 +9,10 @@ Tests functions from Regime Switching Arbitrage Rule module.
 
 import unittest
 import os
+
 import pandas as pd
 import matplotlib.pyplot as plt
+import yfinance as yf
 
 from arbitragelab.time_series_approach.regime_switching_arbitrage_rule import RegimeSwitchingArbitrageRule
 
@@ -30,6 +32,7 @@ class TestRegimeSwitchingArbitrageRule(unittest.TestCase):
         data = pd.read_csv(self.path)
         data = data.set_index('Date')
         Ratt = data["NG=F"]/data["CL=F"]
+
 
         self.Ratts = Ratt.values, Ratt, pd.DataFrame(Ratt)
 
@@ -57,7 +60,7 @@ class TestRegimeSwitchingArbitrageRule(unittest.TestCase):
 
         # Testing the result
         self.assertEqual(signals[0].tolist(), [False, False, False, False])
-        self.assertEqual(signals[79].tolist(), [True, False, False, True])
+        self.assertEqual(signals[79].tolist(), [False, False, False, False])
         self.assertEqual(signals[113].tolist(), [False, False, False, False])
 
     def test_trade(self):
@@ -69,7 +72,7 @@ class TestRegimeSwitchingArbitrageRule(unittest.TestCase):
         test = RegimeSwitchingArbitrageRule(delta=1.5, rho=0.6)
 
         # Setting window size
-        window_size = 60
+        window_size = 100
 
         # Getting signals on a rolling basis
         signals = test.get_signals(self.Ratts[0], window_size, switching_variance=True, silence_warnings=True)
@@ -78,15 +81,14 @@ class TestRegimeSwitchingArbitrageRule(unittest.TestCase):
         trades = test.get_trades(signals)
 
         # Testing the result
-        self.assertEqual(trades[0].tolist(), [False, False, False, False])
-        self.assertEqual(trades[79].tolist(), [True, False, False, False])
+        self.assertEqual(trades[0].tolist(), [True, False, False, True])
+        self.assertEqual(trades[79].tolist(), [False, False, False, False])
         self.assertEqual(trades[113].tolist(), [False, False, False, False])
 
         # Plotting trades
         for i in [0, 1, 2]:
             fig = test.plot_trades(self.Ratts[i], trades)
             self.assertEqual(type(fig), type(plt.figure()))
-        plt.close("all")
 
     def test_change(self):
         """
@@ -141,8 +143,8 @@ class TestRegimeSwitchingArbitrageRule(unittest.TestCase):
 
         # Testing the result
         self.assertEqual(signals[0].tolist(), [False, False, False, False])
-        self.assertEqual(signals[79].tolist(), [True, False, False, True])
-        self.assertEqual(signals[113].tolist(), [False, True, False, False])
+        self.assertEqual(signals[79].tolist(), [False, False, False, False])
+        self.assertEqual(signals[143].tolist(), [True, False, False, True])
         self.assertEqual(trades[0].tolist(), [False, False, False, False])
 
         # Testing the exception

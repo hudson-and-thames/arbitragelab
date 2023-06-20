@@ -8,6 +8,7 @@ The module implements a statistical arbitrage strategy based on the Markov regim
 
 from typing import Union, Callable
 import warnings
+from numpy.linalg import LinAlgError
 
 import pandas as pd
 import numpy as np
@@ -130,7 +131,11 @@ class RegimeSwitchingArbitrageRule:
 
             # Fitting the Markov regime-switching model
             mod = sm.tsa.MarkovRegression(data_npa, k_regimes=2, switching_variance=switching_variance)
-            res = mod.fit()
+            try:
+                res = mod.fit()
+            except (RuntimeError, LinAlgError):
+                warnings.warn("Unable to get a fit")
+                return np.full(4, False)  # Since we were unable to detect the regime, we just return False for every possible strategy.
 
             if np.isnan(res.params).sum() == len(res.params):
                 warnings.warn("Failed to fit the Markov regime-switching model to the input data.")
@@ -189,8 +194,8 @@ class RegimeSwitchingArbitrageRule:
 
         signals = np.full((len(data), 4), False)
 
-        for i in range(window_size, len(signals) + 1):
-            signals[i - 1] = self.get_signal(data[i - window_size:i], switching_variance, silence_warnings)
+        for i in range(len(signals) - window_size + 1):  # + 1 because range is exclusive of upperbound
+            signals[i] = self.get_signal(data[i:i + window_size], switching_variance, silence_warnings)
 
         return signals
 
