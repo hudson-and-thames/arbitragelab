@@ -22,12 +22,12 @@ scikit-learn==1.1.3
 scipy>=1.2.0, <2.0.0
 scs==3.2.0
 seaborn==0.12.2
-statsmodels>=0.9.0, <1.0.0
+statsmodels==0.14.0
 tensorflow-macos==2.12.0; sys_platform == 'darwin' and platform_machine == 'arm64'
 tensorflow==2.12.0; sys_platform != 'darwin' or platform_machine != 'arm64'
 werkzeug==2.2.3
-yahoo-fin==0.8.6
-yfinance==0.2.18
+yahoo-fin==0.8.9.1
+yfinance==0.2.20
 
 # Develop
 coverage==5.4
