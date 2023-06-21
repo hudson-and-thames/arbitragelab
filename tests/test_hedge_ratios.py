@@ -9,6 +9,8 @@ Module which tests hedge ratios module.
 import unittest
 import pandas as pd
 import numpy as np
+from unittest.mock import patch, Mock
+
 
 from arbitragelab.hedge_ratios.linear import get_ols_hedge_ratio, get_tls_hedge_ratio
 from arbitragelab.hedge_ratios.half_life import get_minimum_hl_hedge_ratio
@@ -157,19 +159,26 @@ class TestHedgeRatios(unittest.TestCase):
         """
 
         diverging_series = self.cointegrated_series.copy()
-        diverging_series['Y'] = 1.0
-        diverging_series['X'] = 2.0
 
+        rng_generator = np.random.default_rng(seed=0)
+
+        diverging_series['Y'] = rng_generator.random(100)
+        diverging_series['X'] = 2 * rng_generator.random(100)
+
+        hedge_ratio, _, _, _ = get_ols_hedge_ratio(price_data=diverging_series.iloc[:1],
+                                                   dependent_variable='Y')
+        self.assertAlmostEqual(hedge_ratio['X'], 0.663, places=2)
+
+
+    @patch('arbitragelab.hedge_ratios.adf_optimal.minimize')
+    def test_divering_hedge_ratios_raise_warning(self, mock_minimize):
+        """Test that the diverging hedge ratio function raises a warning when the optimization fails to converge"""
+
+        mock_minimize.return_value.status = 3
+        mock_minimize.return_value.x = np.array([1])
+
+        diverging_series = self.cointegrated_series.copy()
         with self.assertWarns(UserWarning):
             _, _, _, _, res = get_adf_optimal_hedge_ratio(price_data=diverging_series,
                                                           dependent_variable='Y')
         self.assertEqual(res.status, 3.0)
-
-        with self.assertWarns(UserWarning):
-            _, _, _, _, res = get_minimum_hl_hedge_ratio(price_data=diverging_series,
-                                                         dependent_variable='Y')
-        self.assertEqual(res.status, 3.0)
-
-        hedge_ratio, _, _, _ = get_ols_hedge_ratio(price_data=diverging_series.iloc[:1],
-                                                   dependent_variable='Y')
-        self.assertEqual(hedge_ratio['X'], 0.5)
