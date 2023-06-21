@@ -62,8 +62,8 @@ class MultivariateCointegrationTradingRule:
 
         :param latest_price_values: (pd.Series) Latest price values.
         """
-
-        self.price_series = self.price_series.append(latest_price_values)
+        # Ugly trick to append a series as a row to a DataFrame
+        self.price_series = pd.concat([self.price_series, latest_price_values.to_frame().T])
         self.price_series = self.price_series.iloc[-self.nlags:]
 
     @staticmethod
