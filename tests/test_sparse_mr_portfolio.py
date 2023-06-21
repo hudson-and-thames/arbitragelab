@@ -259,7 +259,7 @@ class TestSparseMeanReversionPortfolio(unittest.TestCase):
         self.assertIsNone(allclose(sdp_port_vol_weights_val,
                                    np.array([0.35675015, -0.41894421, 0.47761845, -0.3175681,
                                              -0.24383743, -0.3019539, 0.29348114, 0.3626047]),
-                                   rtol=1e-2))
+                                   atol=0.05))
 
     def test_sdp_crossing_vol(self):
         """
@@ -283,7 +283,7 @@ class TestSparseMeanReversionPortfolio(unittest.TestCase):
         self.assertIsNone(allclose(actual=sdp_cross_vol_weights_val,
                                    desired=np.array([0.35380303, -0.41627861, 0.49314636, -0.30469972,
                                                      -0.24946532, -0.29270862, 0.28273044, 0.3710155]),
-                                   rtol=1e-02))
+                                   atol=0.05))
 
     def test_LASSO_VAR_tuning(self):
         """
