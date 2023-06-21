@@ -98,8 +98,8 @@ class TestCointegration(unittest.TestCase):
         scaled_cointegration_2 = port.get_scaled_cointegration_vector(cointegration_vector=
                                                                       port.cointegration_vectors.iloc[0])
 
-        self.assertEqual(scaled_cointegration_1.iloc[0], 1)
-        self.assertEqual(scaled_cointegration_2.iloc[0], 1)
+        self.assertAlmostEqual(scaled_cointegration_1.iloc[0], 1.)
+        self.assertAlmostEqual(scaled_cointegration_2.iloc[0], 1.)
         self.assertAlmostEqual(scaled_cointegration_1.iloc[1], scaled_cointegration_2.iloc[1], delta=1e-2)
         self.assertAlmostEqual(scaled_cointegration_2.mean(), scaled_cointegration_1.mean(), delta=1e-2)
 
