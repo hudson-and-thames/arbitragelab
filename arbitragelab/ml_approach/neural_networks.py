@@ -16,9 +16,8 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 # Importing needed packages
 import tensorflow as tf
-from keras.models import Model
-from keras.callbacks import History
 from keras.layers import Input, LSTM, Dense, Activation, Lambda
+from keras.models import Model
 import matplotlib.pyplot as plt
 
 from arbitragelab.util import segment
@@ -109,10 +108,6 @@ class MultiLayerPerceptron(BaseNeuralNetwork):
         :return: (Model) Resulting model.
         """
 
-        # Importing needed packages
-        from keras.models import Model
-        from keras.layers import Input, Dense
-
         input_layer = Input((self.frame_size,))
 
         hidden_layer = Dense(self.hidden_size,
@@ -176,10 +171,6 @@ class RecurrentNeuralNetwork(BaseNeuralNetwork):
         :return: (Model) Resulting model.
         """
 
-        # Importing needed packages
-        from keras.models import Model
-        from keras.layers import Input, LSTM, Dense
-
         input_layer = Input(self.input_shape)
 
         hidden_layer = LSTM(self.hidden_size, activation=self.hidden_layer_activation_function,
@@ -242,10 +233,6 @@ class PiSigmaNeuralNetwork(BaseNeuralNetwork):
         :return: (Model) Resulting model.
         """
 
-        # Importing needed packages
-        from keras.models import Model
-        from keras.layers import Input, Dense, Activation, Lambda
-
         input_layer = Input((self.frame_size,))
 
         second_sigma_layer = Dense(self.hidden_size,
@@ -273,9 +260,6 @@ class PiSigmaNeuralNetwork(BaseNeuralNetwork):
         :param tensor: (tf.Tensor) Weights from the hidden layer.
         :return: (tf.Tensor) Product of input tensor.
         """
-
-        # Importing needed packages
-        import tensorflow as tf
 
         prod = tf.math.reduce_prod(tensor, keepdims=True, axis=1)
 
