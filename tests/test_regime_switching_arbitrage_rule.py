@@ -12,7 +12,6 @@ import os
 
 import pandas as pd
 import matplotlib.pyplot as plt
-import yfinance as yf
 
 from arbitragelab.time_series_approach.regime_switching_arbitrage_rule import RegimeSwitchingArbitrageRule
 

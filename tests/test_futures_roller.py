@@ -6,10 +6,10 @@ Tests functionality of Futures Rolling module.
 """
 import os
 import unittest
-import matplotlib
-from matplotlib.axes import Axes
+
 import numpy as np
 import pandas as pd
+from matplotlib.axes import Axes
 
 from arbitragelab.util.rollers import (CrudeOilFutureRoller, NBPFutureRoller, RBFutureRoller,
                                        GrainFutureRoller, EthanolFutureRoller, plot_historical_future_slope_state)

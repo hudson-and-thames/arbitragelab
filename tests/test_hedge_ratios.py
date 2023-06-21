@@ -6,11 +6,11 @@ Module which tests hedge ratios module.
 """
 # pylint: disable=invalid-name
 
+from unittest.mock import patch
 import unittest
+
 import pandas as pd
 import numpy as np
-from unittest.mock import patch, Mock
-
 
 from arbitragelab.hedge_ratios.linear import get_ols_hedge_ratio, get_tls_hedge_ratio
 from arbitragelab.hedge_ratios.half_life import get_minimum_hl_hedge_ratio
