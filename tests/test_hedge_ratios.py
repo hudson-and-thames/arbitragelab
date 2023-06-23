@@ -102,6 +102,19 @@ class TestHedgeRatios(unittest.TestCase):
         self.assertAlmostEqual(hedge_ratios['Z'], 1, delta=1e-3)
         self.assertAlmostEqual(residuals.mean(), -1.7353, delta=1e-2)
 
+    @patch('arbitragelab.hedge_ratios.half_life.minimize')
+    def test_hl_hedge_ratio_raises_warning_for_bad_result(self, mock_minimize):
+        """
+        Test HL hedge ratio calculation.
+        """
+
+        mock_minimize.return_value.status = 3
+        mock_minimize.return_value.x = np.array([1])
+
+        with self.assertWarns(UserWarning):
+            _, _, _, _, _ = get_minimum_hl_hedge_ratio(price_data=self.cointegrated_series,
+                                                                        dependent_variable='Y')
+
     def test_adf_hedge_ratio(self):
         """
         Test ADF optimal hedge ratio calculation.
