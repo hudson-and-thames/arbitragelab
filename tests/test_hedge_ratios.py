@@ -119,7 +119,7 @@ class TestHedgeRatios(unittest.TestCase):
     @patch("arbitragelab.hedge_ratios.half_life.minimize")
     def test_hl_hedge_ratio_raises_warning_for_bad_result(self, mock_minimize):
         """
-        Test HL hedge ratio calculation.
+        Test HL hedge ratio calculation raises warning for non-convergence.
         """
 
         mock_minimize.return_value.status = 3
@@ -206,7 +206,7 @@ class TestHedgeRatios(unittest.TestCase):
 
     @patch("arbitragelab.hedge_ratios.adf_optimal.minimize")
     def test_divering_hedge_ratios_raise_warning(self, mock_minimize):
-        """Test that the diverging hedge ratio function raises a warning when the optimization fails to converge"""
+        """Test that the diverging hedge ratio function raises a warning for non-convergence."""
 
         mock_minimize.return_value.status = 3
         mock_minimize.return_value.x = np.array([1])
