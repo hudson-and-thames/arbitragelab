@@ -137,10 +137,6 @@ class RegimeSwitchingArbitrageRule:
                 warnings.warn("Unable to get a fit")
                 return np.full(4, False)  # Since we were unable to detect the regime, we just return False for every possible strategy.
 
-            if np.isnan(res.params).sum() == len(res.params):
-                warnings.warn("Failed to fit the Markov regime-switching model to the input data.")
-                return np.full(4, False)
-
         # Unpacking parameters
         mu = res.params[2:4]
 
