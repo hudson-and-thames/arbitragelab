@@ -10,7 +10,7 @@ coverage erase
 
 # Discover and run all tests, check unit tests results
 . venv/bin/activate
-coverage run --concurrency=multiprocessing -m unittest discover
+coverage run --concurrency=multiprocessing -m pytest tests/
 res_test=$?
 if [ $res_test -ne 0 ]
 then
