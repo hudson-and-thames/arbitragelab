@@ -9,6 +9,7 @@ omit =
      arbitragelab/util/segment.py
      tests/*
      /opt/conda/*
+     venv/*
      # Ensure we exclude any files in .local
      */.local/*
      */tmp/*

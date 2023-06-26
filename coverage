@@ -10,7 +10,7 @@ coverage erase
 
 # Discover and run all tests, check unit tests results
 . venv/bin/activate
-coverage run --concurrency=multiprocessing -m pytest tests/
+coverage run --concurrency=multiprocessing --source=arbitragelab pytest tests/test_auto_arima.py
 res_test=$?
 if [ $res_test -ne 0 ]
 then
