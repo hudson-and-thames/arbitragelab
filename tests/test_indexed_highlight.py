@@ -8,7 +8,7 @@ utils/indexed_highlight.py
 
 import warnings
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, MagicMock
 
 from arbitragelab.util.indexed_highlight import IndexedHighlight
 
@@ -29,7 +29,7 @@ class TestIndexedHighlight(unittest.TestCase):
         placeholder_annotation = Mock()
         placeholder_annotation.xyann = [0, 0]
 
-        artist = Mock(return_value=[])
+        artist = MagicMock(return_value=[])
         artist.color = "White"
         artist.visible = False
         artist.axes.annotate.return_value = placeholder_annotation

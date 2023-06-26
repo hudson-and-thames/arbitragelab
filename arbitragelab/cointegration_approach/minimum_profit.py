@@ -56,7 +56,7 @@ class MinimumProfit:
             raise Exception("Data Format Error. Should only contain two price series.")
 
         # Verify the index is indeed pd.DatetimeIndex
-        assert price_df.index.is_all_dates, "Index is not of pd.DatetimeIndex type."
+        assert isinstance(price_df.index, pd.DatetimeIndex), "Index is not of pd.DatetimeIndex type."
 
         self.price_df = price_df
 

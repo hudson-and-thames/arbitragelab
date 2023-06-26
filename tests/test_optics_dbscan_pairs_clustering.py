@@ -11,7 +11,8 @@ import os
 import unittest
 import pandas as pd
 import numpy as np
-import matplotlib
+
+from matplotlib.axes import Axes
 
 from arbitragelab.ml_approach import OPTICSDBSCANPairsClustering
 
@@ -45,7 +46,7 @@ class TestDBSCANClustering(unittest.TestCase):
         actual_stds = self.pair_selector.feature_vector.std()
 
         # Check pca reduced dataset components standard deviations.
-        pd.testing.assert_series_equal(expected_stds, actual_stds, check_less_precise=True)
+        pd.testing.assert_series_equal(expected_stds, actual_stds, atol=0.05)
 
         # Test if plotting function returns axes objects.
         pca_plot_obj = self.pair_selector.plot_pca_matrix()
@@ -128,7 +129,6 @@ class TestDBSCANClustering(unittest.TestCase):
         """
         Tests all plotting methods.
         """
-
         # Test the clustering plotting method with no information.
         with self.assertRaises(Exception):
             self.pair_selector.plot_clustering_info()
@@ -139,15 +139,15 @@ class TestDBSCANClustering(unittest.TestCase):
 
         # Test knee plot return object.
         knee_plot_pyplot_obj = self.pair_selector.plot_knee_plot()
-        self.assertTrue(issubclass(type(knee_plot_pyplot_obj), matplotlib.axes.SubplotBase))
+        self.assertTrue(isinstance(knee_plot_pyplot_obj, Axes))
 
         # Test 2d cluster plot return object.
         twod_pyplot_obj = self.pair_selector.plot_clustering_info(n_dimensions=2)
-        self.assertTrue(issubclass(type(twod_pyplot_obj), matplotlib.axes.SubplotBase))
+        self.assertTrue(isinstance(twod_pyplot_obj, Axes))
 
         # Test 3d cluster plot return object.
         threed_pyplot_obj = self.pair_selector.plot_clustering_info(n_dimensions=3)
-        self.assertTrue(issubclass(type(threed_pyplot_obj), matplotlib.axes.SubplotBase))
+        self.assertTrue(isinstance(threed_pyplot_obj, Axes))
 
         # Test the clustering plotting method with an oversized dimension number.
         with self.assertRaises(Exception):

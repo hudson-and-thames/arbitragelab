@@ -279,7 +279,7 @@ class PearsonStrategy:
 
         else:
             self.test_monthly_return = monthly_return
-            self.risk_free = self.risk_free.append(risk_free)
+            self.risk_free = pd.concat([self.risk_free, risk_free])
 
     def _beta_pairs_formation(self, num_pairs, weight):
         """

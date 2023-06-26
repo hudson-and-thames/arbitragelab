@@ -283,9 +283,9 @@ class TestTearSheet(unittest.TestCase):
                               residuals_dataframe)
 
         # Testing divs
-        self.assertEqual(str(type(jh_coint_test_div)), "<class 'dash_html_components.Div.Div'>")
-        self.assertEqual(str(type(jh_div)), "<class 'dash_html_components.Div.Div'>")
-        self.assertEqual(str(type(eg_div)), "<class 'dash_html_components.Div.Div'>")
+        self.assertEqual(str(type(jh_coint_test_div)), "<class 'dash.html.Div.Div'>")
+        self.assertEqual(str(type(jh_div)), "<class 'dash.html.Div.Div'>")
+        self.assertEqual(str(type(eg_div)), "<class 'dash.html.Div.Div'>")
 
     def test_spread_analysis(self):
         """
@@ -388,6 +388,6 @@ class TestTearSheet(unittest.TestCase):
                               norm_asset_price_1, norm_asset_price_2, asset_name_1, asset_name_2)
 
         # Testing divs
-        self.assertEqual(str(type(optimal_levels_div)), "<class 'dash_html_components.Div.Div'>")
-        self.assertEqual(str(type(optimal_levels_error_div)), "<class 'dash_html_components.Div.Div'>")
-        self.assertEqual(str(type(ou_div)), "<class 'dash_html_components.Div.Div'>")
+        self.assertEqual(str(type(optimal_levels_div)), "<class 'dash.html.Div.Div'>")
+        self.assertEqual(str(type(optimal_levels_error_div)), "<class 'dash.html.Div.Div'>")
+        self.assertEqual(str(type(ou_div)), "<class 'dash.html.Div.Div'>")
