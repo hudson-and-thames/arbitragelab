@@ -11,6 +11,8 @@ Changelog
 
 ..
     For Help: https://releases.readthedocs.io/en/latest/index.html
+* :release:`0.8.0 <2022-06-28>`
+* :support:`78` Bump dependencies.
 
 * :release:`0.7.0 <2022-07-04>`
 * :support:`73` Moved research notebooks to .zip format for distribution.
