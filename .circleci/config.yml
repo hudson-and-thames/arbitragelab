@@ -1,10 +1,15 @@
 version: 2.1
 
+workflows:
+  version: 2
+  main:
+    jobs:
+      - run_tests
+
 jobs:
   run_tests:
-    machine:
-      image: ubuntu-2004:202010-01
-    resource_class: medium
+    docker:
+      - image: circleci/python:3.8
     steps:
       # Step 1: obtain repo from GitHub
       - checkout
@@ -34,7 +39,3 @@ jobs:
       - store_artifacts:
           path: test-reports
 
-workflows:
-  main:
-    jobs:
-      - run_tests

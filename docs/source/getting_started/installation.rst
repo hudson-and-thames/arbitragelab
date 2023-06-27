@@ -45,7 +45,7 @@ Ubuntu Linux
 
    .. code-block::
 
-      pip install https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@raw.githubusercontent.com/hudson-and-thames-clients/arbitragelab/master/arbitragelab-0.7.0-py38-none-any.whl
+      pip install https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@raw.githubusercontent.com/hudson-and-thames-clients/arbitragelab/master/arbitragelab-0.8.0-py38-none-any.whl
 
 7. Add API key as an environment variable:
 
@@ -83,19 +83,8 @@ Ubuntu Linux
 
          If you are running Ubuntu on a virtual machine, you may find it easiest to use the ``os.environ`` method.
 
-8. (Optional) **Only if you want to use the ML Approach Module**, install the TensorFlow and Keras packages.
-   Supported TensorFlow and Keras versions are "tensorflow==2.8.0" and "keras==2.8.0".
-
-   To install TensorFlow and Keras:
-
-   .. code-block::
-
-      pip install "tensorflow==2.8.0"
-      pip install "keras==2.8.0"
-
 .. tip::
 
-   * We have added error handling which will raise an error if your environment variables are incorrect.
    * If you are having problems with the installation, please ping us on Slack and we will be able to assist.
 
 
@@ -131,7 +120,7 @@ Mac OS X
 
    .. code-block::
 
-      pip install https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@raw.githubusercontent.com/hudson-and-thames-clients/arbitragelab/master/arbitragelab-0.7.0-py38-none-any.whl
+      pip install https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@raw.githubusercontent.com/hudson-and-thames-clients/arbitragelab/master/arbitragelab-0.8.0-py38-none-any.whl
 
 7. Add API key as an environment variable:
 
@@ -159,19 +148,8 @@ Mac OS X
          os.environ['ARBLAB_API_KEY'] = "426303b02cb7475984b2d4843"
          import arbitragelab as al
 
-8. (Optional) **Only if you want to use the ML Approach Module**, install the TensorFlow and Keras packages.
-   Supported TensorFlow and Keras versions are "tensorflow==2.8.0" and "keras==2.8.0".
-
-   To install TensorFlow and Keras:
-
-   .. code-block::
-
-      pip install "tensorflow==2.8.0"
-      pip install "keras==2.8.0"
-
 .. tip::
 
-   * We have added error handling which will raise an error if your environment variables are incorrect.
    * If you are having problems with the installation, please ping us on Slack and we will be able to assist.
 
 
@@ -211,7 +189,7 @@ Windows
 
    .. code-block::
 
-      pip install https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@raw.githubusercontent.com/hudson-and-thames-clients/arbitragelab/master/arbitragelab-0.7.0-py38-none-any.whl
+      pip install https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@raw.githubusercontent.com/hudson-and-thames-clients/arbitragelab/master/arbitragelab-0.8.0-py38-none-any.whl
 
 7. Add API key as an environment variable:
 
@@ -237,19 +215,8 @@ Windows
          os.environ['ARBLAB_API_KEY'] = "26303adb02cb759b2"
          import arbitragelab as al
 
-8. (Optional) **Only if you want to use the ML Approach Module**, install the TensorFlow and Keras packages.
-   Supported TensorFlow and Keras versions are "tensorflow==2.8.0" and "keras==2.8.0".
-
-   To install TensorFlow and Keras:
-
-   .. code-block::
-
-      pip install "tensorflow==2.8.0"
-      pip install "keras==2.8.0"
-
 .. tip::
 
-   * We have added error handling which will raise an error if your environment variables are incorrect.
    * If you are having problems with the installation, please ping us on Slack and we will be able to assist.
 
 Important Notes

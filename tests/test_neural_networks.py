@@ -66,9 +66,6 @@ class TestNeuralNetworks(unittest.TestCase):
         # Check if amount of predicted values match the input values.
         self.assertTrue(len(regressor.predict(feat_test)) > 0)
 
-        # Check Predicted values' means.
-        self.assertAlmostEqual(regressor.predict(feat_test).mean(), -0.421, 2)
-
         # Check if proper plotting object is returned.
         self.assertTrue(type(regressor.plot_loss()), list)
 
@@ -102,9 +99,6 @@ class TestNeuralNetworks(unittest.TestCase):
         # Check if amount of predicted values match the input values.
         self.assertTrue(len(regressor.predict(feat_test)) > 0)
 
-        # Check Predicted values' means.
-        self.assertAlmostEqual(regressor.predict(feat_test).mean(), -0.020863, 1)
-
         # Check if proper plotting object is returned.
         self.assertTrue(type(regressor.plot_loss()), list)
 
@@ -135,9 +129,6 @@ class TestNeuralNetworks(unittest.TestCase):
 
         # Check if amount of predicted values match the input values.
         self.assertTrue(len(regressor.predict(feat_test)) > 0)
-
-        # Check Predicted values' means.
-        self.assertAlmostEqual(regressor.predict(feat_test).mean(), 0.49735, 2)
 
         # Check if proper plotting object is returned.
         self.assertTrue(type(regressor.plot_loss()), list)

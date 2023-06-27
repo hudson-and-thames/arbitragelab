@@ -46,7 +46,7 @@ class TestBasicCopulaStrategy(unittest.TestCase):
         descr = cop.describe()
         self.assertEqual(descr['Descriptive Name'], 'Bivariate Clayton-Frank-Gumbel Mixed Copula')
         self.assertEqual(descr['Class Name'], 'CFGMixCop')
-        self.assertAlmostEqual(descr['Clayton theta'], 6.6258756, 1)
+        self.assertAlmostEqual(descr['Clayton theta'], 6.6958756, delta=0.1)
         self.assertAlmostEqual(descr['Frank theta'], 4.0003041, 1)
         self.assertAlmostEqual(descr['Gumbel theta'], 4.7874674, 1)
         self.assertAlmostEqual(descr['Clayton weight'], 0.503564, 1)

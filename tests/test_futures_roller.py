@@ -6,9 +6,10 @@ Tests functionality of Futures Rolling module.
 """
 import os
 import unittest
-import matplotlib
+
 import numpy as np
 import pandas as pd
+from matplotlib.axes import Axes
 
 from arbitragelab.util.rollers import (CrudeOilFutureRoller, NBPFutureRoller, RBFutureRoller,
                                        GrainFutureRoller, EthanolFutureRoller, plot_historical_future_slope_state)
@@ -155,5 +156,4 @@ class TestFuturesRoller(unittest.TestCase):
         """
 
         result_plot = plot_historical_future_slope_state(self.eh1_data['PX_LAST'], self.eh2_data['PX_OPEN'])
-
-        self.assertTrue(issubclass(type(result_plot), matplotlib.axes.SubplotBase))
+        self.assertTrue(isinstance(result_plot, Axes))
