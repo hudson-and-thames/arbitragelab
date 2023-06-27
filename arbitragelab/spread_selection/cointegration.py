@@ -133,8 +133,8 @@ class CointegrationSpreadSelector(AbstractPairsSelector):
         :param adf_cutoff_threshold: (float) ADF test threshold used to define if the spread is cointegrated.
             Can be 0.99, 0.95 or 0.9.
         :param hurst_exp_threshold: (float) Max Hurst threshold value.
-        :param min_crossover_threshold: (int) Minimum amount of mean crossovers per year.
-        :param min_half_life: (float) Minimum Half-Life of mean reversion value.
+        :param min_crossover_threshold: (int) Minimum amount of mean crossovers per analysed period.
+        :param min_half_life: (float) Minimum Half-Life of mean reversion value in units of time used.
         :return: (list) Tuple list of final pairs.
         """
 
@@ -171,8 +171,8 @@ class CointegrationSpreadSelector(AbstractPairsSelector):
         :param adf_cutoff_threshold: (float) ADF test threshold used to define if the spread is cointegrated.
             Can be 0.99, 0.95 or 0.9.
         :param hurst_exp_threshold: (float) Max Hurst threshold value.
-        :param min_crossover_threshold: (int) Minimum amount of mean crossovers per year.
-        :param min_half_life: (float) Minimum Half-Life of mean reversion value.
+        :param min_crossover_threshold: (int) Minimum amount of mean crossovers per analysed period.
+        :param min_half_life: (float) Minimum Half-Life of mean reversion value in units of time used.
         :return: (list) Tuple list of final pairs.
         """
 
