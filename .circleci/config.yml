@@ -4,10 +4,11 @@ workflows:
   version: 2
   main:
     jobs:
-      - run_tests
+      - test-code
+      - test-docs
 
 jobs:
-  run_tests:
+  test-code:
     docker:
       - image: circleci/python:3.8
     steps:
@@ -39,3 +40,27 @@ jobs:
       - store_artifacts:
           path: test-reports
 
+  test-docs:
+    docker:
+      - image: circleci/python:3.8
+    steps:
+      - checkout
+      - run:
+          name: Install requirements
+          command: |
+            python 3 -m venv venv
+            . venv/bin/activate
+            pip install -r requirements.txt
+            pip install -r docs/source/requirements.txt
+
+      - run:
+          name: Build documentation
+          command: |
+            . venv/bin/activate
+            make -C docs html
+
+      - run:
+          name: Run doctests
+          command: |
+            . venv/bin/activate
+            make -C docs doctest
