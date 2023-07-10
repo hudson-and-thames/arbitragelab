@@ -168,17 +168,27 @@ Code Example
 
    # Importing packages
    import pandas as pd
-   from arbitragelab.distance_approach.arima_predict import AutoARIMAForecast
-   from arbitragelab.distance_approach.quantile_time_series import QuantileTimeSeriesTradingStrategy
+   from arbitragelab.time_series_approach.arima_predict import AutoARIMAForecast
+   from arbitragelab.time_series_approach.quantile_time_series import QuantileTimeSeriesTradingStrategy
 
-   # Getting the dataframe with spread time series of a cointegrated set of assets
-   data = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])
+   # Load Non Negative Crude and Gasoline futures data.
+   wti_contract_df = pd.read_csv('https://raw.githubusercontent.com/hudson-and-thames/example-data/main/arbitrage_lab_data/NonNegative_CL_forward_roll.csv').set_index('Dates')
+   rbob_contract_df = pd.read_csv('https://raw.githubusercontent.com/hudson-and-thames/example-data/main/arbitrage_lab_data/NonNegative_nRB_forward_roll.csv').set_index('Dates')
+
+   working_df = pd.concat([wti_contract_df, rbob_contract_df], axis=1)
+   working_df.index = pd.to_datetime(working_df.index) 
+   working_df.columns = ['wti', 'gasoline']
+
+   working_df.dropna(inplace=True)
+
+   # Calculate naive spread between gasoline and wti.
+   sprd = (working_df['gasoline'] - working_df['wti'])
 
    # Dividing the dataset into two parts - the first one for model fitting
-   data_model_fitting = data.loc[:'2019-01-01']
+   data_model_fitting = sprd.loc[:'2019-01-01']
 
    # And the second one for signals generation
-   data_signals_generation = data.loc['2019-01-01':]
+   data_signals_generation = sprd.loc['2019-01-01':]
 
    # Setting the ARIMA model
    arima_model = AutoARIMAForecast(start_p=1, start_q=1, max_p=10, max_q=10)
