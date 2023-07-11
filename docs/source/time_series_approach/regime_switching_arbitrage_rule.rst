@@ -312,7 +312,7 @@ Code Example
     cl_rule = lambda Xt, mu, delta, sigma: Xt >= mu
     cs_rule = lambda Xt, mu, delta, sigma: Xt <= mu
 
-    RSAR.change_strategy("High", "Long", "Open", ol_rule)
+    RSAR.change_strategy("High", "Long", "Open", cl_rule)
     RSAR.change_strategy("High", "Short", "Close", cs_rule)
 
     # Getting signals on a rolling basis
