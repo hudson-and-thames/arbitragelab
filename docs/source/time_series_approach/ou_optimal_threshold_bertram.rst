@@ -264,7 +264,7 @@ Code Example
     >>> # Plotting the impact of risk-free rates on the optimal entry threshold
     >>> fig = OUOTB.plot_target_vs_rf(target = "a", method = "maximize_sharpe_ratio",
                                   rf_list = rf_list, c = 0.001)
-    >>> plt.show()
+    >>> plt.show() # doctest: +ELLIPSIS
     array(...)
 
 Research Notebooks
