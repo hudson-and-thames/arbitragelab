@@ -266,67 +266,75 @@ Examples
 Code Example
 ************
 
-.. code-block::
+.. doctest::
 
-    # Importing packages
-    import matplotlib.pyplot as plt
-    import yfinance as yf
-    from arbitragelab.time_series_approach.regime_switching_arbitrage_rule import RegimeSwitchingArbitrageRule
+    >>> # Importing packages
+    >>> import matplotlib.pyplot as plt
+    >>> import yfinance as yf
+    >>> from arbitragelab.time_series_approach.regime_switching_arbitrage_rule import RegimeSwitchingArbitrageRule
 
-    plt.rcParams['figure.figsize'] = (24, 12)
+    >>> plt.rcParams['figure.figsize'] = (24, 12)
 
-    # Loading data
-    data =  yf.download("CL=F NG=F", start="2015-01-01", end="2020-01-01")["Adj Close"]
+    >>> # Loading data
+    >>> data =  yf.download("CL=F NG=F", start="2015-01-01", end="2020-01-01")["Adj Close"]
 
-    # Constructing spread series
-    Ratt = data["NG=F"]/data["CL=F"]
+    >>> # Constructing spread series
+    >>> Ratt = data["NG=F"]/data["CL=F"]
 
-    # Creating a class instance for getting the positions
-    RSAR = RegimeSwitchingArbitrageRule(delta = 1.5, rho = 0.6)
+    >>> # Creating a class instance for getting the positions
+    >>> RSAR = RegimeSwitchingArbitrageRule(delta = 1.5, rho = 0.6)
 
-    # Setting window size
-    window_size = 60
+    >>> # Setting window size
+    >>> window_size = 60
 
-    # Getting current signal
-    signal = RSAR.get_signal(Ratt[-window_size:], switching_variance = False,
+    >>> # Getting current signal
+    >>> signal = RSAR.get_signal(Ratt[-window_size:], switching_variance = False,
                              silence_warnings = True)
-    print("Open a long trade:", signal[0]) 
-    print("Close a long trade:", signal[1]) 
-    print("Open a short trade:", signal[2]) 
-    print("Close a short trade:", signal[3])
+    >>> print("Open a long trade:", signal[0])
+    True 
+    >>> print("Close a long trade:", signal[1])
+    False 
+    >>> print("Open a short trade:", signal[2])
+    False 
+    >>> print("Close a short trade:", signal[3])
+    True
 
-    # Getting signals on a rolling basis
-    signals = RSAR.get_signals(Ratt, window_size, switching_variance = True,
+    >>> # Getting signals on a rolling basis
+    >>> signals = RSAR.get_signals(Ratt, window_size, switching_variance = True,
                                silence_warnings = True)
-    print(signals.shape)
+    >>> print(signals.shape)
+    (...)
 
-    # Deciding the trades based on the signals
-    trades = RSAR.get_trades(signals)
-    print(trades.shape)
+    >>> # Deciding the trades based on the signals
+    >>> trades = RSAR.get_trades(signals)
+    >>> print(trades.shape)
+    (...)
 
-    # Plotting trades
-    fig = RSAR.plot_trades(Ratt, trades)
-    plt.show()
+    >>> # Plotting trades
+    >>> fig = RSAR.plot_trades(Ratt, trades)
+    >>> plt.show()
 
-    # Changing rules
-    cl_rule = lambda Xt, mu, delta, sigma: Xt >= mu
-    cs_rule = lambda Xt, mu, delta, sigma: Xt <= mu
+    >>> # Changing rules
+    >>> cl_rule = lambda Xt, mu, delta, sigma: Xt >= mu
+    >>> cs_rule = lambda Xt, mu, delta, sigma: Xt <= mu
 
-    RSAR.change_strategy("High", "Long", "Open", cl_rule)
-    RSAR.change_strategy("High", "Short", "Close", cs_rule)
+    >>> RSAR.change_strategy("High", "Long", "Open", cl_rule)
+    >>> RSAR.change_strategy("High", "Short", "Close", cs_rule)
 
-    # Getting signals on a rolling basis
-    signals = RSAR.get_signals(Ratt, window_size, switching_variance = True,
+    >>> # Getting signals on a rolling basis
+    >>> signals = RSAR.get_signals(Ratt, window_size, switching_variance = True,
                                silence_warnings = True)
-    print(signals.shape)
+    >>> print(signals.shape)
+    (...)
 
-    # Deciding the trades based on the signals
-    trades = RSAR.get_trades(signals)
-    print(trades.shape)
+    >>> # Deciding the trades based on the signals
+    >>> trades = RSAR.get_trades(signals)
+    >>> print(trades.shape)
+    (...)
 
-    # Plotting trades
-    fig = RSAR.plot_trades(Ratt, trades)
-    plt.show()
+    >>> # Plotting trades
+    >>> fig = RSAR.plot_trades(Ratt, trades)
+    >>> plt.show() # doctest: +ELLIPSIS
 
 Research Notebook
 #################
