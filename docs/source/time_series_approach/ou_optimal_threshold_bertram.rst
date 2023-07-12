@@ -208,56 +208,64 @@ Examples
 Code Example
 ************
 
-.. code-block::
+.. doctest::
 
-    # Importing packages
-    import numpy as np
-    import matplotlib.pyplot as plt
-    from arbitragelab.time_series_approach.ou_optimal_threshold_bertram import OUModelOptimalThresholdBertram
+    >>> # Importing packages
+    >>> # import numpy as np
+    >>> # import matplotlib.pyplot as plt
+    >>> # from arbitragelab.time_series_approach.ou_optimal_threshold_bertram import OUModelOptimalThresholdBertram
 
-    # Creating a class instance
-    OUOTB = OUModelOptimalThresholdBertram()
+    >>> # Creating a class instance
+    >>> OUOTB = OUModelOptimalThresholdBertram()
 
-    # Initializing OU-process parameter
-    OUOTB.construct_ou_model_from_given_parameters(theta = 0, mu = 180.9670, sigma = 0.1538)
+    >>> # Initializing OU-process parameter
+    >>> OUOTB.construct_ou_model_from_given_parameters(theta = 0, mu = 180.9670, sigma = 0.1538)
 
-    # Getting optimal thresholds by maximizing the expected return
-    a, m = OUOTB.get_threshold_by_maximize_expected_return(c = 0.001)
+    >>> # Getting optimal thresholds by maximizing the expected return
+    >>> a, m = OUOTB.get_threshold_by_maximize_expected_return(c = 0.001)
 
-    # Getting the expected return and the variance
-    E = OUOTB.expected_return(a = a, m = m, c = 0.001)
-    V = OUOTB.return_variance(a = a, m = m, c = 0.001)
+    >>> # Getting the expected return and the variance
+    >>> E = OUOTB.expected_return(a = a, m = m, c = 0.001)
+    >>> V = OUOTB.return_variance(a = a, m = m, c = 0.001)
 
-    print("Entering a trade when Xt =", a)
-    print("Exiting the trade at Xt =", m)
-    print("Expected Return:", E)
-    print("Variance:", V)
+    >>> print("Entering a trade when Xt =", a)
+    0.0...
+    >>> print("Exiting the trade at Xt =", m)
+    0.0...
+    >>> print("Expected Return:", E)
+    0.0...
+    >>> print("Variance:", V)
+    0.0...
 
-    # Getting optimal thresholds by maximizing the Sharpe ratio
-    a, m = OUOTB.get_threshold_by_maximize_sharpe_ratio(c = 0.001, rf = 0.01)
+    >>> # Getting optimal thresholds by maximizing the Sharpe ratio
+    >>> a, m = OUOTB.get_threshold_by_maximize_sharpe_ratio(c = 0.001, rf = 0.01)
 
-    # Getting the Sharpe ratio
-    S = OUOTB.sharpe_ratio(a = a, m = m, c = 0.001, rf = 0.01)
+    >>> # Getting the Sharpe ratio
+    >>> S = OUOTB.sharpe_ratio(a = a, m = m, c = 0.001, rf = 0.01)
 
-    print("Entering a trade when Xt =", a)
-    print("Exiting the trade at Xt =", m)
-    print("Sharpe Ratio:", S)
+    >>> print("Entering a trade when Xt =", a)
+    0.0...
+    >>> print("Exiting the trade at Xt =", m)
+    0.0...
+    >>> print("Sharpe Ratio:", S)
+    0.0...
 
-    # Setting a array contains transaction costs
-    c_list = np.linspace(0, 0.01, 30)
+    >>> # Setting a array contains transaction costs
+    >>> c_list = np.linspace(0, 0.01, 30)
 
-    # Plotting the impact of transaction costs on the optimal entry threshold
-    fig = OUOTB.plot_target_vs_c(target = "a", method = "maximize_expected_return",
+    >>> # Plotting the impact of transaction costs on the optimal entry threshold
+    >>> fig = OUOTB.plot_target_vs_c(target = "a", method = "maximize_expected_return",
                                  c_list = c_list)
-    plt.show()
+    >>> plt.show()
 
-    # Setting a array contains risk-free rates. 
-    rf_list = np.linspace(0, 0.05, 30)
+    >>> # Setting a array contains risk-free rates. 
+    >>> rf_list = np.linspace(0, 0.05, 30)
 
-    # Plotting the impact of risk-free rates on the optimal entry threshold
-    fig = OUOTB.plot_target_vs_rf(target = "a", method = "maximize_sharpe_ratio",
+    >>> # Plotting the impact of risk-free rates on the optimal entry threshold
+    >>> fig = OUOTB.plot_target_vs_rf(target = "a", method = "maximize_sharpe_ratio",
                                   rf_list = rf_list, c = 0.001)
-    plt.show()
+    >>> plt.show()
+    array(...)
 
 Research Notebooks
 ******************
