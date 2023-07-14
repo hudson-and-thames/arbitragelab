@@ -34,8 +34,8 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.coverage',
     'sphinx.ext.intersphinx',
-#   'sphinx.ext.viewcode',
-    'releases'
+    'sphinx.ext.doctest',
+    'releases',
 ]
 
 
