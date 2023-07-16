@@ -270,13 +270,14 @@ Code Example
 
     >>> # Creating a class instance
     >>> OUOTZ = OUModelOptimalThresholdZeng()
+    doctest.ELLIPSIS = '...'
 
     >>> # Initializing OU-process parameter
     >>> OUOTZ.construct_ou_model_from_given_parameters(theta = 3.4241, mu = 0.0237, sigma = 0.0081)
-
+    doctest.ELLIPSIS = '...'
     >>> # Getting optimal thresholds by Conventional Optimal Rule.
     >>> a_s, b_s, a_l, b_l = OUOTZ.get_threshold_by_conventional_optimal_rule(c = 0.02)
-
+    doctest.ELLIPSIS = '...'
     >>> print("Entering a short position when Xt =", a_s)
     Entering a short position when Xt = 3...
     >>> print("Exiting a short position when Xt =", b_s)
@@ -302,7 +303,7 @@ Code Example
     Long trade variance: 2...e-05
     >>> # Getting optimal thresholds by New Optimal Rule.
     >>> a_s, b_s, a_l, b_l = OUOTZ.get_threshold_by_new_optimal_rule(c = 0.02)
-    doctest.ELLIPSIS_MARKER = '...'
+    doctest.ELLIPSIS = '...'
     >>> print("Entering a short position when Xt =", a_s)
     Entering a short position when Xt = 3...
 
@@ -334,34 +335,34 @@ Code Example
     >>> # Comparison of the expected return between the Conventional Optimal Rule and New Optimal Rule.
     >>> c_list = np.linspace(0, 0.02, 30)
     >>> fig_con = OUOTZ.plot_target_vs_c(target = "expected_return",
-                                     method = "conventional_optimal_rule",
-                                     c_list = c_list)
+    >>>                              method = "conventional_optimal_rule",
+    >>>                              c_list = c_list)
     >>> fig_new = OUOTZ.plot_target_vs_c(target = "expected_return", method = "new_optimal_rule", c_list = c_list)
-    doctest.ELLIPSIS_MARKER = '...'
+    doctest.ELLIPSIS = '...'
     >>> plt.show()
-    doctest.ELLIPSIS_MARKER = '...'
+    doctest.ELLIPSIS = '...'
 
     >>> # Combining two figures.
     >>> ax_con = fig_con.gca()
-    doctest.ELLIPSIS_MARKER = '...'
+    doctest.ELLIPSIS = '...'
     >>> ax_new = fig_new.gca()
-    doctest.ELLIPSIS_MARKER = '...'
+    doctest.ELLIPSIS = '...'
 
     >>> x = ax_con.lines[0].get_xdata()
-    doctest.ELLIPSIS_MARKER = '...'
+    doctest.ELLIPSIS = '...'
     >>> y_con = ax_con.lines[0].get_ydata()
-    doctest.ELLIPSIS_MARKER = '...'
+    doctest.ELLIPSIS = '...'
     >>> y_new = ax_new.lines[0].get_ydata()
-    doctest.ELLIPSIS_MARKER = '...'
+    doctest.ELLIPSIS = '...'
 
     >>> plt.plot(x, y_con, label = "Conventional Optimal Rule")
-    doctest.ELLIPSIS_MARKER = '...'
+    doctest.ELLIPSIS = '...'
     >>> plt.plot(x, y_new, label = "New Optimal Rule")
-    doctest.ELLIPSIS_MARKER = '...'
+    doctest.ELLIPSIS = '...'
     >>> plt.legend()
-    doctest.ELLIPSIS_MARKER = '...'
+    doctest.ELLIPSIS = '...'
     >>> plt.show()
-    doctest.ELLIPSIS_MARKER = '...'
+    doctest.ELLIPSIS = '...'
 
 Research Notebooks
 ******************
