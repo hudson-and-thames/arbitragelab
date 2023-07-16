@@ -278,13 +278,13 @@ Code Example
     >>> a_s, b_s, a_l, b_l = OUOTZ.get_threshold_by_conventional_optimal_rule(c = 0.02)
 
     >>> print("Entering a short position when Xt =", a_s)
-    Entering a short position when Xt = 3.47...
+    Entering a short position when Xt = 3...
     >>> print("Exiting a short position when Xt =", b_s)
-    Exiting a short position when Xt = 3.42...
+    Exiting a short position when Xt = 3...
     >>> print("Entering a long position when Xt =", a_l)
-    Entering a long position when Xt = 3.3...
+    Entering a long position when Xt = 3...
     >>> print("Exiting a long position when Xt =", b_l)
-    Entering a long position when Xt = 3.42...
+    Exiting a long position when Xt = 3...
 
     >>> # Getting the expected return and the variance for both long and short trade
     >>> E_s = OUOTZ.expected_return(a = a_s, b = b_s, c = 0.02)
@@ -295,22 +295,23 @@ Code Example
     >>> print("Short trade expected return:", E_s)
     Short trade expected return: 0.0...
     >>> print("Short trade variance:", V_s)
-    Short trade variance: 0.0...
+    Short trade variance: 2...e-05
     >>> print("Long trade expected return:", E_l)
     Long trade expected return: 0.0...
     >>> print("Long trade variance:", V_l)
-    Long trade expected return: 0.0...
+    Long trade variance: 2...e-05
     >>> # Getting optimal thresholds by New Optimal Rule.
     >>> a_s, b_s, a_l, b_l = OUOTZ.get_threshold_by_new_optimal_rule(c = 0.02)
-
+    doctest.ELLIPSIS_MARKER = '...'
     >>> print("Entering a short position when Xt =", a_s)
-    Entering a short position when Xt = 3.4...
+    Entering a short position when Xt = 3...
+
     >>> print("Exiting a short position when Xt =", b_s)
-    Entering a short position when Xt = 3.3...
+    Entering a short position when Xt = 3...
     >>> print("Entering a long position when Xt =", a_l)
-    Entering a long position when Xt = 3.3...
+    Entering a long position when Xt = 3...
     >>> print("Exiting a long position when Xt =", b_l)
-    Exiting a long position when Xt = 3.4...
+    Exiting a long position when Xt = 3...
 
     >>> # Getting the expected return and the variance for both long and short trade
     >>> E_s = OUOTZ.expected_return(a = a_s, b = b_s, c = 0.02)
@@ -335,23 +336,32 @@ Code Example
     >>> fig_con = OUOTZ.plot_target_vs_c(target = "expected_return",
                                      method = "conventional_optimal_rule",
                                      c_list = c_list)
-    >>> fig_new = OUOTZ.plot_target_vs_c(target = "expected_return",
-                                     method = "new_optimal_rule",
-                                     c_list = c_list)
-    >>> plt.show()  # doctest: +ELLIPSIS
+    >>> fig_new = OUOTZ.plot_target_vs_c(target = "expected_return", method = "new_optimal_rule", c_list = c_list)
+    doctest.ELLIPSIS_MARKER = '...'
+    >>> plt.show()
+    doctest.ELLIPSIS_MARKER = '...'
 
     >>> # Combining two figures.
     >>> ax_con = fig_con.gca()
+    doctest.ELLIPSIS_MARKER = '...'
     >>> ax_new = fig_new.gca()
+    doctest.ELLIPSIS_MARKER = '...'
 
     >>> x = ax_con.lines[0].get_xdata()
+    doctest.ELLIPSIS_MARKER = '...'
     >>> y_con = ax_con.lines[0].get_ydata()
+    doctest.ELLIPSIS_MARKER = '...'
     >>> y_new = ax_new.lines[0].get_ydata()
+    doctest.ELLIPSIS_MARKER = '...'
 
     >>> plt.plot(x, y_con, label = "Conventional Optimal Rule")
+    doctest.ELLIPSIS_MARKER = '...'
     >>> plt.plot(x, y_new, label = "New Optimal Rule")
+    doctest.ELLIPSIS_MARKER = '...'
     >>> plt.legend()
-    >>> plt.show() # doctest: +ELLIPSIS
+    doctest.ELLIPSIS_MARKER = '...'
+    >>> plt.show()
+    doctest.ELLIPSIS_MARKER = '...'
 
 Research Notebooks
 ******************

@@ -277,7 +277,7 @@ Code Example
 
     >>> # Loading data
     >>> data =  yf.download("CL=F NG=F", start="2015-01-01", end="2020-01-01")["Adj Close"]
-
+    doctest.ELLIPSIS_MARKER = '...'
     >>> # Constructing spread series
     >>> Ratt = data["NG=F"]/data["CL=F"]
 
@@ -288,29 +288,30 @@ Code Example
     >>> window_size = 60
 
     >>> # Getting current signal
-    >>> signal = RSAR.get_signal(Ratt[-window_size:], switching_variance = False,
-                             silence_warnings = True)
+    >>> signal = RSAR.get_signal(Ratt[-window_size:], switching_variance = False, silence_warnings = True)
     >>> print("Open a long trade:", signal[0])
-    True 
+    Open a long trade: True 
     >>> print("Close a long trade:", signal[1])
-    False 
+    Close a long trade: False 
     >>> print("Open a short trade:", signal[2])
-    False 
+    Open a short trade: False 
     >>> print("Close a short trade:", signal[3])
-    True
+    Close a short trade: True
 
     >>> # Getting signals on a rolling basis
-    >>> signals = RSAR.get_signals(Ratt, window_size, switching_variance = True,
-                               silence_warnings = True)
-    >>> print(signals.shape) # doctest: +ELLIPSIS
+    >>> signals = RSAR.get_signals(Ratt, window_size, switching_variance = True, silence_warnings = True)
+    >>> print(signals.shape)
+    doctest.ELLIPSIS_MARKER = '...'
 
     >>> # Deciding the trades based on the signals
     >>> trades = RSAR.get_trades(signals)
-    >>> print(trades.shape) # doctest: +ELLIPSIS
+    >>> print(trades.shape)
+    doctest.ELLIPSIS_MARKER = '...'
 
     >>> # Plotting trades
     >>> fig = RSAR.plot_trades(Ratt, trades)
     >>> plt.show()
+    doctest.ELLIPSIS_MARKER = '...'
 
     >>> # Changing rules
     >>> cl_rule = lambda Xt, mu, delta, sigma: Xt >= mu
@@ -322,15 +323,18 @@ Code Example
     >>> # Getting signals on a rolling basis
     >>> signals = RSAR.get_signals(Ratt, window_size, switching_variance = True,
                                silence_warnings = True)
-    >>> print(signals.shape) # doctest: +ELLIPSIS
+    >>> print(signals.shape)
+    doctest.ELLIPSIS_MARKER = '...'
 
     >>> # Deciding the trades based on the signals
     >>> trades = RSAR.get_trades(signals)
-    >>> print(trades.shape) # doctest: +ELLIPSIS
+    >>> print(trades.shape)
+    doctest.ELLIPSIS_MARKER = '...'
 
     >>> # Plotting trades
     >>> fig = RSAR.plot_trades(Ratt, trades)
-    >>> plt.show() # doctest: +ELLIPSIS
+    >>> plt.show()
+    doctest.ELLIPSIS_MARKER = '...'
 
 Research Notebook
 #################

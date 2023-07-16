@@ -186,9 +186,11 @@ Code Example
 
    >>> # Dividing the dataset into two parts - the first one for model fitting
    >>> data_model_fitting = sprd.loc[:'2019-01-01']
+   doctest.ELLIPSIS_MARKER = '...'
 
    >>> # And the second one for signals generation
    >>> data_signals_generation = sprd.loc['2019-01-01':]
+   doctest.ELLIPSIS_MARKER = '...'
 
    >>> # Setting the ARIMA model
    >>> arima_model = AutoARIMAForecast(start_p=1, start_q=1, max_p=10, max_q=10)
@@ -204,16 +206,17 @@ Code Example
 
    >>> # Plotting thresholds used for trading
    >>> time_series_trading.plot_thresholds()
-
+   doctest.ELLIPSIS_MARKER = '...'
    >>> # Generating out-of-sample ARIMA prediction
    >>> oos_prediction = arima_model.predict(y=data_signals_generation, silence_warnings = True)
-
+   doctest.ELLIPSIS_MARKER = '...'
    >>># Using the difference between prediction and actual value to trade the spread
    >>> for prediction, actual in zip(oos_prediction, data_signals_generation):
    >>>     time_series_trading.get_allocation(predicted_difference=prediction-actual, exit_threshold=0)
-
+   doctest.ELLIPSIS_MARKER = '...'
    >>> # Get the trading signals created using quantile time series strategy
-   >>> positions = pd.Series(index=data_signals_generation.index, data=time_series_trading.positions) # doctest: +ELLIPSIS
+   >>> positions = pd.Series(index=data_signals_generation.index, data=time_series_trading.positions)
+   doctest.ELLIPSIS_MARKER = '...'
 
 Research Notebooks
 ******************

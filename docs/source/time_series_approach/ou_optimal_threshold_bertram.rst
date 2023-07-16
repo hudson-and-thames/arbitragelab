@@ -217,54 +217,62 @@ Code Example
 
     >>> # Creating a class instance
     >>> OUOTB = OUModelOptimalThresholdBertram()
+    doctest.ELLIPSIS_MARKER = '...'
 
     >>> # Initializing OU-process parameter
     >>> OUOTB.construct_ou_model_from_given_parameters(theta = 0, mu = 180.9670, sigma = 0.1538)
-
+    doctest.ELLIPSIS_MARKER = '...'
     >>> # Getting optimal thresholds by maximizing the expected return
     >>> a, m = OUOTB.get_threshold_by_maximize_expected_return(c = 0.001)
-
+    doctest.ELLIPSIS_MARKER = '...'
     >>> # Getting the expected return and the variance
     >>> E = OUOTB.expected_return(a = a, m = m, c = 0.001)
+    doctest.ELLIPSIS_MARKER = '...'
     >>> V = OUOTB.return_variance(a = a, m = m, c = 0.001)
+    doctest.ELLIPSIS_MARKER = '...'
 
     >>> print("Entering a trade when Xt =", a)
-    0.0...
+    Entering a trade when Xt = 0.0...
     >>> print("Exiting the trade at Xt =", m)
-    0.0...
+    Exiting the trade at Xt = 0.0...
     >>> print("Expected Return:", E)
-    0.0...
+    Expected Return: 0.0...
     >>> print("Variance:", V)
-    0.0...
+    Variance: 0.0...
 
     >>> # Getting optimal thresholds by maximizing the Sharpe ratio
     >>> a, m = OUOTB.get_threshold_by_maximize_sharpe_ratio(c = 0.001, rf = 0.01)
-
+    doctest.ELLIPSIS_MARKER = '...'
     >>> # Getting the Sharpe ratio
     >>> S = OUOTB.sharpe_ratio(a = a, m = m, c = 0.001, rf = 0.01)
+    doctest.ELLIPSIS_MARKER = '...'
 
     >>> print("Entering a trade when Xt =", a)
-    0.0...
+    Entering a trade when Xt = 0.0...
     >>> print("Exiting the trade at Xt =", m)
-    0.0...
+    Exiting the trade at Xt = 0.0...
     >>> print("Sharpe Ratio:", S)
-    0.0...
+    Sharpe Ratio: 0.0...
 
     >>> # Setting a array contains transaction costs
     >>> c_list = np.linspace(0, 0.01, 30)
+    doctest.ELLIPSIS_MARKER = '...'
 
     >>> # Plotting the impact of transaction costs on the optimal entry threshold
-    >>> fig = OUOTB.plot_target_vs_c(target = "a", method = "maximize_expected_return",
-                                 c_list = c_list)
+    >>> fig = OUOTB.plot_target_vs_c(target = "a", method = "maximize_expected_return", c_list = c_list)
+    doctest.ELLIPSIS_MARKER = '...'
     >>> plt.show()
+    doctest.ELLIPSIS_MARKER = '...'
 
     >>> # Setting a array contains risk-free rates. 
     >>> rf_list = np.linspace(0, 0.05, 30)
+    doctest.ELLIPSIS_MARKER = '...'
 
     >>> # Plotting the impact of risk-free rates on the optimal entry threshold
-    >>> fig = OUOTB.plot_target_vs_rf(target = "a", method = "maximize_sharpe_ratio",
-                                  rf_list = rf_list, c = 0.001)
-    >>> plt.show() # doctest: +ELLIPSIS
+    >>> fig = OUOTB.plot_target_vs_rf(target = "a", method = "maximize_sharpe_ratio", rf_list = rf_list, c = 0.001)
+    doctest.ELLIPSIS_MARKER = '...'
+    >>> plt.show()
+    doctest.ELLIPSIS_MARKER = '...'
 
 Research Notebooks
 ******************

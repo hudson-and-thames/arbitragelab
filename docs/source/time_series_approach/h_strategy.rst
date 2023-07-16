@@ -322,11 +322,11 @@ HConstruction
 
     >>> #Getting H-statistics
     >>> print("H-inversion:", hc.h_inversion())
-    19
+    H-inversion: 19
     >>> print("H-distances:", hc.h_distances())
-    1.4...
+    H-distances: 1.4...
     >>> print("H-volatility:", hc.h_volatility())
-    0.0...
+    H-volatility: 0.0...
 
     >>> # Getting signals
     >>> signals = hc.get_signals("contrarian")
@@ -336,7 +336,9 @@ HConstruction
     >>> returns = data["KO"]["2020"].pct_change() - data["PEP"]["2020"].pct_change()
     >>> total_returns = ((positions.shift(1)*returns).dropna() + 1).cumprod()
     >>> total_returns.plot()
-    >>> plt.show() # doctest: +ELLIPSIS
+    doctest.ELLIPSIS_MARKER = '...'
+    >>> plt.show()
+    doctest.ELLIPSIS_MARKER = '...'
 
 HSelection
 **********
@@ -353,7 +355,7 @@ HSelection
     >>> # Loading data
     >>> tickers = "AAPL MFST AMZN FB GOOGL GOOG TSLA NVDA JPM"
     >>> data = yf.download(tickers, start="2019-01-01", end="2020-12-31")["Adj Close"]
-
+    doctest.ELLIPSIS_MARKER = '...'
     >>> # Creating a class object
     >>> hs = HSelection(data)
     >>> hs.select()
@@ -361,8 +363,8 @@ HSelection
     >>> # Getting pairs
     >>> pairs = hs.get_pairs(5, "highest", False)
     >>> for p in pairs:
-            print("H-inversion:", p[0], "Threshold for H-construction:", p[1], "Pairs:", p[2]) # doctest: +ELLIPSIS
-
+    >>>     print("H-inversion:", p[0], "Threshold for H-construction:", p[1], "Pairs:", p[2])
+    doctest.ELLIPSIS_MARKER = '...'
 Research Notebooks
 ******************
 
