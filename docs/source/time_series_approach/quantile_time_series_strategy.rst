@@ -214,7 +214,6 @@ Code Example
 
    >>> # Get the trading signals created using quantile time series strategy
    >>> positions = pd.Series(index=data_signals_generation.index, data=time_series_trading.positions) # doctest: +ELLIPSIS
-   array([...
 
 Research Notebooks
 ******************

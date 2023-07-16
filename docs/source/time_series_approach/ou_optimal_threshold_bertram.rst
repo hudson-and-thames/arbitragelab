@@ -265,7 +265,6 @@ Code Example
     >>> fig = OUOTB.plot_target_vs_rf(target = "a", method = "maximize_sharpe_ratio",
                                   rf_list = rf_list, c = 0.001)
     >>> plt.show() # doctest: +ELLIPSIS
-    array(...)
 
 Research Notebooks
 ******************

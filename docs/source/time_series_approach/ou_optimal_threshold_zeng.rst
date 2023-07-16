@@ -338,8 +338,7 @@ Code Example
     >>> fig_new = OUOTZ.plot_target_vs_c(target = "expected_return",
                                      method = "new_optimal_rule",
                                      c_list = c_list)
-    >>> plt.show()
-    array(...)
+    >>> plt.show()  # doctest: +ELLIPSIS
 
     >>> # Combining two figures.
     >>> ax_con = fig_con.gca()

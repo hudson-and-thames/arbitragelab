@@ -302,13 +302,11 @@ Code Example
     >>> # Getting signals on a rolling basis
     >>> signals = RSAR.get_signals(Ratt, window_size, switching_variance = True,
                                silence_warnings = True)
-    >>> print(signals.shape)
-    (...)
+    >>> print(signals.shape) # doctest: +ELLIPSIS
 
     >>> # Deciding the trades based on the signals
     >>> trades = RSAR.get_trades(signals)
-    >>> print(trades.shape)
-    (...)
+    >>> print(trades.shape) # doctest: +ELLIPSIS
 
     >>> # Plotting trades
     >>> fig = RSAR.plot_trades(Ratt, trades)
@@ -324,13 +322,11 @@ Code Example
     >>> # Getting signals on a rolling basis
     >>> signals = RSAR.get_signals(Ratt, window_size, switching_variance = True,
                                silence_warnings = True)
-    >>> print(signals.shape)
-    (...)
+    >>> print(signals.shape) # doctest: +ELLIPSIS
 
     >>> # Deciding the trades based on the signals
     >>> trades = RSAR.get_trades(signals)
-    >>> print(trades.shape)
-    (...)
+    >>> print(trades.shape) # doctest: +ELLIPSIS
 
     >>> # Plotting trades
     >>> fig = RSAR.plot_trades(Ratt, trades)
