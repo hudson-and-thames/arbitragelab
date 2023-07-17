@@ -311,8 +311,8 @@ HConstruction
     >>> from arbitragelab.time_series_approach.h_strategy import HConstruction
 
     >>> # Loading data
-    >>> data = yf.download("KO PEP", start="2019-01-01", end="2020-12-31")["Adj Close"] # doctest: +SKIP
-
+    >>> data = yf.download("KO PEP", start="2019-01-01", end="2020-12-31")["Adj Close"] # doctest: +ELLIPSIS
+    ...
     >>> # Constructing spread series
     >>> series = np.log(data["KO"]) - np.log(data["PEP"])
 
@@ -355,12 +355,14 @@ HSelection
 
     >>> # Creating a class object
     >>> hs = HSelection(data)
-    >>> hs.select() # doctest: +SKIP
+    >>> hs.select() # doctest: +ELLIPSIS
+    ...
 
     >>> # Getting pairs
     >>> pairs = hs.get_pairs(5, "highest", False)
     >>> for p in pairs:
-    >>>     print("H-inversion:", p[0], "Threshold for H-construction:", p[1], "Pairs:", p[2])
+    ...     print("H-inversion:", p[0], "Threshold for H-construction:", p[1], "Pairs:", p[2])
+    ...
     H-inversion: 34 Threshold for H-construction: 0.003407973347664936 Pairs: ('GOOG', 'GOOGL')
     H-inversion: 12 Threshold for H-construction: 0.13... Pairs: ('AAPL', 'NVDA')
     H-inversion: 12 Threshold for H-construction: 0.10... Pairs: ('META', 'MSFT')
