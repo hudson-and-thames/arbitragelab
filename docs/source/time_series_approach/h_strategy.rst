@@ -351,7 +351,8 @@ HSelection
 
     >>> # Loading data
     >>> tickers = "AAPL MFST AMZN FB GOOGL GOOG TSLA NVDA JPM"
-    >>> data = yf.download(tickers, start="2019-01-01", end="2020-12-31")["Adj Close"] #doctest: +SKIP
+    >>> data = yf.download(tickers, start="2019-01-01", end="2020-12-31")["Adj Close"] # doctest: +ELLIPSIS
+    ...
 
     >>> # Creating a class object
     >>> hs = HSelection(data)
