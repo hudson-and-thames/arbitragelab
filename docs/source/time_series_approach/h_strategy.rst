@@ -311,7 +311,7 @@ HConstruction
     >>> from arbitragelab.time_series_approach.h_strategy import HConstruction
 
     >>> # Loading data
-    >>> data = yf.download("KO PEP", start="2019-01-01", end="2020-12-31")["Adj Close"] # doctest: +ELLIPSIS
+    >>> data = yf.download("KO PEP", start="2019-01-01", end="2020-12-31")["Adj Close"] # doctest: +IGNORE_OUTPUT
     ...
     >>> # Constructing spread series
     >>> series = np.log(data["KO"]) - np.log(data["PEP"])
@@ -350,8 +350,8 @@ HSelection
     >>> from arbitragelab.time_series_approach.h_strategy import HSelection
 
     >>> # Loading data
-    >>> tickers = "AAPL MFST AMZN FB GOOGL GOOG TSLA NVDA JPM"
-    >>> data = yf.download(tickers, start="2019-01-01", end="2020-12-31")["Adj Close"] # doctest: +ELLIPSIS
+    >>> tickers = "AAPL MSFT AMZN META GOOGL GOOG TSLA NVDA JPM"
+    >>> data = yf.download(tickers, start="2019-01-01", end="2020-12-31")["Adj Close"] # doctest: +IGNORE_OUTPUT
     ...
 
     >>> # Creating a class object
