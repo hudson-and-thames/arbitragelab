@@ -311,7 +311,7 @@ HConstruction
     >>> from arbitragelab.time_series_approach.h_strategy import HConstruction
 
     >>> # Loading data
-    >>> data =  yf.download("KO PEP", start="2019-01-01", end="2020-12-31")["Adj Close"] # doctest: +SKIP
+    >>> data = yf.download("KO PEP", start="2019-01-01", end="2020-12-31")["Adj Close"] # doctest: +SKIP
 
     >>> # Constructing spread series
     >>> series = np.log(data["KO"]) - np.log(data["PEP"])
