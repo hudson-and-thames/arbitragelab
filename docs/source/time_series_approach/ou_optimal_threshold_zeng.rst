@@ -343,8 +343,8 @@ Code Example
     >>> y_new = ax_new.lines[0].get_ydata()
 
     >>> plt.plot(x, y_con, label = "Conventional Optimal Rule") # doctest: +SKIP
-    >>> plt.plot(x, y_new, label = "New Optimal Rule")
-    >>> plt.legend()
+    >>> plt.plot(x, y_new, label = "New Optimal Rule") # doctest: +SKIP
+    >>> plt.legend() # doctest: +SKIP
     >>> plt.show()
 
 
