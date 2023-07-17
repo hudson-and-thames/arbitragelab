@@ -336,7 +336,6 @@ Code Example
 
     >>> # Combining two figures.
     >>> ax_con = fig_con.gca()
-    # doctest: +ELLIPSIS
     >>> ax_new = fig_new.gca()
 
     >>> x = ax_con.lines[0].get_xdata()
@@ -344,9 +343,13 @@ Code Example
     >>> y_new = ax_new.lines[0].get_ydata()
 
     >>> plt.plot(x, y_con, label = "Conventional Optimal Rule") # doctest: +ELLIPSIS
+    ...
     >>> plt.plot(x, y_new, label = "New Optimal Rule") # doctest: +ELLIPSIS
+    ...
     >>> plt.legend() # doctest: +ELLIPSIS
+    ...
     >>> plt.show() # doctest: +ELLIPSIS
+    ...
 
 
 Research Notebooks
