@@ -17,9 +17,9 @@ from scipy.stats import (kurtosis, skew, shapiro)
 from statsmodels.tsa.stattools import (pacf, adfuller, acf)
 import dash
 from dash.dependencies import (Input, Output)
-import dash_core_components as dcc
-import dash_html_components as html
-import dash_table
+from dash import dcc
+from dash import html
+from dash import dash_table
 import plotly.graph_objects as go
 from jupyter_dash import JupyterDash
 
