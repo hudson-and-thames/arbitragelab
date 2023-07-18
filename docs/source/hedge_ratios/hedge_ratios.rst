@@ -197,10 +197,10 @@ Code Example
     >>> import pandas as pd
     >>> import numpy as np
     >>> from arbitragelab.hedge_ratios import (get_ols_hedge_ratio, get_tls_hedge_ratio,
-                                           get_johansen_hedge_ratio,
-                                           get_box_tiao_hedge_ratio,
-                                           get_minimum_hl_hedge_ratio,
-                                           get_adf_optimal_hedge_ratio)
+    ...                                    get_johansen_hedge_ratio,
+    ...                                    get_box_tiao_hedge_ratio,
+    ...                                    get_minimum_hl_hedge_ratio,
+    ...                                    get_adf_optimal_hedge_ratio)
 
     >>> # Getting the dataframe with time series of asset prices
     >>> url = "https://raw.githubusercontent.com/hudson-and-thames/example-data/main/arbitrage_lab_data/gld_gdx_data.csv"
