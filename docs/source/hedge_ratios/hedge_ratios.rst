@@ -228,7 +228,7 @@ Code Example
     ...                                                              dependent_variable='GLD')
 
     >>> print(f'Minimum HL hedge ratio for GLD/GDX spread is {hl_hedge_ratio}')
-    Minimum HL hedge ratio for GDL/GDX spread is {'GLD': 1.0, 'GDX': 7.42...}
+    Minimum HL hedge ratio for GLD/GDX spread is {'GLD': 1.0, 'GDX': 7.42...}
 
     >>> print(opt_object.status)
     0
@@ -236,7 +236,7 @@ Code Example
     >>> adf_hedge_ratio, _, _, _, opt_object = get_adf_optimal_hedge_ratio(data,
     ...                                                                dependent_variable='GLD')
     >>> print(f'Minimum ADF t-statistic hedge ratio for GLD/GDX spread is {adf_hedge_ratio}')
-    Minimum ADF t-statistic hedge ratio for GDL/GDX spread is {'GLD': 1.0, 'GDX': 7.0...}
+    Minimum ADF t-statistic hedge ratio for GLD/GDX spread is {'GLD': 1.0, 'GDX': 7.0...}
 
     >>> print(opt_object.status)
     0
