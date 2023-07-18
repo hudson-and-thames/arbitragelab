@@ -208,7 +208,7 @@ Code Example
     
 
     >>> ols_hedge_ratio, _, _, _ = get_ols_hedge_ratio(data, dependent_variable='GLD',
-                                                   add_constant=False)
+    ...                                            add_constant=False)
     >>> print(f'OLS hedge ratio for GLD/GDX spread is {ols_hedge_ratio}')
     OLS hedge ratio for GLD/GDX spread is {'GLD': 1.0, 'GDX': 7.6...}
 
