@@ -1,6 +1,6 @@
 "Tests for the `segment` module"
 
-# pylint: disbale=redefined-outer-name
+# pylint: disable=redefined-outer-name
 
 from unittest import mock
 
