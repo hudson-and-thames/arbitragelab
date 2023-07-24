@@ -97,7 +97,7 @@ Examples
     # Importing packages
     import pandas as pd
     import numpy as np
-    from arbitragelab.spread_selection import CointegrationSpreadSelector
+    from arbitragelab.spread_selection.cointegration import CointegrationSpreadSelector
 
     data = pd.read_csv('sp100_prices.csv', index_col=0, parse_dates=[0])
     input_spreads = [('ABMD', 'AZO'), ('AES', 'BBY'), ('BKR', 'CE'), ('BKR', 'CE', 'AMZN')]
