@@ -161,3 +161,35 @@ to add the ``ARBLAB_API_KEY`` environment variable before importing
    import os
 
    os.environ["ARBLAB_API_KEY"] = "<your-api-key>"
+
+
+Fixing "No MAC Address Found" Errors
+####################################
+
+Depending on your setup, especially when using a VPN service or application,
+importing ``arbitragelab`` may cause a "No MAC Address Found" error to be
+raised. This occurs when attempting to verify your API key, and occurs when we
+are unable to access the MAC address of your computer's network device. This is
+usually the result of a virtual network device, associated with your VPN, that
+doesn't report a physical MAC address.
+
+The workaround is to manually specify your physical hardware network interface
+name using another environment variable, ``ARBLAB_MAC_INTERFACE``:
+
+For Windows:
+
+.. code-block::
+
+   setx ARBLAB_MAC_INTERFACE "<your-network-interface>"
+
+
+For Linux / MacOS:
+
+.. code-block::
+
+   # In ~/.bashrc, ~/.zshrc, or ~/.profile, depending on platform
+   ARBLAB_MAC_INTERFACE="<your-network-interface>"
+
+
+With this environment variable set (remember to ``source`` your rc files if
+you're on Linux or MacOS), you should now be able to import the package normally.
