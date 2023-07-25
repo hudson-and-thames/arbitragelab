@@ -9,8 +9,8 @@ Changelog
     * :feature:`50` Add a distutils command for marbles
     * :bug:`58` Fixed test failure on OSX
 
-..
-    For Help: https://releases.readthedocs.io/en/latest/index.html
+* :support:`91` Allow user to specify network interface for MAC address
+
 * :release:`0.8.0 <2022-06-28>`
 * :support:`78` Bump dependencies.
 
