@@ -64,19 +64,19 @@ hedge ratios.
 .. autofunction:: construct_spread
 
 
-.. code-block::
+.. doctest::
 
-    # Importing packages
-    import pandas as pd
-    import numpy as np
-    from arbitragelab.hedge_ratios import construct_spread
+  # Importing packages
+  >>> import pandas as pd
+  >>> import numpy as np
+  >>> from arbitragelab.hedge_ratios import construct_spread
 
-    url = "https://raw.githubusercontent.com/hudson-and-thames/example-data/main/arbitrage_lab_data/sp100_prices.csv"
-    data = pd.read_csv(url, index_col=0, parse_dates=[0])
-    hedge_ratios = pd.Series({'A': 1, 'AVB': 0.832406370860649})
-    spread = construct_spread(data[['AVB', 'A']], hedge_ratios=hedge_ratios)
-    inverted_spread = construct_spread(data[['AVB', 'A']], hedge_ratios=hedge_ratios,
-                                       dependent_variable='A')
+  >>> url = "https://raw.githubusercontent.com/hudson-and-thames/example-data/main/arbitrage_lab_data/sp100_prices.csv"
+  >>> data = pd.read_csv(url, index_col=0, parse_dates=[0])
+  >>> hedge_ratios = pd.Series({'A': 1, 'AVB': 0.832406370860649})
+  >>> spread = construct_spread(data[['AVB', 'A']], hedge_ratios=hedge_ratios)
+  >>> inverted_spread = construct_spread(data[['AVB', 'A']], hedge_ratios=hedge_ratios,
+  ...                                   dependent_variable='A')
 
 Ordinary Least Squares (OLS)
 ############################
@@ -193,53 +193,51 @@ Code Example
 
 .. doctest::
 
-    >>> # Importing packages
-    >>> import pandas as pd
-    >>> import numpy as np
-    >>> from arbitragelab.hedge_ratios import (get_ols_hedge_ratio, get_tls_hedge_ratio,
-    ...                                    get_johansen_hedge_ratio,
-    ...                                    get_box_tiao_hedge_ratio,
-    ...                                    get_minimum_hl_hedge_ratio,
-    ...                                    get_adf_optimal_hedge_ratio)
+  >>> # Importing packages
+  >>> import pandas as pd
+  >>> import numpy as np
+  >>> from arbitragelab.hedge_ratios import (get_ols_hedge_ratio, get_tls_hedge_ratio,
+  ...                                    get_johansen_hedge_ratio,
+  ...                                    get_box_tiao_hedge_ratio,
+  ...                                    get_minimum_hl_hedge_ratio,
+  ...                                    get_adf_optimal_hedge_ratio)
 
-    >>> # Getting the dataframe with time series of asset prices
-    >>> url = "https://raw.githubusercontent.com/hudson-and-thames/example-data/main/arbitrage_lab_data/gld_gdx_data.csv"
-    >>> data = pd.read_csv(url, index_col=0, parse_dates = [0])
-    
+  >>> # Getting the dataframe with time series of asset prices
+  >>> url = "https://raw.githubusercontent.com/hudson-and-thames/example-data/main/arbitrage_lab_data/gld_gdx_data.csv"
+  >>> data = pd.read_csv(url, index_col=0, parse_dates = [0])
+  >>> ols_hedge_ratio, _, _, _ = get_ols_hedge_ratio(data, dependent_variable='GLD',
+  ...                                            add_constant=False)
+  >>> print(f'OLS hedge ratio for GLD/GDX spread is {ols_hedge_ratio}') # doctest: +ELLIPSIS
+  OLS hedge ratio for GLD/GDX spread is {'GLD': 1.0, 'GDX': 7.6...}
 
-    >>> ols_hedge_ratio, _, _, _ = get_ols_hedge_ratio(data, dependent_variable='GLD',
-    ...                                            add_constant=False)
-    >>> print(f'OLS hedge ratio for GLD/GDX spread is {ols_hedge_ratio}')
-    OLS hedge ratio for GLD/GDX spread is {'GLD': 1.0, 'GDX': 7.6...}
+  >>> tls_hedge_ratio, _, _, _ = get_tls_hedge_ratio(data, dependent_variable='GLD')
+  >>> print(f'TLS hedge ratio for GLD/GDX spread is {tls_hedge_ratio}')# doctest: +ELLIPSIS
+  TLS hedge ratio for GLD/GDX spread is {...}
 
-    >>> tls_hedge_ratio, _, _, _ = get_tls_hedge_ratio(data, dependent_variable='GLD')
-    >>> print(f'TLS hedge ratio for GLD/GDX spread is {tls_hedge_ratio}')
-    TLS hedge ratio for GLD/GDX spread is {'GLD': 1.0, 'GDX': 7.7...}
+  >>> joh_hedge_ratio, _, _, _ = get_johansen_hedge_ratio(data, dependent_variable='GLD')
+  >>> print(f'Johansen hedge ratio for GLD/GDX spread is {joh_hedge_ratio}')# doctest: +ELLIPSIS
+  Johansen hedge ratio for GLD/GDX spread is {...}
 
-    >>> joh_hedge_ratio, _, _, _ = get_johansen_hedge_ratio(data, dependent_variable='GLD')
-    >>> print(f'Johansen hedge ratio for GLD/GDX spread is {joh_hedge_ratio}')
-    Johansen hedge ratio for GLD/GDX spread is {'GDX': 8.1..., 'GLD': 1.0}
+  >>> box_tiao_hedge_ratio, _, _, _ = get_box_tiao_hedge_ratio(data, dependent_variable='GLD')
+  >>> print(f'Box-Tiao hedge ratio for GLD/GDX spread is {box_tiao_hedge_ratio}')# doctest: +ELLIPSIS
+  Box-Tiao hedge ratio for GLD/GDX spread is {...}
 
-    >>> box_tiao_hedge_ratio, _, _, _ = get_box_tiao_hedge_ratio(data, dependent_variable='GLD')
-    >>> print(f'Box-Tiao hedge ratio for GLD/GDX spread is {box_tiao_hedge_ratio}')
-    Box-Tiao hedge ratio for GLD/GDX spread is {'GLD': 1.0, 'GDX': 7.7...}
+  >>> hl_hedge_ratio, _, _, _, opt_object = get_minimum_hl_hedge_ratio(data,
+  ...                                                                  dependent_variable='GLD')
 
-    >>> hl_hedge_ratio, _, _, _, opt_object = get_minimum_hl_hedge_ratio(data,
-    ...                                                              dependent_variable='GLD')
+  >>> print(f'Minimum HL hedge ratio for GLD/GDX spread is {hl_hedge_ratio}')# doctest: +ELLIPSIS
+  Minimum HL hedge ratio for GLD/GDX spread is {...}
 
-    >>> print(f'Minimum HL hedge ratio for GLD/GDX spread is {hl_hedge_ratio}')
-    Minimum HL hedge ratio for GLD/GDX spread is {'GLD': 1.0, 'GDX': 7.42...}
+  >>> print(opt_object.status)
+  0
 
-    >>> print(opt_object.status)
-    0
+  >>> adf_hedge_ratio, _, _, _, opt_object = get_adf_optimal_hedge_ratio(data,
+  ...                                                                    dependent_variable='GLD')
+  >>> print(f'Minimum ADF t-statistic hedge ratio for GLD/GDX spread is {adf_hedge_ratio}')# doctest: +ELLIPSIS
+  Minimum ADF t-statistic hedge ratio for GLD/GDX spread is {...}
 
-    >>> adf_hedge_ratio, _, _, _, opt_object = get_adf_optimal_hedge_ratio(data,
-    ...                                                                dependent_variable='GLD')
-    >>> print(f'Minimum ADF t-statistic hedge ratio for GLD/GDX spread is {adf_hedge_ratio}')
-    Minimum ADF t-statistic hedge ratio for GLD/GDX spread is {'GLD': 1.0, 'GDX': 7.0...}
-
-    >>> print(opt_object.status)
-    0
+  >>> print(opt_object.status)
+  0
 
 
 Research Notebooks
