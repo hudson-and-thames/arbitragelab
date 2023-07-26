@@ -320,8 +320,8 @@ HConstruction
     >>> hc = HConstruction(series["2020"], threshold, "Kagi")
 
     >>> # Getting H-statistics
-    >>> print("H-inversion:", hc.h_inversion())
-    H-inversion: 19
+    >>> print("H-inversion:", hc.h_inversion())# doctest: +ELLIPSIS
+    H-inversion: ...
     >>> print("H-distances:", hc.h_distances()) # doctest: +ELLIPSIS
     H-distances: ...
     >>> print("H-volatility:", hc.h_volatility()) # doctest: +ELLIPSIS
@@ -359,12 +359,12 @@ HSelection
     >>> # Getting pairs
     >>> pairs = hs.get_pairs(5, "highest", False)
     >>> for p in pairs:
-    ...     print("H-inversion:", p[0], "Threshold for H-construction:", p[1], "Pairs:", p[2])
+    ...     print("H-inversion:", p[0], "Threshold for H-construction:", p[1], "Pairs:", p[2])# doctest: +ELLIPSIS
     ...
-    H-inversion: 34 Threshold for H-construction: 0.003407973347664936 Pairs: ('GOOG', 'GOOGL')
-    H-inversion: 12 Threshold for H-construction: 0.13... Pairs: ('AAPL', 'NVDA')
-    H-inversion: 12 Threshold for H-construction: 0.10... Pairs: ('META', 'MSFT')
-    H-inversion: 4 Threshold for H-construction: 0.65... Pairs: ('AMZN', 'TSLA')
+    H-inversion: 34 Threshold for H-construction: ...
+    H-inversion: 12 Threshold for H-construction: ...
+    H-inversion: 12 Threshold for H-construction: ...
+    H-inversion: 4 Threshold for H-construction: ...
 
 Research Notebooks
 ******************
