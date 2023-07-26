@@ -22,7 +22,7 @@ copyright = '2019, Hudson & Thames Quantitative Research.'
 author = 'Hudson & Thames Quantitative Research'
 
 # The full version, including alpha/beta/rc tags
-release = '0.8.0'
+release = '0.8.1'
 
 
 # -- General configuration ---------------------------------------------------
@@ -34,8 +34,8 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.coverage',
     'sphinx.ext.intersphinx',
-#   'sphinx.ext.viewcode',
-    'releases'
+    'sphinx.ext.doctest',
+    'releases',
 ]
 
 

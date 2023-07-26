@@ -27,15 +27,16 @@ tensorflow-macos==2.12.0; sys_platform == 'darwin' and platform_machine == 'arm6
 tensorflow==2.12.0; sys_platform != 'darwin' or platform_machine != 'arm64'
 werkzeug==2.2.3
 yahoo-fin==0.8.9.1
-yfinance==0.2.20
+yfinance==0.2.24
 
 # Develop
-coverage==5.4
+coverage==7.2.7
 docutils==0.16 # Docs
 hudsonthames-sphinx-theme==0.1.5 # Docs
 jinja2<3.1 # Docs
 pyarmor==8.2.5 # Encryption
 pylint==2.6.0
+pytest==7.3.1
 releases==1.6.3 # Docs
 sphinx-rtd-theme==0.5.2 # Docs
 sphinx==3.4.3 # Docs
