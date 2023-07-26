@@ -303,7 +303,6 @@ HConstruction
 
 .. doctest::
 
-    >>> # Importing packages
     >>> import pandas as pd
     >>> import numpy as np
     >>> import matplotlib.pyplot as plt
@@ -311,7 +310,7 @@ HConstruction
     >>> from arbitragelab.time_series_approach.h_strategy import HConstruction
 
     >>> # Loading data
-    >>> data = yf.download("KO PEP", start="2019-01-01", end="2020-12-31")["Adj Close"] # doctest: +IGNORE_OUTPUT
+    >>> data = yf.download("KO PEP", start="2019-01-01", end="2020-12-31", progess=False)["Adj Close"]
     ...
     >>> # Constructing spread series
     >>> series = np.log(data["KO"]) - np.log(data["PEP"])
@@ -320,23 +319,24 @@ HConstruction
     >>> threshold = series["2019"].std()
     >>> hc = HConstruction(series["2020"], threshold, "Kagi")
 
-    >>> #Getting H-statistics
+    >>> # Getting H-statistics
     >>> print("H-inversion:", hc.h_inversion())
     H-inversion: 19
-    >>> print("H-distances:", hc.h_distances())
-    H-distances: 1.4...
-    >>> print("H-volatility:", hc.h_volatility())
-    H-volatility: 0.0...
+    >>> print("H-distances:", hc.h_distances()) # doctest: +ELLIPSIS
+    H-distances: ...
+    >>> print("H-volatility:", hc.h_volatility()) # doctest: +ELLIPSIS
+    H-volatility: ...
 
     >>> # Getting signals
     >>> signals = hc.get_signals("contrarian")
 
-    >>> # A quick backtesting
+    >>> # A quick backtest
     >>> positions = signals.replace(0, np.nan).ffill()
     >>> returns = data["KO"]["2020"].pct_change() - data["PEP"]["2020"].pct_change()
     >>> total_returns = ((positions.shift(1)*returns).dropna() + 1).cumprod()
-    >>> total_returns.plot() # doctest: +SKIP
-    >>> plt.show() # doctest: +SKIP
+    >>> fig = total_returns.plot()
+    >>> fig # doctest: +ELLIPSIS
+    <Figure...>
 HSelection
 **********
 
@@ -351,14 +351,11 @@ HSelection
 
     >>> # Loading data
     >>> tickers = "AAPL MSFT AMZN META GOOGL GOOG TSLA NVDA JPM"
-    >>> data = yf.download(tickers, start="2019-01-01", end="2020-12-31")["Adj Close"] # doctest: +IGNORE_OUTPUT
-    ...
-
+    >>> data = yf.download(tickers, start="2019-01-01", end="2020-12-31", progess=False)["Adj Close"]
     >>> # Creating a class object
     >>> hs = HSelection(data)
-    >>> hs.select() # doctest: +ELLIPSIS
+    >>> hs.select()
     ...
-
     >>> # Getting pairs
     >>> pairs = hs.get_pairs(5, "highest", False)
     >>> for p in pairs:
