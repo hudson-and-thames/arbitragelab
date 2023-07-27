@@ -14,37 +14,44 @@
 ArbitrageLab is a python library that enables traders who want to exploit mean-reverting portfolios
 by providing a complete set of algorithms from the best academic journals.
 
-## Documentation, Example Notebooks and Lecture Videos
-For every technique present in the library we not only provide extensive documentation, with both theoretical explanations
-and detailed descriptions of available functions, but also supplement the modules with ever-growing array of lecture videos and slides 
-on the implemented methods.
- 
-We want you to be able to use the tools right away. To achieve that, every module comes with a number of example notebooks 
-which include detailed examples of the usage of the algorithms. Our goal is to show you the whole pipeline, starting from 
-importing the libraries and ending with strategy performance metrics so you can get the added value from the get-go.
 
-## Licensing options
-This project is licensed under an all rights reserved [licence](https://github.com/hudson-and-thames/mlfinlab/blob/master/LICENSE.txt).
+## Development
 
-* Business
-* Enterprise
+### Creating a release
 
-## Community
-With the purchase of the library, our clients get access to the Hudson & Thames Slack community, where our engineers and other quants 
-are always ready to answer your questions.
+- Create `release/<version>` branch
+- Bump versions throughout source files (we use `bump2version` to do automate this process, TODO: Add instructions)
+- Update customer install instructions in documentation source files
+- Update release information in changelog in documentation source files
+- Open PR from `release` branch into `develop`
+- Merge PR once approved
+- Obfuscate `develop` using PyArmor (instructions are located elsewhere in this README)
+- Test you can install the wheel from a fresh environment
+- Merge `develop` into `master`
+- Upload the obfuscated wheel to the Hudson & Thames Clients organization
+- Tag the commit with the version number
+- Write a blog post announcing the release
+- Send a newsletter email
+- Post on social media
 
-Alternatively, you can email us at: research@hudsonthames.org.
+### Bumping version numbers using `bump2version`
 
-<div align="center">
-   <a>
-   <img src="https://hudsonthames.org/wp-content/uploads/2021/11/header_github_ht.jpg" width="100%" 
-   style="margin-left: auto; margin-right: auto; display:block;">
-   </a>
-</div>
+We use `bump2version` to automatically bump versions throughout source files.
 
-## Who is Hudson & Thames?
-Hudson and Thames Quantitative Research is a company with the goal of bridging the gap between the advanced research developed in 
-quantitative finance and its practical application. We have created three premium python libraries so you can effortlessly access the
-latest techniques and focus on what matters most: **creating your own winning strategy**.
+Configuration lives in the `.bumpversion.cfg` file. To run `bump2version`, first install it via `pip`:
 
-### What was only possible with the help of huge R&D teams is now at your disposal, anywhere, anytime.
+``` sh
+pip install --upgrade bump2version
+```
+
+And then bump the version:
+
+``` sh
+bump2version <version-bump-type>
+```
+
+where `<version-bump-type>` tells you which version to be bumped. The acceptable
+values are `major`, `minor` or `patch`, conforming to the semantic versioning
+pattern: `major.minor.patch`. For example, `3.2.7` has a major version of 3, a
+minor version of 2 and a patch version of 7.
+
