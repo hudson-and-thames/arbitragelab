@@ -82,10 +82,13 @@ def get_mac():
     """
     Identify the device by MAC Address
     """
-    mac = getmac.get_mac_address()
 
+    mac = getmac.get_mac_address(os.environ.get("ARBLAB_MAC_INTERFACE"))
     if mac is None:
-        raise Exception(" No MAC Address is found on this device, must have a MAC Address.")
+        raise ValueError("No MAC Address is found on this device, must have a MAC Address."
+                         " If using a VPN, you might be able to resolve this by specifying"
+                         " the correct interface manually using the PORTLAB_MAC_INTERFACE environment"
+                         " variable.")
 
     return mac
 
