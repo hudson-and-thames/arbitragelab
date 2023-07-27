@@ -4,223 +4,192 @@
 Installation
 ============
 
-Recommended Versions
-####################
 
-* Anaconda
-* Python 3.8.
+API Keys
+########
+In order to use ``arbitragelab``, you will require an API key. This is provided to
+you when you purchase ArbitrageLab, and can be found on the client portal. If you are unable to find your API key, please reach out to sales@hudsonthames.org.
 
-Installation
+Recommended Setup on Windows
+############################
+
+#. Download and install the latest version of `Anaconda 3 <https://www.anaconda.com/products/individual>`__
+#. Launch Anaconda Navigator
+#. Click Environments, choose an environment name, select Python 3.8, and click Create
+#. Click Home, browse to your new environment, and click Install under Jupyter Notebook
+#. Launch the Anaconda Prompt and activate the environment:
+
+   .. code-block::
+
+      conda activate <env_name>
+
+#. Install ArbitrageLab using ``pip``:
+
+   .. code-block::
+
+      pip install https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@raw.githubusercontent.com/hudson-and-thames-clients/arbitragelab/master/arbitragelab-0.8.1-py38-none-any.whl
+
+
+#. Make sure your API key is available in your environment under the ``ARBLAB_API_KEY`` environment variable by opening the Command Prompt as an administrator, and running the following command:
+
+   .. code-block::
+
+      setx ARBLAB_API_KEY "<your-api-key"
+
+   where you replace ``<your-api-key`` with your ArbitrageLab API key you received
+   when you purchased a subscription.
+
+   Verify that your API key is available in your environment by executing the following in a **new** command prompt terminal:
+
+   .. code-block::
+
+      echo %ARBLAB_API_KEY%
+
+   which should echo your API key to the terminal.
+
+#. You are now ready to use ArbitrageLab.
+
+
+Recommended Setup on Linux / MacOS
+##################################
+
+.. note::
+
+   If you are running on Apple Silicon, you will need to make sure `Homebrew
+   <https://brew.sh/>`__ is installed, and that you have installed ``cmake``:
+
+   .. code-block::
+
+      brew install cmake
+
+
+
+#. Install some variant of ``conda`` environment manager (we recommend Anaconda or Miniconda) for your platform.
+#. Launch a new terminal and create a new ``conda`` environment using your environment manager:
+
+   .. code-block::
+
+      conda create -n <env_name> python=3.8
+
+#. Make sure the environment is activated:
+
+   .. code-block::
+
+      conda activate <env_name>
+
+#. Install ArbitrageLab using ``pip``:
+
+   .. code-block::
+
+      pip install https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@raw.githubusercontent.com/hudson-and-thames-clients/arbitragelab/master/arbitragelab-0.8.1-py38-none-any.whl
+
+#. Make sure your API key is available in your environment under the ``ARBLAB_API_KEY`` environment variable.
+
+   If you're running on **Linux or MacOS**, you can add the following to your
+   ``~/.zshrc``, ``~/.bashrc`` or ``~/.profile`` file in order to make the API
+   key available:
+
+   .. code-block::
+
+      ARBLAB_API_KEY="<your-api-key>"
+
+   where you replace ``<your-api-key`` with your ArbitrageLab API key you received
+   when you purchased a subscription.
+
+   .. note::
+
+      Remember to close and open a new terminal, or ``source`` your terminal
+      configuration to make sure the environment gets refreshed with our new
+      ``ARBLAB_API_KEY`` variable.
+
+
+   Verify that your API key is available in your environment by executing the following in your refreshed terminal
+
+   .. code-block::
+
+      echo $ARBLAB_API_KEY
+
+   which should echo your API key to the terminal.
+
+
+#. You are now ready to use ArbitrageLab.
+
+
+Google Colab
 ############
 
-Ubuntu Linux
-************
+.. note::
 
-0. Set up Git (if you haven't already, the following `link <https://docs.github.com/en/free-pro-team@latest/github/getting-started-with-github/set-up-git>`__ provides a nice guide.)
-1. Make sure you install the latest version of the Anaconda distribution. To do this you can follow the install and update instructions found on this `link <https://www.anaconda.com/products/individual>`_
-2. Launch a terminal
-3. Create a New Conda Environment. From terminal.
+   Google Colab frequently updates the version of Python it used. You might need to
+   explore additional methods of using a Python 3.8 kernel for full support of
+   ArbitrageLab. We are currently working on bring Python 3.9+ support.
 
-   .. code-block::
-
-      conda create -n <env name> python=3.8
-
-   Accept all the requests to install.
-
-4. Now activate the environment with:
+#. Open a new Terminal, and install ArbitrageLab using ``pip``:
 
    .. code-block::
 
-      source activate <env name>
-
-5. Contact Hudson & Thames sales team and purchase ArbitrageLab. You will be provided with an API key.
-
-   .. code-block::
-
-       Example: "26303adb02cb759b2"
-
-6. Install ArbitrageLab into your python environment via the terminal.
-
-   Please make sure to use this exact statement:
-
-   .. code-block::
-
-      pip install https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@raw.githubusercontent.com/hudson-and-thames-clients/arbitragelab/master/arbitragelab-0.8.0-py38-none-any.whl
-
-7. Add API key as an environment variable:
-
-   7.1 The Best Way:
-
-      By adding the API key as an environment variable, you won't need to constantly add the key every time you import the library.
-
-      * Open the terminal and run: ``sudo gedit /etc/environment``
-      * This will open a text editor.
-      * Add the following environment variable: ``ARBLAB_API_KEY="26303adb02cb759b2"``
-      * Note that you must add your own API key and not the one given in this example.
-      * Save the file and Logout or restart your computer. (If you skip this step, it won't register the change)
-      * To confirm your new env variable is active: ``echo $ARBLAB_API_KEY``
-
-      .. tip::
-
-         * If you are using Ubuntu on WSL (Windows Subsystem for Linux), then you should add this environment variable
-           to ~/.profile. Since you always load WSL from bash, this would make sure that the environment variable could
-           be loaded each time you start the virtual machine, which in turn ensured that Python can pick it up.
+      pip install https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@raw.githubusercontent.com/hudson-and-thames-clients/arbitragelab/master/arbitragelab-0.8.1-py38-none-any.whl
 
 
-   7.2 The Easy Way:
+#. Insert the following in the first cell of your notebook in order to register your API key
 
-      If you don't want the key to persist on your local machine, you can always declare it each time, before you import ArbitrageLab.
+.. code-block:: python
 
-      * In your python script or notebook, add the following line before you import ArbitrageLab:
+   # Insert this at the start of your script or notebook
+   import os
 
-      .. code::
-
-         import os
-         os.environ['ARBLAB_API_KEY'] = "26303adb02cb759b2"
-         import arbitragelab as al
-
-      .. tip::
-
-         If you are running Ubuntu on a virtual machine, you may find it easiest to use the ``os.environ`` method.
-
-.. tip::
-
-   * If you are having problems with the installation, please ping us on Slack and we will be able to assist.
+   os.environ["ARBLAB_API_KEY"] = "<your-api-key>"
 
 
-Mac OS X
-********
-
-0. Set up Git (if you haven't already, the following `link <https://docs.github.com/en/free-pro-team@latest/github/getting-started-with-github/set-up-git>`__ provides a nice guide.)
-1. Make sure you install the latest version of the Anaconda distribution. To do this you can follow the install and update instructions found on this `link <https://www.anaconda.com/products/individual>`_
-2. Launch a terminal
-3. Create a New Conda Environment. From terminal.
-
-   .. code-block::
-
-      conda create -n <env name> python=3.8
-
-   Accept all the requests to install.
-
-4. Now activate the environment with:
-
-   .. code-block::
-
-      source activate <env name>
-
-5. Contact Hudson & Thames sales team and purchase ArbitrageLab. You will be provided with an API key.
-
-   .. code-block::
-
-      Example: "26303adb02cb759b2"
-
-6. Install ArbitrageLab into your python environment via the terminal.
-
-   Please make sure to use this exact statement:
-
-   .. code-block::
-
-      pip install https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@raw.githubusercontent.com/hudson-and-thames-clients/arbitragelab/master/arbitragelab-0.8.0-py38-none-any.whl
-
-7. Add API key as an environment variable:
-
-   7.1 The Best Way:
-
-      By adding the API key as an environment variable, you won't need to constantly add the key every time you import the library.
-
-      * Open the terminal and run: ``sudo nano ~/.bash_profile``. This will open a text editor.
-      * Note: If there is no file named .bash_profile, then this above nano command will create a new file named .bash_profile.
-      * Add the following environment variable to the last line of the file: ``export ARBLAB_API_KEY="26303adb02cb759b2"``
-      * Note that you must add your own API key and not the one given in this example.
-      * Press ctrl+X to exit the editor. Press ‘Y’ for saving the buffer, and you will return back to the terminal screen.
-      * Restart your computer. (If you skip this step, it won't register the change). The following may work to refresh your environment: ``source ~/.bash_profile``
-      * To confirm your new env variable is active: ``echo $ARBLAB_API_KEY``
-
-   7.2 The Easy Way:
-
-      If you don't want the key to persist on your local machine, you can always declare it each time, before you import ArbitrageLab.
-
-      * In your python script or notebook, add the following line before you import ArbitrageLab:
-
-      .. code::
-
-         import os
-         os.environ['ARBLAB_API_KEY'] = "426303b02cb7475984b2d4843"
-         import arbitragelab as al
-
-.. tip::
-
-   * If you are having problems with the installation, please ping us on Slack and we will be able to assist.
-
-
-Windows
-*******
+Alternative ways of adding the API Key
+######################################
 
 .. warning::
 
-    Before installing ArbitrageLab on Windows machines you should download and install
-    `Visual Studio build tools for Python3 <https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=BuildTools&rel=16>`_.
-    You can use this `installation guide <https://drive.google.com/file/d/0B4GsMXCRaSSIOWpYQkstajlYZ0tPVkNQSElmTWh1dXFaYkJr/view?usp=sharing>`_.
+   The following is not recommended for security reasons, since you run the risk
+   of accidentally leaking your API key in your source code by accidentally
+   committing it to your version control system. As a result, we highly
+   recommended using environment variables instead.
 
-0. Set up Git (if you haven't already, the following `link <https://docs.github.com/en/free-pro-team@latest/github/getting-started-with-github/set-up-git>`__ provides a nice guide.)
-1. Download and install the latest version of `Anaconda 3 <https://www.anaconda.com/products/individual>`__
-2. Launch Anaconda Prompt
-3. Create new environment (replace <env name> with a name, for example ``arbitragelab``):
+You can also use the ``os`` module in your Python script or Jupyter notebook
+to add the ``ARBLAB_API_KEY`` environment variable before importing
+``arbitragelab``:
 
-   .. code-block::
+.. code-block:: python
 
-      conda create -n <env name> python=3.8
+   # Insert this at the start of your script or notebook
+   import os
 
-4. Activate the new environment:
+   os.environ["ARBLAB_API_KEY"] = "<your-api-key>"
 
-   .. code-block::
 
-      conda activate <env name>
+Fixing "No MAC Address Found" Errors
+####################################
 
-5. Contact Hudson & Thames sales team and purchase ArbitrageLab. You will be provided with an API key.
+Depending on your setup, especially when using a VPN service or application,
+importing ``arbitragelab`` may cause a "No MAC Address Found" error to be
+raised. This occurs when attempting to verify your API key, and occurs when we
+are unable to access the MAC address of your computer's network device. This is
+usually the result of a virtual network device, associated with your VPN, that
+doesn't report a physical MAC address.
 
-   .. code-block::
+The workaround is to manually specify your physical hardware network interface
+name using another environment variable, ``ARBLAB_MAC_INTERFACE``:
 
-      Example: "26303adb02cb759b2d484233"
+For Windows:
 
-6. Install ArbitrageLab into your python environment via the terminal.
+.. code-block::
 
-   Please make sure to use this exact statement:
+   setx ARBLAB_MAC_INTERFACE "<your-network-interface>"
 
-   .. code-block::
 
-      pip install https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@raw.githubusercontent.com/hudson-and-thames-clients/arbitragelab/master/arbitragelab-0.8.0-py38-none-any.whl
+For Linux / MacOS:
 
-7. Add API key as an environment variable:
+.. code-block::
 
-   7.1 The Best Way:
+   # In ~/.bashrc, ~/.zshrc, or ~/.profile, depending on platform
+   ARBLAB_MAC_INTERFACE="<your-network-interface>"
 
-      By adding the API key as an environment variable, you won't need to constantly add the key every time you import the library.
 
-      * Open command prompt as an administrator.
-      * Create the variable: ``setx ARBLAB_API_KEY  "26303adb02cb759b2"``
-      * Note that you must add your own API key and not the one given in this example.
-      * Close and open a new command prompt
-      * Validate that your variable has been added: ``echo %ARBLAB_API_KEY%``
-
-   7.2 The Easy Way:
-
-      If you don't want the key to persist on your local machine, you can always declare it each time, before you import ArbitrageLab.
-
-      * In your python script or notebook, add the following line before you import ArbitrageLab:
-
-      .. code::
-
-         import os
-         os.environ['ARBLAB_API_KEY'] = "26303adb02cb759b2"
-         import arbitragelab as al
-
-.. tip::
-
-   * If you are having problems with the installation, please ping us on Slack and we will be able to assist.
-
-Important Notes
-###############
-* You may need to `install Cython <https://cython.readthedocs.io/en/latest/src/quickstart/install.html>`__ if your distribution hasn't already.
-* ArbitrageLab requires an internet connection when you import the library. This checks that your API key is valid.
-* We have added analytics to the library, please see the analytics tab for more details.
+With this environment variable set (remember to ``source`` your rc files if
+you're on Linux or MacOS), you should now be able to import the package normally.
