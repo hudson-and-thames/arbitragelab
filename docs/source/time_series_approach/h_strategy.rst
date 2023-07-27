@@ -336,7 +336,7 @@ HConstruction
     >>> total_returns = ((positions.shift(1)*returns).dropna() + 1).cumprod()
     >>> fig = total_returns.plot()
     >>> fig # doctest: +ELLIPSIS
-    <Figure...>
+    <Axes:...>
 HSelection
 **********
 
