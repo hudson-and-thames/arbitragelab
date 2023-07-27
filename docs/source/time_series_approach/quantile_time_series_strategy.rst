@@ -166,7 +166,6 @@ Code Example
 
 .. doctest::
 
-   >>> # Importing packages
    >>> import pandas as pd
    >>> from arbitragelab.time_series_approach.arima_predict import AutoARIMAForecast
    >>> from arbitragelab.time_series_approach.quantile_time_series import QuantileTimeSeriesTradingStrategy

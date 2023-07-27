@@ -210,7 +210,6 @@ Code Example
 
 .. doctest::
 
-    >>> # Importing packages
     >>> import numpy as np
     >>> import matplotlib.pyplot as plt
     >>> from arbitragelab.time_series_approach.ou_optimal_threshold_bertram import OUModelOptimalThresholdBertram

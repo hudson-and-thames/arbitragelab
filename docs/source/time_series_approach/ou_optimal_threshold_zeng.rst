@@ -263,7 +263,6 @@ Code Example
 
 .. doctest::
 
-    >>> # Importing packages
     >>> import numpy as np
     >>> import matplotlib.pyplot as plt
     >>> from arbitragelab.time_series_approach.ou_optimal_threshold_zeng import OUModelOptimalThresholdZeng
@@ -284,7 +283,7 @@ Code Example
     >>> print("Exiting a long position when Xt =", b_l)
     Exiting a long position when Xt = 3...
 
-    >>> # Getting the expected return and the variance for both long and short trade
+    # Getting the expected return and the variance for both long and short trade
     >>> E_s = OUOTZ.expected_return(a = a_s, b = b_s, c = 0.02)
     >>> V_s = OUOTZ.return_variance(a = a_s, b = b_s, c = 0.02)
     >>> E_l = OUOTZ.expected_return(a = a_l, b = b_l, c = 0.02)
