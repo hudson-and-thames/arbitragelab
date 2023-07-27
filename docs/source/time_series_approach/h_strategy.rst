@@ -351,7 +351,7 @@ HSelection
 
     >>> # Loading data
     >>> tickers = "AAPL MSFT AMZN META GOOGL GOOG TSLA NVDA JPM"
-    >>> data = yf.download(tickers, start="2019-01-01", end="2020-12-31", progess=False)["Adj Close"]
+    >>> data = yf.download(tickers, start="2019-01-01", end="2020-12-31", progress=False)["Adj Close"]
     >>> # Creating a class object
     >>> hs = HSelection(data)
     >>> hs.select()
@@ -359,14 +359,14 @@ HSelection
     >>> # Getting pairs
     >>> pairs = hs.get_pairs(5, "highest", False)
     >>> # Getting pairs
-    >>> pairs = hs.get_pairs(5, "highest", False)  # doctest: +ELLIPSIS
-    >>> print("H-inversion:", pairs[0][0], "Threshold for H-construction:", pairs[0][1], "Pairs:", pairs[0][2])
+    >>> pairs = hs.get_pairs(5, "highest", False)  
+    >>> print("H-inversion:", pairs[0][0], "Threshold for H-construction:", pairs[0][1], "Pairs:", pairs[0][2])# doctest: +ELLIPSIS
     H-inversion: ... Threshold for H-construction: ... Pairs: ...
-    >>> print("H-inversion:", pairs[1][0], "Threshold for H-construction:", pairs[1][1], "Pairs:", pairs[1][2])
+    >>> print("H-inversion:", pairs[1][0], "Threshold for H-construction:", pairs[1][1], "Pairs:", pairs[1][2])# doctest: +ELLIPSIS
     H-inversion: ... Threshold for H-construction: ... Pairs: ...
-    >>> print("H-inversion:", pairs[2][0], "Threshold for H-construction:", pairs[2][1], "Pairs:", pairs[2][2])
+    >>> print("H-inversion:", pairs[2][0], "Threshold for H-construction:", pairs[2][1], "Pairs:", pairs[2][2])# doctest: +ELLIPSIS
     H-inversion: ... Threshold for H-construction: ... Pairs: ...
-    >>> print("H-inversion:", pairs[3][0], "Threshold for H-construction:", pairs[3][1], "Pairs:", pairs[3][2])
+    >>> print("H-inversion:", pairs[3][0], "Threshold for H-construction:", pairs[3][1], "Pairs:", pairs[3][2])# doctest: +ELLIPSIS
     H-inversion: ... Threshold for H-construction: ... Pairs: ... 
 
 Research Notebooks
