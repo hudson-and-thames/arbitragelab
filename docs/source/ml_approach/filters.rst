@@ -84,7 +84,9 @@ Example
     from arbitragelab.ml_approach.filters import ThresholdFilter
 
     # Getting the dataframe with time series of asset returns
-    data = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])
+    url = "https://raw.githubusercontent.com/hudson-and-thames/example-data/main/arbitrage_lab_data/CL%3DF_NG%3DF_data.csv"
+    data = pd.read_csv(url, index_col=0, parse_dates = [0])
+    data['spread'] = (data['CL=F'] - data['NG=F'])
 
     # Calculating spread returns and std dev.
     spread_series = data['spread']
