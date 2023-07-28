@@ -69,13 +69,13 @@ class QuantileTimeSeriesTradingStrategy:
         _, axes = plt.subplots(1, 2, figsize=(10, 8), sharey=True)
 
         # Positive differences plot
-        sns.kdeplot(self.positive_differences, shade=True, color="green", ax=axes[0],
+        sns.kdeplot(self.positive_differences, fill=True, color="green", ax=axes[0],
                     label='threshold: {}'.format(self.long_diff_threshold.round(4)))
         axes[0].axvline(self.long_diff_threshold, linestyle='--', color='black')
         axes[0].set_title('Positive differences KDE')
 
         # Negative differences plot
-        sns.kdeplot(self.negative_differences, shade=True, color="red", ax=axes[1],
+        sns.kdeplot(self.negative_differences, fill=True, color="red", ax=axes[1],
                     label='threshold: {}'.format(self.short_diff_threshold.round(4)))
         axes[1].axvline(self.short_diff_threshold, linestyle='--', color='black')
         axes[1].set_title('Negative differences KDE')

@@ -301,64 +301,72 @@ Examples
 HConstruction
 *************
 
-.. code-block::
+.. doctest::
 
-    # Importing packages
-    import pandas as pd
-    import numpy as np
-    import matplotlib.pyplot as plt
-    import yfinance as yf
-    from arbitragelab.time_series_approach.h_strategy import HConstruction
+    >>> import pandas as pd
+    >>> import numpy as np
+    >>> import matplotlib.pyplot as plt
+    >>> import yfinance as yf
+    >>> from arbitragelab.time_series_approach.h_strategy import HConstruction
 
-    # Loading data
-    data =  yf.download("KO PEP", start="2019-01-01", end="2020-12-31")["Adj Close"]
+    >>> # Loading data
+    >>> data = yf.download("KO PEP", start="2019-01-01", end="2020-12-31", progress=False)["Adj Close"]
+    ...
+    >>> # Constructing spread series
+    >>> series = np.log(data["KO"]) - np.log(data["PEP"])
 
-    # Constructing spread series
-    series = np.log(data["KO"]) - np.log(data["PEP"])
+    >>> # Creating a class object
+    >>> threshold = series["2019"].std()
+    >>> hc = HConstruction(series["2020"], threshold, "Kagi")
 
-    # Creating a class object
-    threshold = series["2019"].std()
-    hc = HConstruction(series["2020"], threshold, "Kagi")
+    >>> # Getting H-statistics
+    >>> print("H-inversion:", hc.h_inversion())# doctest: +ELLIPSIS
+    H-inversion: ...
+    >>> print("H-distances:", hc.h_distances()) # doctest: +ELLIPSIS
+    H-distances: ...
+    >>> print("H-volatility:", hc.h_volatility()) # doctest: +ELLIPSIS
+    H-volatility: ...
 
-    #Getting H-statistics
-    print("H-inversion:", hc.h_inversion())
-    print("H-distances:", hc.h_distances())
-    print("H-volatility:", hc.h_volatility())
+    >>> # Getting signals
+    >>> signals = hc.get_signals("contrarian")
 
-    #Getting signals
-    signals = hc.get_signals("contrarian")
-
-    # A quick backtesting
-    positions = signals.replace(0, np.nan).ffill()
-    returns = data["KO"]["2020"].pct_change() - data["PEP"]["2020"].pct_change()
-    total_returns = ((positions.shift(1)*returns).dropna() + 1).cumprod()
-    total_returns.plot()
-    plt.show()
-
+    >>> # A quick backtest
+    >>> positions = signals.replace(0, np.nan).ffill()
+    >>> returns = data["KO"]["2020"].pct_change() - data["PEP"]["2020"].pct_change()
+    >>> total_returns = ((positions.shift(1)*returns).dropna() + 1).cumprod()
+    >>> fig = total_returns.plot()
+    >>> fig # doctest: +ELLIPSIS
+    <Axes:...>
 HSelection
 **********
 
-.. code-block::
+.. doctest::
 
-    # Importing packages
-    import pandas as pd
-    import numpy as np
-    import matplotlib.pyplot as plt
-    import yfinance as yf
-    from arbitragelab.time_series_approach.h_strategy import HSelection
+    >>> import pandas as pd
+    >>> import numpy as np
+    >>> import matplotlib.pyplot as plt
+    >>> import yfinance as yf
+    >>> from arbitragelab.time_series_approach.h_strategy import HSelection
 
-    # Loading data
-    tickers = "AAPL MFST AMZN FB GOOGL GOOG TSLA NVDA JPM"
-    data = yf.download(tickers, start="2019-01-01", end="2020-12-31")["Adj Close"]
-
-    # Creating a class object
-    hs = HSelection(data)
-    hs.select()
-
-    # Getting pairs
-    pairs = hs.get_pairs(5, "highest", False)
-    for p in pairs:
-        print("H-inversion:", p[0], "Threshold for H-construction:", p[1], "Pairs:", p[2])
+    >>> # Loading data
+    >>> tickers = "AAPL MSFT AMZN META GOOGL GOOG TSLA NVDA JPM"
+    >>> data = yf.download(tickers, start="2019-01-01", end="2020-12-31", progress=False)["Adj Close"]
+    >>> # Creating a class object
+    >>> hs = HSelection(data)
+    >>> hs.select()
+    ...
+    >>> # Getting pairs
+    >>> pairs = hs.get_pairs(5, "highest", False)
+    >>> # Getting pairs
+    >>> pairs = hs.get_pairs(5, "highest", False)  
+    >>> print("H-inversion:", pairs[0][0], "Threshold for H-construction:", pairs[0][1], "Pairs:", pairs[0][2])# doctest: +ELLIPSIS
+    H-inversion: ... Threshold for H-construction: ... Pairs: ...
+    >>> print("H-inversion:", pairs[1][0], "Threshold for H-construction:", pairs[1][1], "Pairs:", pairs[1][2])# doctest: +ELLIPSIS
+    H-inversion: ... Threshold for H-construction: ... Pairs: ...
+    >>> print("H-inversion:", pairs[2][0], "Threshold for H-construction:", pairs[2][1], "Pairs:", pairs[2][2])# doctest: +ELLIPSIS
+    H-inversion: ... Threshold for H-construction: ... Pairs: ...
+    >>> print("H-inversion:", pairs[3][0], "Threshold for H-construction:", pairs[3][1], "Pairs:", pairs[3][2])# doctest: +ELLIPSIS
+    H-inversion: ... Threshold for H-construction: ... Pairs: ... 
 
 Research Notebooks
 ******************

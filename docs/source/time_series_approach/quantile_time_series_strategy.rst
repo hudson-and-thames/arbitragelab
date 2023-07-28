@@ -164,46 +164,52 @@ Examples
 Code Example
 ************
 
-.. code-block::
+.. doctest::
 
-   # Importing packages
-   import pandas as pd
-   from arbitragelab.distance_approach.arima_predict import AutoARIMAForecast
-   from arbitragelab.distance_approach.quantile_time_series import QuantileTimeSeriesTradingStrategy
+   >>> import pandas as pd
+   >>> from arbitragelab.time_series_approach.arima_predict import AutoARIMAForecast
+   >>> from arbitragelab.time_series_approach.quantile_time_series import QuantileTimeSeriesTradingStrategy
 
-   # Getting the dataframe with spread time series of a cointegrated set of assets
-   data = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])
+   >>> # Load Non Negative Crude and Gasoline futures data.
+   >>> wti_contract_df = pd.read_csv('https://raw.githubusercontent.com/hudson-and-thames/example-data/main/arbitrage_lab_data/NonNegative_CL_forward_roll.csv').set_index('Dates')
+   >>> rbob_contract_df = pd.read_csv('https://raw.githubusercontent.com/hudson-and-thames/example-data/main/arbitrage_lab_data/NonNegative_nRB_forward_roll.csv').set_index('Dates')
 
-   # Dividing the dataset into two parts - the first one for model fitting
-   data_model_fitting = data.loc[:'2019-01-01']
+   >>> working_df = pd.concat([wti_contract_df, rbob_contract_df], axis=1)
+   >>> working_df.index = pd.to_datetime(working_df.index) 
+   >>> working_df.columns = ['wti', 'gasoline']
 
-   # And the second one for signals generation
-   data_signals_generation = data.loc['2019-01-01':]
+   >>> working_df.dropna(inplace=True) # doctest: +SKIP
 
-   # Setting the ARIMA model
-   arima_model = AutoARIMAForecast(start_p=1, start_q=1, max_p=10, max_q=10)
+   >>> # Calculate naive spread between gasoline and wti.
+   >>> sprd = (working_df['gasoline'] - working_df['wti'])
 
-   # Finding the best fitting model
-   arima_model.get_best_arima_model(y_train=data_model_fitting, verbose=True)
+   >>> # Dividing the dataset into two parts - the first one for model fitting
+   >>> data_model_fitting = sprd.loc[:'2019-01-01']
 
-   # Getting the thresholds at 20% and 80% quantiles
-   time_series_trading = QuantileTimeSeriesTradingStrategy(long_quantile=0.8, short_quantile=0.2)
+   >>> # And the second one for signals generation
+   >>> data_signals_generation = sprd.loc['2019-01-01':]
 
-   # Calculating the thresholds for the data
-   time_series_trading.fit_thresholds(data_model_fitting)
+   >>> # Setting the ARIMA model
+   >>> arima_model = AutoARIMAForecast(start_p=1, start_q=1, max_p=10, max_q=10) # doctest: +SKIP
 
-   # Plotting thresholds used for trading
-   time_series_trading.plot_thresholds()
+   >>> # Finding the best fitting model
+   >>> arima_model.get_best_arima_model(y_train=data_model_fitting, verbose=True) # doctest: +SKIP
 
-   # Generating out-of-sample ARIMA prediction
-   oos_prediction = arima_model.predict(y=data_signals_generation, silence_warnings = True)
+   >>> # Getting the thresholds at 20% and 80% quantiles
+   >>> time_series_trading = QuantileTimeSeriesTradingStrategy(long_quantile=0.8, short_quantile=0.2)
 
-   # Using the difference between prediction and actual value to trade the spread
-   for prediction, actual in zip(oos_prediction, data_signals_generation):
-       time_series_trading.get_allocation(predicted_difference=prediction-actual, exit_threshold=0)
+   >>> # Calculating the thresholds for the data
+   >>> time_series_trading.fit_thresholds(data_model_fitting) # doctest: +SKIP
 
-   # Get the trading signals created using quantile time series strategy
-   positions = pd.Series(index=data_signals_generation.index, data=time_series_trading.positions)
+   >>> # Plotting thresholds used for trading
+   >>> time_series_trading.plot_thresholds() # doctest: +SKIP
+   >>> # Generating out-of-sample ARIMA prediction
+   >>> oos_prediction = arima_model.predict(y=data_signals_generation, silence_warnings = True)
+   >>># Using the difference between prediction and actual value to trade the spread
+   >>> for prediction, actual in zip(oos_prediction, data_signals_generation):
+   >>>     time_series_trading.get_allocation(predicted_difference=prediction-actual, exit_threshold=0) # doctest: +SKIP
+   >>> # Get the trading signals created using quantile time series strategy
+   >>> positions = pd.Series(index=data_signals_generation.index, data=time_series_trading.positions)
 
 Research Notebooks
 ******************
