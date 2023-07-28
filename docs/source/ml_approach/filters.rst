@@ -281,22 +281,23 @@ Implementation
 Example
 *******
 
-.. code-block::
+.. doctest::
 
-    # Importing packages
-    import pandas as pd
-    from arbitragelab.ml_approach.filters import VolatilityFilter
+    >>> import pandas as pd
+    >>> from arbitragelab.ml_approach.filters import VolatilityFilter
 
-    # Getting the dataframe with time series of asset returns
-    data = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])
-    spread_series = data['spread']
+    >>> # Getting the dataframe with time series of asset returns
+    >>> url = "https://raw.githubusercontent.com/hudson-and-thames/example-data/main/arbitrage_lab_data/CL%3DF_NG%3DF_data.csv"
+    >>> data = pd.read_csv(url, index_col=0, parse_dates = [0])
+    >>> data['spread'] = (data['CL=F'] 
 
-    # Initialize VolatilityFilter a 30 period lookback parameter.
-    vol_filter = VolatilityFilter(lookback=30)
-    vol_events = vol_filter.fit_transform(spread_series)
+    >>> # Initialize VolatilityFilter a 30 period lookback parameter.
+    >>> vol_filter = VolatilityFilter(lookback=30)
+    >>> vol_events = vol_filter.fit_transform(spread_series)
 
-    # Plotting results
-    vol_filter.plot()
+    >>> # Plotting results
+    >>> vol_filter.plot() # doctest: +ELLIPSIS
+    (...)
 
 Presentation Slides
 ###################
