@@ -289,7 +289,8 @@ Example
     >>> # Getting the dataframe with time series of asset returns
     >>> url = "https://raw.githubusercontent.com/hudson-and-thames/example-data/main/arbitrage_lab_data/CL%3DF_NG%3DF_data.csv"
     >>> data = pd.read_csv(url, index_col=0, parse_dates = [0])
-    >>> data['spread'] = (data['CL=F'] 
+    >>> data['spread'] = (data['CL=F'] - data['NG=F'])
+    >>> spread_series = data['spread']
 
     >>> # Initialize VolatilityFilter a 30 period lookback parameter.
     >>> vol_filter = VolatilityFilter(lookback=30)
