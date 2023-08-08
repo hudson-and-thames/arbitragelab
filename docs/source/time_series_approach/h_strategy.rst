@@ -33,11 +33,13 @@ H-Strategy
 
 |
 
-In this paper, the author proposes a new nonparametric approach to pairs trading based on the idea of
-Renko and Kagi charts. This approach exploits statistical information about the variability of the
-tradable process. The approach does not aim to find a long-run mean of the process and trade towards it
-like other methods of pairs trading. Instead, it manages the problem of how far the process should move
-in one direction before trading in the opposite direction becomes potentially profitable by measure the
+In this paper, the author proposes a new non-parametric approach to pairs
+trading based on the idea of Renko and Kagi charts. This approach exploits
+statistical information about the variability of the tradable process. The
+approach does not aim to find a long-run mean of the process and trade towards
+it like other methods of pairs trading. Instead, it manages the problem of how
+far the process should move in one direction before trading in the *opposite*
+direction potentially becomes profitable, which is done by measuring the
 variability of the process.
 
 H-construction
@@ -226,19 +228,22 @@ and the total profit from time $0$ till time $T$ is
 Properties
 **********
 
-It is clear that the choice of H-strategy depends on the value of H-volatility. If :math:`\xi^1_T > 2H`,
-then to achieve a positive profit the investor should
-employ a momentum H -strategy; If :math:`\xi^1_T < 2H` then the investor should use a contrarian H-strategy.
+It is clear that the choice of H-strategy depends on the value of H-volatility.
+If :math:`\xi^1_T > 2H`, then to achieve a positive profit the investor should
+employ a momentum H-strategy. If, on the other hand, :math:`\xi^1_T < 2H` then
+the investor should use a contrarian H-strategy.
 
-Suppose :math:`P(t)` follows the Wiener process, the H-volatility :math:`\xi^1_T = 2H`. As a result,
-it is impossible to profit from the trading on the process :math:`P(t)`. We can also see that H-volatility
-:math:`\xi^1_T = 2H` is a property of a martingale. Likewise :math:`\xi^1_T > 2H` could be a property of a
-sub-martingale or a super-martingale or a process regularly switching over time from a sub-martingale to a
-super-martingale and back.
+Suppose :math:`P(t)` follows the Wiener process, the H-volatility :math:`\xi^1_T
+= 2H`. As a result, it is impossible to profit by trading on the process
+:math:`P(t)`. We can also see that H-volatility :math:`\xi^1_T = 2H` is a
+property of a martingale. Likewise :math:`\xi^1_T > 2H` could be a property of a
+sub-martingale or a super-martingale or a process that regularly switches
+back-and-forth over time between a sub-martingale and a super-martingale.
 
-In this paper, the author proposes that for any mean-reverting process, regardless of its distribution,
-the H-volatility is less than :math:`2H`. Hence, theoretically, trading the mean-reverting process by the
-contrarian H-strategy is profitable for any choice of :math:`H`.
+In this paper, the author proposes that for any mean-reverting process,
+regardless of its distribution, the H-volatility is less than :math:`2H`. Hence,
+theoretically, trading the mean-reverting process by the contrarian H-strategy
+is profitable for any choice of :math:`H`.
 
 Pairs Selection
 ###############
