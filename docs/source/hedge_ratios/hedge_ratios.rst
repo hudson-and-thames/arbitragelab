@@ -80,7 +80,9 @@ hedge ratios.
     >>> inverted_spread = construct_spread(
     ...     data[["AVB", "A"]], hedge_ratios=hedge_ratios, dependent_variable="A"
     ... )
-    >>> inverted_spread
+    >>> inverted_spread # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    Date
+    2017-01-03 -100.529...
 
 Ordinary Least Squares (OLS)
 ############################
