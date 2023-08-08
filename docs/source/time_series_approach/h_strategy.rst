@@ -308,35 +308,34 @@ HConstruction
     >>> import matplotlib.pyplot as plt
     >>> import yfinance as yf
     >>> from arbitragelab.time_series_approach.h_strategy import HConstruction
-
-    >>> # Loading data
-    >>> data = yf.download("KO PEP", start="2019-01-01", end="2020-12-31", progress=False)["Adj Close"]
-    ...
-    >>> # Constructing spread series
+    >>> data = yf.download("KO PEP", start="2019-01-01", end="2020-12-31", progress=False)[
+    ...     "Adj Close"
+    ... ]
+    >>> # Construct spread series
     >>> series = np.log(data["KO"]) - np.log(data["PEP"])
-
-    >>> # Creating a class object
     >>> threshold = series["2019"].std()
     >>> hc = HConstruction(series["2020"], threshold, "Kagi")
-
-    >>> # Getting H-statistics
-    >>> print("H-inversion:", hc.h_inversion())# doctest: +ELLIPSIS
-    H-inversion: ...
-    >>> print("H-distances:", hc.h_distances()) # doctest: +ELLIPSIS
-    H-distances: ...
-    >>> print("H-volatility:", hc.h_volatility()) # doctest: +ELLIPSIS
-    H-volatility: ...
-
-    >>> # Getting signals
+    >>> # Get H-statistics
+    >>> hc.h_inversion()  # doctest: +ELLIPSIS
+    19
+    >>> hc.h_distances()  # doctest: +ELLIPSIS
+    1.475...
+    >>> hc.h_volatility()  # doctest: +ELLIPSIS
+    0.0776...
+    >>> # Extract signals
     >>> signals = hc.get_signals("contrarian")
-
+    >>> signals  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    Date
+    2020-01-02 0.0...
     >>> # A quick backtest
     >>> positions = signals.replace(0, np.nan).ffill()
     >>> returns = data["KO"]["2020"].pct_change() - data["PEP"]["2020"].pct_change()
-    >>> total_returns = ((positions.shift(1)*returns).dropna() + 1).cumprod()
+    >>> total_returns = ((positions.shift(1) * returns).dropna() + 1).cumprod()
     >>> fig = total_returns.plot()
-    >>> fig # doctest: +ELLIPSIS
+    >>> fig  # doctest: +ELLIPSIS
     <Axes:...>
+
+
 HSelection
 **********
 
@@ -347,26 +346,22 @@ HSelection
     >>> import matplotlib.pyplot as plt
     >>> import yfinance as yf
     >>> from arbitragelab.time_series_approach.h_strategy import HSelection
-
-    >>> # Loading data
+    >>> # Fetch data
     >>> tickers = "AAPL MSFT AMZN META GOOGL GOOG TSLA NVDA JPM"
-    >>> data = yf.download(tickers, start="2019-01-01", end="2020-12-31", progress=False)["Adj Close"]
-    >>> # Creating a class object
+    >>> data = yf.download(tickers, start="2019-01-01", end="2020-12-31", progress=False)[
+    ...     "Adj Close"
+    ... ]
     >>> hs = HSelection(data)
-    >>> hs.select()
-    ...
-    >>> # Getting pairs
+    >>> hs.select()  # Calculate H-inversion statistic
     >>> pairs = hs.get_pairs(5, "highest", False)
-    >>> # Getting pairs
-    >>> pairs = hs.get_pairs(5, "highest", False)  
-    >>> print("H-inversion:", pairs[0][0], "Threshold for H-construction:", pairs[0][1], "Pairs:", pairs[0][2])# doctest: +ELLIPSIS
-    H-inversion: ... Threshold for H-construction: ... Pairs: ...
-    >>> print("H-inversion:", pairs[1][0], "Threshold for H-construction:", pairs[1][1], "Pairs:", pairs[1][2])# doctest: +ELLIPSIS
-    H-inversion: ... Threshold for H-construction: ... Pairs: ...
-    >>> print("H-inversion:", pairs[2][0], "Threshold for H-construction:", pairs[2][1], "Pairs:", pairs[2][2])# doctest: +ELLIPSIS
-    H-inversion: ... Threshold for H-construction: ... Pairs: ...
-    >>> print("H-inversion:", pairs[3][0], "Threshold for H-construction:", pairs[3][1], "Pairs:", pairs[3][2])# doctest: +ELLIPSIS
-    H-inversion: ... Threshold for H-construction: ... Pairs: ... 
+    >>> # Inspect the first pair
+    >>> # Each pair contains [H-inversion statistic, H-construction threshold, Asset pair]
+    >>> pairs[0]  # doctest: +ELLIPSIS
+    [34, 0.0034..., ('GOOG', 'GOOGL')]
+    >>> # Inspect another pair
+    >>> pairs[1]  # doctest: +ELLIPSIS
+    [12, 0.132..., ('AAPL', 'NVDA')]
+
 
 Research Notebooks
 ******************
