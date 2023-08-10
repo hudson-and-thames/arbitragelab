@@ -266,67 +266,65 @@ Examples
 Code Example
 ************
 
-.. code-block::
+.. doctest::
 
-    # Importing packages
-    import matplotlib.pyplot as plt
-    import yfinance as yf
-    from arbitragelab.time_series_approach.regime_switching_arbitrage_rule import RegimeSwitchingArbitrageRule
-
-    plt.rcParams['figure.figsize'] = (24, 12)
-
-    # Loading data
-    data =  yf.download("CL=F NG=F", start="2015-01-01", end="2020-01-01")["Adj Close"]
-
-    # Constructing spread series
-    Ratt = data["NG=F"]/data["CL=F"]
-
-    # Creating a class instance for getting the positions
-    RSAR = RegimeSwitchingArbitrageRule(delta = 1.5, rho = 0.6)
-
-    # Setting window size
-    window_size = 60
-
-    # Getting current signal
-    signal = RSAR.get_signal(Ratt[-window_size:], switching_variance = False,
-                             silence_warnings = True)
-    print("Open a long trade:", signal[0]) 
-    print("Close a long trade:", signal[1]) 
-    print("Open a short trade:", signal[2]) 
-    print("Close a short trade:", signal[3])
-
-    # Getting signals on a rolling basis
-    signals = RSAR.get_signals(Ratt, window_size, switching_variance = True,
-                               silence_warnings = True)
-    print(signals.shape)
-
-    # Deciding the trades based on the signals
-    trades = RSAR.get_trades(signals)
-    print(trades.shape)
-
-    # Plotting trades
-    fig = RSAR.plot_trades(Ratt, trades)
-    plt.show()
-
-    # Changing rules
-    cl_rule = lambda Xt, mu, delta, sigma: Xt >= mu
-    cs_rule = lambda Xt, mu, delta, sigma: Xt <= mu
-
-    RSAR.change_strategy("High", "Long", "Open", ol_rule)
-    RSAR.change_strategy("High", "Short", "Close", cs_rule)
-
-    # Getting signals on a rolling basis
-    signals = RSAR.get_signals(Ratt, window_size, switching_variance = True,
-                               silence_warnings = True)
-    print(signals.shape)
-
-    # Deciding the trades based on the signals
-    trades = RSAR.get_trades(signals)
-    print(trades.shape)
-
-    # Plotting trades
-    fig = RSAR.plot_trades(Ratt, trades)
-    plt.show()
+  >>> import matplotlib.pyplot as plt
+  >>> import yfinance as yf
+  >>> from arbitragelab.time_series_approach.regime_switching_arbitrage_rule import (
+  ...     RegimeSwitchingArbitrageRule,
+  ... )
+  >>> data = yf.download("CL=F NG=F", start="2015-01-01", end="2020-01-01", progress=False)[
+  ...     "Adj Close"
+  ... ]
+  >>> # Construct spread series
+  >>> ratt = data["NG=F"] / data["CL=F"]
+  >>> rsar = RegimeSwitchingArbitrageRule(delta=1.5, rho=0.6)
+  >>> window_size = 60
+  >>> # Get the current signal
+  >>> signal = rsar.get_signal(
+  ...     ratt[-window_size:], switching_variance=False, silence_warnings=True
+  ... )
+  >>> # [Open long, close long, open short, close short]
+  >>> list(signal)  # doctest: +NORMALIZE_WHITESPACE
+  [True, False, False, True]
+  >>> signals = rsar.get_signals(
+  ...     ratt, window_size, switching_variance=True, silence_warnings=True
+  ... )
+  >>> signals  # doctest: +ELLIPSIS
+  array(...)
+  >>> signals.shape
+  (1256, 4)
+  >>> # Decide on trades based on the signals
+  >>> trades = rsar.get_trades(signals)
+  >>> trades  # doctest: +ELLIPSIS
+  array(...)
+  >>> trades.shape
+  (1256, 4)
+  >>> # Plot trades
+  >>> rsar.plot_trades(ratt, trades)  # doctest: +ELLIPSIS
+  <Figure...>
+  >>> # Changing rules
+  >>> cl_rule = lambda Xt, mu, delta, sigma: Xt >= mu
+  >>> cs_rule = lambda Xt, mu, delta, sigma: Xt <= mu
+  >>> rsar.change_strategy("High", "Long", "Open", cl_rule)
+  >>> rsar.change_strategy("High", "Short", "Close", cs_rule)
+  >>> # Get signals on a rolling basis
+  >>> signals = rsar.get_signals(
+  ...     ratt, window_size, switching_variance=True, silence_warnings=True
+  ... )
+  >>> signals  # doctest: +ELLIPSIS
+  array(...)
+  >>> signals.shape
+  (1256, 4)
+  >>> # Deciding the trades based on the signals
+  >>> trades = rsar.get_trades(signals)
+  >>> trades  # doctest: +ELLIPSIS
+  array(...)
+  >>> trades.shape
+  (1256, 4)
+  >>> # Plotting trades
+  >>> rsar.plot_trades(ratt, trades)  # doctest: +ELLIPSIS
+  <Figure...>
 
 Research Notebook
 #################
