@@ -258,93 +258,79 @@ the optimal thresholds and performance metrics under the optimal thresholds.
 Examples
 ########
 
-Code Example
-************
-
 .. doctest::
 
     >>> import numpy as np
     >>> import matplotlib.pyplot as plt
-    >>> from arbitragelab.time_series_approach.ou_optimal_threshold_zeng import OUModelOptimalThresholdZeng
-
-    >>> # Creating a class instance
-    >>> OUOTZ = OUModelOptimalThresholdZeng()
-
-    >>> # Initializing OU-process parameter
-    >>> OUOTZ.construct_ou_model_from_given_parameters(theta = 3.4241, mu = 0.0237, sigma = 0.0081)
+    >>> from arbitragelab.time_series_approach.ou_optimal_threshold_zeng import (
+    ...     OUModelOptimalThresholdZeng,
+    ... )
+    >>> ouotz = OUModelOptimalThresholdZeng()
+    >>> # Init OU-process parameter
+    >>> ouotz.construct_ou_model_from_given_parameters(theta=3.4241, mu=0.0237, sigma=0.0081)
     >>> # Getting optimal thresholds by Conventional Optimal Rule.
-    >>> a_s, b_s, a_l, b_l = OUOTZ.get_threshold_by_conventional_optimal_rule(c = 0.02)
-    >>> print("Entering a short position when Xt =", a_s)
-    Entering a short position when Xt = 3...
-    >>> print("Exiting a short position when Xt =", b_s)
-    Exiting a short position when Xt = 3...
-    >>> print("Entering a long position when Xt =", a_l)
-    Entering a long position when Xt = 3...
-    >>> print("Exiting a long position when Xt =", b_l)
-    Exiting a long position when Xt = 3...
-
-    # Getting the expected return and the variance for both long and short trade
-    >>> E_s = OUOTZ.expected_return(a = a_s, b = b_s, c = 0.02)
-    >>> V_s = OUOTZ.return_variance(a = a_s, b = b_s, c = 0.02)
-    >>> E_l = OUOTZ.expected_return(a = a_l, b = b_l, c = 0.02)
-    >>> V_l = OUOTZ.return_variance(a = a_l, b = b_l, c = 0.02)
-
-    >>> print("Short trade expected return:", E_s)
-    Short trade expected return: 0.0...
-    >>> print("Short trade variance:", V_s)
-    Short trade variance: 2...e-05
-    >>> print("Long trade expected return:", E_l)
-    Long trade expected return: 0.0...
-    >>> print("Long trade variance:", V_l)
-    Long trade variance: 2...e-05
+    >>> a_s, b_s, a_l, b_l = ouotz.get_threshold_by_conventional_optimal_rule(c=0.02)
+    >>> # When we enter a short position
+    >>> a_s  # doctest: +ELLIPSIS
+    3.47...
+    >>> # When we exit a short position
+    >>> b_s  # doctest: +ELLIPSIS
+    3.42...
+    >>> # When we enter a long position
+    >>> a_l  # doctest: +ELLIPSIS
+    3.37...
+    >>> # When we exit a long position
+    >>> b_l  # doctest: +ELLIPSIS
+    3.42...
+    >>> # Get the expected return and the variance for both long and short trades
+    >>> # Short
+    >>> ouotz.expected_return(a=a_s, b=b_s, c=0.02)  # doctest: +ELLIPSIS
+    0.0003...
+    >>> ouotz.return_variance(a=a_s, b=b_s, c=0.02)  # doctest: +ELLIPSIS
+    2.54...e-05
+    >>> # Long
+    >>> ouotz.expected_return(a=a_l, b=b_l, c=0.02)  # doctest: +ELLIPSIS
+    0.0003...
+    >>> ouotz.return_variance(a=a_l, b=b_l, c=0.02)  # doctest: +ELLIPSIS
+    2.207...e-05
     >>> # Getting optimal thresholds by New Optimal Rule.
-    >>> a_s, b_s, a_l, b_l = OUOTZ.get_threshold_by_new_optimal_rule(c = 0.02)
-    >>> print("Entering a short position when Xt =", a_s)
-    Entering a short position when Xt = 3...
-
-    >>> print("Exiting a short position when Xt =", b_s)
-    Exiting a short position when Xt = 3...
-    >>> print("Entering a long position when Xt =", a_l)
-    Entering a long position when Xt = 3...
-    >>> print("Exiting a long position when Xt =", b_l)
-    Exiting a long position when Xt = 3...
-
-    >>> # Getting the expected return and the variance for both long and short trade
-    >>> E_s = OUOTZ.expected_return(a = a_s, b = b_s, c = 0.02)
-    >>> V_s = OUOTZ.return_variance(a = a_s, b = b_s, c = 0.02)
-    >>> E_l = OUOTZ.expected_return(a = a_l, b = b_l, c = 0.02)
-    >>> V_l = OUOTZ.return_variance(a = a_l, b = b_l, c = 0.02)
-
-    >>> print("Short trade expected return:", E_s)
-    Short trade expected return: 0.0...
-    >>> print("Short trade variance:", V_s)
-    Short trade variance: 3...e-05
-    >>> print("Long trade expected return:", E_l)
-    Long trade expected return: 0.0...
-    >>> print("Long trade variance:", V_l)
-    Long trade variance: 3...e-05
-
+    >>> a_s, b_s, a_l, b_l = ouotz.get_threshold_by_new_optimal_rule(c=0.02)
+    >>> # When we enter a short position
+    >>> a_s  # doctest: +ELLIPSIS
+    3.460...
+    >>> # When we exit a short position
+    >>> b_s  # doctest: +ELLIPSIS
+    3.38...
+    >>> # When we enter a long position
+    >>> a_l  # doctest: +ELLIPSIS
+    3.38...
+    >>> # When we exit a long position
+    >>> b_l  # doctest: +ELLIPSIS
+    3.460...
+    >>> # Get the expected return and the variance for both long and short trade
+    >>> # Short
+    >>> ouotz.expected_return(a=a_s, b=b_s, c=0.02)  # doctest: +ELLIPSIS
+    0.00043...
+    >>> ouotz.return_variance(a=a_s, b=b_s, c=0.02)  # doctest: +ELLIPSIS
+    3.467...e-05
+    >>> # Long
+    >>> ouotz.expected_return(a=a_l, b=b_l, c=0.02)  # doctest: +ELLIPSIS
+    0.00043...
+    >>> ouotz.return_variance(a=a_l, b=b_l, c=0.02)  # doctest: +ELLIPSIS
+    3.467...e-05
     >>> # Setting a array contains transaction costs
-    >>> c_list = np.linspace(0, 0.01, 30)
-
-    >>> # Comparison of the expected return between the Conventional Optimal Rule and New Optimal Rule.
     >>> c_list = np.linspace(0, 0.02, 30)
-    >>> fig_con = OUOTZ.plot_target_vs_c(target = "expected_return", method = "conventional_optimal_rule", c_list = c_list)
-    >>> fig_new = OUOTZ.plot_target_vs_c(target = "expected_return", method = "new_optimal_rule", c_list = c_list)
-    >>> plt.show()
-
-    >>> # Combining two figures.
-    >>> ax_con = fig_con.gca()
-    >>> ax_new = fig_new.gca()
-
-    >>> x = ax_con.lines[0].get_xdata()
-    >>> y_con = ax_con.lines[0].get_ydata()
-    >>> y_new = ax_new.lines[0].get_ydata()
-
-    >>> plt.plot(x, y_con, label = "Conventional Optimal Rule") # doctest: +SKIP
-    >>> plt.plot(x, y_new, label = "New Optimal Rule") # doctest: +SKIP
-    >>> plt.legend() # doctest: +SKIP
-    >>> plt.show()
+    >>> # Comparison of the expected return between the Conventional Optimal Rule and New Optimal Rule.
+    >>> fig_con = ouotz.plot_target_vs_c(
+    ...     target="expected_return", method="conventional_optimal_rule", c_list=c_list
+    ... )
+    >>> fig_con  # doctest: +ELLIPSIS
+    <Figure...>
+    >>> fig_new = ouotz.plot_target_vs_c(
+    ...     target="expected_return", method="new_optimal_rule", c_list=c_list
+    ... )
+    >>> fig_new  # doctest: +ELLIPSIS
+    <Figure...>
 
 
 Research Notebooks
