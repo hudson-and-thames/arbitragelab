@@ -212,53 +212,51 @@ Code Example
 
     >>> import numpy as np
     >>> import matplotlib.pyplot as plt
-    >>> from arbitragelab.time_series_approach.ou_optimal_threshold_bertram import OUModelOptimalThresholdBertram
-
-    >>> # Creating a class instance
+    >>> from arbitragelab.time_series_approach.ou_optimal_threshold_bertram import (
+    ...     OUModelOptimalThresholdBertram,
+    ... )
     >>> OUOTB = OUModelOptimalThresholdBertram()
-
-    >>> # Initializing OU-process parameter
-    >>> OUOTB.construct_ou_model_from_given_parameters(theta = 0, mu = 180.9670, sigma = 0.1538)
-    >>> # Getting optimal thresholds by maximizing the expected return
-    >>> a, m = OUOTB.get_threshold_by_maximize_expected_return(c = 0.001)
-    >>> # Getting the expected return and the variance
-    >>> E = OUOTB.expected_return(a = a, m = m, c = 0.001)
-    >>> V = OUOTB.return_variance(a = a, m = m, c = 0.001)
-
-    >>> print("Entering a trade when Xt =", a)
-    Entering a trade when Xt = -0.0...
-    >>> print("Exiting the trade at Xt =", m)
-    Exiting the trade at Xt = 0.0...
-    >>> print("Expected Return:", E)
-    Expected Return: 0.4...
-    >>> print("Variance:", V)
-    Variance: 0.0...
-
-    >>> # Getting optimal thresholds by maximizing the Sharpe ratio
-    >>> a, m = OUOTB.get_threshold_by_maximize_sharpe_ratio(c = 0.001, rf = 0.01)
-    >>> # Getting the Sharpe ratio
-    >>> S = OUOTB.sharpe_ratio(a = a, m = m, c = 0.001, rf = 0.01)
-
-    >>> print("Entering a trade when Xt =", a)
-    Entering a trade when Xt = -0.0...
-    >>> print("Exiting the trade at Xt =", m)
-    Exiting the trade at Xt = 0.0...
-    >>> print("Sharpe Ratio:", S)
-    Sharpe Ratio: 3.8...
-
-    >>> # Setting a array contains transaction costs
+    >>> # Init the OU-process parameter
+    >>> OUOTB.construct_ou_model_from_given_parameters(theta=0, mu=180.9670, sigma=0.1538)
+    >>> # Get optimal thresholds by maximizing the expected return
+    >>> a, m = OUOTB.get_threshold_by_maximize_expected_return(c=0.001)
+    >>> # Threshold when we enter a trade
+    >>> a  # doctest: +ELLIPSIS
+    -0.004...
+    >>> # Threshold when we exit the trade
+    >>> m  # doctest: +ELLIPSIS
+    0.004...
+    >>> # Get the expected return and the variance
+    >>> expected_return = OUOTB.expected_return(a=a, m=m, c=0.001)
+    >>> expected_return  # doctest: +ELLIPSIS
+    0.492...
+    >>> return_variance = OUOTB.return_variance(a=a, m=m, c=0.001)
+    >>> return_variance  # doctest: +ELLIPSIS
+    0.0021...
+    >>> # Get optimal thresholds by maximizing the Sharpe ratio
+    >>> a, m = OUOTB.get_threshold_by_maximize_sharpe_ratio(c=0.001, rf=0.01)
+    >>> a  # doctest: +ELLIPSIS
+    -0.01125...
+    >>> m  # doctest: +ELLIPSIS
+    0.01125...
+    >>> # Get the Sharpe ratio
+    >>> S = OUOTB.sharpe_ratio(a=a, m=m, c=0.001, rf=0.01)
+    >>> S  # doctest: +ELLIPSIS
+    3.862...
+    >>> # Set an array of transaction costs
     >>> c_list = np.linspace(0, 0.01, 30)
-
-    >>> # Plotting the impact of transaction costs on the optimal entry threshold
-    >>> fig = OUOTB.plot_target_vs_c(target = "a", method = "maximize_expected_return", c_list = c_list)
-    >>> plt.show() # doctest: +SKIP
-
-    >>> # Setting a array contains risk-free rates. 
+    >>> # Plot the impact of transaction costs on the optimal entry threshold
+    >>> OUOTB.plot_target_vs_c(
+    ...     target="a", method="maximize_expected_return", c_list=c_list
+    ... )  # doctest: +ELLIPSIS
+    <Figure...>
+    >>> # Set an array containing risk-free rates.
     >>> rf_list = np.linspace(0, 0.05, 30)
-
-    >>> # Plotting the impact of risk-free rates on the optimal entry threshold
-    >>> fig = OUOTB.plot_target_vs_rf(target = "a", method = "maximize_sharpe_ratio", rf_list = rf_list, c = 0.001)
-    >>> plt.show() # doctest: +SKIP
+    >>> # Plot the impact of risk-free rates on the optimal entry threshold
+    >>> OUOTB.plot_target_vs_rf(
+    ...     target="a", method="maximize_sharpe_ratio", rf_list=rf_list, c=0.001
+    ... )  # doctest: +ELLIPSIS
+    <Figure...>
 
 Research Notebooks
 ******************

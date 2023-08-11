@@ -33,11 +33,13 @@ H-Strategy
 
 |
 
-In this paper, the author proposes a new nonparametric approach to pairs trading based on the idea of
-Renko and Kagi charts. This approach exploits statistical information about the variability of the
-tradable process. The approach does not aim to find a long-run mean of the process and trade towards it
-like other methods of pairs trading. Instead, it manages the problem of how far the process should move
-in one direction before trading in the opposite direction becomes potentially profitable by measure the
+In this paper, the author proposes a new non-parametric approach to pairs
+trading based on the idea of Renko and Kagi charts. This approach exploits
+statistical information about the variability of the tradable process. The
+approach does not aim to find a long-run mean of the process and trade towards
+it like other methods of pairs trading. Instead, it manages the problem of how
+far the process should move in one direction before trading in the *opposite*
+direction potentially becomes profitable, which is done by measuring the
 variability of the process.
 
 H-construction
@@ -226,19 +228,22 @@ and the total profit from time $0$ till time $T$ is
 Properties
 **********
 
-It is clear that the choice of H-strategy depends on the value of H-volatility. If :math:`\xi^1_T > 2H`,
-then to achieve a positive profit the investor should
-employ a momentum H -strategy; If :math:`\xi^1_T < 2H` then the investor should use a contrarian H-strategy.
+It is clear that the choice of H-strategy depends on the value of H-volatility.
+If :math:`\xi^1_T > 2H`, then to achieve a positive profit the investor should
+employ a momentum H-strategy. If, on the other hand, :math:`\xi^1_T < 2H` then
+the investor should use a contrarian H-strategy.
 
-Suppose :math:`P(t)` follows the Wiener process, the H-volatility :math:`\xi^1_T = 2H`. As a result,
-it is impossible to profit from the trading on the process :math:`P(t)`. We can also see that H-volatility
-:math:`\xi^1_T = 2H` is a property of a martingale. Likewise :math:`\xi^1_T > 2H` could be a property of a
-sub-martingale or a super-martingale or a process regularly switching over time from a sub-martingale to a
-super-martingale and back.
+Suppose :math:`P(t)` follows the Wiener process, the H-volatility :math:`\xi^1_T
+= 2H`. As a result, it is impossible to profit by trading on the process
+:math:`P(t)`. We can also see that H-volatility :math:`\xi^1_T = 2H` is a
+property of a martingale. Likewise :math:`\xi^1_T > 2H` could be a property of a
+sub-martingale or a super-martingale or a process that regularly switches
+back-and-forth over time between a sub-martingale and a super-martingale.
 
-In this paper, the author proposes that for any mean-reverting process, regardless of its distribution,
-the H-volatility is less than :math:`2H`. Hence, theoretically, trading the mean-reverting process by the
-contrarian H-strategy is profitable for any choice of :math:`H`.
+In this paper, the author proposes that for any mean-reverting process,
+regardless of its distribution, the H-volatility is less than :math:`2H`. Hence,
+theoretically, trading the mean-reverting process by the contrarian H-strategy
+is profitable for any choice of :math:`H`.
 
 Pairs Selection
 ###############
@@ -308,35 +313,34 @@ HConstruction
     >>> import matplotlib.pyplot as plt
     >>> import yfinance as yf
     >>> from arbitragelab.time_series_approach.h_strategy import HConstruction
-
-    >>> # Loading data
-    >>> data = yf.download("KO PEP", start="2019-01-01", end="2020-12-31", progress=False)["Adj Close"]
-    ...
-    >>> # Constructing spread series
+    >>> data = yf.download("KO PEP", start="2019-01-01", end="2020-12-31", progress=False)[
+    ...     "Adj Close"
+    ... ]
+    >>> # Construct spread series
     >>> series = np.log(data["KO"]) - np.log(data["PEP"])
-
-    >>> # Creating a class object
     >>> threshold = series["2019"].std()
     >>> hc = HConstruction(series["2020"], threshold, "Kagi")
-
-    >>> # Getting H-statistics
-    >>> print("H-inversion:", hc.h_inversion())# doctest: +ELLIPSIS
-    H-inversion: ...
-    >>> print("H-distances:", hc.h_distances()) # doctest: +ELLIPSIS
-    H-distances: ...
-    >>> print("H-volatility:", hc.h_volatility()) # doctest: +ELLIPSIS
-    H-volatility: ...
-
-    >>> # Getting signals
+    >>> # Get H-statistics
+    >>> hc.h_inversion()  # doctest: +ELLIPSIS
+    19
+    >>> hc.h_distances()  # doctest: +ELLIPSIS
+    1.475...
+    >>> hc.h_volatility()  # doctest: +ELLIPSIS
+    0.0776...
+    >>> # Extract signals
     >>> signals = hc.get_signals("contrarian")
-
+    >>> signals  # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    Date
+    2020-01-02 0.0...
     >>> # A quick backtest
     >>> positions = signals.replace(0, np.nan).ffill()
     >>> returns = data["KO"]["2020"].pct_change() - data["PEP"]["2020"].pct_change()
-    >>> total_returns = ((positions.shift(1)*returns).dropna() + 1).cumprod()
+    >>> total_returns = ((positions.shift(1) * returns).dropna() + 1).cumprod()
     >>> fig = total_returns.plot()
-    >>> fig # doctest: +ELLIPSIS
+    >>> fig  # doctest: +ELLIPSIS
     <Axes:...>
+
+
 HSelection
 **********
 
@@ -347,26 +351,22 @@ HSelection
     >>> import matplotlib.pyplot as plt
     >>> import yfinance as yf
     >>> from arbitragelab.time_series_approach.h_strategy import HSelection
-
-    >>> # Loading data
+    >>> # Fetch data
     >>> tickers = "AAPL MSFT AMZN META GOOGL GOOG TSLA NVDA JPM"
-    >>> data = yf.download(tickers, start="2019-01-01", end="2020-12-31", progress=False)["Adj Close"]
-    >>> # Creating a class object
+    >>> data = yf.download(tickers, start="2019-01-01", end="2020-12-31", progress=False)[
+    ...     "Adj Close"
+    ... ]
     >>> hs = HSelection(data)
-    >>> hs.select()
-    ...
-    >>> # Getting pairs
+    >>> hs.select()  # Calculate H-inversion statistic
     >>> pairs = hs.get_pairs(5, "highest", False)
-    >>> # Getting pairs
-    >>> pairs = hs.get_pairs(5, "highest", False)  
-    >>> print("H-inversion:", pairs[0][0], "Threshold for H-construction:", pairs[0][1], "Pairs:", pairs[0][2])# doctest: +ELLIPSIS
-    H-inversion: ... Threshold for H-construction: ... Pairs: ...
-    >>> print("H-inversion:", pairs[1][0], "Threshold for H-construction:", pairs[1][1], "Pairs:", pairs[1][2])# doctest: +ELLIPSIS
-    H-inversion: ... Threshold for H-construction: ... Pairs: ...
-    >>> print("H-inversion:", pairs[2][0], "Threshold for H-construction:", pairs[2][1], "Pairs:", pairs[2][2])# doctest: +ELLIPSIS
-    H-inversion: ... Threshold for H-construction: ... Pairs: ...
-    >>> print("H-inversion:", pairs[3][0], "Threshold for H-construction:", pairs[3][1], "Pairs:", pairs[3][2])# doctest: +ELLIPSIS
-    H-inversion: ... Threshold for H-construction: ... Pairs: ... 
+    >>> # Inspect the first pair
+    >>> # Each pair contains [H-inversion statistic, H-construction threshold, Asset pair]
+    >>> pairs[0]  # doctest: +ELLIPSIS
+    [34, 0.0034..., ('GOOG', 'GOOGL')]
+    >>> # Inspect another pair
+    >>> pairs[1]  # doctest: +ELLIPSIS
+    [12, 0.132..., ('AAPL', 'NVDA')]
+
 
 Research Notebooks
 ******************

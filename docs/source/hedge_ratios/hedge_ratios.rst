@@ -28,17 +28,21 @@ Hedge Ratio Calculations
 
 |
 
-There are various ways to find mean-reverting spread, including distance, cointegration, copula and ML approach.
-In the next step, when a trade signal is generated (Z-score > or < then threshold value), a researcher needs to understand
-how to trade the spread. How many units of X stock to buy and how many units of Y to sell.
+There are various ways to find mean-reverting spread, including distance,
+cointegration, copula, and ML approach.  In the next step, when a trade signal
+is generated (Z-score above or below some threshold value), a researcher needs
+to understand how to trade the spread. In other words, how many units of X stock to buy and how
+many units of Y to sell.
 
-Let's consider the example: a filter system detected a potentially profitable mean-reverting pair of **AMZN** and
-**AMD** stock. However, AMZN price is 3200$/stock, and AMD is only 78$. If we trade 1 unit of AMZN vs 1 unit of AMD and both
-prices revert back - we will face a negative P&L. Why so?
+Let's consider an example: a filter system detected a potentially profitable mean-reverting pair of **AMZN** and
+**AMD** stock. However, AMZN price is $3200, and AMD is only $78. If we trade 1 unit of AMZN vs 1 unit of AMD and both
+prices revert back, we will face a negative P&L.
 
-1% change in AMZN results in 32$ change in your position value, however 1% in AMD results in only 0.78$ P&L change.
-This problem is solved by calculating the **hedge ratio**, which will balance dollar value differences between the spread
-legs. One way to solve this problem is to divide AMZN price by AMD price and use it as a hedge ratio.
+Why?
+
+A 1% change in AMZN results in $32 change in your position value, however 1% in AMD results in only $0.78 P&L change.
+This problem is solved by calculating the *hedge ratio*, which will balance dollar value differences between the spread
+legs. A simple solution is to divide the AMZN price by AMD price, and use this resulting value as a hedge ratio.
 
 In this case, for each AMZN stock, we trade 3200/78 = 41 units of AMD stock. This approach is called the **ratio method**.
 In ArbitrageLab, we have implemented several methods which are used in hedge ratio calculations.
@@ -55,7 +59,7 @@ Spread construction methodology
 
 .. note::
     All hedge ratio calculation methods assume that the first asset is a dependent variable unless a user specifies which asset
-    should be used as a dependent one.
+    should be used as dependent.
 
 One can use the `construct_spread` function from the ArbitrageLab hedge ratio module to construct spread series from generated
 hedge ratios.
@@ -66,16 +70,19 @@ hedge ratios.
 
 .. doctest::
 
-    # Importing packages
     >>> import pandas as pd
     >>> import numpy as np
     >>> from arbitragelab.hedge_ratios import construct_spread
     >>> url = "https://raw.githubusercontent.com/hudson-and-thames/example-data/main/arbitrage_lab_data/sp100_prices.csv"
     >>> data = pd.read_csv(url, index_col=0, parse_dates=[0])
-    >>> hedge_ratios = pd.Series({'A': 1, 'AVB': 0.832406370860649})
-    >>> spread = construct_spread(data[['AVB', 'A']], hedge_ratios=hedge_ratios)
-    >>> inverted_spread = construct_spread(data[['AVB', 'A']], hedge_ratios=hedge_ratios,
-    ...                                   dependent_variable='A')
+    >>> hedge_ratios = pd.Series({"A": 1, "AVB": 0.832406370860649})
+    >>> spread = construct_spread(data[["AVB", "A"]], hedge_ratios=hedge_ratios)
+    >>> inverted_spread = construct_spread(
+    ...     data[["AVB", "A"]], hedge_ratios=hedge_ratios, dependent_variable="A"
+    ... )
+    >>> inverted_spread # doctest: +ELLIPSIS +NORMALIZE_WHITESPACE
+    Date
+    2017-01-03 -100.529...
 
 Ordinary Least Squares (OLS)
 ############################
@@ -192,39 +199,52 @@ Code Example
 
 .. doctest::
 
-    >>> # Importing packages
     >>> import pandas as pd
     >>> import numpy as np
-    >>> from arbitragelab.hedge_ratios import (get_ols_hedge_ratio, get_tls_hedge_ratio,
-    ...                                    get_johansen_hedge_ratio,
-    ...                                    get_box_tiao_hedge_ratio,
-    ...                                    get_minimum_hl_hedge_ratio,
-    ...                                    get_adf_optimal_hedge_ratio)
-    >>> # Getting the dataframe with time series of asset prices
+    >>> from arbitragelab.hedge_ratios import (
+    ...     get_ols_hedge_ratio,
+    ...     get_tls_hedge_ratio,
+    ...     get_johansen_hedge_ratio,
+    ...     get_box_tiao_hedge_ratio,
+    ...     get_minimum_hl_hedge_ratio,
+    ...     get_adf_optimal_hedge_ratio,
+    ... )
+    >>> # Fetch time series of asset prices
     >>> url = "https://raw.githubusercontent.com/hudson-and-thames/example-data/main/arbitrage_lab_data/gld_gdx_data.csv"
-    >>> data = pd.read_csv(url, index_col=0, parse_dates = [0])
-    >>> ols_hedge_ratio, _, _, _ = get_ols_hedge_ratio(data, dependent_variable='GLD',
-    ...                                            add_constant=False)
-    >>> print(f'OLS hedge ratio for GLD/GDX spread is {ols_hedge_ratio}') # doctest: +ELLIPSIS
+    >>> data = pd.read_csv(url, index_col=0, parse_dates=[0])
+    >>> ols_hedge_ratio, _, _, _ = get_ols_hedge_ratio(
+    ...     data, dependent_variable="GLD", add_constant=False
+    ... )
+    >>> print(f"OLS hedge ratio for GLD/GDX spread is {ols_hedge_ratio}")  # doctest: +ELLIPSIS
     OLS hedge ratio for GLD/GDX spread is {'GLD': 1.0, 'GDX': 7.6...}
-    >>> tls_hedge_ratio, _, _, _ = get_tls_hedge_ratio(data, dependent_variable='GLD')
-    >>> print(f'TLS hedge ratio for GLD/GDX spread is {tls_hedge_ratio}')# doctest: +ELLIPSIS
+    >>> tls_hedge_ratio, _, _, _ = get_tls_hedge_ratio(data, dependent_variable="GLD")
+    >>> print(f"TLS hedge ratio for GLD/GDX spread is {tls_hedge_ratio}")  # doctest: +ELLIPSIS
     TLS hedge ratio for GLD/GDX spread is {...}
-    >>> joh_hedge_ratio, _, _, _ = get_johansen_hedge_ratio(data, dependent_variable='GLD')
-    >>> print(f'Johansen hedge ratio for GLD/GDX spread is {joh_hedge_ratio}')# doctest: +ELLIPSIS
+    >>> joh_hedge_ratio, _, _, _ = get_johansen_hedge_ratio(data, dependent_variable="GLD")
+    >>> print(
+    ...     f"Johansen hedge ratio for GLD/GDX spread is {joh_hedge_ratio}"
+    ... )  # doctest: +ELLIPSIS
     Johansen hedge ratio for GLD/GDX spread is {...}
-    >>> box_tiao_hedge_ratio, _, _, _ = get_box_tiao_hedge_ratio(data, dependent_variable='GLD')
-    >>> print(f'Box-Tiao hedge ratio for GLD/GDX spread is {box_tiao_hedge_ratio}')# doctest: +ELLIPSIS
+    >>> box_tiao_hedge_ratio, _, _, _ = get_box_tiao_hedge_ratio(data, dependent_variable="GLD")
+    >>> print(
+    ...     f"Box-Tiao hedge ratio for GLD/GDX spread is {box_tiao_hedge_ratio}"
+    ... )  # doctest: +ELLIPSIS
     Box-Tiao hedge ratio for GLD/GDX spread is {...}
-    >>> hl_hedge_ratio, _, _, _, opt_object = get_minimum_hl_hedge_ratio(data,
-    ...                                                                  dependent_variable='GLD')
-    >>> print(f'Minimum HL hedge ratio for GLD/GDX spread is {hl_hedge_ratio}')# doctest: +ELLIPSIS
+    >>> hl_hedge_ratio, _, _, _, opt_object = get_minimum_hl_hedge_ratio(
+    ...     data, dependent_variable="GLD"
+    ... )
+    >>> print(
+    ...     f"Minimum HL hedge ratio for GLD/GDX spread is {hl_hedge_ratio}"
+    ... )  # doctest: +ELLIPSIS
     Minimum HL hedge ratio for GLD/GDX spread is {...}
     >>> print(opt_object.status)
     0
-    >>> adf_hedge_ratio, _, _, _, opt_object = get_adf_optimal_hedge_ratio(data,
-    ...                                                                    dependent_variable='GLD')
-    >>> print(f'Minimum ADF t-statistic hedge ratio for GLD/GDX spread is {adf_hedge_ratio}')# doctest: +ELLIPSIS
+    >>> adf_hedge_ratio, _, _, _, opt_object = get_adf_optimal_hedge_ratio(
+    ...     data, dependent_variable="GLD"
+    ... )
+    >>> print(
+    ...     f"Minimum ADF t-statistic hedge ratio for GLD/GDX spread is {adf_hedge_ratio}"
+    ... )  # doctest: +ELLIPSIS
     Minimum ADF t-statistic hedge ratio for GLD/GDX spread is {...}
     >>> print(opt_object.status)
     0
