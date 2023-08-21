@@ -35,9 +35,28 @@ extensions = [
     'sphinx.ext.coverage',
     'sphinx.ext.intersphinx',
     'sphinx.ext.doctest',
+    'sphinx_copybutton',
+    'myst_parser',
+    'autoapi.extension',
     'releases',
 ]
 
+# AUTOAPI SETTINGS
+autoapi_type = 'python'
+autoapi_dirs = ["../../arbitragelab"]
+autoapi_root = "technical/api"
+autoapi_add_toctree_entry = False
+autoapi_ignore = ["*arbitragelab/network/imports*", "*arbitragelab/util/segment*"]
+autoapi_options = [
+    "members",
+    "undoc-members",
+    "inherited-members",
+    "special-members",
+    "show-inheritance",
+    "show-module-summary",
+]
+
+suppress_warnings = ["autoapi.python_import_resolution" ]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
