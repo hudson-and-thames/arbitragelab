@@ -31,12 +31,15 @@ yfinance==0.2.24
 
 # Develop
 coverage==7.2.7
-docutils==0.16 # Docs
+docutils==0.18.1 # Docs
 hudsonthames-sphinx-theme==0.1.5 # Docs
 jinja2<3.1 # Docs
 pyarmor==8.2.5 # Encryption
-pylint==2.6.0
+pylint==2.17.4
 pytest==7.3.1
 releases==1.6.3 # Docs
-sphinx-rtd-theme==0.5.2 # Docs
-sphinx==3.4.3 # Docs
+sphinx-copybutton==0.5.2 # docs
+sphinx-rtd-theme==1.2.2 # docs
+sphinx-autoapi==2.1.1
+sphinx-tabs==3.4.1
+myst-parser==2.0.0 # Docs

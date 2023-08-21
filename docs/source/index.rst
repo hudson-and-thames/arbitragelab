@@ -2,7 +2,6 @@
    :align: center
    :target: https://hudsonthames.org/
 
-|
 
 ============================================
 Welcome to Statistical Arbitrage Laboratory
@@ -33,7 +32,6 @@ whole range of strategies defined by Krauss' taxonomy for pairs trading strategi
                        height: 100%;">
         </iframe>
     </div>
-|
 
 
 Hudson & Thames documentation has three core advantages in helping you learn the new techniques:
@@ -73,6 +71,7 @@ The general documentation structure looks the following way:
 |    Presentation slides*                  |
 +------------------------------------------+
 
+
 \* *- optional content*
 
 .. image:: https://hudsonthames.org/wp-content/uploads/2021/03/2-n.png
@@ -84,7 +83,6 @@ ___________
 
 Flexibility
 +++++++++++
-|
 
 Learn in the way that is most suitable for you as more and more documentation pages are now supplemented with both
 video lectures and presentation slides on the topic.
@@ -93,7 +91,6 @@ video lectures and presentation slides on the topic.
 .. image:: https://hudsonthames.org/wp-content/uploads/2021/12/docs-example.png
    :align: center
    :target: https://hudsonthames.org/
-|
 
 .. image:: https://hudsonthames.org/wp-content/uploads/2021/03/3-n.png
    :height: 70 px
@@ -104,7 +101,6 @@ ___________
 
 Credibility
 +++++++++++
-|
 
 All of our implementations are from the most elite and peer-reviewed journals.
 
@@ -119,13 +115,12 @@ Including publications from:
 
 .. image:: https://hudsonthames.org/wp-content/uploads/2021/12/sourses-v2.png
    :align: center
-|
 
 
 .. image:: https://hudsonthames.org/wp-content/uploads/2021/11/header_github_ht.jpg
    :align: center
    :target: https://hudsonthames.org/
-|
+
 
 Who is Hudson & Thames?
 +++++++++++++++++++++++
@@ -169,6 +164,12 @@ This project is licensed under an all rights reserved license and is NOT open-so
     getting_started/installation
     getting_started/research_tools
     getting_started/equity_curve_convention
+
+.. toctree::
+    :maxdepth: 1
+    :caption: API Reference
+
+    technical/api/arbitragelab/index
 
 .. toctree::
     :maxdepth: 2
