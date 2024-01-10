@@ -7,25 +7,21 @@ This module allows us to track how the library is used and measure statistics su
 """
 
 import os
-from datetime import datetime as dt
+
+# from datetime import datetime as dt
 from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
 from requests import get
-
-import analytics as segment
-import getmac
 
 
 class Analytics:
     """
     Validates the API Key and tracks imports on load.
     """
+
     def __init__(self):
         # Check valid API key
         self.__isvalid = self.__check_api_key()
-
-        # Identify new session
-        identify()
 
     def is_valid(self):
         """
@@ -43,26 +39,42 @@ class Analytics:
         """
         # Check environment variables is present
         if API_KEY_ENV_VAR in os.environ:
-            new_key = ''
-            site = "https://hudson-thames.ew.r.appspot.com/api/access/" + os.environ[API_KEY_ENV_VAR]
+            # site for portal.hudsonthames.org -- new system
+            site1 = (
+                "https://portal.hudsonthames.org/api/verify/"
+                + os.environ[API_KEY_ENV_VAR]
+                + "/arbitrage"
+            )
+            # site for hudson-thames.ew.r.appspot.com -- old system
+            site2 = (
+                "https://hudson-thames.ew.r.appspot.com/api/access/"
+                + os.environ[API_KEY_ENV_VAR]
+            )
 
-            # Validate api key
+            # Validate API key with portal.hudsonthames.org
             try:
-                with urlopen(site) as response:
-                    # Get validation message.
+                with urlopen(site1) as response:
                     response_content = response.read().decode()
-                    # Confirm that it is valid.
-                    new_key = response_content == 'OK'
-            except HTTPError as err:
-                raise Exception(" ARBLAB_API_KEY is not valid.") from err
-            except URLError as err:
-                raise ConnectionError('Can not reach the server. Please check your connection or firewall.') from err
-            # Return the results
-            return new_key
+                    if response_content == "true":
+                        return True
+            except (HTTPError, URLError):
+                pass
+
+            # Validate API key with hudson-thames.ew.r.appspot.com
+            try:
+                with urlopen(site2) as response:
+                    response_content = response.read().decode()
+                    if response_content == "OK":
+                        return True
+            except (HTTPError, URLError):
+                pass
+
+            return False
 
         # Else the API KEy has not been registered.
         raise Exception(
-            " ARBLAB_API_KEY not found in your environment variables. Please check the install instructions.")
+            " ARBLAB_API_KEY not found in your environment variables. Please check the install instructions."
+        )
 
 
 # Get user data functions
@@ -73,24 +85,9 @@ def get_apikey():
     try:
         apikey = os.environ[API_KEY_ENV_VAR]
     except KeyError:
-        apikey = 'Bandit'
+        apikey = "Bandit"
 
     return apikey
-
-
-def get_mac():
-    """
-    Identify the device by MAC Address
-    """
-
-    mac = getmac.get_mac_address(os.environ.get("ARBLAB_MAC_INTERFACE"))
-    if mac is None:
-        raise ValueError("No MAC Address is found on this device, must have a MAC Address."
-                         " If using a VPN, you might be able to resolve this by specifying"
-                         " the correct interface manually using the PORTLAB_MAC_INTERFACE environment"
-                         " variable.")
-
-    return mac
 
 
 # Validate functions
@@ -111,24 +108,11 @@ def is_build_server():
     Check if device is build server.
     """
     try:
-        is_dev = bool(validate_env_variable('IS_CIRCLECI'))
+        is_dev = bool(validate_env_variable("IS_CIRCLECI"))
     except KeyError:
         is_dev = False
 
     return is_dev
-
-
-# Segment functions
-def identify():
-    """
-    Identify the user and device.
-    """
-    # Validate not build server
-    if not IS_DEV:
-        segment.identify(MAC, {'mac_address': MAC,
-                               'api_key': API_KEY,
-                               'IP': IP,
-                               'created_at': dt.now()})
 
 
 def track(func):
@@ -137,35 +121,24 @@ def track(func):
 
     :param func: String - name of function.
     """
-    # Validate key
-    if VALIDATOR.is_valid():
-        # Validate not build server
-        if not IS_DEV:
-            # If 1st time func called
-            if func not in TRACK_CALLS:
-                TRACK_CALLS[func] = True
-                segment.track(MAC, func, {'time': dt.now()})
-    else:
-        raise Exception(" ARBLAB_API_KEY is not valid.")
+    pass
 
 
 # ----------------------------------------------------------------------------------
 # Body
 # Env Var
 API_KEY_ENV_VAR = "ARBLAB_API_KEY"
-SEGMENT = 'F7gnyZS5UWo12fFj3m8sIgANC9ttPEbA'
 IP = None
 API_KEY = get_apikey()
-MAC = get_mac()
-
 IS_DEV = is_build_server()
 TRACK_CALLS = {}
 
 try:
-    IP = get('http://checkip.amazonaws.com/').text.strip()
+    IP = get("http://checkip.amazonaws.com/").text.strip()
 except ConnectionError as err:
-    raise ConnectionError('Can not reach the Amazon CheckIP server. Please check your connection or firewall.') from err
+    raise ConnectionError(
+        "Can not reach the Amazon CheckIP server. Please check your connection or firewall."
+    ) from err
 
 # Connect with DB
-segment.write_key = SEGMENT
 VALIDATOR = Analytics()
