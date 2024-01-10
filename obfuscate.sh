@@ -5,7 +5,7 @@
 # Set the version
 # TODO: Do this automatically in the future by reading from setup.cfg (or
 # similar)
-VERSION=0.8.1
+VERSION=0.9.0
 
 # Start clean
 rm -rf dist/
