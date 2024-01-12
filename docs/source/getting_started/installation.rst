@@ -27,7 +27,7 @@ Recommended Setup on Windows
 
    .. code-block::
 
-      pip install https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@raw.githubusercontent.com/hudson-and-thames-clients/arbitragelab/master/arbitragelab-0.8.1-py38-none-any.whl
+      pip install https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@raw.githubusercontent.com/hudson-and-thames-clients/arbitragelab/master/arbitragelab-0.9.0-py38-none-any.whl
 
 
 #. Make sure your API key is available in your environment under the ``ARBLAB_API_KEY`` environment variable by opening the Command Prompt as an administrator, and running the following command:
@@ -81,7 +81,7 @@ Recommended Setup on Linux / MacOS
 
    .. code-block::
 
-      pip install https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@raw.githubusercontent.com/hudson-and-thames-clients/arbitragelab/master/arbitragelab-0.8.1-py38-none-any.whl
+      pip install https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@raw.githubusercontent.com/hudson-and-thames-clients/arbitragelab/master/arbitragelab-0.9.0-py38-none-any.whl
 
 #. Make sure your API key is available in your environment under the ``ARBLAB_API_KEY`` environment variable.
 
@@ -128,7 +128,7 @@ Google Colab
 
    .. code-block::
 
-      pip install https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@raw.githubusercontent.com/hudson-and-thames-clients/arbitragelab/master/arbitragelab-0.8.1-py38-none-any.whl
+      pip install https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@raw.githubusercontent.com/hudson-and-thames-clients/arbitragelab/master/arbitragelab-0.9.0-py38-none-any.whl
 
 
 #. Insert the following in the first cell of your notebook in order to register your API key
