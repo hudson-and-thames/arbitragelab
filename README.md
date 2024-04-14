@@ -42,6 +42,10 @@ talent have been instrumental in enhancing the library and company as a whole. I
 and meticulous attention to detail, have not only enriched our project but also set a high standard for excellence. We deeply 
 appreciate your hard work and commitment to making ArbitrageLab a success.
 
+A special thank you to Dirk for the quality time and deep insights you have dedicated to enhancing our business. 
+Your expertise and motivational efforts were, and continue to be invaluable. We greatly appreciate your 
+commitment and enthusiastic support. We couldn't have asked for a better Start-Up Advisor!
+
 Core Contributions
 * [Hansen Pei](https://www.linkedin.com/in/hansen-pei-0949691b3/)
 * [Yefeng Wang]
