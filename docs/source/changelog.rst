@@ -12,7 +12,7 @@ Changelog
 * :release:`0.9.0 <2024-01-10>`
 
 * :release:`0.8.1 <2022-07-25>`
-* :support:`91` Allow user to specify network interface for MAC address
+* :support:`91` NA
 
 * :release:`0.8.0 <2022-06-28>`
 * :support:`78` Bump dependencies.
@@ -56,9 +56,6 @@ Changelog
 * :support:`51` OU Optimal Threshold Model Zeng documentation.
 * :support:`51` Updated requirements - new package (mpmath==1.2.1).
 * :bug:`60 major` Fix unit tests not passing due to cvxpy bad installs.
-* :bug:`58 major` Fixed maxed connections a day by pointing the get public IP server to AWS.
-* :bug:`58 major` Fixed the API key validation and build server authentication.
-* :feature:`58` Changed the analytics we track to: MAC Address, Public IP, API_KEY, and Function Calls + time stamps.
 
 * :release:`0.5.0 <2021-04-15>`
 * :bug:`52 major` Fixed issue with too many function calls in web analytics.
@@ -116,7 +113,7 @@ Changelog
 * :bug:`32` Copulas module imports were not exposed.
 
 * :release:`0.2.1 <2020-12-22>`
-* :bug:`Hot` Error with environment variables in analytics module.
+* :bug:`Hot` Error with environment variables.
 
 * :release:`0.2.0 <2020-12-14>`
 * :feature:`5` ML Based Pairs Selection (Horta, 2020) and Data Importer added.
@@ -136,8 +133,6 @@ Changelog
 * :support:`24` Quantile Time Series Strategy and Auto ARIMA model documentation.
 * :feature:`27` CIR-model to the Optimal Mean Reversion module added.
 * :support:`27` CIR-model documentation.
-* :feature:`30` Track user analytics using Segment
-* :support:`30` Analytics documentation.
 
 * :release:`0.1.0 <2020-11-18>`
 * :feature:`2` Kalman Filter + Kalman strategy added.
@@ -156,5 +151,4 @@ Changelog
 * :feature:`16` OU-model to the Optimal Mean Reversion module added.
 * :support:`16` OU-model documentation.
 * :support:`17` Added Licence, ReadMe, and RoadMap
-* :support:`20` Added API Key Validation.
 * :support:`20` Add install documentation and test on OS/Ubuntu/Windows.
