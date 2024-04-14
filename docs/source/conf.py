@@ -18,7 +18,6 @@ sys.path.insert(0, os.path.abspath('./../..'))
 # -- Project information -----------------------------------------------------
 
 project = 'arbitragelab'
-copyright = '2019, Hudson & Thames Quantitative Research.'
 author = 'Hudson & Thames Quantitative Research'
 
 # The full version, including alpha/beta/rc tags
