@@ -1,0 +1,38 @@
+# Development
+
+## Creating a release
+
+- Create `release/<version>` branch
+- Bump versions throughout source files (we use `bump2version` to do automate this process, TODO: Add instructions)
+- Update customer install instructions in documentation source files
+- Update release information in changelog in documentation source files
+- Open PR from `release` branch into `develop`
+- Merge PR once approved
+- Test you can install the wheel from a fresh environment
+- Merge `develop` into `master`
+- Upload the wheel to pypi.
+- Tag the commit with the version number
+- Write a blog post announcing the release
+- Send a newsletter email
+- Post on social media
+
+## Bumping version numbers using `bump2version`
+
+We use `bump2version` to automatically bump versions throughout source files.
+
+Configuration lives in the `.bumpversion.cfg` file. To run `bump2version`, first install it via `pip`:
+
+``` sh
+pip install --upgrade bump2version
+```
+
+And then bump the version:
+
+``` sh
+bump2version <version-bump-type>
+```
+
+where `<version-bump-type>` tells you which version to be bumped. The acceptable
+values are `major`, `minor` or `patch`, conforming to the semantic versioning
+pattern: `major.minor.patch`. For example, `3.2.7` has a major version of 3, a
+minor version of 2 and a patch version of 7.
