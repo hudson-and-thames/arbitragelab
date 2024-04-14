@@ -104,8 +104,6 @@ Credibility
 
 All of our implementations are from the most elite and peer-reviewed journals.
 
-
-
 Including publications from:
 
 1. `The Journal of Portfolio Management <https://jpm.pm-research.com/>`_
@@ -130,20 +128,10 @@ quantitative finance and its practical application. We have created three premiu
 latest techniques and focus on what matters most: **creating your own winning strategy**.
 
 
-Community
-+++++++++
-
-With the purchase of the library, our clients get access to the Hudson & Thames Slack community, where our engineers and other quants
-are always ready to answer your questions.
-
-Alternatively, you can email us at: research@hudsonthames.org.
-
-
-
 License
 +++++++
 
-This project is licensed under an all rights reserved license and is NOT open-source, and may not be used for any purposes without a commercial license which may be purchased from Hudson and Thames Quantitative Research.
+This project is open-source, following the BSD 3 license.
 
 
 
