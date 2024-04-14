@@ -1,7 +1,3 @@
-# Copyright 2019, Hudson and Thames Quantitative Research
-# All rights reserved
-# Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
-
 # pylint: disable=invalid-name, too-many-arguments
 """
 This module optimizes the upper and lower bounds for mean-reversion cointegration pair trading.

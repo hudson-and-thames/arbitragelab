@@ -1,7 +1,3 @@
-# Copyright 2019, Hudson and Thames Quantitative Research
-# All rights reserved
-# Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
-
 """
 This module implements the PCA approach described by by Marco Avellaneda and Jeong-Hyun Lee in
 `"Statistical Arbitrage in the U.S. Equities Market"

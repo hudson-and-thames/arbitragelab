@@ -1,7 +1,3 @@
-# Copyright 2019, Hudson and Thames Quantitative Research
-# All rights reserved
-# Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
-
 """
 Correlation based distances and various modifications (angular, absolute, squared) described in Cornell lecture notes:
 Codependence: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3512994&download=yes

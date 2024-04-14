@@ -1,6 +1,7 @@
 """
 This module implements Cointegration-based Statistical Arbitrage strategies.
 """
+
 from arbitragelab.cointegration_approach.johansen import JohansenPortfolio
 from arbitragelab.cointegration_approach.engle_granger import EngleGrangerPortfolio
 from arbitragelab.cointegration_approach.minimum_profit import MinimumProfit

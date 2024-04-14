@@ -1,7 +1,3 @@
-# Copyright 2019, Hudson and Thames Quantitative Research
-# All rights reserved
-# Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
-
 """
 This module implements Kalman filter logic in statistical arbitrage trading. Kalman trading
 technique is applied to dynamically estimate a hedge ratio between two assets. The output of

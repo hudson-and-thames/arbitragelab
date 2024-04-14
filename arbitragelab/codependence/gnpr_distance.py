@@ -1,12 +1,9 @@
-# Copyright 2019, Hudson and Thames Quantitative Research
-# All rights reserved
-# Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
-
 """
 Implementation of distance using the Generic Non-Parametric Representation approach from "Some contributions to the
 clustering of financial time series and applications to credit default swaps" by Gautier Marti
 https://www.researchgate.net/publication/322714557
 """
+
 import numpy as np
 import pandas as pd
 from scipy.stats import spearmanr

@@ -1,7 +1,3 @@
-# Copyright 2019, Hudson and Thames Quantitative Research
-# All rights reserved
-# Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
-
 """
 This module validates your API key. Please note that making changes to this file or any of the files in this library is
 a violation of the license agreement. If you have any problems, please contact us: research@hudsonthames.org.

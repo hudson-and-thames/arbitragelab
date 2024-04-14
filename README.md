@@ -7,13 +7,12 @@
   </br>
 </div>
 
-# Welcome to Statistical Arbitrage Laboratory! 
+# Welcome to the Statistical Arbitrage Laboratory! 
 
 ## What is ArbitrageLab?
 
 ArbitrageLab is a python library that enables traders who want to exploit mean-reverting portfolios
 by providing a complete set of algorithms from the best academic journals.
-
 
 ## Development
 
@@ -25,10 +24,9 @@ by providing a complete set of algorithms from the best academic journals.
 - Update release information in changelog in documentation source files
 - Open PR from `release` branch into `develop`
 - Merge PR once approved
-- Obfuscate `develop` using PyArmor (instructions are located elsewhere in this README)
 - Test you can install the wheel from a fresh environment
 - Merge `develop` into `master`
-- Upload the obfuscated wheel to the Hudson & Thames Clients organization
+- Upload the wheel to pypi.
 - Tag the commit with the version number
 - Write a blog post announcing the release
 - Send a newsletter email

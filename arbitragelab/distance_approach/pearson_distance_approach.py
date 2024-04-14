@@ -1,7 +1,3 @@
-# Copyright 2021, Hudson and Thames Quantitative Research
-# All rights reserved
-# Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
-
 """
 Implementation of the statistical arbitrage distance approach proposed by
 Chen, H., Chen, S. J., and Li, F.

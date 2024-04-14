@@ -1,6 +1,3 @@
-# Copyright 2019, Hudson and Thames Quantitative Research
-# All rights reserved
-# Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 """
 This module implements the Multi Layer Perceptron, RNN model and the Pi Sigma Model described in Dunis et al. (2005).
 """

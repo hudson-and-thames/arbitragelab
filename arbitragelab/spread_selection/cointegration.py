@@ -1,7 +1,3 @@
-# Copyright 2019, Hudson and Thames Quantitative Research
-# All rights reserved
-# Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
-
 """
 This module implements the ML based Pairs Selection Framework described by Simão Moraes
 Sarmento and Nuno Horta in `"A Machine Learning based Pairs Trading Investment Strategy."
