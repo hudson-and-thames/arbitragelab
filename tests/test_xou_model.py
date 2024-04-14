@@ -11,6 +11,7 @@ import matplotlib
 
 from arbitragelab.optimal_mean_reversion.xou_model import ExponentialOrnsteinUhlenbeck
 
+
 class TestExponentialOrnsteinUhlenbeck(unittest.TestCase):
     """
     Test the Exponential Ornstein-Uhlenbeck module.

@@ -1,8 +1,3 @@
-# Copyright 2023, Hudson and Thames Quantitative Research
-# All rights reserved
-# Read more: https://github.com/hudson-and-thames/arbitragtelab/blob/master/LICENSE.txt
-
-
 # Always prefer setuptools over distutils
 from setuptools import setup
 
