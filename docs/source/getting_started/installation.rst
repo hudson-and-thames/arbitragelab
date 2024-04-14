@@ -4,12 +4,6 @@
 Installation
 ============
 
-
-API Keys
-########
-In order to use ``arbitragelab``, you will require an API key. This is provided to
-you when you purchase ArbitrageLab, and can be found on the client portal. If you are unable to find your API key, please reach out to sales@hudsonthames.org.
-
 Recommended Setup on Windows
 ############################
 
@@ -27,25 +21,7 @@ Recommended Setup on Windows
 
    .. code-block::
 
-      pip install https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@raw.githubusercontent.com/hudson-and-thames-clients/arbitragelab/master/arbitragelab-0.9.0-py38-none-any.whl
-
-
-#. Make sure your API key is available in your environment under the ``ARBLAB_API_KEY`` environment variable by opening the Command Prompt as an administrator, and running the following command:
-
-   .. code-block::
-
-      setx ARBLAB_API_KEY "<your-api-key"
-
-   where you replace ``<your-api-key`` with your ArbitrageLab API key you received
-   when you purchased a subscription.
-
-   Verify that your API key is available in your environment by executing the following in a **new** command prompt terminal:
-
-   .. code-block::
-
-      echo %ARBLAB_API_KEY%
-
-   which should echo your API key to the terminal.
+      pip install arbitragelab
 
 #. You are now ready to use ArbitrageLab.
 
@@ -81,36 +57,7 @@ Recommended Setup on Linux / MacOS
 
    .. code-block::
 
-      pip install https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@raw.githubusercontent.com/hudson-and-thames-clients/arbitragelab/master/arbitragelab-0.9.0-py38-none-any.whl
-
-#. Make sure your API key is available in your environment under the ``ARBLAB_API_KEY`` environment variable.
-
-   If you're running on **Linux or MacOS**, you can add the following to your
-   ``~/.zshrc``, ``~/.bashrc`` or ``~/.profile`` file in order to make the API
-   key available:
-
-   .. code-block::
-
-      ARBLAB_API_KEY="<your-api-key>"
-
-   where you replace ``<your-api-key`` with your ArbitrageLab API key you received
-   when you purchased a subscription.
-
-   .. note::
-
-      Remember to close and open a new terminal, or ``source`` your terminal
-      configuration to make sure the environment gets refreshed with our new
-      ``ARBLAB_API_KEY`` variable.
-
-
-   Verify that your API key is available in your environment by executing the following in your refreshed terminal
-
-   .. code-block::
-
-      echo $ARBLAB_API_KEY
-
-   which should echo your API key to the terminal.
-
+      pip install arbitragelab
 
 #. You are now ready to use ArbitrageLab.
 
@@ -122,74 +69,10 @@ Google Colab
 
    Google Colab frequently updates the version of Python it used. You might need to
    explore additional methods of using a Python 3.8 kernel for full support of
-   ArbitrageLab. We are currently working on bring Python 3.9+ support.
+   ArbitrageLab.
 
 #. Open a new Terminal, and install ArbitrageLab using ``pip``:
 
    .. code-block::
 
-      pip install https://1fed2947109cfffdd6aaf615ea84a82be897c4b9@raw.githubusercontent.com/hudson-and-thames-clients/arbitragelab/master/arbitragelab-0.9.0-py38-none-any.whl
-
-
-#. Insert the following in the first cell of your notebook in order to register your API key
-
-.. code-block:: python
-
-   # Insert this at the start of your script or notebook
-   import os
-
-   os.environ["ARBLAB_API_KEY"] = "<your-api-key>"
-
-
-Alternative ways of adding the API Key
-######################################
-
-.. warning::
-
-   The following is not recommended for security reasons, since you run the risk
-   of accidentally leaking your API key in your source code by accidentally
-   committing it to your version control system. As a result, we highly
-   recommended using environment variables instead.
-
-You can also use the ``os`` module in your Python script or Jupyter notebook
-to add the ``ARBLAB_API_KEY`` environment variable before importing
-``arbitragelab``:
-
-.. code-block:: python
-
-   # Insert this at the start of your script or notebook
-   import os
-
-   os.environ["ARBLAB_API_KEY"] = "<your-api-key>"
-
-
-Fixing "No MAC Address Found" Errors
-####################################
-
-Depending on your setup, especially when using a VPN service or application,
-importing ``arbitragelab`` may cause a "No MAC Address Found" error to be
-raised. This occurs when attempting to verify your API key, and occurs when we
-are unable to access the MAC address of your computer's network device. This is
-usually the result of a virtual network device, associated with your VPN, that
-doesn't report a physical MAC address.
-
-The workaround is to manually specify your physical hardware network interface
-name using another environment variable, ``ARBLAB_MAC_INTERFACE``:
-
-For Windows:
-
-.. code-block::
-
-   setx ARBLAB_MAC_INTERFACE "<your-network-interface>"
-
-
-For Linux / MacOS:
-
-.. code-block::
-
-   # In ~/.bashrc, ~/.zshrc, or ~/.profile, depending on platform
-   ARBLAB_MAC_INTERFACE="<your-network-interface>"
-
-
-With this environment variable set (remember to ``source`` your rc files if
-you're on Linux or MacOS), you should now be able to import the package normally.
+      pip install arbitragelab
