@@ -28,8 +28,8 @@ All the original developers (including myself (Jacques)), have gone on to have s
 the work we did can hopefully make a small contribution to the scientific community, and further research in
 this field can be fostered.
 
-## Special Thank You To
-A lot of passion and care went into the creation of this library, and we would like to say special thank you to: 
+## Special Thank You:
+A lot of passion and love went into the creation of this library, and we would like to say special thank you to: 
 
 Original Team:
 * [Jacques Francois Joubert](https://www.linkedin.com/in/jacquesjoubert/)
