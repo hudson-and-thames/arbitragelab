@@ -37,6 +37,11 @@ Original Team:
 * [Valeriia Pervushyna](https://www.linkedin.com/in/valeriia-pervushyna/)
 * [Dirk Frees](https://www.linkedin.com/in/dirkfreese/)
 
+A heartfelt thank you to Illya and Valeriia for your exceptional contributions to ArbitrageLab. Your dedication and 
+talent have been instrumental in enhancing the library and company as a whole. Illya and Valeriia, your technical ingenuity,
+and meticulous attention to detail, have not only enriched our project but also set a high standard for excellence. We deeply 
+appreciate your hard work and commitment to making ArbitrageLab a success.
+
 Core Contributions
 * [Hansen Pei](https://www.linkedin.com/in/hansen-pei-0949691b3/)
 * [Yefeng Wang]
@@ -68,3 +73,7 @@ If you're looking to elevate your expertise or pivot your career towards quantit
 explore this opportunity. WorldQuant University is not just about education; it’s about empowering future financial 
 leaders. Learn more about their [MSFE program](https://www.wqu.edu/) and take a significant step towards transforming
 your professional life.
+
+## Learn To Build Production Ready Python Libraries
+We have released a course on Udemy that you can follow to produce your own open-source projects for finance.
+* [Writing Production-Grade Python Code for Quant Developers](https://www.udemy.com/course/writing-production-grade-code-for-quantitative-developers/)
