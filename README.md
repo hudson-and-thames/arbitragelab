@@ -38,7 +38,7 @@ Original Team:
 * [Dirk Frees](https://www.linkedin.com/in/dirkfreese/)
 
 A heartfelt thank you to Illya and Valeriia for your exceptional contributions to ArbitrageLab. Your dedication and 
-talent have been instrumental in enhancing the library and company as a whole. Illya and Valeriia, your technical ingenuity,
+talent have been instrumental in enhancing the library and company as a whole. Your technical ingenuity,
 and meticulous attention to detail, have not only enriched our project but also set a high standard for excellence. We deeply 
 appreciate your hard work and commitment to making ArbitrageLab a success.
 
