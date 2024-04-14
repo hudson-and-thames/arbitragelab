@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 
 from arbitragelab.optimal_mean_reversion.ou_model import OrnsteinUhlenbeck
-from arbitragelab.util import segment
 
 
 class ExponentialOrnsteinUhlenbeck(OrnsteinUhlenbeck):
@@ -27,9 +26,6 @@ class ExponentialOrnsteinUhlenbeck(OrnsteinUhlenbeck):
 
         super().__init__()
         self.a_tilde = None
-
-        segment.track('ExponentialOrnsteinUhlenbeck')
-
 
     def fit(self, data: pd.DataFrame, data_frequency: str, discount_rate: tuple, transaction_cost: tuple,
             start: str = None, end: str = None, stop_loss: float = None):

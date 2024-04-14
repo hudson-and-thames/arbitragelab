@@ -8,7 +8,6 @@ from scipy import optimize, special
 import matplotlib.pyplot as plt
 
 from arbitragelab.time_series_approach.ou_optimal_threshold import OUModelOptimalThreshold
-from arbitragelab.util import segment
 
 
 class OUModelOptimalThresholdBertram(OUModelOptimalThreshold):
@@ -26,8 +25,6 @@ class OUModelOptimalThresholdBertram(OUModelOptimalThreshold):
         """
 
         super().__init__()
-
-        segment.track('OUModelOptimalThresholdBertram')
 
     def expected_trade_length(self, a: float, m: float) -> float:
         """

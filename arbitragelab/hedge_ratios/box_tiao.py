@@ -10,7 +10,6 @@ import pandas as pd
 import statsmodels.api as sm
 
 from arbitragelab.hedge_ratios.spread_construction import construct_spread
-from arbitragelab.util import segment
 
 
 def _least_square_VAR_fit(demeaned_price_data: pd.DataFrame) -> np.array:
@@ -43,8 +42,6 @@ def get_box_tiao_hedge_ratio(price_data: pd.DataFrame, dependent_variable: str) 
     :param dependent_variable: (str) Column name which represents the dependent variable (y).
     :return: (Tuple) Hedge ratios, X, and fit residuals.
     """
-
-    segment.track('get_box_tiao_hedge_ratio')
 
     X = price_data.copy()
     X = X[[dependent_variable] + [x for x in X.columns if x != dependent_variable]]

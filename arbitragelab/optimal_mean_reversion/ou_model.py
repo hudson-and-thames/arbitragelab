@@ -7,8 +7,6 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from arbitragelab.util import segment
-
 
 class OrnsteinUhlenbeck:
     """
@@ -43,8 +41,6 @@ class OrnsteinUhlenbeck:
         self.data = None  # Training data provided by the user
         self.training_period = None  # Current training period
         self.mll = None  # Maximum log likelihood
-
-        segment.track('OrnsteinUhlenbeck')
 
     def fit(self, data, data_frequency, discount_rate, transaction_cost, start=None, end=None,
             stop_loss=None):

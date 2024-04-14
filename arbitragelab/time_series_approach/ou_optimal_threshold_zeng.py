@@ -9,7 +9,6 @@ from mpmath import nsum, inf, gamma, fac, cos, exp, ln, quad
 import matplotlib.pyplot as plt
 
 from arbitragelab.time_series_approach.ou_optimal_threshold import OUModelOptimalThreshold
-from arbitragelab.util import segment
 
 
 class OUModelOptimalThresholdZeng(OUModelOptimalThreshold):
@@ -27,8 +26,6 @@ class OUModelOptimalThresholdZeng(OUModelOptimalThreshold):
         """
 
         super().__init__()
-
-        segment.track('OUModelOptimalThresholdZeng')
 
     def expected_trade_length(self, a: float, b: float) -> float:
         """

@@ -8,8 +8,6 @@ from uuid import UUID
 import numpy as np
 import pandas as pd
 
-from arbitragelab.util import segment
-
 
 class MultivariateCointegrationTradingRule:
     """
@@ -37,8 +35,6 @@ class MultivariateCointegrationTradingRule:
         :param nlags: (int) Amount of lags for cointegrated returns sum, corresponding to the parameter P in the paper.
         :param dollar_invest: (float) The value of long/short positions, corresponding to the parameter C in the paper.
         """
-
-        segment.track('MultivariateCointegrationTradingRule')
 
         self.open_trades = {}
         self.closed_trades = {}

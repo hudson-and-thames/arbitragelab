@@ -11,7 +11,6 @@ import arbitragelab.copula_approach.copula_calculation as ccalc
 from arbitragelab.copula_approach.archimedean import Gumbel, Clayton
 from arbitragelab.copula_approach.elliptical import StudentCopula
 from arbitragelab.copula_approach.mixed_copulas.base import MixedCopula
-from arbitragelab.util import segment
 
 
 class CTGMixCop(MixedCopula):
@@ -53,8 +52,6 @@ class CTGMixCop(MixedCopula):
             self.gumbel_cop = Gumbel(theta=self.cop_params[3])
 
         self.copulas = [self.clayton_cop, self.t_cop, self.gumbel_cop]
-
-        segment.track('CTGMixCop')
 
     def fit(self, data: pd.DataFrame, max_iter: int = 25, gamma_scad: float = 0.6, a_scad: float = 6,
             weight_margin: float = 1e-2) -> float:

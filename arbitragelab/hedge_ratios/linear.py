@@ -9,8 +9,6 @@ import numpy as np
 from sklearn.linear_model import LinearRegression
 from scipy.odr import ODR, Model, RealData
 
-from arbitragelab.util import segment
-
 
 def get_ols_hedge_ratio(price_data: pd.DataFrame, dependent_variable: str, add_constant: bool = False) -> \
         Tuple[dict, pd.DataFrame, pd.Series, pd.Series]:
@@ -22,8 +20,6 @@ def get_ols_hedge_ratio(price_data: pd.DataFrame, dependent_variable: str, add_c
     :param add_constant: (bool) Boolean flag to add constant in regression setting.
     :return: (Tuple) Hedge ratios, X, and y and OLS fit residuals.
     """
-
-    segment.track('get_ols_hedge_ratio')
 
     ols_model = LinearRegression(fit_intercept=add_constant)
 
@@ -84,8 +80,6 @@ def get_tls_hedge_ratio(price_data: pd.DataFrame, dependent_variable: str, add_c
     :param add_constant: (bool) Boolean flag to add constant in regression setting.
     :return: (Tuple) Hedge ratios dict, X, and y and fit residuals.
     """
-
-    segment.track('get_tls_hedge_ratio')
 
     X = price_data.copy()
     X.drop(columns=dependent_variable, axis=1, inplace=True)

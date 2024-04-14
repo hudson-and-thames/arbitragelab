@@ -12,8 +12,6 @@ import pandas as pd
 import pyvinecopulib as pv
 import scipy.integrate as integrate
 
-from arbitragelab.util import segment
-
 
 class RVineCop:
     """
@@ -50,8 +48,6 @@ class CVineCop(RVineCop):
                               pv.BicopFamily.gaussian, pv.BicopFamily.gumbel, pv.BicopFamily.indep]
         # The pv.Vinecop being wrapped
         self.cvine_cop = cvine_cop
-
-        segment.track('CVineCop')
 
     def fit_auto(self, data: pd.DataFrame, pv_target_idx: int = 1, if_renew: bool = True, alt_cvine_structure=False):
         """

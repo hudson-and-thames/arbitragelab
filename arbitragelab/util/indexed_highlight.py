@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 
 # Temporary solution, current version 0.7.1 is not compatible with matplotlib>=3.3.0
 from arbitragelab.util.data_cursor import DataCursor, HighlightingDataCursor
-from arbitragelab.util import segment
 
 
 class IndexedHighlight(HighlightingDataCursor):
@@ -26,8 +25,6 @@ class IndexedHighlight(HighlightingDataCursor):
         HighlightingDataCursor.__init__(self, artists, **kwargs)
         self.highlights = [self.create_highlight(artist) for artist in artists]
         plt.setp(self.highlights, visible=False)
-
-        segment.track('IndexedHighlight')
 
     def update(self, event, annotation):
         """

@@ -17,7 +17,6 @@ from keras.layers import Input, LSTM, Dense, Activation, Lambda
 from keras.models import Model
 import matplotlib.pyplot as plt
 
-from arbitragelab.util import segment
 
 class BaseNeuralNetwork:
     """
@@ -96,8 +95,6 @@ class MultiLayerPerceptron(BaseNeuralNetwork):
         self.hidden_layer_activation_function = hidden_layer_activation_function
         self.output_layer_activation_function = output_layer_act_func
 
-        segment.track('MultiLayerPerceptron')
-
     def build(self):
         """
         Builds and compiles model architecture.
@@ -159,8 +156,6 @@ class RecurrentNeuralNetwork(BaseNeuralNetwork):
         self.hidden_layer_activation_function = hidden_layer_activation_function
         self.output_layer_activation_function = output_layer_act_func
 
-        segment.track('RecurrentNeuralNetwork')
-
     def build(self):
         """
         Builds and compiles model architecture.
@@ -220,8 +215,6 @@ class PiSigmaNeuralNetwork(BaseNeuralNetwork):
         self.metrics = metrics
         self.hidden_layer_activation_function = hidden_layer_activation_function
         self.output_layer_activation_function = output_layer_act_func
-
-        segment.track('PiSigmaNeuralNetwork')
 
     def build(self):
         """

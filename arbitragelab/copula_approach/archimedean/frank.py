@@ -8,7 +8,6 @@ from scipy.integrate import quad
 from scipy.optimize import brentq
 
 from arbitragelab.copula_approach.base import Copula
-from arbitragelab.util import segment
 
 
 class Frank(Copula):
@@ -28,8 +27,6 @@ class Frank(Copula):
         # Lower than this amount will be rounded to threshold
         self.threshold = threshold
         self.theta = theta  # Default input
-
-        segment.track('FrankCopula')
 
     def sample(self, num: int = None, unif_vec: np.array = None) -> np.array:
         """

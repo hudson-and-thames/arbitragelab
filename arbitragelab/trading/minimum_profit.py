@@ -8,8 +8,6 @@ from uuid import UUID
 import numpy as np
 import pandas as pd
 
-from arbitragelab.util import segment
-
 
 class MinimumProfitTradingRule:
     """
@@ -33,8 +31,6 @@ class MinimumProfitTradingRule:
         :param optimal_levels: (np.array) Optimal levels to enter aenter and close a trade.
         :param spread_window: (int) Number of previous spread values to print when reporting trades.
         """
-
-        segment.track('MinimumProfitTradingRule')
 
         self.open_trades = {}
         self.closed_trades = {}

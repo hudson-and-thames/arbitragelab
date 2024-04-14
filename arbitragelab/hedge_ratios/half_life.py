@@ -10,7 +10,6 @@ import numpy as np
 from scipy.optimize import minimize
 
 from arbitragelab.cointegration_approach.utils import get_half_life_of_mean_reversion
-from arbitragelab.util import segment
 
 
 def _min_hl_function(beta: np.array, X: pd.DataFrame, y: pd.Series) -> float:
@@ -37,8 +36,6 @@ def get_minimum_hl_hedge_ratio(price_data: pd.DataFrame, dependent_variable: str
     :param dependent_variable: (str) Column name which represents the dependent variable (y).
     :return: (Tuple) Hedge ratios, X, and y, OLS fit residuals and optimization object.
     """
-
-    segment.track('get_minimum_hl_hedge_ratio')
 
     X = price_data.copy()
     X.drop(columns=dependent_variable, axis=1, inplace=True)

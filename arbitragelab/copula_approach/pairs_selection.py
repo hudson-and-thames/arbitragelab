@@ -9,8 +9,6 @@ import numpy as np
 import scipy.stats as ss
 import pandas as pd
 
-from arbitragelab.util import segment
-
 
 class PairsSelector:
     r"""
@@ -26,8 +24,6 @@ class PairsSelector:
         """
         Class initiation.
         """
-
-        segment.track('PairsSelector')
 
     def rank_pairs(self, stocks_universe: pd.DataFrame, method: str = 'kendall tau',
                    nan_option: Union[str, None] = 'forward fill',

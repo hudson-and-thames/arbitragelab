@@ -10,8 +10,6 @@ import pandas as pd
 from scipy import optimize
 from mpmath import nsum, inf, gamma, digamma, fac
 
-from arbitragelab.util import segment
-
 
 class OUModelOptimalThreshold:
     """
@@ -32,8 +30,6 @@ class OUModelOptimalThreshold:
         self.data = None  # Fitting data provided by the user
         self.delta_t = None  # Delta between observations, calculated in years
         self.beta = None  # Optimal ratio between two assets
-
-        segment.track('OUModelOptimalThreshold')
 
     def construct_ou_model_from_given_parameters(self, theta: float, mu: float, sigma: float):
         """

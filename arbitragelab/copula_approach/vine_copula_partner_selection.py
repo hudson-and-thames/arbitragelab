@@ -12,7 +12,6 @@ import seaborn as sns
 
 from arbitragelab.copula_approach.vine_copula_partner_selection_utils import extremal_measure, get_quantiles_data ,\
     get_co_variance_matrix, get_sum_correlations_vectorized, diagonal_measure_vectorized, multivariate_rho_vectorized
-from arbitragelab.util import segment
 
 
 class PartnerSelection:
@@ -58,8 +57,6 @@ class PartnerSelection:
         self.top_n_correlations = self._top_n_tickers()
         # Quadruple combinations for all stocks in universe
         self.all_quadruples = self._generate_all_combinations()
-
-        segment.track('PartnerSelection')
 
     def _correlation(self) -> pd.DataFrame:
         """

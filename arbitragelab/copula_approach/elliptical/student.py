@@ -11,7 +11,6 @@ from scipy.special import gamma as gm
 from sklearn.covariance import EmpiricalCovariance
 
 from arbitragelab.copula_approach.base import Copula
-from arbitragelab.util import segment
 
 
 class StudentCopula(Copula):
@@ -38,8 +37,6 @@ class StudentCopula(Copula):
             self.cov = cov  # Covariance matrix
             # Correlation from covariance matrix
             self.rho = cov[0][1] / (np.sqrt(cov[0][0]) * np.sqrt(cov[1][1]))
-
-        segment.track('StudentCopula')
 
     def sample(self, num: int = None) -> np.array:
         """

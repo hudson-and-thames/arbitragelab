@@ -9,8 +9,6 @@ from uuid import UUID
 import numpy as np
 import pandas as pd
 
-from arbitragelab.util import segment
-
 
 class BollingerBandsTradingRule:
     """
@@ -35,8 +33,6 @@ class BollingerBandsTradingRule:
                                            enter a position when z-score is >= 3 or <= -3, and exit when z-score
                                            <= -3 or >= 3 respectively.
         """
-
-        segment.track('BollingerBandsTradingRule')
 
         self.open_trades = {}
         self.closed_trades = {}

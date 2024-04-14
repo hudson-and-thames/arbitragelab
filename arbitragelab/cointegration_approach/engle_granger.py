@@ -9,7 +9,6 @@ from statsmodels.tsa.stattools import adfuller
 from sklearn.linear_model import LinearRegression
 
 from arbitragelab.cointegration_approach.base import CointegratedPortfolio
-from arbitragelab.util import segment
 
 
 class EngleGrangerPortfolio(CointegratedPortfolio):
@@ -30,8 +29,6 @@ class EngleGrangerPortfolio(CointegratedPortfolio):
         self.cointegration_vectors = None  # Regression coefficients used as hedge-ratios.
         self.hedge_ratios = None  # Engle-Granger hedge ratios.
         self.adf_statistics = None  # ADF statistics.
-
-        segment.track('EngleGrangerPortfolio')
 
     def perform_eg_test(self, residuals: pd.Series):
         """

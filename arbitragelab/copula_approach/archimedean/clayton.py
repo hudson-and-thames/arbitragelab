@@ -6,7 +6,6 @@ Module that houses Clayton copula class.
 import numpy as np
 
 from arbitragelab.copula_approach.base import Copula
-from arbitragelab.util import segment
 
 
 class Clayton(Copula):
@@ -26,8 +25,6 @@ class Clayton(Copula):
         # Lower than this amount will be rounded to threshold
         self.threshold = threshold
         self.theta = theta  # Default input
-
-        segment.track('ClaytonCopula')
 
     def sample(self, num: int = None, unif_vec: np.array = None) -> np.array:
         r"""

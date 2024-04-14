@@ -15,7 +15,6 @@ from arbitragelab.hedge_ratios import get_ols_hedge_ratio, get_tls_hedge_ratio, 
     get_johansen_hedge_ratio, get_box_tiao_hedge_ratio
 from arbitragelab.hedge_ratios.adf_optimal import get_adf_optimal_hedge_ratio
 from arbitragelab.spread_selection.base import AbstractPairsSelector
-from arbitragelab.util import segment
 from arbitragelab.cointegration_approach.utils import get_hurst_exponent
 
 
@@ -48,8 +47,6 @@ class CointegrationSpreadSelector(AbstractPairsSelector):
         self.final_pairs = []
         self.selection_logs = pd.DataFrame(columns=['coint_t', 'p_value_99%', 'p_value_95%', 'p_value_90%',
                                                     'hurst_exponent', 'half_life', 'crossovers', 'hedge_ratio'])
-
-        segment.track('CointegrationSpreadSelector')
 
     def set_prices(self, prices_df: pd.DataFrame, baskets_to_filter: list):
         """

@@ -13,7 +13,6 @@ import statsmodels.api as sm
 
 from arbitragelab.cointegration_approach.engle_granger import EngleGrangerPortfolio
 from arbitragelab.cointegration_approach.johansen import JohansenPortfolio
-from arbitragelab.util import segment
 
 
 class MinimumProfit:
@@ -37,8 +36,6 @@ class MinimumProfit:
 
         # Store the asset price series
         self.price_df = None
-
-        segment.track('MinimumProfit')
 
     def set_train_dataset(self, price_df: pd.DataFrame):
         """

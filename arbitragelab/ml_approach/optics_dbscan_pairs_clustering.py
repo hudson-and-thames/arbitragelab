@@ -15,7 +15,6 @@ import matplotlib.pyplot as plt
 from matplotlib.axes._axes import Axes
 from matplotlib.figure import Figure
 
-from arbitragelab.util import segment
 from arbitragelab.util.indexed_highlight import IndexedHighlight
 
 
@@ -41,8 +40,6 @@ class OPTICSDBSCANPairsClustering:
         self.spreads_df = None
 
         self.clust_labels_ = []
-
-        segment.track('OPTICSDBSCANPairsClustering')
 
     def dimensionality_reduction_by_components(self, num_features: int = 10):
         """

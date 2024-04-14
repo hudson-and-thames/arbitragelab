@@ -16,9 +16,7 @@ Additional information can be found in the following sources:
 import numpy as np
 import pandas as pd
 
-
 # pylint: disable=invalid-name
-from arbitragelab.util import segment
 
 
 class KalmanFilterStrategy:
@@ -63,8 +61,6 @@ class KalmanFilterStrategy:
         # Helper variables from Kalman filter
         self.R = None  # Prediction variance-covariance
         self.beta = np.array([0, 0])  # Starting state prediction
-
-        segment.track('KalmanFilterStrategy')
 
     def update(self, x: float, y: float):
         """

@@ -6,7 +6,6 @@ import pandas as pd
 import yfinance as yf
 import yahoo_fin.stock_info as ys
 
-from arbitragelab.util import segment
 
 class DataImporter:
     """
@@ -28,8 +27,6 @@ class DataImporter:
 
         tickers_sp500 = ys.tickers_sp500()
 
-        segment.track('get_sp500_tickers')
-
         return tickers_sp500
 
     @staticmethod
@@ -41,8 +38,6 @@ class DataImporter:
         """
 
         tickers_dow = ys.tickers_dow()
-
-        segment.track('get_dow_tickers')
 
         return tickers_dow
 
@@ -79,8 +74,6 @@ class DataImporter:
 
         price_data = yf.download(tickers, start=start_date, end=end_date,
                                  interval=interval, group_by='column')['Close']
-
-        segment.track('get_price_data')
 
         return price_data
 

@@ -9,7 +9,6 @@ import numpy as np
 from scipy.optimize import brentq
 
 from arbitragelab.copula_approach.base import Copula
-from arbitragelab.util import segment
 
 
 class N14(Copula):
@@ -29,8 +28,6 @@ class N14(Copula):
         # Lower than this amount will be rounded to threshold
         self.threshold = threshold
         self.theta = theta  # Default input
-
-        segment.track('N14Copula')
 
     def sample(self, num: int = None, unif_vec: np.array = None) -> np.array:
         """

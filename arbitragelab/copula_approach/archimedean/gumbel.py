@@ -9,7 +9,6 @@ import numpy as np
 from scipy.optimize import brentq
 
 from arbitragelab.copula_approach.base import Copula
-from arbitragelab.util import segment
 
 
 class Gumbel(Copula):
@@ -29,8 +28,6 @@ class Gumbel(Copula):
         # Lower than this amount will be rounded to threshold
         self.threshold = threshold
         self.theta = theta  # Gumbel copula parameter
-
-        segment.track('GumbelCopula')
 
     def sample(self, num: int = None, unif_vec: np.array = None) -> np.array:
         """

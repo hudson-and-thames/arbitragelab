@@ -7,8 +7,6 @@ from typing import Callable, Sequence
 import numpy as np
 import pandas as pd
 
-from arbitragelab.util import segment
-
 
 class MPICopulaTradingRule:
     """
@@ -56,8 +54,6 @@ class MPICopulaTradingRule:
         self.copula = None  # Fit copula
         self.cdf_x = None
         self.cdf_y = None
-
-        segment.track('MPICopulaTradingRule')
 
     def set_copula(self, copula: object):
         """

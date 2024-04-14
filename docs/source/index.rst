@@ -153,8 +153,6 @@ This project is licensed under an all rights reserved license and is NOT open-so
     :hidden:
 
     additional_information/license
-    additional_information/analytics
-    additional_information/privacy_gdpr
 
 .. toctree::
     :maxdepth: 2

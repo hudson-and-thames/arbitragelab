@@ -6,8 +6,6 @@ import numpy as np
 import pandas as pd
 from sklearn.linear_model import LinearRegression
 
-from arbitragelab.util import segment
-
 
 def get_half_life_of_mean_reversion(data: pd.Series) -> float:
     """
@@ -16,8 +14,6 @@ def get_half_life_of_mean_reversion(data: pd.Series) -> float:
     :param data: (np.array) Data points.
     :return: (float) Half-life of mean reversion.
     """
-
-    segment.track('get_half_life_of_mean_reversion')
 
     reg = LinearRegression(fit_intercept=True)
 
@@ -39,7 +35,6 @@ def get_hurst_exponent(data: np.array, max_lags: int = 100) -> float:
     :return: (float) Hurst exponent.
     """
 
-    segment.track('get_hurst_exponent')
     lags = range(2, max_lags)
     tau = [np.sqrt(np.std(np.subtract(data[lag:], data[:-lag])))
            for lag in lags]

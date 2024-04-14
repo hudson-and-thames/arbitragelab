@@ -11,7 +11,6 @@ import numpy as np
 import pandas as pd
 
 from arbitragelab.cointegration_approach.johansen import JohansenPortfolio
-from arbitragelab.util import segment
 
 
 class MultivariateCointegration:
@@ -31,8 +30,6 @@ class MultivariateCointegration:
 
         self.__asset_df = None
         self.__coint_vec = None
-
-        segment.track('MultivariateCointegration')
 
     def set_train_dataset(self, price_df: pd.DataFrame):
         """
