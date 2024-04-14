@@ -1,7 +1,3 @@
-# Copyright 2021, Hudson and Thames Quantitative Research
-# All rights reserved
-# Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
-
 """
 Tests the pearson distance approach from the Distance Approach module of ArbitrageLab.
 """

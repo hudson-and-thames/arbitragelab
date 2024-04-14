@@ -1,6 +1,3 @@
-# Copyright 2019, Hudson and Thames Quantitative Research
-# All rights reserved
-# Read more: https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/additional_information/license.html
 """
 Tests Spread Modeling filter functionality.
 """
@@ -10,6 +7,7 @@ import unittest
 import pandas as pd
 
 from arbitragelab.ml_approach.filters import ThresholdFilter, CorrelationFilter, VolatilityFilter
+
 
 class TestFilters(unittest.TestCase):
     """
