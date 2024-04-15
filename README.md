@@ -1,6 +1,6 @@
 <div align="center">
    <a href="https://hudsonthames.org/arbitragelab">
-   <img src="https://hudsonthames.org/wp-content/uploads/2021/04/featured-picture-arbitragelab.jpg" height="100%" 
+   <img src="https://hudsonthames.org/wp-content/uploads/2021/04/featured-picture-arbitragelab.jpg" height="200" 
    style="margin-left: auto; margin-right: auto; display:block;">
    </a>
   </br>
@@ -19,14 +19,6 @@ ArbitrageLab is an open-source python library that enables traders who want to e
 by providing a complete set of algorithms from the best academic journals.
 
 View the documentation to [get started](https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/index.html).
-
-## Why is it Open-Source?
-H&T originally started out as an open-source company, but we found it very difficult 
-to build a company around python libraries, despite us serving several of the top hedge funds in the world. 
-
-All the original developers (including myself (Jacques)), have gone on to have successful careers at other funds, and we feel that
-the work we did can hopefully make a small contribution to the scientific community, and further research in
-this field can be fostered.
 
 ## Special Thank You:
 A lot of passion and love went into the creation of this library, and we would like to say special thank you to: 
