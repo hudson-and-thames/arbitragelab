@@ -40,7 +40,7 @@ commitment and enthusiastic support. We couldn't have asked for a better Start-U
 
 Core Contributions
 * [Hansen Pei](https://www.linkedin.com/in/hansen-pei-0949691b3/)
-* [Yefeng Wang]
+* Yefeng Wang
 * [Vijay Nadimpalli](https://www.linkedin.com/in/vijay-nadimpalli/)
 * [Joohwan Ko](https://www.linkedin.com/in/joohwan-ko-638748174/)
 
