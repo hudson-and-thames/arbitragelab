@@ -1,0 +1,79 @@
+name: Test code and documentation
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test-code:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8]  # Add versions as needed
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
+
+      - name: Run Pylint
+        run: |
+          source venv/bin/activate
+          pylint arbitragelab tests --rcfile=.pylintrc -f text
+
+      - name: Run tests with coverage
+        run: |
+          source venv/bin/activate
+          bash coverage
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-reports-${{ matrix.python-version }}
+          path: test-reports
+
+  test-docs:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install requirements
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
+          pip install -r docs/source/requirements.txt
+
+      - name: Build documentation
+        run: |
+          source venv/bin/activate
+          make -C docs html
+
+      - name: Run doctests
+        run: |
+          source venv/bin/activate
+          make -C docs doctest
