@@ -9,7 +9,8 @@ Changelog
     * :feature:`50` Add a distutils command for marbles
     * :bug:`58` Fixed test failure on OSX
 
-* :release:`0.9.0 <2024-01-10>`
+* :release:`0.9.1 <2024-01-10>`
+* :bug:`92` Released a new version because of pypi version was wrong
 
 * :release:`0.8.1 <2022-07-25>`
 * :support:`91` NA
