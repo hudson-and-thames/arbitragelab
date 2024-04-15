@@ -2,10 +2,10 @@
    :align: center
    :target: https://hudsonthames.org/
 
-
-============================================
-Welcome to Statistical Arbitrage Laboratory
-============================================
+|
+===============================================
+Welcome to the Statistical Arbitrage Laboratory
+===============================================
 
 
 **What was only possible with the help of huge R&D teams is now at your disposal, anywhere, anytime.**
@@ -71,9 +71,6 @@ The general documentation structure looks the following way:
 |    Presentation slides*                  |
 +------------------------------------------+
 
-
-\* *- optional content*
-
 .. image:: https://hudsonthames.org/wp-content/uploads/2021/03/2-n.png
    :height: 70 px
    :align: left
@@ -119,7 +116,7 @@ Including publications from:
    :align: center
    :target: https://hudsonthames.org/
 
-
+|
 Who is Hudson & Thames?
 +++++++++++++++++++++++
 
@@ -133,14 +130,6 @@ License
 
 This project is open-source, following the BSD 3 license.
 
-
-
-.. toctree::
-    :maxdepth: 2
-    :caption: Legal
-    :hidden:
-
-    additional_information/license
 
 .. toctree::
     :maxdepth: 2
@@ -303,6 +292,12 @@ This project is open-source, following the BSD 3 license.
     ml_approach/neural_networks
     ml_approach/filters
 
+.. toctree::
+    :maxdepth: 2
+    :caption: Legal
+    :hidden:
+
+    additional_information/license
 
 .. toctree::
     :maxdepth: 3
