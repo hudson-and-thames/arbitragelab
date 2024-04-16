@@ -9,7 +9,7 @@ on:
       - develop
 
 jobs:
-  test-code:
+  test-code-style:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -35,6 +35,27 @@ jobs:
           source venv/bin/activate
           pylint arbitragelab tests --rcfile=.pylintrc -f text
 
+test-coverage:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8]  # Add versions as needed
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
+
       - name: Run tests with coverage
         run: |
           source venv/bin/activate
@@ -45,6 +66,7 @@ jobs:
         with:
           name: test-reports-${{ matrix.python-version }}
           path: test-reports
+
 
   test-docs:
     runs-on: ubuntu-latest
