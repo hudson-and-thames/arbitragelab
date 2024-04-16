@@ -67,7 +67,6 @@ test-coverage:
           name: test-reports-${{ matrix.python-version }}
           path: test-reports
 
-
   test-docs:
     runs-on: ubuntu-latest
     strategy:
