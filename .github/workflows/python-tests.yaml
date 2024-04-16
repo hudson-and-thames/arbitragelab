@@ -35,7 +35,8 @@ jobs:
           source venv/bin/activate
           pylint arbitragelab tests --rcfile=.pylintrc -f text
 
-test-coverage:
+
+  test-coverage:
     runs-on: ubuntu-latest
     strategy:
       matrix:
