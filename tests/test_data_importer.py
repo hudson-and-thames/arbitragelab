@@ -9,6 +9,7 @@ import pandas as pd
 import numpy as np
 from arbitragelab.util import DataImporter
 
+
 class TestDataImporter(unittest.TestCase):
     """
     Tests Data Importer class.
