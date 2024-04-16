@@ -11,7 +11,7 @@
 **What was only possible with the help of huge R&D teams is now at your disposal, anywhere, anytime.**
 
 ArbitrageLab is a python library that includes both end-to-end strategies and strategy creation tools that cover the
-whole range of strategies defined by Krauss' taxonomy for pairs trading strategies.
+whole range of strategies defined by [Krauss' taxonomy](https://www.econstor.eu/bitstream/10419/116783/1/833997289.pdf) for pairs trading strategies.
 
 ## What is ArbitrageLab?
 
@@ -40,7 +40,7 @@ commitment and enthusiastic support. We couldn't have asked for a better Start-U
 
 Core Contributions
 * [Hansen Pei](https://www.linkedin.com/in/hansen-pei-0949691b3/)
-* [Yefeng Wang]
+* Yefeng Wang
 * [Vijay Nadimpalli](https://www.linkedin.com/in/vijay-nadimpalli/)
 * [Joohwan Ko](https://www.linkedin.com/in/joohwan-ko-638748174/)
 
