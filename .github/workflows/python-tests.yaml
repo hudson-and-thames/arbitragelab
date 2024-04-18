@@ -31,7 +31,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          poetry install
+          poetry install --only dev
 
       - name: Run Pylint
         run: |
@@ -65,7 +65,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          poetry install
+          poetry install --only dev
 
       - name: Run tests with coverage
         run: |
@@ -104,7 +104,7 @@ jobs:
 
       - name: Install requirements
         run: |
-          poetry install
+          poetry install --only docs
 
       - name: Build documentation
         run: |
@@ -120,5 +120,5 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: doctest-results
-          path: build/doctest/output.txt
+          path: docs/build/doctest/output.txt
 
