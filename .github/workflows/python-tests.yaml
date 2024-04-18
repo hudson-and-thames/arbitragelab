@@ -35,7 +35,7 @@ jobs:
 
       - name: Run Pylint
         run: |
-          poetry run pylint arbitragelab tests --rcfile=.pylintrc --output-format=text --output-file=pylint-report.txt
+          poetry run pylint arbitragelab tests --rcfile=.pylintrc --output-format=text --output=pylint-report.txt
 
       - name: Upload test results
         uses: actions/upload-artifact@v3
