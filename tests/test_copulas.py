@@ -709,8 +709,8 @@ class TestCopulas(unittest.TestCase):
                         'N13': -2211.6295423299603, 'N14': -2111.9831835080827,
                         'Gaussian': -2211.4486204860873, 'Student': -2275.069087841567}
 
-        for key, _ in aics.items():
-            self.assertAlmostEqual(aics[key], expeced_aics[key], delta=1)
+        for key, aic_item in aics.items():
+            self.assertAlmostEqual(aic_item, expeced_aics[key], delta=1)
 
     @staticmethod
     def test_construct_ecdf_lin():
