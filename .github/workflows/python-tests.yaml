@@ -35,7 +35,7 @@ jobs:
 
       - name: Run Pylint
         run: |
-          poetry run pylint arbitragelab tests --rcfile=.pylintrc --output-format=text
+          poetry run pylint arbitragelab tests --rcfile=.pylintrc --output-format=text --output=pylint-report.txt
 
       - name: Upload test results
         uses: actions/upload-artifact@v3
@@ -72,13 +72,13 @@ jobs:
           poetry run pytest tests/ --cov=arbitragelab --cov-report=term --cov-branch --cov-config=.coveragerc
 
       - name: Generate coverage XML report
-        run: poetry run coverage xml
+        run: poetry run coverage html
 
       - name: Upload Coverage XML Report as Artifact
         uses: actions/upload-artifact@v2
         with:
-          name: coverage-xml
-          path: coverage.xml
+          name: coverage-html
+          path: coverage.html
 
       - name: Check coverage
         run: poetry run coverage report --fail-under=100

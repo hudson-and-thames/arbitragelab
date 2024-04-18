@@ -31,13 +31,6 @@ class MultivariateCointegration:
         self.__asset_df = None
         self.__coint_vec = None
 
-    @property
-    def coint_vec(self):
-        """
-        Accessor for the cointegration vector.
-        """
-        return self.__coint_vec
-
     def set_train_dataset(self, price_df: pd.DataFrame):
         """
         Provide price series for model to calculate the cointegration coefficient and beta.
@@ -154,7 +147,7 @@ class MultivariateCointegration:
         coint_vec = jo_portfolio.cointegration_vectors.loc[0]
         self.__coint_vec = coint_vec
 
-        return coint_vec
+        return self.__coint_vec
 
     # pylint: disable=invalid-name, too-many-locals
     def get_coint_vec(self) -> Tuple[pd.DataFrame, ...]:
