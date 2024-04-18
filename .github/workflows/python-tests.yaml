@@ -35,7 +35,7 @@ jobs:
 
       - name: Run Pylint
         run: |
-          pylint arbitragelab tests --rcfile=.pylintrc --output-format=text --reports=y --output=pylint-report.txt 
+          poetry run pylint arbitragelab tests --rcfile=.pylintrc --output-format=text --reports=y --output=pylint-report.txt 
 
       - name: Upload test results
         uses: actions/upload-artifact@v3
@@ -113,7 +113,6 @@ jobs:
 
       - name: Run doctests
         run: |
-          source venv/bin/activate
           poetry run make doctest
 
       - name: Upload doctest results as an artifact
