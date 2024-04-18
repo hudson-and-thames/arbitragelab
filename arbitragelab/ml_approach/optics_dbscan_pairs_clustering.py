@@ -167,7 +167,7 @@ class OPTICSDBSCANPairsClustering:
 
         fig = plt.figure(facecolor='white', figsize=figsize)
 
-        tsne = TSNE(n_components=n_dimensions)
+        tsne = TSNE(n_components=n_dimensions, init="random")
 
         tsne_fv = pd.DataFrame(tsne.fit_transform(self.feature_vector),
                                index=self.feature_vector.index)
