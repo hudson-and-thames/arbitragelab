@@ -327,7 +327,7 @@ class OPTICSDBSCANPairsClustering:
 
             for combination in list(itertools.combinations(cluster_x, 2)):
                 pair_combinations.append(combination)
-
+        
         return pair_combinations
 
     @staticmethod

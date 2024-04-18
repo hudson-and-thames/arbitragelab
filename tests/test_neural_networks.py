@@ -5,8 +5,9 @@ Tests Spread Modeling Neural Network Classes.
 import unittest
 import numpy as np
 import tensorflow as tf
-from keras.engine.training import Model
+from keras import Model
 from keras.callbacks import History
+from tensorflow.python.keras import backend as K
 from sklearn.model_selection import train_test_split
 from sklearn.datasets import make_regression
 
@@ -31,7 +32,7 @@ class TestNeuralNetworks(unittest.TestCase):
 
         session_conf = tf.compat.v1.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
         sess = tf.compat.v1.Session(graph=tf.compat.v1.get_default_graph(), config=session_conf)
-        tf.compat.v1.keras.backend.set_session(sess)
+        K.set_session(sess)
 
         self.seed_value = seed_value
 

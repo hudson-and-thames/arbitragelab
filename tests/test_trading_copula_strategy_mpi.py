@@ -319,10 +319,15 @@ class TestMPICopulaTradingRule(unittest.TestCase):
             results_2.append(CS._get_position_and_reset_flag(
                 pre_flag=pre_flag, raw_cur_flag=raw_cur_flags[i], open_rule='or', exit_rule='and',
                 pre_position=pre_positions[i], open_based_on=open_based_ons_2[i]))
+            
+        # Numpy doesnt like inhomogeneous arrays in numpy > 1.21.6. Fix for this is to make an array of objects    
         # Expected results, (cur_position, if_reset_flag, open_based_on)
-        expected = [(1, False, [1, 2]), (1, False, [1, 1]), (-1, False, [-1, 1]), (-1, False, [-1, 2]),
+        expected = np.asarray([(1, False, [1, 2]), (1, False, [1, 1]), (-1, False, [-1, 1]), (-1, False, [-1, 2]),
                     (-1, False, [-1, 2]), (-1, False, [-1, 1]), (1, False, [1, 2]), (1, False, [1, 1]),
-                    (-1, False, [-1, 1]), (-1, False, [-1, 1])]
+                    (-1, False, [-1, 1]), (-1, False, [-1, 1])], dtype="object")
+        
+        results_1 = np.asarray(results_1, dtype="object")
+        results_2 = np.asarray(results_2, dtype="object")
         # Check matching with expecteation
         np.testing.assert_array_equal(results_1, expected)
         # Check results are indep of open_based_on conditions
@@ -481,10 +486,15 @@ class TestMPICopulaTradingRule(unittest.TestCase):
             results_2.append(CS._get_position_and_reset_flag(
                 pre_flag=pre_flag, raw_cur_flag=raw_cur_flags[i], open_rule='and', exit_rule='or',
                 pre_position=pre_positions[i], open_based_on=open_based_ons_2[i]))
+        
+        # Numpy doesnt like inhomogeneous arrays in numpy > 1.21.6. Fix for this is to make an array of objects
         # Expected results, (cur_position, if_reset_flag, open_based_on)
-        expected = [(0, False, [1, 2]), (0, False, [1, 1]), (0, False, [-1, 1]), (0, False, [-1, 2]),
+        expected = np.asarray([(0, False, [1, 2]), (0, False, [1, 1]), (0, False, [-1, 1]), (0, False, [-1, 2]),
                     (1, False, [-1, 2]), (1, False, [-1, 1]), (-1, False, [1, 2]), (-1, False, [1, 1]),
-                    (0, True, [0, 0]), (0, True, [0, 0]), (-1, False, [-1, 2])]
+                    (0, True, [0, 0]), (0, True, [0, 0]), (-1, False, [-1, 2])], dtype="object")
+
+        results_1 = np.asarray(results_1, dtype="object")
+        results_2 = np.asarray(results_2, dtype="object")        
         # Check matching with expecteation
         np.testing.assert_array_equal(results_1, expected)
         # Check results are indep of open_based_on conditions
@@ -646,10 +656,15 @@ class TestMPICopulaTradingRule(unittest.TestCase):
                 pre_flag=pre_flag, raw_cur_flag=raw_cur_flags[i], open_rule='and', exit_rule='and',
                 pre_position=pre_positions[i], open_based_on=open_based_ons_2[i]))
 
+        # Numpy doesnt like inhomogeneous arrays in numpy > 1.21.6. Fix for this is to make an array of objects
         # Expected results, (cur_position, if_reset_flag, open_based_on)
-        expected = [(0, False, [1, 2]), (0, False, [1, 1]), (0, False, [-1, 1]), (0, False, [-1, 2]),
+        expected = np.asarray([(0, False, [1, 2]), (0, False, [1, 1]), (0, False, [-1, 1]), (0, False, [-1, 2]),
                     (1, False, [-1, 2]), (1, False, [-1, 1]), (-1, False, [1, 2]), (-1, False, [1, 1]),
-                    (-1, False, [-1, 1]), (-1, False, [-1, 1]), (-1, False, [-1, 2])]
+                    (-1, False, [-1, 1]), (-1, False, [-1, 1]), (-1, False, [-1, 2])], dtype="object")
+        
+        results_1 = np.asarray(results_1, dtype="object")
+        results_2 = np.asarray(results_2, dtype="object")
+        
         # Check matching with expecteation
         np.testing.assert_array_equal(results_1, expected)
         # Check results are indep of open_based_on conditions

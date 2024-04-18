@@ -99,6 +99,9 @@ class TestDBSCANClustering(unittest.TestCase):
         self.assertEqual(len(c_labels), 15)
 
         # Check number of pairwise combinations using cluster data.
+        a = np.array(init_labels)
+        print(len(a[a==-1]))
+        print([len(a[a == i]) for i in c_labels])
         pair_list = self.pair_selector._generate_pairwise_combinations(c_labels)
         self.assertEqual(len(pair_list), 158)
 
