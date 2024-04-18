@@ -1,0 +1,91 @@
+[tool.poetry]
+name = "arbitragelab"
+version = "0.9.1"
+description = "ArbitrageLab is a collection of algorithms from the best academic journals and graduate-level textbooks, which focuses on the branch of statistical arbitrage known as pairs trading. We have extended the implementations to include the latest methods that trade a portfolio of n-assets (mean-reverting portfolios)."
+authors = ["Hudson and Thames Quantitative Research <opensource@hudsonthames.org>"]
+license = "BSD-3-Clause"
+readme = "README.md"
+homepage = "https://www.hudsonthames.org/"
+repository = "https://github.com/hudson-and-thames/arbitragelab"
+documentation = "https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/index.html"
+keywords = ["arbitrage", "finance", "investment", "education", "trading"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Financial and Insurance Industry",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.8",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Office/Business :: Financial :: Investment"
+]
+
+packages = [
+    { include = "arbitragelab" }
+]
+
+exclude = ["contrib", "docs", "tests"]
+
+[tool.poetry.dependencies]
+python = "~3.8"
+POT = "0.9.0"
+arch = "5.5.0"
+cvxpy = {version = "1.3.1", markers = "sys_platform != 'darwin' or platform_machine != 'arm64'"} # install manually with command conda install -c conda-forge cvxpy
+cython = "0.29.28"
+dash = "2.10.2"
+jupyter-dash = { version = ">=0.2.0,<1.0.0" }
+keras = "2.12.0"
+lxml = { version = "^4.9.1" }
+matplotlib = "3.7.1"
+mpmath = "1.2.1"
+networkx = { version = ">=2.2,<2.6" }
+numpy = "1.23.5"
+pandas = "2.0.0"
+pmdarima = "2.0.3"
+protobuf = { version = ">=3.20.3" }
+pyvinecopulib = "0.6.5"
+requests_html = "0.10.0"
+scikit-learn = "1.1.3"
+scipy = { version = ">=1.2.0,<2.0.0" }
+scs = { version = "3.2.0", markers = "sys_platform != 'darwin' or platform_machine != 'arm64'" } # install manually with command conda install -c conda-forge scs
+
+seaborn = "0.12.2"
+statsmodels = "0.14.0"
+tensorflow-macos = { version = "2.12.0", markers = "sys_platform == 'darwin' and platform_machine == 'arm64'" }
+tensorflow = { version = "2.12.0", markers = "sys_platform != 'darwin' or platform_machine != 'arm64'" }
+werkzeug = "2.2.3"
+yahoo-fin = "0.8.9.1"
+yfinance = "0.2.37"
+
+[tool.poetry.urls]
+"Bug Reports" = "https://github.com/hudson-and-thames/arbitragelab/issues"
+"Blog" = "https://hudsonthames.org/blog/"
+"Apprenticeship Program" = "https://hudsonthames.org/apprenticeship-program/"
+
+[build-system]
+requires = ["poetry-core>=1.0"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.poetry.dev-dependencies]
+coverage = "7.2.7"
+docutils = "0.18.1"
+hudsonthames-sphinx-theme = "0.1.5"
+jinja2 = "<3.1"
+pylint = "3.1.0"
+pytest = "7.3.1"
+releases = "1.6.3"
+sphinx-rtd-theme = "1.2.0"
+sphinx-tabs = "3.4.1"
+sphinx = "6.2.1"
+sphinx-autoapi = "3.0.0"
+sphinx-copybutton = "0.5.2"
+myst-parser = "2.0.0"
+pyarmor = "8.5.2"
+pytest-cov = "3.0.0"
+
+[tool.poetry.extras]
+docs = ["sphinx", "sphinx-rtd-theme", "sphinx-tabs", "sphinx-autoapi", "sphinx-copybutton", "myst-parser", "hudsonthames-sphinx-theme", "docutils", "jinja2", "releases"]

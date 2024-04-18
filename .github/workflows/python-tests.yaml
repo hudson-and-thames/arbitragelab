@@ -24,16 +24,24 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Install Poetry
+        run: |
+          pip install poetry
+
+
       - name: Install dependencies
         run: |
-          python -m venv venv
-          source venv/bin/activate
-          pip install -r requirements.txt
+          poetry install
 
       - name: Run Pylint
         run: |
-          source venv/bin/activate
-          pylint arbitragelab tests --rcfile=.pylintrc -f text
+          pylint arbitragelab tests --rcfile=.pylintrc --output-format=text --reports=y --output=pylint-report.txt 
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: pylint-report-${{ matrix.python-version }}
+          path: pylint-report.txt
 
 
   test-coverage:
@@ -51,22 +59,29 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Install Poetry
+        run: |
+          pip install poetry
+
       - name: Install dependencies
         run: |
-          python -m venv venv
-          source venv/bin/activate
-          pip install -r requirements.txt
+          poetry install
 
       - name: Run tests with coverage
         run: |
-          source venv/bin/activate
-          bash coverage
+          poetry run pytest tests/ --cov=arbitragelab --cov-report=term --cov-branch --cov-config=.coveragerc
 
-      - name: Upload test results
-        uses: actions/upload-artifact@v3
+      - name: Generate coverage XML report
+        run: poetry run coverage xml
+
+      - name: Upload Coverage XML Report as Artifact
+        uses: actions/upload-artifact@v2
         with:
-          name: test-reports-${{ matrix.python-version }}
-          path: test-reports
+          name: coverage-xml
+          path: coverage.xml
+
+      - name: Check coverage
+        run: poetry run coverage report --fail-under=100
 
   test-docs:
     runs-on: ubuntu-latest
@@ -83,19 +98,27 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Install Poetry
+        run: |
+          pip install poetry
+
       - name: Install requirements
         run: |
-          python -m venv venv
-          source venv/bin/activate
-          pip install -r requirements.txt
-          pip install -r docs/source/requirements.txt
+          poetry install
 
       - name: Build documentation
         run: |
-          source venv/bin/activate
-          make -C docs html
+          cd docs
+          poetry run make html
 
       - name: Run doctests
         run: |
           source venv/bin/activate
-          make -C docs doctest
+          poetry run make doctest
+
+      - name: Upload doctest results as an artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: doctest-results
+          path: build/doctest/output.txt
+
