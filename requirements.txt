@@ -1,31 +1,31 @@
 # Production
-POT==0.9.0
+POT==0.9.1
 arch==5.5.0
-cvxpy==1.3.1
+cvxpy>=1.3.1, <=1.4.3
 cython==0.29.28
 dash==2.10.2
 jupyter-dash>=0.2.0, <1.0.0
-keras==2.12.0
+keras>=2.12.0, <=3.2.1
 lxml>=4.9.1
 matplotlib==3.7.1
 mpmath==1.2.1
 networkx>=2.2, <2.6
-numpy==1.23.5
+numpy >=1.23.5, <=1.26.4
 pandas==2.0.0
-pmdarima==2.0.3
+pmdarima==2.0.4
 protobuf>=3.20.3
-pyvinecopulib==0.5.5
+pyvinecopulib>=0.5.5, <=0.6.5
 requests_html==0.10.0
-scikit-learn==1.1.3
-scipy>=1.2.0, <2.0.0
-scs==3.2.0
+scikit-learn>=1.1.3, <=1.2.2
+scipy>=1.2.0, <=1.11.4
+scs>=3.2.0, <=3.2.4
 seaborn==0.12.2
 statsmodels==0.14.0
-tensorflow-macos==2.12.0; sys_platform == 'darwin' and platform_machine == 'arm64'
-tensorflow==2.12.0; sys_platform != 'darwin' or platform_machine != 'arm64'
+tensorflow-macos>=2.12.0, <=2.16.1; sys_platform == 'darwin' and platform_machine == 'arm64'
+tensorflow>=2.12.0, <=2.16.1; sys_platform != 'darwin' or platform_machine != 'arm64'
 werkzeug==2.2.3
 yahoo-fin==0.8.9.1
-yfinance==0.2.24
+yfinance>=0.2.24, <=0.2.38
 
 # Develop
 coverage==7.2.7
