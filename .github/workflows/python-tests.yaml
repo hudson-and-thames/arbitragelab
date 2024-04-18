@@ -31,11 +31,11 @@ jobs:
 
       - name: Install dependencies
         run: |
-          poetry install --only dev
+          poetry install
 
       - name: Run Pylint
         run: |
-          poetry run pylint arbitragelab tests --rcfile=.pylintrc --output-format=text
+          poetry run pylint arbitragelab tests --rcfile=.pylintrc --output-format=text --output-file=pylint-report.txt
 
       - name: Upload test results
         uses: actions/upload-artifact@v3
@@ -65,7 +65,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          poetry install --only dev
+          poetry install
 
       - name: Run tests with coverage
         run: |
@@ -104,7 +104,7 @@ jobs:
 
       - name: Install requirements
         run: |
-          poetry install --only docs
+          poetry install
 
       - name: Build documentation
         run: |

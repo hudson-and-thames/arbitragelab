@@ -10,7 +10,7 @@ from itertools import permutations
 import numpy as np
 import pandas as pd
 import pyvinecopulib as pv
-import scipy.integrate as integrate
+from scipy import integrate
 
 
 class RVineCop:
@@ -87,8 +87,8 @@ class CVineCop(RVineCop):
 
         # Fit among all possible structures.
         controls = pv.FitControlsVinecop(family_set=self._bicop_family)  # Bivar copula constituents for the C-vine
-        aics = dict()  # Dictionary for AIC values for all candidate C-vine copulas
-        cvine_cops = dict()  # Dictionary for storing all candidate C-vine copulas
+        aics = {}  # Dictionary for AIC values for all candidate C-vine copulas
+        cvine_cops = {}  # Dictionary for storing all candidate C-vine copulas
         for cvine_structure in possible_cvine_structures:
             temp_cvine_struct = pv.CVineStructure(order=cvine_structure)  # Specific C-vine structure
             temp_cvine_cop = pv.Vinecop(structure=temp_cvine_struct)  # Construct the C-vine copula

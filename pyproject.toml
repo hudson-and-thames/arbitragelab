@@ -73,7 +73,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.group.dev.dependencies]
 coverage = "7.2.7"
-pylint = "2.6.0"
+pylint = "2.10.0"
 pytest = "7.3.1"
 releases = "1.6.3"
 pyarmor = "8.5.2"
@@ -89,7 +89,6 @@ sphinx-tabs = "3.4.1"
 sphinx = "6.2.1"
 sphinx-autoapi = "3.0.0"
 sphinx-copybutton = "0.5.2"
-pylint = "2.17.0"
 
 [tool.poetry.extras]
 docs = ["sphinx", "sphinx-rtd-theme", "sphinx-tabs", "sphinx-autoapi", "sphinx-copybutton", "myst-parser", "hudsonthames-sphinx-theme", "docutils", "jinja2", "releases"]
