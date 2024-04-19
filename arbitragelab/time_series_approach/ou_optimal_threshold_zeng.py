@@ -20,13 +20,6 @@ class OUModelOptimalThresholdZeng(OUModelOptimalThreshold):
     <https://www.tandfonline.com/doi/pdf/10.1080/14697688.2014.917806>`_.
     """
 
-    def __init__(self):
-        """
-        Initializes the module parameters.
-        """
-
-        super().__init__()
-
     def expected_trade_length(self, a: float, b: float) -> float:
         """
         Calculates the expected trade length.

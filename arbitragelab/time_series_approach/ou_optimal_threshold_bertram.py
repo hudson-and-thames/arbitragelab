@@ -19,13 +19,6 @@ class OUModelOptimalThresholdBertram(OUModelOptimalThreshold):
     <http://www.stagirit.org/sites/default/files/articles/a_0340_ssrn-id1505073.pdf>`_
     """
 
-    def __init__(self):
-        """
-        Initializes the module parameters.
-        """
-
-        super().__init__()
-
     def expected_trade_length(self, a: float, m: float) -> float:
         """
         Calculates equation (9) in the paper to get the expected trade length.
