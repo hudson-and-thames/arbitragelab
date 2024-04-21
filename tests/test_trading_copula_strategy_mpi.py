@@ -2,7 +2,7 @@
 Unit tests for copula strategy using mispricing index (MPI).
 """
 
-# pylint: disable = invalid-name, protected-access
+# pylint: disable=invalid-name, protected-access
 import os
 import unittest
 
@@ -324,9 +324,9 @@ class TestMPICopulaTradingRule(unittest.TestCase):
                     (-1, False, [-1, 2]), (-1, False, [-1, 1]), (1, False, [1, 2]), (1, False, [1, 1]),
                     (-1, False, [-1, 1]), (-1, False, [-1, 1])]
         # Check matching with expecteation
-        np.testing.assert_array_equal(results_1, expected)
+        np.testing.assert_array_equal(np.array(results_1, dtype=object), np.array(expected, dtype=object))
         # Check results are indep of open_based_on conditions
-        np.testing.assert_array_equal(results_1, results_2)
+        np.testing.assert_array_equal(np.array(results_1, dtype=object), np.array(results_2, dtype=object))
 
     def test_cur_flag_and_position_or_and(self):
         """
@@ -486,9 +486,9 @@ class TestMPICopulaTradingRule(unittest.TestCase):
                     (1, False, [-1, 2]), (1, False, [-1, 1]), (-1, False, [1, 2]), (-1, False, [1, 1]),
                     (0, True, [0, 0]), (0, True, [0, 0]), (-1, False, [-1, 2])]
         # Check matching with expecteation
-        np.testing.assert_array_equal(results_1, expected)
+        np.testing.assert_array_equal(np.array(results_1, dtype=object), np.array(expected, dtype=object))
         # Check results are indep of open_based_on conditions
-        np.testing.assert_array_equal(results_1, results_2)
+        np.testing.assert_array_equal(np.array(results_1, dtype=object), np.array(results_2, dtype=object))
 
     def test_cur_flag_and_position_and_or(self):
         """
@@ -651,9 +651,9 @@ class TestMPICopulaTradingRule(unittest.TestCase):
                     (1, False, [-1, 2]), (1, False, [-1, 1]), (-1, False, [1, 2]), (-1, False, [1, 1]),
                     (-1, False, [-1, 1]), (-1, False, [-1, 1]), (-1, False, [-1, 2])]
         # Check matching with expecteation
-        np.testing.assert_array_equal(results_1, expected)
+        np.testing.assert_array_equal(np.array(results_1, dtype=object), np.array(expected, dtype=object))
         # Check results are indep of open_based_on conditions
-        np.testing.assert_array_equal(results_1, results_2)
+        np.testing.assert_array_equal(np.array(results_1, dtype=object), np.array(results_2, dtype=object))
 
     def test_cur_flag_and_position_and_and(self):
         """

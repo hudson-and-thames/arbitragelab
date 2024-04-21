@@ -1,4 +1,5 @@
 # pylint: disable=missing-module-docstring, invalid-name, too-many-instance-attributes
+# pylint: disable=unnecessary-lambda-assignment, broad-exception-raised
 import warnings
 from scipy.integrate import quad
 from scipy.optimize import root_scalar

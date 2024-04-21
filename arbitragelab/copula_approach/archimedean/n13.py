@@ -2,7 +2,7 @@
 Module that houses N13 copula class.
 """
 
-# pylint: disable = invalid-name, too-many-lines
+# pylint: disable=invalid-name, too-many-lines, unnecessary-lambda-assignment
 from typing import Callable
 
 import numpy as np

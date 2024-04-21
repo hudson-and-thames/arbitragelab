@@ -26,10 +26,6 @@ class TestSpreadModelingHelper(unittest.TestCase):
         np.random.seed(seed_value)
         tf.random.set_seed(seed_value)
 
-        session_conf = tf.compat.v1.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
-        sess = tf.compat.v1.Session(graph=tf.compat.v1.get_default_graph(), config=session_conf)
-        tf.compat.v1.keras.backend.set_session(sess)
-
         # Collect all contract price data.
         project_path = os.path.dirname(__file__)
 

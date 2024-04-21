@@ -1,7 +1,8 @@
 """
 Unit tests for copula functions.
 """
-# pylint: disable = invalid-name,  protected-access, too-many-locals, unexpected-keyword-arg, too-many-public-methods
+# pylint: disable=invalid-name,  protected-access, too-many-locals, unexpected-keyword-arg
+# pylint: disable=too-many-public-methods, unnecessary-lambda-assignment
 
 import os
 import unittest

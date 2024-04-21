@@ -3,6 +3,7 @@
    :target: https://hudsonthames.org/
 
 |
+
 ===============================================
 Welcome to the Statistical Arbitrage Laboratory
 ===============================================
@@ -117,6 +118,7 @@ Including publications from:
    :target: https://hudsonthames.org/
 
 |
+
 Who is Hudson & Thames?
 +++++++++++++++++++++++
 

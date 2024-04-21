@@ -1,4 +1,5 @@
 # pylint: disable=missing-module-docstring, invalid-name, too-many-locals
+# pylint: disable=unnecessary-lambda-assignment, consider-using-generator
 
 from typing import Callable
 import numpy as np

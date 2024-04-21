@@ -1,6 +1,7 @@
 """
 This module generates a cointegration vector for mean-reversion trading of three or more cointegrated assets.
 """
+# pylint: disable=consider-using-f-string
 
 import warnings
 from typing import Tuple, Optional

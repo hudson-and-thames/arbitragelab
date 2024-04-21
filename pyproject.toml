@@ -30,36 +30,74 @@ packages = [
 exclude = ["contrib", "docs", "tests"]
 
 [tool.poetry.dependencies]
-python = "~3.8"
+python = "^3.8"
 POT = "0.9.0"
 arch = "5.5.0"
-cvxpy = {version = "1.3.1", markers = "sys_platform != 'darwin' or platform_machine != 'arm64'"} # install manually with command conda install -c conda-forge cvxpy
-cython = "0.29.28"
-dash = "2.10.2"
-jupyter-dash = { version = ">=0.2.0,<1.0.0" }
-keras = "2.12.0"
-lxml = { version = "^4.9.1" }
-matplotlib = "3.7.1"
-mpmath = "1.2.1"
-networkx = { version = ">=2.2,<2.6" }
-numpy = "1.23.5"
-pandas = "2.0.0"
-pmdarima = "2.0.3"
-protobuf = { version = ">=3.20.3" }
-pyvinecopulib = "0.6.5"
-requests_html = "0.10.0"
-scikit-learn = "1.1.3"
-scipy = { version = ">=1.2.0,<2.0.0" }
-scs = { version = "3.2.0", markers = "sys_platform != 'darwin' or platform_machine != 'arm64'" } # install manually with command conda install -c conda-forge scs
-
-seaborn = "0.12.2"
-statsmodels = "0.14.0"
-tensorflow-macos = { version = "2.12.0", markers = "sys_platform == 'darwin' and platform_machine == 'arm64'" }
-tensorflow = { version = "2.12.0", markers = "sys_platform != 'darwin' or platform_machine != 'arm64'" }
-tensorflow-io-gcs-filesystem = { version = "0.27.0", markers = "sys_platform != 'darwin' or platform_machine != 'arm64'"}
 werkzeug = "2.2.3"
 yahoo-fin = "0.8.9.1"
 yfinance = "0.2.37"
+cython = "0.29.28"
+dash = "2.10.2"
+mpmath = "1.2.1"
+pandas = "2.0.0"
+pmdarima = "2.0.4"
+pyvinecopulib = "0.6.5"
+requests_html = "0.10.0"
+pyzmq = "26.0.0"
+seaborn = "0.12.2"
+
+statsmodels = {version = "0.14.0" }
+lxml = { version = "^4.9.1" }
+protobuf = { version = ">=3.20.3" }
+networkx = { version = ">=2.2,<2.6" }
+jupyter-dash = { version = ">=0.2.0,<1.0.0" }
+
+numpy = [
+    { version = "1.23.5", python = ">=3.8,<3.12" },
+    { version = "1.26.4", python = ">=3.12,<4" },
+]
+
+matplotlib = [
+    { version = "3.7.1", python = ">=3.8,<3.12" },
+    { version = "3.8.4", python = ">=3.12,<4" },
+]
+
+scikit-learn = [
+    { version = "1.1.3", python = ">=3.8,<3.12" },
+    { version = "1.3.0", python = ">=3.12,<4" },
+]
+
+scipy = [
+    { version = "1.10.1", python = ">=3.8,<3.9" },
+    { version = "1.11.0", python = ">=3.9,<3.10" },
+    { version = "1.12.0", python = ">=3.10,<4" },
+]
+
+tensorflow-macos = [
+    { version = "2.13.0", markers = "sys_platform == 'darwin' and platform_machine == 'arm64'", python = ">=3.8, <3.12" },
+    { version = "2.16.1", markers = "sys_platform == 'darwin' and platform_machine == 'x86_64'", python = ">=3.12, <4" }
+]
+
+tensorflow = [
+    { version = "2.13.0", markers = "sys_platform != 'darwin' or platform_machine != 'arm64'", python = ">=3.8, <3.12" },
+    { version = "2.16.1", markers = "sys_platform != 'darwin' or platform_machine != 'x86_64'", python = ">=3.12, <4" }
+]
+
+tensorflow-io-gcs-filesystem = { version = "0.34.0", markers = "sys_platform != 'darwin' or platform_machine != 'arm64'", python = ">=3.8, <3.12" }
+
+keras = [
+    { version = "2.13.1", python = ">=3.8,<3.12" },
+    { version = "3.0.0", python = ">=3.12,<4" },
+]
+
+wrapt = { version = "1.14.0" , python = ">=3.8,<3.12" }
+
+cvxpy = [
+    { version = "1.4.3", markers = "sys_platform != 'darwin' or platform_machine != 'arm64'", python = ">=3.8,<3.10"},
+    { version = "1.4.3", python = ">=3.10,<4"},
+] # install manually with command conda install -c conda-forge cvxpy,
+  # otherwise causes problems whit some of its dependecy 'ecos' and 'scs ->
+  #refer to this link: https://apple.stackexchange.com/questions/254380/why-am-i-getting-an-invalid-active-developer-path-when-attempting-to-use-git-a
 
 [tool.poetry.urls]
 "Bug Reports" = "https://github.com/hudson-and-thames/arbitragelab/issues"
@@ -73,7 +111,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.group.dev.dependencies]
 coverage = "7.2.7"
-pylint = "2.10.0"
+pylint = "3.1.0"
 pytest = "7.3.1"
 releases = "1.6.3"
 pyarmor = "8.5.2"
@@ -87,7 +125,7 @@ myst-parser = "2.0.0"
 sphinx-rtd-theme = "1.2.0"
 sphinx-tabs = "3.4.1"
 sphinx = "6.2.1"
-sphinx-autoapi = "2.1.1"
+sphinx-autoapi = "3.0.0"
 sphinx-copybutton = "0.5.2"
 
 [tool.poetry.extras]

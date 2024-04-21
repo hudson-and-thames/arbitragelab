@@ -2,6 +2,7 @@
 This module implements the ML based Pairs Selection Framework described by Simão Moraes
 Sarmento and Nuno Horta in `"A Machine Learning based Pairs Trading Investment Strategy." <http://premio-vidigal.inesc.pt/pdf/SimaoSarmentoMSc-resumo.pdf>`__.
 """
+# pylint: disable=broad-exception-raised)
 
 import itertools
 import numpy as np

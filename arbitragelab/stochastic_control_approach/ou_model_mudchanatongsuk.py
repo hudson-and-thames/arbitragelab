@@ -6,7 +6,7 @@ This module is a realization of the methodology in the following paper:
 `Mudchanatongsuk, S., Primbs, J.A. and Wong, W., 2008, June. Optimal pairs trading: A stochastic control approach.
 <http://folk.ntnu.no/skoge/prost/proceedings/acc08/data/papers/0479.pdf>`__
 """
-# pylint: disable=invalid-name, too-many-instance-attributes
+# pylint: disable=invalid-name, too-many-instance-attributes, broad-exception-raised
 
 import math
 import numpy as np

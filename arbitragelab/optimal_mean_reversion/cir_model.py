@@ -1,4 +1,4 @@
-# pylint: disable=missing-module-docstring, invalid-name, no-name-in-module
+# pylint: disable=missing-module-docstring, invalid-name, no-name-in-module, unnecessary-lambda-assignment
 
 import warnings
 import numpy as np

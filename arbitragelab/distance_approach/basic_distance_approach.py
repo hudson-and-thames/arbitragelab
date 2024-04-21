@@ -4,7 +4,7 @@ Gatev, E., Goetzmann, W. N., and Rouwenhorst, K. G. in
 "Pairs trading:  Performance of a relative-value arbitrage rule." (2006)
 https://papers.ssrn.com/sol3/papers.cfm?abstract_id=141615.
 """
-
+# pylint: disable=broad-exception-raised)
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
