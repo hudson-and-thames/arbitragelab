@@ -9,6 +9,7 @@ from keras.models import Model
 from keras.callbacks import History
 from sklearn.model_selection import train_test_split
 from sklearn.datasets import make_regression
+from tensorflow.python.keras import backend
 
 from arbitragelab.ml_approach.neural_networks import MultiLayerPerceptron, RecurrentNeuralNetwork, PiSigmaNeuralNetwork
 
@@ -28,10 +29,9 @@ class TestNeuralNetworks(unittest.TestCase):
         seed_value = 0
         np.random.seed(seed_value)
         tf.random.set_seed(seed_value)
-
-        #session_conf = tf.compat.v1.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
-        #sess = tf.compat.v1.Session(graph=tf.compat.v1.get_default_graph(), config=session_conf)
-        #tf.compat.v1.keras.backend.set_session(sess)
+        session_conf = tf.compat.v1.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
+        sess = tf.compat.v1.Session(graph=tf.compat.v1.get_default_graph(), config=session_conf)
+        backend.set_session(sess)
 
         self.seed_value = seed_value
 
