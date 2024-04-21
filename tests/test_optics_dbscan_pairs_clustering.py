@@ -139,12 +139,10 @@ class TestDBSCANClustering(unittest.TestCase):
         self.assertTrue(isinstance(knee_plot_pyplot_obj, Axes))
 
         # Test 2d cluster plot return object.
-        self.pair_selector.dimensionality_reduction_by_components(2)
         twod_pyplot_obj = self.pair_selector.plot_clustering_info(n_dimensions=2)
         self.assertTrue(isinstance(twod_pyplot_obj, Axes))
 
         # Test 3d cluster plot return object.
-        self.pair_selector.dimensionality_reduction_by_components(3)
         threed_pyplot_obj = self.pair_selector.plot_clustering_info(n_dimensions=3)
         self.assertTrue(isinstance(threed_pyplot_obj, Axes))
 
