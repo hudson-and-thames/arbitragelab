@@ -1,6 +1,7 @@
 """
 Tests Spread Modeling Neural Network Classes.
 """
+# pylint: disable=unbalanced-tuple-unpacking, no-name-in-module
 
 import unittest
 import numpy as np
@@ -10,10 +11,7 @@ from keras.callbacks import History
 from sklearn.model_selection import train_test_split
 from sklearn.datasets import make_regression
 from tensorflow.python.keras import backend
-
 from arbitragelab.ml_approach.neural_networks import MultiLayerPerceptron, RecurrentNeuralNetwork, PiSigmaNeuralNetwork
-
-# pylint: disable=unbalanced-tuple-unpacking
 
 class TestNeuralNetworks(unittest.TestCase):
     """

@@ -1,6 +1,8 @@
 """
 Tests Spread Modeling Helper Class.
 """
+# pylint: disable=no-name-in-module
+
 import os
 import unittest
 import numpy as np
