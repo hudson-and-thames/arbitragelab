@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.8, 3.9]  # Add versions as needed
+        python-version: [3.8, 3.9, 3.10]  # Add versions as needed
 
     steps:
       - name: Checkout code
@@ -48,7 +48,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.8]  # Add versions as needed
+        python-version: [3.8, 3.9, 3.10]  # Add versions as needed
 
     steps:
       - name: Checkout code
