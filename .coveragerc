@@ -3,6 +3,7 @@ directory = build/coverage/html
 
 [run]
 branch = True
+parallel = True
 omit =
      *__init__*
      arbitragelab/network/imports.py

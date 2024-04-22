@@ -1,7 +1,7 @@
 """
 The module implements a statistical arbitrage strategy based on the Markov regime-switching model.
 """
-# pylint: disable=invalid-name
+# pylint: disable=invalid-name, unnecessary-lambda-assignment, broad-exception-raised
 
 from typing import Union, Callable
 import warnings
@@ -128,7 +128,8 @@ class RegimeSwitchingArbitrageRule:
                 res = mod.fit()
             except (RuntimeError, LinAlgError):
                 warnings.warn("Unable to get a fit")
-                return np.full(4, False)  # Since we were unable to detect the regime, we just return False for every possible strategy.
+                return np.full(4,
+                               False)  # Since we were unable to detect the regime, we just return False for every possible strategy.
 
         # Unpacking parameters
         mu = res.params[2:4]
@@ -230,7 +231,7 @@ class RegimeSwitchingArbitrageRule:
                 if not (long_exit[i] or short_exit[i]):
                     positions[i] = positions[i - 1]
                 else:
-                    positions[i] = 0
+                    positions[i] = 0  # pragma: no cover
 
         return np.column_stack((long_entry, long_exit, short_entry, short_exit))
 

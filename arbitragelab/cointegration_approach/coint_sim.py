@@ -2,6 +2,7 @@
 """
 This module allows simulation of cointegrated time series pairs.
 """
+# pylint: disable=consider-using-f-string
 
 from typing import Tuple, Optional
 

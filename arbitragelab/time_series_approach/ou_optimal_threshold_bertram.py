@@ -1,7 +1,7 @@
 """
 The module implements the Bertram class for OU Optimal Threshold Model.
 """
-# pylint: disable=invalid-name
+# pylint: disable=invalid-name, unnecessary-lambda-assignment, broad-exception-raised, consider-iterating-dictionary
 
 import numpy as np
 from scipy import optimize, special

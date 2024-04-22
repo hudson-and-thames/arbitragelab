@@ -1,6 +1,7 @@
 """
 This module generates a cointegration vector for mean-reversion trading of three or more cointegrated assets.
 """
+# pylint: disable=consider-using-f-string
 
 import warnings
 from typing import Tuple, Optional
@@ -147,7 +148,7 @@ class MultivariateCointegration:
         coint_vec = jo_portfolio.cointegration_vectors.loc[0]
         self.__coint_vec = coint_vec
 
-        return coint_vec
+        return self.__coint_vec
 
     # pylint: disable=invalid-name, too-many-locals
     def get_coint_vec(self) -> Tuple[pd.DataFrame, ...]:

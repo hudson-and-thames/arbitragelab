@@ -1,11 +1,10 @@
 """
 This module implements interactive Tear Sheets for various modules of the ArbitrageLab package.
 """
-# pylint: disable=too-many-lines, too-many-locals, invalid-name, unused-argument
-# pylint: disable=too-many-arguments, too-many-statements, unused-variable, broad-except
+# pylint: disable=too-many-lines, too-many-locals, invalid-name, unused-argument, use-dict-literal, broad-except
+# pylint: disable=too-many-arguments, too-many-statements, unused-variable,  consider-using-f-string
 
 import warnings
-
 import pandas as pd
 import numpy as np
 from scipy import stats
@@ -18,7 +17,6 @@ from dash import html
 from dash import dash_table
 import plotly.graph_objects as go
 from jupyter_dash import JupyterDash
-
 from arbitragelab.optimal_mean_reversion import OrnsteinUhlenbeck
 from arbitragelab.cointegration_approach import (get_half_life_of_mean_reversion,
                                                  EngleGrangerPortfolio, JohansenPortfolio)

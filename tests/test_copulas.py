@@ -1,7 +1,8 @@
 """
 Unit tests for copula functions.
 """
-# pylint: disable = invalid-name,  protected-access, too-many-locals, unexpected-keyword-arg, too-many-public-methods
+# pylint: disable=invalid-name,  protected-access, too-many-locals, unexpected-keyword-arg
+# pylint: disable=too-many-public-methods, unnecessary-lambda-assignment
 
 import os
 import unittest
@@ -698,7 +699,7 @@ class TestCopulas(unittest.TestCase):
 
         # Fit through the copulas and the last one we do not update
         copulas = [Gumbel, Clayton, Frank, Joe, N13, N14, GaussianCopula, StudentCopula]
-        aics = dict()
+        aics = {}
 
         for cop in copulas:
             result_dict, _, _, _ = fit_copula_to_empirical_data(x=BKD_clr, y=ESC_clr, copula=cop)
@@ -709,8 +710,8 @@ class TestCopulas(unittest.TestCase):
                         'N13': -2211.6295423299603, 'N14': -2111.9831835080827,
                         'Gaussian': -2211.4486204860873, 'Student': -2275.069087841567}
 
-        for key in aics:
-            self.assertAlmostEqual(aics[key], expeced_aics[key], delta=1)
+        for key, aic_item in aics.items():
+            self.assertAlmostEqual(aic_item, expeced_aics[key], delta=1)
 
     @staticmethod
     def test_construct_ecdf_lin():
@@ -823,7 +824,7 @@ class TestCopulas(unittest.TestCase):
         student = StudentCopula(cov=cov, nu=nu)
 
         # Initiate without an axes
-        axs = dict()
+        axs = {}
         axs['Gumbel'] = gumbel.plot_scatter(200)
         axs['Frank'] = frank.plot_scatter(200)
         axs['Clayton'] = clayton.plot_scatter(200)

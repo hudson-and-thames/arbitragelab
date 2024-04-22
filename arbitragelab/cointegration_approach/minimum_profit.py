@@ -1,7 +1,8 @@
-# pylint: disable=invalid-name, too-many-arguments
 """
 This module optimizes the upper and lower bounds for mean-reversion cointegration pair trading.
 """
+# pylint: disable=invalid-name, too-many-arguments
+# pylint: disable=broad-exception-raised, consider-using-f-string
 
 import sys
 import warnings

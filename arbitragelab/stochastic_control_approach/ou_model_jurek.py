@@ -6,7 +6,7 @@ This module is a realization of the methodology in the following paper:
 `Jurek, J.W. and Yang, H., 2007, April. Dynamic portfolio selection in arbitrage. In EFA 2006 Meetings Paper.
 <https://papers.ssrn.com/sol3/papers.cfm?abstract_id=882536>`__
 """
-# pylint: disable=invalid-name, too-many-instance-attributes, too-many-locals
+# pylint: disable=invalid-name, too-many-instance-attributes, too-many-locals, broad-exception-raised
 
 import warnings
 import cvxpy as cp

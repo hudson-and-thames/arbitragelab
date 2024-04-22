@@ -3,7 +3,7 @@ This module is a realization of the methodology in the following paper:
 `Liu, J. and Timmermann, A., 2013. Optimal convergence trade strategies. The Review of Financial Studies, 26(4), pp.1048-1086.
 <https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.905.236&rep=rep1&type=pdf>`__
 """
-# pylint: disable=invalid-name, too-many-instance-attributes
+# pylint: disable=invalid-name, too-many-instance-attributes, broad-exception-raised
 
 import warnings
 import numpy as np

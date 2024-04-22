@@ -1,12 +1,14 @@
 """
 Tests Spread Modeling Helper Class.
 """
+# pylint: disable=no-name-in-module
+
 import os
 import unittest
 import numpy as np
 import pandas as pd
 import tensorflow as tf
-
+from tensorflow.python.keras import backend
 from arbitragelab.cointegration_approach.johansen import JohansenPortfolio
 from arbitragelab.ml_approach.regressor_committee import RegressorCommittee
 from arbitragelab.util.spread_modeling_helper import SpreadModelingHelper
@@ -28,7 +30,7 @@ class TestSpreadModelingHelper(unittest.TestCase):
 
         session_conf = tf.compat.v1.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
         sess = tf.compat.v1.Session(graph=tf.compat.v1.get_default_graph(), config=session_conf)
-        tf.compat.v1.keras.backend.set_session(sess)
+        backend.set_session(sess)
 
         # Collect all contract price data.
         project_path = os.path.dirname(__file__)

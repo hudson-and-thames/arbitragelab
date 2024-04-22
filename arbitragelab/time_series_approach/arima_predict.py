@@ -1,6 +1,7 @@
 """
 The module implements the ARIMA forecast of any time series using the Auto-ARIMA approach.
 """
+# pylint: disable=consider-using-f-string, broad-exception-raised
 
 import warnings
 import sys

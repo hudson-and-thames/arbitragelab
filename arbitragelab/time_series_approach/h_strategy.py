@@ -3,7 +3,7 @@ This module implements the strategy described in
 `Bogomolov, T. (2013). Pairs trading based on statistical variability of the spread process. Quantitative Finance, 13(9): 1411–1430.
 <https://www.researchgate.net/publication/263339291_Pairs_trading_based_on_statistical_variability_of_the_spread_process>`_
 """
-# pylint: disable=invalid-name
+# pylint: disable=invalid-name, broad-exception-raised
 
 from itertools import compress, combinations
 

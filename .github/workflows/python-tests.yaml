@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.8]  # Add versions as needed
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']  # Add versions as needed
 
     steps:
       - name: Checkout code
@@ -24,23 +24,32 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Install Poetry
+        run: |
+          pip install --upgrade pip
+          pip install poetry
+
+
       - name: Install dependencies
         run: |
-          python -m venv venv
-          source venv/bin/activate
-          pip install -r requirements.txt
+          poetry install
 
       - name: Run Pylint
         run: |
-          source venv/bin/activate
-          pylint arbitragelab tests --rcfile=.pylintrc -f text
+          poetry run pylint arbitragelab tests --rcfile=.pylintrc --output-format=text --output=pylint-report.txt
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: pylint-report-${{ matrix.python-version }}
+          path: pylint-report.txt
 
 
   test-coverage:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.8]  # Add versions as needed
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']  # Add versions as needed
 
     steps:
       - name: Checkout code
@@ -51,22 +60,30 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Install Poetry
+        run: |
+          pip install --upgrade pip
+          pip install poetry
+
       - name: Install dependencies
         run: |
-          python -m venv venv
-          source venv/bin/activate
-          pip install -r requirements.txt
+          poetry install
 
       - name: Run tests with coverage
         run: |
-          source venv/bin/activate
-          bash coverage
+          poetry run pytest tests/ --cov=arbitragelab --cov-report=term --cov-branch --cov-config=.coveragerc
 
-      - name: Upload test results
-        uses: actions/upload-artifact@v3
+      - name: Generate coverage XML report
+        run: poetry run coverage html
+
+      - name: Upload Coverage XML Report as Artifact
+        uses: actions/upload-artifact@v2
         with:
-          name: test-reports-${{ matrix.python-version }}
-          path: test-reports
+          name: coverage-html
+          path: coverage.html
+
+      - name: Check coverage
+        run: poetry run coverage report --fail-under=100
 
   test-docs:
     runs-on: ubuntu-latest
@@ -83,19 +100,27 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Install Poetry
+        run: |
+          pip install poetry
+
       - name: Install requirements
         run: |
-          python -m venv venv
-          source venv/bin/activate
-          pip install -r requirements.txt
-          pip install -r docs/source/requirements.txt
+          poetry install
 
       - name: Build documentation
         run: |
-          source venv/bin/activate
-          make -C docs html
+          cd docs
+          poetry run make html
 
       - name: Run doctests
         run: |
-          source venv/bin/activate
-          make -C docs doctest
+          cd docs
+          poetry run make doctest
+
+      - name: Upload doctest results as an artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: doctest-results
+          path: docs/build/doctest/output.txt
+

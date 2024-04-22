@@ -2,7 +2,7 @@
 Module for implementing partner selection approaches for vine copulas.
 """
 
-# pylint: disable = invalid-name
+# pylint: disable = invalid-name, broad-exception-raised
 import functools
 import itertools
 import matplotlib.pyplot as plt

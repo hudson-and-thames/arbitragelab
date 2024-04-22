@@ -1,7 +1,7 @@
 """
 The module implements the base class for OU Optimal Threshold Model.
 """
-# pylint: disable=invalid-name
+# pylint: disable=invalid-name, broad-exception-raised, unnecessary-lambda-assignment
 
 from typing import Union
 

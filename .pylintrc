@@ -41,11 +41,11 @@ load-plugins=
 # Reference: http://pylint-messages.wikidot.com/all-codes
 disable=I,
         maybe-no-member,
-        star-args,
-        abstract-class-not-used,
+#        star-args,
+#        abstract-class-not-used,
         duplicate-code,
         superfluous-parens,
-        abstract-class-little-used,
+#        abstract-class-little-used,
         too-few-public-methods,
         RP0401,
         RP0801,
@@ -70,7 +70,7 @@ output-format=text
 # Put messages in a separate file for each module / package specified on the
 # command line instead of printing them on stdout. Reports (if any) will be
 # written in a file name "pylint_global.[txt|html]".
-files-output=no
+#files-output=no
 
 # Tells whether to display a full report or only the messages
 reports=yes
@@ -91,7 +91,7 @@ msg-template={C}:{line:3d},{column:2d}: [{obj}] {msg} ({msg_id} - {symbol})
 [BASIC]
 
 # List of builtins function names that should not be used, separated by a comma
-bad-functions=map,filter,apply,input
+#bad-functions=map,filter,apply,input
 
 # Regular expression which should only match correct module names
 module-rgx=(([a-z_][a-z0-9_]*)|([A-Z][a-zA-Z0-9]+))$
@@ -275,4 +275,4 @@ int-import-graph=
 
 # Exceptions that will emit a warning when being caught. Defaults to
 # "Exception"
-overgeneral-exceptions=Exception
+overgeneral-exceptions=builtins.Exception

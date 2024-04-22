@@ -9,6 +9,8 @@ Changelog
     * :feature:`50` Add a distutils command for marbles
     * :bug:`58` Fixed test failure on OSX
 
+* :support:`93` Add poetry package manager for dependency management.
+
 * :release:`0.9.1 <2024-01-10>`
 * :bug:`92` Released a new version because of pypi version was wrong
 

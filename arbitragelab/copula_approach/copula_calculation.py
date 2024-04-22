@@ -20,7 +20,7 @@ Statistical Association, 109(506), pp.788-801.
 <https://www.tandfonline.com/doi/pdf/10.1080/01621459.2013.873366?casa_token=sey8HrojSgYAAAAA:TEMBX8wLYdGFGyM78UXSYm6hXl1Qp_K6wiLgRJf6kPcqW4dYT8z3oA3I_odrAL48DNr3OSoqkQsEmQ>`__
 """
 
-# pylint: disable = invalid-name
+# pylint: disable=invalid-name, unnecessary-lambda-assignment
 from typing import Callable, Tuple
 
 import numpy as np

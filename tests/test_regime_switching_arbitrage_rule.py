@@ -2,6 +2,7 @@
 Tests functions from Regime Switching Arbitrage Rule module.
 """
 # pylint: disable=invalid-name
+# pylint: disable=unnecessary-lambda-assignment
 
 import unittest
 import os
@@ -26,8 +27,7 @@ class TestRegimeSwitchingArbitrageRule(unittest.TestCase):
         self.path = project_path + '/test_data/CL=F_NG=F_data.csv'
         data = pd.read_csv(self.path)
         data = data.set_index('Date')
-        Ratt = data["NG=F"]/data["CL=F"]
-
+        Ratt = data["NG=F"] / data["CL=F"]
 
         self.Ratts = Ratt.values, Ratt, pd.DataFrame(Ratt)
 
@@ -37,7 +37,7 @@ class TestRegimeSwitchingArbitrageRule(unittest.TestCase):
         """
 
         # Creating an object of class
-        test = RegimeSwitchingArbitrageRule(delta = 1.5, rho = 0.6)
+        test = RegimeSwitchingArbitrageRule(delta=1.5, rho=0.6)
 
         # Setting window size
         window_size = 60
@@ -97,9 +97,9 @@ class TestRegimeSwitchingArbitrageRule(unittest.TestCase):
         window_size = 60
 
         # Changing rules in the high regime
-        ol_rule = lambda Xt, mu, delta, sigma: Xt <= mu - delta*sigma
+        ol_rule = lambda Xt, mu, delta, sigma: Xt <= mu - delta * sigma
         cl_rule = lambda Xt, mu, delta, sigma: Xt >= mu
-        os_rule = lambda Xt, mu, delta, sigma: Xt >= mu + delta*sigma
+        os_rule = lambda Xt, mu, delta, sigma: Xt >= mu + delta * sigma
         cs_rule = lambda Xt, mu, delta, sigma: Xt <= mu
 
         test.change_strategy("High", "Long", "Open", ol_rule)
@@ -114,9 +114,9 @@ class TestRegimeSwitchingArbitrageRule(unittest.TestCase):
         self.assertEqual(test.strategy["High"]["Short"]["Close"], cs_rule)
 
         # Changing rules in the low regime
-        ol_rule = lambda Xt, mu, delta, sigma, prob: Xt <= mu - delta*sigma and prob >= 0.7
+        ol_rule = lambda Xt, mu, delta, sigma, prob: Xt <= mu - delta * sigma and prob >= 0.7
         cl_rule = lambda Xt, mu, delta, sigma: Xt >= mu
-        os_rule = lambda Xt, mu, delta, sigma, prob, rho: Xt >= mu + delta*sigma and prob >= rho
+        os_rule = lambda Xt, mu, delta, sigma, prob, rho: Xt >= mu + delta * sigma and prob >= rho
         cs_rule = lambda Xt, mu, delta, sigma: Xt <= mu
 
         test.change_strategy("Low", "Long", "Open", ol_rule)
@@ -144,5 +144,5 @@ class TestRegimeSwitchingArbitrageRule(unittest.TestCase):
 
         # Testing the exception
         with self.assertRaises(Exception):
-            ol_rule = lambda Xt, mu, delta, sigma, error: Xt <= mu - delta*sigma*error
+            ol_rule = lambda Xt, mu, delta, sigma, error: Xt <= mu - delta * sigma * error
             test.change_strategy("High", "Long", "Open", ol_rule)
