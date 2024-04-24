@@ -8,6 +8,7 @@ Changelog
     * :support:`119` Upgrade to pandas 1.0
     * :feature:`50` Add a distutils command for marbles
     * :bug:`58` Fixed test failure on OSX
+* :support:`94` upgraded pyvinecopulib version to support apple silicon devices.
 
 * :support:`93` Add poetry package manager for dependency management.
 
