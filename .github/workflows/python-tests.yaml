@@ -32,7 +32,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          poetry install
+          poetry install --without docs
 
       - name: Run Pylint
         run: |
@@ -67,7 +67,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          poetry install
+          poetry install --without docs
 
       - name: Run tests with coverage
         run: |
@@ -106,7 +106,7 @@ jobs:
 
       - name: Install requirements
         run: |
-          poetry install
+          poetry install --only docs
 
       - name: Build documentation
         run: |
