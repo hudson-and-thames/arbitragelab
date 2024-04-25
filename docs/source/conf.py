@@ -21,7 +21,7 @@ project = 'arbitragelab'
 author = 'Hudson & Thames Quantitative Research'
 
 # The full version, including alpha/beta/rc tags
-release = "0.9.1"
+release = "0.9.3"
 
 
 # -- General configuration ---------------------------------------------------
