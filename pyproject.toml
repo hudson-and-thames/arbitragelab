@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "arbitragelab"
-version = "0.9.1"
+version = "0.9.2"
 description = "ArbitrageLab is a collection of algorithms from the best academic journals and graduate-level textbooks, which focuses on the branch of statistical arbitrage known as pairs trading. We have extended the implementations to include the latest methods that trade a portfolio of n-assets (mean-reverting portfolios)."
 authors = ["Hudson and Thames Quantitative Research <opensource@hudsonthames.org>"]
 license = "BSD-3-Clause"
