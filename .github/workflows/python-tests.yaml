@@ -106,7 +106,7 @@ jobs:
 
       - name: Install requirements
         run: |
-          poetry install --only docs
+          poetry install --without tests
 
       - name: Build documentation
         run: |
