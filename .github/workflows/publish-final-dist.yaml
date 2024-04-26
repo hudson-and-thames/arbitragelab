@@ -3,9 +3,7 @@ name: Publish Distribution to PyPI
 on:
   pull_request:
     branches:
-      - develop
-    paths:
-      - 'release/*'
+      - master
 
 jobs:
   build-and-publish-final-dist:
