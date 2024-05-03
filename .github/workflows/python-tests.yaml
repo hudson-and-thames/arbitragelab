@@ -79,7 +79,7 @@ jobs:
       - name: Upload Coverage HTML Report as Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-html
+          name: coverage-html-${{ matrix.python-version }}
           path: build/coverage/html/index.html
 
       - name: Check coverage
