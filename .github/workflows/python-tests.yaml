@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']  # Add versions as needed
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
 
     steps:
       - name: Checkout code
@@ -49,7 +49,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']  # Add versions as needed
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
 
     steps:
       - name: Checkout code
@@ -73,14 +73,14 @@ jobs:
         run: |
           poetry run pytest tests/ --cov=arbitragelab --cov-report=term --cov-branch --cov-config=.coveragerc
 
-      - name: Generate coverage XML report
+      - name: Generate coverage HTML report
         run: poetry run coverage html
 
-      - name: Upload Coverage XML Report as Artifact
+      - name: Upload Coverage HTML Report as Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-html
-          path: coverage.html
+          name: coverage-html-${{ matrix.python-version }}
+          path: build/coverage/html/index.html
 
       - name: Check coverage
         run: poetry run coverage report --fail-under=100
