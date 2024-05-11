@@ -2,8 +2,6 @@ name: Publish Distribution to TestPyPI
 
 on:
   push:
-    branches:
-      - develop
     tags:
       - '[0-9]+.[0-9]+.[0-9]+-dev'
 
@@ -25,7 +23,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          poetry install --without docs tests
+          poetry install --without docs,tests
 
       - name: Build the package
         run: |
