@@ -10,6 +10,8 @@
 
 **What was only possible with the help of huge R&D teams is now at your disposal, anywhere, anytime.**
 
+[Documentation Click Here](https://hudson-and-thames-arbitragelab.readthedocs-hosted.com/en/latest/index.html).
+
 ArbitrageLab is a python library that includes both end-to-end strategies and strategy creation tools that cover the
 whole range of strategies defined by [Krauss' taxonomy](https://www.econstor.eu/bitstream/10419/116783/1/833997289.pdf) for pairs trading strategies.
 
