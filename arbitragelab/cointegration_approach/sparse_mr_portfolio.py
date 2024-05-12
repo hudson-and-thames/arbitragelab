@@ -1,4 +1,3 @@
-# pylint: disable=invalid-name
 """
 This module selects sparse mean-reverting portfolios out of an asset universe. The methods implemented in this module
 include the following:
@@ -12,6 +11,8 @@ include the following:
 7. Semidefinite programming approach to portmanteau statistics optimization under a minimum volatility constraint.
 8. Semidefinite programming approach to crossing statistics optimization under a minimum volatility constraint.
 """
+# pylint: disable=consider-using-f-string
+# pylint: disable=invalid-name
 
 from typing import Tuple
 import warnings

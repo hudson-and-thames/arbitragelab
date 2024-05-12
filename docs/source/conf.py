@@ -21,7 +21,7 @@ project = 'arbitragelab'
 author = 'Hudson & Thames Quantitative Research'
 
 # The full version, including alpha/beta/rc tags
-release = '0.9.1'
+release = "1.0.0"
 
 
 # -- General configuration ---------------------------------------------------
@@ -82,7 +82,11 @@ add_module_names = False
 #
 # html_theme_options = {}
 
-html_context = {'logo': 'logo_white.png', 'theme_logo_only': True}
+html_logo = '_static/logo_white.png'
+html_theme_options = {
+    'logo_only': True,
+    'display_version': True,
+}
 html_favicon = '_static/favicon_arbitragelab.png'
 
 # Add any paths that contain custom static files (such as style sheets) here,

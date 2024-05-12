@@ -1,7 +1,7 @@
 """
 The module implements the Zeng class for OU Optimal Threshold Model.
 """
-# pylint: disable=invalid-name
+# pylint: disable=invalid-name, unnecessary-lambda-assignment, broad-exception-raised, consider-iterating-dictionary
 
 import numpy as np
 from scipy import optimize
@@ -19,13 +19,6 @@ class OUModelOptimalThresholdZeng(OUModelOptimalThreshold):
     Quantitative Finance, 14(11): 1881–1893
     <https://www.tandfonline.com/doi/pdf/10.1080/14697688.2014.917806>`_.
     """
-
-    def __init__(self):
-        """
-        Initializes the module parameters.
-        """
-
-        super().__init__()
 
     def expected_trade_length(self, a: float, b: float) -> float:
         """

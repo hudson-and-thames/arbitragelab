@@ -1,4 +1,4 @@
-# pylint: disable=missing-module-docstring, invalid-name
+# pylint: disable=missing-module-docstring, invalid-name, unnecessary-lambda-assignment, broad-exception-raised
 import warnings
 from scipy.optimize import root_scalar, fsolve, minimize
 import numpy as np

@@ -1,7 +1,7 @@
 """
 The module implements the Bertram class for OU Optimal Threshold Model.
 """
-# pylint: disable=invalid-name
+# pylint: disable=invalid-name, unnecessary-lambda-assignment, broad-exception-raised, consider-iterating-dictionary
 
 import numpy as np
 from scipy import optimize, special
@@ -18,13 +18,6 @@ class OUModelOptimalThresholdBertram(OUModelOptimalThreshold):
     Physica A: Statistical Mechanics and its Applications, 389(11): 2234–2243.
     <http://www.stagirit.org/sites/default/files/articles/a_0340_ssrn-id1505073.pdf>`_
     """
-
-    def __init__(self):
-        """
-        Initializes the module parameters.
-        """
-
-        super().__init__()
 
     def expected_trade_length(self, a: float, m: float) -> float:
         """

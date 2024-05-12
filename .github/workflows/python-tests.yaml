@@ -1,0 +1,126 @@
+name: Test code and documentation
+
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  test-code-style:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Poetry
+        run: |
+          pip install --upgrade pip
+          pip install poetry
+
+
+      - name: Install dependencies
+        run: |
+          poetry install --without docs
+
+      - name: Run Pylint
+        run: |
+          poetry run pylint arbitragelab tests --rcfile=.pylintrc --output-format=text --output=pylint-report.txt
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: pylint-report-${{ matrix.python-version }}
+          path: pylint-report.txt
+
+
+  test-coverage:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Poetry
+        run: |
+          pip install --upgrade pip
+          pip install poetry
+
+      - name: Install dependencies
+        run: |
+          poetry install --without docs
+
+      - name: Run tests with coverage
+        run: |
+          poetry run pytest tests/ --cov=arbitragelab --cov-report=term --cov-branch --cov-config=.coveragerc
+
+      - name: Generate coverage HTML report
+        run: poetry run coverage html
+
+      - name: Upload Coverage HTML Report as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-html-${{ matrix.python-version }}
+          path: build/coverage/html/index.html
+
+      - name: Check coverage
+        run: poetry run coverage report --fail-under=100
+
+  test-docs:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Poetry
+        run: |
+          pip install poetry
+
+      - name: Install requirements
+        run: |
+          poetry install --without tests
+
+      - name: Build documentation
+        run: |
+          cd docs
+          poetry run make html
+
+      - name: Run doctests
+        run: |
+          cd docs
+          poetry run make doctest
+
+      - name: Upload doctest results as an artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: doctest-results
+          path: docs/build/doctest/output.txt
+

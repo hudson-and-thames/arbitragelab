@@ -13,7 +13,7 @@ from arbitragelab.codependence.gnpr_distance import spearmans_rho, gpr_distance,
 from arbitragelab.codependence.optimal_transport import optimal_transport_dependence
 
 
-# pylint: disable=invalid-name
+# pylint: disable=invalid-name, unnecessary-lambda-assignment
 def get_dependence_matrix(df: pd.DataFrame, dependence_method: str, theta: float = 0.5,
                           n_bins: int = None, normalize: bool = True,
                           estimator: str = 'standard', target_dependence: str = 'comonotonicity',

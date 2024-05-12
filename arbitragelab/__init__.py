@@ -2,6 +2,7 @@
 ArbitrageLab helps portfolio managers and traders who want to leverage the power of Statistical Arbitrage by providing
 reproducible, interpretable, and easy to use tools.
 """
+# pylint: disable=consider-using-from-import
 
 import arbitragelab.codependence as codependence
 import arbitragelab.cointegration_approach as cointegration_approach

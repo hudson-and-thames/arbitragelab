@@ -3,6 +3,7 @@ This module implements the quantile time series approach described in
 `"A Machine Learning based Pairs Trading Investment Strategy" <https://www.springer.com/gp/book/9783030472504>`__
 (pages 37-43) by Simão Moraes Sarmento and Nuno Horta.
 """
+# pylint: disable=consider-using-f-string
 
 import pandas as pd
 import seaborn as sns

@@ -8,7 +8,7 @@ import unittest
 import numpy as np
 import pandas as pd
 
-import arbitragelab.copula_approach.pairs_selection as pairs_selection
+from arbitragelab.copula_approach import pairs_selection
 
 
 class TestPairsSelector(unittest.TestCase):

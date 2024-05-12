@@ -1,7 +1,7 @@
 """
 Abstract pair selector class.
 """
-
+# pylint: disable=consider-using-f-string
 from abc import ABC
 from abc import abstractmethod
 

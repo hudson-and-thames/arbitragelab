@@ -2,7 +2,7 @@
 Module that implements Clayton, Student-t and Gumbel mixed copula.
 """
 
-# pylint: disable = invalid-name, too-many-locals, arguments-differ
+# pylint: disable=invalid-name, too-many-locals, arguments-differ, arguments-renamed
 import numpy as np
 import pandas as pd
 from scipy.optimize import minimize

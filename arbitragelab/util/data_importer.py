@@ -116,7 +116,7 @@ class DataImporter:
             # Set end as the limit value equals to the chunk size.
             # If we hit the last chunk, set the end value as the
             # full length of the ticker list.
-            end = i+yf_call_chunk if i <= len(tickers) else len(tickers)
+            end = i + yf_call_chunk if i <= len(tickers) else len(tickers)
 
             ticker_sector_queue.append(self._sector_info_helper(tickers[i: end]))
 
@@ -132,13 +132,16 @@ class DataImporter:
             and industry information.
         """
 
-        tckrs = yf.Tickers(' '.join(tickers))
+        tickers_obj = yf.Tickers(' '.join(tickers))
 
         tckr_info = []
+        for name in tickers:
 
-        for tckr in tickers:
-            ticker_info = tckrs.tickers[tckr].info
-            tckr_tuple = (tckr, ticker_info['industry'], ticker_info['sector'])
+            sector = tickers_obj.tickers[name].info.get('sector', 'NA')
+            industry = tickers_obj.tickers[name].info.get('industry', 'NA')
+
+            # Append to list storage
+            tckr_tuple = (name, industry, sector)
             tckr_info.append(tckr_tuple)
 
         return pd.DataFrame(data=tckr_info, columns=['ticker', 'industry', 'sector'])

@@ -88,11 +88,14 @@ Implementation
 **************
 
 .. automodule:: arbitragelab.tearsheet.tearsheet
+   :noindex:
 
 .. autoclass:: TearSheet
+   :noindex:
    :members: __init__
 
 .. automethod:: TearSheet.cointegration_tearsheet
+    :noindex:
 
 Code Example
 ************
@@ -172,6 +175,7 @@ Implementation
 **************
 
 .. automethod:: TearSheet.ou_tearsheet
+    :noindex:
 
 Code Example
 ************
