@@ -229,7 +229,7 @@ The following research notebook can be used to better understand the Pearson app
 
 * `Pearson Distance Approach`_
 
-.. _`Pearson Distance Approach`: https://hudsonthames.org/notebooks/arblab/pearson_distance_approach.html
+.. _`Pearson Distance Approach`: https://github.com/hudson-and-thames/arbitrage_research/blob/master/Distance%20Approach/pearson_distance_approach.ipynb
 
 .. raw:: html
 

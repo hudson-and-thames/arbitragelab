@@ -118,7 +118,7 @@ The following research notebook can be used to better understand the Strategy de
 
 * `Multivariate Cointegration Strategy`_
 
-.. _`Multivariate Cointegration Strategy`: https://hudsonthames.org/notebooks/arblab/multivariate_cointegration.html
+.. _`Multivariate Cointegration Strategy`: https://github.com/hudson-and-thames/arbitrage_research/blob/master/Cointegration%20Approach/multivariate_cointegration.ipynb
 
 .. raw:: html
 

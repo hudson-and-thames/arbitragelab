@@ -311,7 +311,7 @@ Research Notebooks
 
 * `Minimum Profit Optimization`_
 
-.. _`Minimum Profit Optimization`: https://hudsonthames.org/notebooks/arblab/minimum_profit_optimization.html
+.. _`Minimum Profit Optimization`: https://github.com/hudson-and-thames/arbitrage_research/blob/master/Cointegration%20Approach/minimum_profit_optimization.ipynb
 
 .. raw:: html
 

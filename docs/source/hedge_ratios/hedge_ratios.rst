@@ -257,7 +257,7 @@ The following research notebook can be used to better understand the hedge ratio
 
 * `Hedge Ratios`_
 
-.. _`Hedge Ratios`: https://hudsonthames.org/notebooks/arblab/hedge_ratios.html
+.. _`Hedge Ratios`: https://github.com/hudson-and-thames/arbitrage_research/blob/master/Hedge%20Ratios/hedge_ratios.ipynb
 
 .. raw:: html
 

@@ -345,7 +345,7 @@ The following research notebook can be used to better understand the PCA approac
 
 * `PCA Approach`_
 
-.. _`PCA Approach`: https://hudsonthames.org/notebooks/arblab/pca_approach.html
+.. _`PCA Approach`: https://github.com/hudson-and-thames/arbitrage_research/blob/master/Other%20Approaches/pca_approach.ipynb
 
 .. raw:: html
 

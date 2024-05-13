@@ -517,7 +517,7 @@ The following research notebook can be used to better understand the approach de
 
 * `Dynamic Portfolio Selection in Arbitrage`_
 
-.. _`Dynamic Portfolio Selection in Arbitrage`: https://hudsonthames.org/notebooks/arblab/OU_Model_Jurek.html
+.. _`Dynamic Portfolio Selection in Arbitrage`: https://github.com/hudson-and-thames/arbitrage_research/blob/master/Stochastic%20Control%20Approach/OU_Model_Jurek.ipynb
 
 .. raw:: html
 

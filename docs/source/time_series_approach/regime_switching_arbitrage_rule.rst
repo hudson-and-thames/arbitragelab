@@ -333,7 +333,7 @@ The following research notebook can be used to better understand the strategy de
 
 * `Statistical Arbitrage Strategy Based on the Markov Regime-Switching Model`_
 
-.. _`Statistical Arbitrage Strategy Based on the Markov Regime-Switching Model`: https://hudsonthames.org/notebooks/arblab/regime_switching_arbitrage_rule.html
+.. _`Statistical Arbitrage Strategy Based on the Markov Regime-Switching Model`: https://github.com/hudson-and-thames/arbitrage_research/blob/master/Time%20Series%20Approach/regime_switching_arbitrage_rule.ipynb
 
 .. raw:: html
 

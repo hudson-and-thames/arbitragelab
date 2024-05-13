@@ -131,7 +131,7 @@ The following research notebooks can be used to better understand the components
 
 * `Fair Value Modeling`_ - showcases the use of the TAR model on the crack spread.
 
-.. _`Fair Value Modeling`: https://hudsonthames.org/notebooks/arblab/fair_value_modeling.html
+.. _`Fair Value Modeling`: https://github.com/hudson-and-thames/arbitrage_research/blob/master/ML%20Approach/fair_value_modeling.ipynb
 
 .. raw:: html
 
