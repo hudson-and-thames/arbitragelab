@@ -55,9 +55,19 @@ Recommended Setup on Linux / MacOS
 
 #. Install ArbitrageLab using ``pip``:
 
-   .. code-block::
+    .. note::
 
-      pip install arbitragelab
+        If you are using on Apple Silicon, and Python 3.8 or 3.9, first install the ``cvxpy``
+        dependency before installing ArbitrageLab, as follows:
+
+        .. code-block::
+
+            conda install -c conda-forge cvxpy
+
+
+    .. code-block::
+
+        pip install arbitragelab
 
 #. You are now ready to use ArbitrageLab.
 
