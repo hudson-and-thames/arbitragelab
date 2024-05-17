@@ -16,3 +16,4 @@ coverage.xml
 */.ipynb_checkpoints/*
 arbitragelab.egg-info/*
 .eggs
+/poetry.lock
