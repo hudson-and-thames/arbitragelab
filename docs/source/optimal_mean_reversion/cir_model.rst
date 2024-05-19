@@ -374,7 +374,7 @@ The following research notebook can be used to better understand the concepts of
 
 * `Trading Under the Cox-Ingersoll-Ross Model`_
 
-.. _`Trading Under the Cox-Ingersoll-Ross Model`: https://hudsonthames.org/notebooks/arblab/cir_model.html
+.. _`Trading Under the Cox-Ingersoll-Ross Model`: https://github.com/hudson-and-thames/arbitrage_research/blob/master/Optimal%20Mean%20Reversion/cir_model.ipynb
 
 .. raw:: html
 

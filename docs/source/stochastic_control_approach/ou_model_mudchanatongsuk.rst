@@ -226,7 +226,7 @@ The following research notebook can be used to better understand the approach de
 
 * `Optimal Pairs Trading A Stochastic Control Approach`_
 
-.. _`Optimal Pairs Trading A Stochastic Control Approach`: https://hudsonthames.org/notebooks/arblab/OU_Model_Mudchanatongsuk.html
+.. _`Optimal Pairs Trading A Stochastic Control Approach`: https://github.com/hudson-and-thames/arbitrage_research/blob/master/Stochastic%20Control%20Approach/OU_Model_Mudchanatongsuk.ipynb
 
 .. raw:: html
 

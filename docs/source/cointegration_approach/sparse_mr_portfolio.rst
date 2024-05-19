@@ -716,7 +716,7 @@ portfolio selection module.
 
 * `Sparse Mean-reverting Portfolio Selection`_
 
-.. _`Sparse Mean-reverting Portfolio Selection`: https://hudsonthames.org/notebooks/arblab/sparse_mean-reverting_portfolio_selection.html
+.. _`Sparse Mean-reverting Portfolio Selection`: https://github.com/hudson-and-thames/arbitrage_research/blob/master/Cointegration%20Approach/sparse_mean-reverting_portfolio_selection.ipynb
 
 .. raw:: html
 

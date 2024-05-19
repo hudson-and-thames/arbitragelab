@@ -124,7 +124,7 @@ The following research notebook can be used to better understand trading strateg
 
 * `Mean Reversion`_
 
-.. _`Mean Reversion`: https://hudsonthames.org/notebooks/arblab/mean_reversion.html
+.. _`Mean Reversion`: https://github.com/hudson-and-thames/arbitrage_research/blob/master/Cointegration%20Approach/mean_reversion.ipynb
 
 .. raw:: html
 

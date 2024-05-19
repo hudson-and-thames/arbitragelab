@@ -366,7 +366,7 @@ The following research notebook can be used to better understand the partner sel
 
 * `Vine Copula Partner Selection Approaches`_
 
-.. _`Vine Copula Partner Selection Approaches`: https://hudsonthames.org/notebooks/arblab/Vine_copula_partner_selection.html
+.. _`Vine Copula Partner Selection Approaches`: https://github.com/hudson-and-thames/arbitrage_research/blob/master/Copula%20Approach/vine_copula_partner_selection.ipynb
 
 .. raw:: html
 

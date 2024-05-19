@@ -348,7 +348,7 @@ The following research notebook can be used to better understand the basic copul
 
 * `Basic Copula Strategy`_
 
-.. _`Basic Copula Strategy`: https://hudsonthames.org/notebooks/arblab/Copula_Strategy_Basic.html
+.. _`Basic Copula Strategy`: https://github.com/hudson-and-thames/arbitrage_research/blob/master/Copula%20Approach/Copula_Strategy_Basic.ipynb
 
 .. raw:: html
 

@@ -337,7 +337,7 @@ The following research notebook can be used to better understand the copula stra
 
 * `Mispricing Index Copula Strategy`_
 
-.. _`Mispricing Index Copula Strategy`: https://hudsonthames.org/notebooks/arblab/Copula_Strategy_Mispricing_Index.html
+.. _`Mispricing Index Copula Strategy`: https://github.com/hudson-and-thames/arbitrage_research/blob/master/Copula%20Approach/Copula_Strategy_Mispricing_Index.ipynb
 
 .. raw:: html
 
