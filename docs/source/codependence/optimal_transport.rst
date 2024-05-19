@@ -255,7 +255,7 @@ The following research notebook can be used to better understand the optimal cop
 
 * `Optimal Transport`_
 
-.. _`Optimal Transport`: https://hudsonthames.org/notebooks/arblab/optimal_transport.html
+.. _`Optimal Transport`: https://github.com/hudson-and-thames/arbitrage_research/blob/master/Codependence%20Module/Optimal%20Transport/optimal_transport.ipynb
 
 .. raw:: html
 

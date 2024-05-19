@@ -313,7 +313,7 @@ The following research notebook can be used to better understand the distance ap
 
 * `Basic Distance Approach`_
 
-.. _`Basic Distance Approach`: https://hudsonthames.org/notebooks/arblab/basic_distance_approach.html
+.. _`Basic Distance Approach`: https://github.com/hudson-and-thames/arbitrage_research/blob/master/Distance%20Approach/basic_distance_approach.ipynb
 
 .. raw:: html
 
@@ -321,7 +321,7 @@ The following research notebook can be used to better understand the distance ap
 
 * `Basic Distance Approach Comparison`_
 
-.. _`Basic Distance Approach Comparison`: https://hudsonthames.org/notebooks/arblab/basic_distance_approach_comparison.html
+.. _`Basic Distance Approach Comparison`: https://github.com/hudson-and-thames/arbitrage_research/blob/master/Distance%20Approach/basic_distance_approach_comparsion.ipynb
 
 .. raw:: html
 

@@ -254,7 +254,7 @@ The following research notebook can be used to better understand the Pairs Selec
 
 * `ML based Pairs Selection`_
 
-.. _`ML based Pairs Selection`: https://hudsonthames.org/notebooks/arblab/ml_based_pairs_selection.html
+.. _`ML based Pairs Selection`: https://github.com/hudson-and-thames/arbitrage_research/blob/master/ML%20Approach/ml_based_pairs_selection.ipynb
 
 .. raw:: html
 

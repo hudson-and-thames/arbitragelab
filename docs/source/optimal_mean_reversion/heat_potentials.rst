@@ -230,7 +230,7 @@ The following research notebook can be used to better understand the concepts of
 
 * `Heat Potentials`_
 
-.. _`Heat Potentials`: https://hudsonthames.org/notebooks/arblab/heat_potentials.html
+.. _`Heat Potentials`: https://github.com/hudson-and-thames/arbitrage_research/blob/master/Optimal%20Mean%20Reversion/heat_potentials.ipynb
 
 .. raw:: html
 

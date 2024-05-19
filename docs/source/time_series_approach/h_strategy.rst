@@ -375,7 +375,7 @@ The following research notebook can be used to better understand the method desc
 
 * `H-Strategy`_
 
-.. _`H-Strategy`: https://hudsonthames.org/notebooks/arblab/H_strategy.html
+.. _`H-Strategy`: https://github.com/hudson-and-thames/arbitrage_research/blob/master/Time%20Series%20Approach/H_strategy.ipynb
 
 .. raw:: html
 

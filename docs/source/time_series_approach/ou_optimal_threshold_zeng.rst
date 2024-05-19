@@ -340,7 +340,7 @@ The following research notebook can be used to better understand the method desc
 
 * `OU Model Optimal Trading Thresholds Zeng`_
 
-.. _`OU Model Optimal Trading Thresholds Zeng`: https://hudsonthames.org/notebooks/arblab/ou_model_optimal_threshold_Zeng.html
+.. _`OU Model Optimal Trading Thresholds Zeng`: https://github.com/hudson-and-thames/arbitrage_research/blob/master/Time%20Series%20Approach/ou_model_optimal_threshold_Zeng.ipynb
 
 .. raw:: html
 
