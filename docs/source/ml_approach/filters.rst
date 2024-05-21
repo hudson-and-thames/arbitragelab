@@ -77,28 +77,30 @@ Implementation
 Example
 *******
 
-.. code-block::
+.. doctest::
 
-    # Importing packages
-    import pandas as pd
-    from arbitragelab.ml_approach.filters import ThresholdFilter
+    >>> import pandas as pd
+    >>> from arbitragelab.ml_approach.filters import ThresholdFilter
 
-    # Getting the dataframe with time series of asset returns
-    data = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])
+    >>> # Getting the dataframe with time series of asset returns
+    >>> url = "https://raw.githubusercontent.com/hudson-and-thames/example-data/main/arbitrage_lab_data/CL%3DF_NG%3DF_data.csv"
+    >>> data = pd.read_csv(url, index_col=0, parse_dates = [0])
+    >>> data['spread'] = (data['CL=F'] - data['NG=F'])
 
-    # Calculating spread returns and std dev.
-    spread_series = data['spread']
-    spread_diff_series = spread_series.diff()
-    spread_diff_std = spread_diff_series.std()
+    >>> # Calculating spread returns and std dev.
+    >>> spread_series = data['spread']
+    >>> spread_diff_series = spread_series.diff()
+    >>> spread_diff_std = spread_diff_series.std()
     
-    # Initializing ThresholdFilter with 2 std dev band for buying and selling triggers.
-    thres_filter = ThresholdFilter(buy_threshold=-spread_diff_std*2,
-                                   sell_threshold=spread_diff_std*2)
+    >>> # Initializing ThresholdFilter with 2 std dev band for buying and selling triggers.
+    >>> thres_filter = ThresholdFilter(buy_threshold=-spread_diff_std*2,
+    ...                            sell_threshold=spread_diff_std*2)
 
-    std_events = thres_filter.fit_transform(spread_diff_series)
+    >>> std_events = thres_filter.fit_transform(spread_diff_series)
 
-    # Plotting results
-    thres_filter.plot()
+    >>> # Plotting results
+    >>> thres_filter.plot()# doctest: +ELLIPSIS
+    (...)
 
 Asymmetric Threshold Filter
 ###########################
@@ -117,35 +119,37 @@ being coefficients estimated from the TAR model.
 Example
 *******
 
-.. code-block::
+.. doctest::
 
-    # Importing packages
-    import pandas as pd
-    from arbitragelab.ml_approach.filters import ThresholdFilter
+    >>> import pandas as pd
+    >>> from arbitragelab.ml_approach.filters import ThresholdFilter
 
-    # Getting the dataframe with time series of asset returns
-    data = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])
+    >>> # Getting the dataframe with time series of asset returns
+    >>> url = "https://raw.githubusercontent.com/hudson-and-thames/example-data/main/arbitrage_lab_data/CL%3DF_NG%3DF_data.csv"
+    >>> data = pd.read_csv(url, index_col=0, parse_dates = [0])
+    >>> data['spread'] = (data['CL=F'] - data['NG=F'])
 
-    # Calculate spread returns and std dev.
-    spread_series = data['spread']
-    spread_diff_series = spread_series.diff()
-    spread_diff_std = spread_diff_series.std()
+    >>> # Calculate spread returns and std dev.
+    >>> spread_series = data['spread']
+    >>> spread_diff_series = spread_series.diff()
+    >>> spread_diff_std = spread_diff_series.std()
     
-    # Initialize the TAR asymmetry coefficients.
-    p_1 = -0.012957
-    p_2 = -0.038508
+    >>> # Initialize the TAR asymmetry coefficients.
+    >>> p_1 = -0.012957
+    >>> p_2 = -0.038508
 
-    buy_thresh = abs(p_1) * spread_diff_std*2
-    sell_thresh = - abs(p_2) * spread_diff_std*2
+    >>> buy_thresh = abs(p_1) * spread_diff_std*2
+    >>> sell_thresh = - abs(p_2) * spread_diff_std*2
     
-    # Initialize ThresholdFilter with asymmetric buying and selling triggers.
-    asym_thres_filter = ThresholdFilter(buy_threshold=buy_thresh,
-                                        sell_threshold=sell_thresh)
+    >>> # Initialize ThresholdFilter with asymmetric buying and selling triggers.
+    >>> asym_thres_filter = ThresholdFilter(buy_threshold=buy_thresh,
+    ...                                  sell_threshold=sell_thresh)
 
-    std_events = asym_thres_filter.fit_transform(spread_diff_series)
+    >>> std_events = asym_thres_filter.fit_transform(spread_diff_series)
 
-    # Plotting results
-    asym_thres_filter.plot()
+    >>> # Plotting results
+    >>> asym_thres_filter.plot()# doctest: +ELLIPSIS
+    (...)
 
 Correlation Filter
 ##################
@@ -277,22 +281,24 @@ Implementation
 Example
 *******
 
-.. code-block::
+.. doctest::
 
-    # Importing packages
-    import pandas as pd
-    from arbitragelab.ml_approach.filters import VolatilityFilter
+    >>> import pandas as pd
+    >>> from arbitragelab.ml_approach.filters import VolatilityFilter
 
-    # Getting the dataframe with time series of asset returns
-    data = pd.read_csv('X_FILE_PATH.csv', index_col=0, parse_dates = [0])
-    spread_series = data['spread']
+    >>> # Getting the dataframe with time series of asset returns
+    >>> url = "https://raw.githubusercontent.com/hudson-and-thames/example-data/main/arbitrage_lab_data/CL%3DF_NG%3DF_data.csv"
+    >>> data = pd.read_csv(url, index_col=0, parse_dates = [0])
+    >>> data['spread'] = (data['CL=F'] - data['NG=F'])
+    >>> spread_series = data['spread']
 
-    # Initialize VolatilityFilter a 30 period lookback parameter.
-    vol_filter = VolatilityFilter(lookback=30)
-    vol_events = vol_filter.fit_transform(spread_series)
+    >>> # Initialize VolatilityFilter a 30 period lookback parameter.
+    >>> vol_filter = VolatilityFilter(lookback=30)
+    >>> vol_events = vol_filter.fit_transform(spread_series)
 
-    # Plotting results
-    vol_filter.plot()
+    >>> # Plotting results
+    >>> vol_filter.plot() # doctest: +ELLIPSIS
+    (...)
 
 Presentation Slides
 ###################
